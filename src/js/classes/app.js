@@ -137,7 +137,7 @@ export var App = function(name, version) {
       var MarqueeOffset = [0, 0];
       var midClickHeld = false;
 
-      $('.nodes').on('pointerdown', function(e) {
+      $('.nodes').on('mousedown', function(e) {
         if (e.button == 1) {
           midClickHeld = true;
         }
