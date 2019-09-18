@@ -700,6 +700,9 @@ a:hover {
   background-position: -64px 0px;
 }
 
+.styled-dropdown {
+  width: 80px;
+}
 /* --- MARQUEE --- */
 
 #marquee {
