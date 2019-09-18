@@ -31,25 +31,32 @@ This is a port to electron, made possible by Todor Imreorov. It adds a number of
 Win64 and MacOS: https://github.com/blurymind/Yarn/releases/latest
 
 # To compile and run web app on localhost from source:
-Make sure you have nodejs installed. Then from the root folder
+Make sure you have nodejs installed https://nodejs.org/en/  (LTS version recommended)
 
+Then from the root folder run:
+```
 npm install
 
 npm start
+```
 
 # To build web app:
+```
 npm run build
-
+```
+The app will be in a /dist sub folder
 
 # To compile and run electron app:
+```
 cd electron
 
 npm install
 
 npm start
-
+```
 
 # To build an electron yarn executable yourself:
+```
 cd electron
 
 npm run build-windows
@@ -57,7 +64,7 @@ npm run build-windows
 or
 
 npm run build-linux
-
+```
 
 # Examples
 
