@@ -1,6 +1,6 @@
 @font-face {
   font-family: yarnFont;
-  src: url("../public/droid-sans-mono.ttf");
+  src: url('../public/droid-sans-mono.ttf');
 }
 /* --- ROOT CSS --- */
 
@@ -50,7 +50,7 @@ select,
   outline: none;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 20px;
   height: 20px;
   margin: 0;
@@ -118,14 +118,14 @@ a:hover {
 }
 
 .app-version::before {
-  content: "Version ";
+  content: 'Version ';
 }
 
 .icon {
   border-radius: 4px;
   width: 32px;
   height: 32px;
-  background: #eee url("../public/images/icons.png") no-repeat;
+  background: #eee url('../public/images/icons.png') no-repeat;
   background-blend-mode: difference;
   overflow: hidden;
   opacity: 0.5;
@@ -142,19 +142,19 @@ a:hover {
 
 .app-menu {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 10px;
+  right: 10px;
   z-index: 100;
 }
 
 .app-menu .menu {
-  width: 140px;
+  width: 100px;
   float: left;
   display: inline;
   margin-left: 10px;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  font-size: 0.9em;
+  font-size: 0.8em;
   color: #666;
   text-transform: uppercase;
   background: #fff;
@@ -169,8 +169,8 @@ a:hover {
   box-sizing: border-box;
   padding: 15px;
   width: 100%;
-  height: 50px;
-  line-height: 20px;
+  height: 40px;
+  line-height: 15px;
   font-weight: bold;
   float: left;
   transition: background 0.25s;
@@ -226,19 +226,19 @@ a:hover {
 
 .app-search {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 5px;
+  left: 5px;
   z-index: 100;
 
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 10px 20px 10px 10px;
+  padding: 5px 10px 5px 5px;
 }
 
 .app-search input {
   padding: 4px 8px 4px 8px;
-  font-family: "Lucida Console", Monaco, monospace;
+  font-family: 'Lucida Console', Monaco, monospace;
   margin-left: 10px;
   margin-right: 4px;
 }
@@ -246,7 +246,7 @@ a:hover {
   margin-left: 0px;
   margin-right: 0px;
 }
-.app-search input[type="checkbox"] {
+.app-search input[type='checkbox'] {
   cursor: pointer;
 }
 
@@ -258,13 +258,13 @@ a:hover {
 
 .app-zoom {
   position: absolute;
-  bottom: 33px;
-  right: 20px;
+  bottom: 5px;
+  right: 5px;
 
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 10px 10px 10px 10px;
+  padding: 5px 5px 5px 5px;
   z-index: 99;
   opacity: 0.2;
 }
@@ -273,10 +273,10 @@ a:hover {
 }
 
 .app-zoom span {
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   margin: 8px;
-  background: #fff url("../public/images/zooms.png") no-repeat;
+  background: #fff url('../public/images/zooms.png') no-repeat;
   float: left;
   display: inline;
   opacity: 0.15;
@@ -301,13 +301,12 @@ a:hover {
 
 .app-sort {
   position: absolute;
-  top: 83px;
-  left: 20px;
-
+  bottom: 60px;
+  right: 5px;
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 10px 10px 10px 10px;
+  padding: 5px 5px 5px 5px;
   z-index: 99;
   opacity: 0.2;
 }
@@ -316,10 +315,10 @@ a:hover {
 }
 
 .app-sort span {
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   margin: 8px;
-  background: #fff url("../public/images/sort.png") no-repeat;
+  background: #fff url('../public/images/sort.png') no-repeat;
   float: left;
   display: inline;
   opacity: 0.25;
@@ -529,7 +528,7 @@ a:hover {
   background-position: -64px 0px;
 }
 
-.node-editor .form input[type="text"] {
+.node-editor .form input[type='text'] {
   box-sizing: border-box;
   width: 100%;
   font-size: 1.2em;
@@ -538,7 +537,7 @@ a:hover {
   margin-bottom: 10px;
   border: none;
   border-bottom: 2px solid #eee;
-  font-family: "Lucida Console", Monaco, monospace;
+  font-family: 'Lucida Console', Monaco, monospace;
 }
 
 .node-editor .form .bbcode-toolbar {
@@ -721,7 +720,7 @@ a:hover {
   .app-menu {
     position: relative;
     float: right;
-    margin-top: 20px;
+    margin-top: 5px;
   }
 }
 
@@ -758,7 +757,7 @@ a:hover {
   border: solid;
   border-color: #444 transparent;
   border-width: 12px 6px 0 6px;
-  content: "";
+  content: '';
   left: 45%;
   bottom: 30px;
   position: absolute;
