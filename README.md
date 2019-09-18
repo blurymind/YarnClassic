@@ -1,17 +1,12 @@
-# Live APP (Use it in the browser)
-https://blurymind.github.io/YarnEditor/dist/
-
-
 # Yarn
 
-Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
+Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 
-This is a port to electron, made possible by Todor Imreorov. It adds a number of new features, such as:
-- Helper menu to create node links - with a search filter
-- Support for multiple app instances and file drag and drop
-- Automatic creation of nodes with correct name and path when writing any new story threads that have no node created yet
-- Ability to copy/paste nodes
--  Ability to run as a web app with propper file open and save functionality
+# Live APP (Use it in the browser)
+https://blurymind.github.io/YarnEditor/dist/
+<a href="https://blurymind.github.io/YarnEditor/dist/
+" target="_blank"><img src="https://raw.githubusercontent.com/blurymind/YarnEditor/master/doc/yarnWebApp.png" 
+alt="Yarn web app"  height="480" border="10" /></a>
 
 # BBcode styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
