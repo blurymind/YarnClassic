@@ -515,10 +515,11 @@ a:hover {
   top: 5%;
   width: 90%;
   height: 90%;
-  padding: 20px 20px 40px 20px;
+  padding: 5px 5px 10px 5px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
+  overflow: hidden;
 }
 
 .node-editor .form .close {
@@ -531,10 +532,10 @@ a:hover {
 .node-editor .form input[type='text'] {
   box-sizing: border-box;
   width: 100%;
-  font-size: 1.2em;
+  font-size: 1em;
   color: #666;
-  padding: 10px 0px 10px 0px;
-  margin-bottom: 10px;
+  padding: 5px 0px 5px 10px;
+  margin-top: 0.3em;
   border: none;
   border-bottom: 2px solid #eee;
   font-family: 'Lucida Console', Monaco, monospace;
