@@ -3,7 +3,7 @@
 Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 
 # Live APP (Use it in the browser)
-<a href="https://blurymind.github.io/YarnEditor/dist/" target="_blank">https://blurymind.github.io/YarnEditor/dist/</a>
+<a href="https://blurymind.github.io/YarnEditor/dist/">https://blurymind.github.io/YarnEditor/dist/</a>
 <br/>
 <a href="https://blurymind.github.io/YarnEditor/dist/
 " target="_blank"><img src="https://raw.githubusercontent.com/blurymind/YarnEditor/master/doc/yarnWebApp.png" 
