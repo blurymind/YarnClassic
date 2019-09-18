@@ -1,28 +1,28 @@
-import { data } from "./data";
-import { Utils } from "./utils";
+import { data } from './data';
+import { Utils } from './utils';
 
 var globalNodeIndex = 0;
 const NodeExpandWidth = 300;
 const NodeExpandHeight = 150;
 const ClipNodeTextLength = 1024;
-const bbcode = require("bbcode");
+const bbcode = require('bbcode');
 
 export var Node = function() {
   var self = this;
   this.titleColorValues = [
-    "#eee",
-    "#6EA5E0",
-    "#9EDE74",
-    "#FFE374",
-    "#F7A666",
-    "#C47862",
-    "#97E1E9"
+    '#eee',
+    '#6EA5E0',
+    '#9EDE74',
+    '#FFE374',
+    '#F7A666',
+    '#C47862',
+    '#97E1E9'
   ];
   // primary values
   this.index = ko.observable(globalNodeIndex++);
-  this.title = ko.observable("Node" + this.index());
-  this.tags = ko.observable("");
-  this.body = ko.observable("Empty Text");
+  this.title = ko.observable('Node' + this.index());
+  this.tags = ko.observable('');
+  this.body = ko.observable('Empty Text');
   //this.x = ko.observable(128);
   //this.y = ko.observable(128);
   this.active = ko.observable(true);
@@ -38,11 +38,11 @@ export var Node = function() {
 
   // clipped values for display
   this.clippedTags = ko.computed(function() {
-    var tags = this.tags().split(" ");
-    var output = "";
+    var tags = this.tags().split(' ');
+    var output = '';
     if (this.tags().length > 0) {
       for (var i = 0; i < tags.length; i++)
-        output += "<span>" + tags[i] + "</span>";
+        output += '<span>' + tags[i] + '</span>';
     }
     return output;
   }, this);
@@ -50,31 +50,31 @@ export var Node = function() {
   this.textToHtml = function(text, showRowNumbers = false) {
     var rowCounter = 1;
     var result = showRowNumbers
-      ? '<font color="pink">' + rowCounter + ".   </font>" + text
+      ? '<font color="pink">' + rowCounter + '.   </font>' + text
       : text;
 
     /// Links in preview mode
     result = result.replace(/\[\[[^\[]+\]\]/gi, function(goto) {
       const extractedGoto = goto.match(/\[\[(.*)\]\]/i);
       if (extractedGoto.length > 1) {
-        return '<font color="tomato">(go:' + extractedGoto[1] + ")</font>";
+        return '<font color="tomato">(go:' + extractedGoto[1] + ')</font>';
       }
     });
 
     /// Commands in preview mode
     result = result.replace(/<</gi, "<font color='violet'>(run:");
-    result = result.replace(/>>/gi, ")</font>");
+    result = result.replace(/>>/gi, ')</font>');
 
     /// bbcode color tags in preview mode
     result = result.replace(/\[color=#[A-Za-z0-9]+\]/gi, function(colorCode) {
       const extractedCol = colorCode.match(/\[color=#([A-Za-z0-9]+)\]/i);
       if (extractedCol && extractedCol.length > 1) {
         return (
-          "[color=#" +
+          '[color=#' +
           extractedCol[1] +
-          "]<font color=#" +
+          ']<font color=#' +
           extractedCol[1] +
-          ">&#9751</font>"
+          '>&#9751</font>'
         );
       }
     });
@@ -103,10 +103,10 @@ export var Node = function() {
 
     /// do this last, as we need the newline characters in previous regex tests
     result = result.replace(/[\n\r]/g, function(row) {
-      var rowAppend = "<br/>";
+      var rowAppend = '<br/>';
       rowCounter += 1;
       if (showRowNumbers) {
-        rowAppend += '<font color="pink">' + rowCounter + ".   </font>";
+        rowAppend += '<font color="pink">' + rowCounter + '.   </font>';
       }
       return rowAppend;
     });
@@ -150,16 +150,16 @@ export var Node = function() {
     var updateArrowsInterval = setInterval(app.updateArrowsThrottled, 16);
 
     $(self.element)
-      .css({ opacity: 0, scale: 0.8, y: "-=80px", rotate: "45deg" })
+      .css({ opacity: 0, scale: 0.8, y: '-=80px', rotate: '45deg' })
       .transition(
         {
           opacity: 1,
           scale: 1,
-          y: "+=80px",
-          rotate: "0deg"
+          y: '+=80px',
+          rotate: '0deg'
         },
         250,
-        "easeInQuad",
+        'easeInQuad',
         function() {
           clearInterval(updateArrowsInterval);
           app.updateArrowsThrottled();
@@ -167,11 +167,11 @@ export var Node = function() {
       );
     self.drag();
 
-    $(self.element).on("dblclick", function() {
+    $(self.element).on('dblclick touchstart', function() {
       if (self.canDoubleClick) app.editNode(self);
     });
 
-    $(self.element).on("click", function(e) {
+    $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
         if (self.selected) app.removeNodeSelection(self);
         else app.addNodeSelected(self);
@@ -182,8 +182,8 @@ export var Node = function() {
   this.setSelected = function(select) {
     self.selected = select;
 
-    if (self.selected) $(self.element).css({ border: "1px solid #49eff1" });
-    else $(self.element).css({ border: "none" });
+    if (self.selected) $(self.element).css({ border: '1px solid #49eff1' });
+    else $(self.element).css({ border: 'none' });
   };
 
   this.toggleSelected = function() {
@@ -245,9 +245,9 @@ export var Node = function() {
 
   this.remove = function() {
     $(self.element).transition(
-      { opacity: 0, scale: 0.8, y: "-=80px", rotate: "-45deg" },
+      { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
       250,
-      "easeInQuad",
+      'easeInQuad',
       function() {
         app.removeNode(self);
         app.updateArrowsThrottled();
@@ -263,7 +263,7 @@ export var Node = function() {
     var offset = [0, 0];
     var moved = false;
 
-    $(document.body).on("mousemove", function(e) {
+    $(document.body).on('mousemove', function(e) {
       if (dragging) {
         var parent = $(self.element).parent();
         var newX = e.pageX / self.getScale() - offset[0];
@@ -297,7 +297,7 @@ export var Node = function() {
       }
     });
 
-    $(self.element).on("mousedown", function(e) {
+    $(self.element).on('mousedown', function(e) {
       if (!dragging && self.active()) {
         var parent = $(self.element).parent();
 
@@ -312,18 +312,18 @@ export var Node = function() {
       }
     });
 
-    $(self.element).on("mousedown", function(e) {
+    $(self.element).on('mousedown', function(e) {
       e.stopPropagation();
     });
 
-    $(self.element).on("mouseup", function(e) {
+    $(self.element).on('mouseup', function(e) {
       // alert("" + e.target.nodeName);
       if (!moved) app.mouseUpOnNodeNotMoved();
 
       moved = false;
     });
 
-    $(document.body).on("mouseup", function(e) {
+    $(document.body).on('mouseup', function(e) {
       dragging = false;
       groupDragging = false;
       moved = false;
@@ -366,8 +366,8 @@ export var Node = function() {
       for (var i = links.length - 1; i >= 0; i--) {
         links[i] = links[i].substr(2, links[i].length - 4).trim(); //.toLowerCase();
 
-        if (links[i].indexOf("|") >= 0) {
-          links[i] = links[i].split("|")[1];
+        if (links[i].indexOf('|') >= 0) {
+          links[i] = links[i].split('|')[1];
         }
 
         if (exists[links[i]] != undefined) {
@@ -403,7 +403,7 @@ export var Node = function() {
   };
 
   this.getScale = function() {
-    if (app && typeof app.cachedScale === "number") {
+    if (app && typeof app.cachedScale === 'number') {
       return app.cachedScale;
     } else {
       return 1;
@@ -430,7 +430,7 @@ ko.bindingHandlers.nodeBind = {
     viewModel,
     bindingContext
   ) {
-    $(element).on("mousedown", function() {
+    $(element).on('mousedown', function() {
       Utils.pushToTop($(element));
     });
   }
