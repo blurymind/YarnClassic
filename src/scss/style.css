@@ -529,15 +529,28 @@ a:hover {
   background-position: -64px 0px;
 }
 
+.node-editor .form input[type='text']:focus {
+  font-size: 1em;
+  padding: 5px 0px 5px 10px;
+  margin-top: 0.3em;
+}
+
+@media only screen and (max-width: 500px) {
+  .hide-on-phone {
+    display: none;
+  }
+}
+
 .node-editor .form input[type='text'] {
   box-sizing: border-box;
   width: 100%;
-  font-size: 1em;
+  font-size: 0.9em;
   color: #666;
-  padding: 5px 0px 5px 10px;
-  margin-top: 0.3em;
+  padding: 2px 0px 2px 5px;
+  margin-top: 0.1em;
   border: none;
-  border-bottom: 2px solid #eee;
+  border-bottom: 1px solid #eee;
+
   font-family: 'Lucida Console', Monaco, monospace;
 }
 
