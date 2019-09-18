@@ -35,7 +35,6 @@ build/Release
 node_modules
 
 # Dist
-dist
 electron/dist
 electron/app
 
@@ -93,5 +92,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-dist/
