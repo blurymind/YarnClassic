@@ -37,6 +37,7 @@ node_modules
 # Dist
 electron/dist
 electron/app
+yarn-editor
 
 # Optional npm cache directory
 .npm
