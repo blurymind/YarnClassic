@@ -4,6 +4,7 @@ Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB
 
 # Live APP (Use it in the browser)
 https://blurymind.github.io/YarnEditor/dist/
+
 <a href="https://blurymind.github.io/YarnEditor/dist/
 " target="_blank"><img src="https://raw.githubusercontent.com/blurymind/YarnEditor/master/doc/yarnWebApp.png" 
 alt="Yarn web app"  height="480" border="10" /></a>
