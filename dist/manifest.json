@@ -8,7 +8,7 @@
       "sizes": "32x32"
     }
   ],
-  "start_url": "/?utm_source=a2hs",
+  "start_url": "https://blurymind.github.io/YarnEditor/dist/",
   "background_color": "#3367D6",
   "display": "fullscreen",
   "scope": "/",
