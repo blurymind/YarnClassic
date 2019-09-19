@@ -3,12 +3,11 @@
   "name": "Yarn Story Editor",
   "icons": [
     {
-      "src": "public/icon.ico",
+      "src": "./public/icon.ico",
       "type": "image/ico",
       "sizes": "32x32"
     }
   ],
-  "start_url": "blurymind.github.io/YarnEditor/dist/",
   "background_color": "#3367D6",
   "display": "fullscreen",
   "scope": "/",
