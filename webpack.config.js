@@ -96,6 +96,10 @@ const config = {
     }),
     new CopyWebpackPlugin([
       {
+        from: './src/manifest.json',
+        to: ''
+      },
+      {
         from: './src/public',
         to: 'public'
       }

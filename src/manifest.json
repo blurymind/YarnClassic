@@ -1,0 +1,16 @@
+{
+  "short_name": "Yarn",
+  "name": "Yarn Story Editor",
+  "icons": [
+    {
+      "src": "public/icon.ico",
+      "type": "image/ico",
+      "sizes": "32x32"
+    }
+  ],
+  "start_url": "/?utm_source=a2hs",
+  "background_color": "#3367D6",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#3367D6"
+}
