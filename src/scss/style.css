@@ -646,41 +646,6 @@ a:hover {
   position: absolute;
 }
 
-@media only screen and (max-width: 500px) {
-  .hide-when-narrow {
-    display: none;
-  }
-  /* portrait mode css */
-  .app-menu {
-    top: 10px;
-    right: 10px;
-    margin-top: 5px;
-  }
-  .app-menu .menu {
-    width: 100px;
-    font-size: 0.8em;
-  }
-  .app-menu .title {
-    height: 40px;
-    line-height: 15px;
-  }
-  .app-search {
-    top: 5px;
-    left: 5px;
-    padding: 5px 10px 5px 5px;
-  }
-  .node-editor .form {
-    top: 8%;
-    padding: 5px 5px 10px 5px;
-    border-radius: 4px;
-  }
-  .node-editor .form input[type='text'] {
-    font-size: 0.9em;
-    padding: 2px 0px 2px 5px;
-    margin-top: 0.1em;
-    border-bottom: 1px solid #eee;
-  }
-}
 /* --- EDITOR HIGHLIGHTING --- */
 
 .editor p,
@@ -765,6 +730,42 @@ a:hover {
     position: relative;
     float: right;
     margin-top: 20px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .hide-when-narrow {
+    display: none;
+  }
+  /* portrait mode css */
+  .app-menu {
+    top: 10px;
+    right: 30px;
+    margin-top: 0px;
+  }
+  .app-menu .menu {
+    width: 100px;
+    font-size: 0.8em;
+  }
+  .app-menu .title {
+    height: 40px;
+    line-height: 15px;
+  }
+  .app-search {
+    top: 5px;
+    left: 10px;
+    padding: 5px 10px 5px 5px;
+  }
+  .node-editor .form {
+    top: 8%;
+    padding: 5px 5px 10px 5px;
+    border-radius: 4px;
+  }
+  .node-editor .form input[type='text'] {
+    font-size: 0.9em;
+    padding: 2px 0px 2px 5px;
+    margin-top: 0.1em;
+    border-bottom: 1px solid #eee;
   }
 }
 
