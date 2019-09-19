@@ -21,18 +21,20 @@
 			<div class="app-search">
 				<input id="nodeSearchInput" type="text" class="search-field"/>
 				
-				<div class="search-title search-item">
-					<input type="checkbox" checked="checked" id="search-title" />
-					<label for="search-title">Title</label>
-				</div>
-				<div class="search-body search-item">
-					<input type="checkbox" id="search-body" />
-					<label for="search-body">Body</label>
-				</div>
-				<div class="search-tags search-item">
-					<input type="checkbox" id="search-tags" />
-					<label for="search-tags">Tags</label>
-				</div>
+				<span class="hide-when-narrow">
+					<div class="search-title search-item">
+						<input type="checkbox" checked="checked" id="search-title" />
+						<label for="search-title">Title</label>
+					</div>
+					<div class="search-body search-item">
+						<input type="checkbox" id="search-body" />
+						<label for="search-body">Body</label>
+					</div>
+					<div class="search-tags search-item">
+						<input type="checkbox" id="search-tags" />
+						<label for="search-tags">Tags</label>
+					</div>
+				</span>
 			</div>
 
 			<!-- zoom controls -->
@@ -152,7 +154,7 @@
 							<input type="checkbox" id="toglAutocomplete"></input>
 							<label for="toglAutocomplete" title="Auto Close tags" style="color:#292929">🔮</label>
 						</span>
-						<span class="styled-checkbox hide-on-phone">
+						<span class="styled-checkbox hide-when-narrow">
 							<input type="checkbox" id="toglAutocompleteWords" onclick="app.toggleWordCompletion()"></input>
 							<label for="toglAutocompleteWords" title="auto-completion">💬</label>
 						</span>
@@ -171,7 +173,7 @@
 								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
 							</span>
 						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
-						<span class="styled-checkbox hide-on-phone">
+						<span class="styled-checkbox hide-when-narrow">
 							<input class="styled-checkbox" type="checkbox" id="toglTranscribing" onclick="app.toglTranscribing()"></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>

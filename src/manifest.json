@@ -3,8 +3,7 @@
   "name": "Yarn Story Editor",
   "icons": [
     {
-      "src": "./public/icon.ico",
-      "type": "image/ico",
+      "src": "icon.ico",
       "sizes": "32x32"
     }
   ],

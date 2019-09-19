@@ -142,19 +142,19 @@ a:hover {
 
 .app-menu {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   z-index: 100;
 }
 
 .app-menu .menu {
-  width: 100px;
+  width: 140px;
   float: left;
   display: inline;
   margin-left: 10px;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  font-size: 0.8em;
+  font-size: 0.9em;
   color: #666;
   text-transform: uppercase;
   background: #fff;
@@ -169,8 +169,8 @@ a:hover {
   box-sizing: border-box;
   padding: 15px;
   width: 100%;
-  height: 40px;
-  line-height: 15px;
+  height: 50px;
+  line-height: 20px;
   font-weight: bold;
   float: left;
   transition: background 0.25s;
@@ -226,14 +226,13 @@ a:hover {
 
 .app-search {
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 20px;
+  left: 20px;
   z-index: 100;
-
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 5px 10px 5px 5px;
+  padding: 10px 20px 10px 10px;
 }
 
 .app-search input {
@@ -515,7 +514,7 @@ a:hover {
   top: 5%;
   width: 90%;
   height: 90%;
-  padding: 5px 5px 10px 5px;
+  padding: 20px 20px 40px 20px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
@@ -535,22 +534,15 @@ a:hover {
   margin-top: 0.3em;
 }
 
-@media only screen and (max-width: 500px) {
-  .hide-on-phone {
-    display: none;
-  }
-}
-
 .node-editor .form input[type='text'] {
   box-sizing: border-box;
   width: 100%;
-  font-size: 0.9em;
+  font-size: 1.2em;
   color: #666;
-  padding: 2px 0px 2px 5px;
-  margin-top: 0.1em;
+  padding: 10px 0px 10px 0px;
+  margin-bottom: 10px;
   border: none;
-  border-bottom: 1px solid #eee;
-
+  border-bottom: 2px solid #eee;
   font-family: 'Lucida Console', Monaco, monospace;
 }
 
@@ -654,6 +646,41 @@ a:hover {
   position: absolute;
 }
 
+@media only screen and (max-width: 500px) {
+  .hide-when-narrow {
+    display: none;
+  }
+  /* portrait mode css */
+  .app-menu {
+    top: 10px;
+    right: 10px;
+    margin-top: 5px;
+  }
+  .app-menu .menu {
+    width: 100px;
+    font-size: 0.8em;
+  }
+  .app-menu .title {
+    height: 40px;
+    line-height: 15px;
+  }
+  .app-search {
+    top: 5px;
+    left: 5px;
+    padding: 5px 10px 5px 5px;
+  }
+  .node-editor .form {
+    top: 7%;
+    padding: 5px 5px 10px 5px;
+    border-radius: 4px;
+  }
+  .node-editor .form input[type='text'] {
+    font-size: 0.9em;
+    padding: 2px 0px 2px 5px;
+    margin-top: 0.1em;
+    border-bottom: 1px solid #eee;
+  }
+}
 /* --- EDITOR HIGHLIGHTING --- */
 
 .editor p,
@@ -737,7 +764,7 @@ a:hover {
   .app-menu {
     position: relative;
     float: right;
-    margin-top: 5px;
+    margin-top: 20px;
   }
 }
 

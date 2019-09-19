@@ -35,6 +35,7 @@ build/Release
 node_modules
 
 # Dist
+dist
 electron/dist
 electron/app
 yarn-editor
