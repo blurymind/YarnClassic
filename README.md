@@ -32,27 +32,27 @@ Win64 and MacOS: https://github.com/blurymind/Yarn/releases/latest
 
 # To compile and run web app on localhost from source:
 Make sure you have nodejs installed. Then from the root folder
-``
+```
 npm install
 
 npm start
-``
+```
 # To build web app:
-``
+```
 npm run build
 
-``
+```
 # To compile and run electron app:
-``
+```
 cd electron
 
 npm install
 
 npm start
-``
+```
 
 # To build an electron yarn executable yourself:
-``
+```
 cd electron
 
 npm run build-windows
@@ -60,7 +60,7 @@ npm run build-windows
 or
 
 npm run build-linux
-``
+```
 
 # Examples
 
