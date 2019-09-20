@@ -767,6 +767,11 @@ a:hover {
     margin-top: 0.1em;
     border-bottom: 1px solid #eee;
   }
+
+  .context-menu-visible > .context-menu-list {
+    left: 0px !important;
+    top: 40px !important;
+  }
 }
 
 .tooltip {
