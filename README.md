@@ -3,10 +3,10 @@
 Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 
 # Live APP (Use it in the browser)
-<a href="https://blurymind.github.io/YarnEditor/dist/">https://blurymind.github.io/YarnEditor/dist/</a>
+<a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/>
-<a href="https://blurymind.github.io/YarnEditor/dist/
-" target="_blank"><img src="https://raw.githubusercontent.com/blurymind/YarnEditor/master/doc/yarnWebApp.png" 
+<a href="https://yarnspinnertool.github.io/YarnEditor/
+" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png" 
 alt="Yarn web app"  height="480" border="10" /></a>
 
 # BBcode styling in editor, Spellchecking, Autocompletion, and more!
@@ -32,24 +32,27 @@ Win64 and MacOS: https://github.com/blurymind/Yarn/releases/latest
 
 # To compile and run web app on localhost from source:
 Make sure you have nodejs installed. Then from the root folder
-
+``
 npm install
 
 npm start
-
+``
 # To build web app:
+``
 npm run build
 
-
+``
 # To compile and run electron app:
+``
 cd electron
 
 npm install
 
 npm start
-
+``
 
 # To build an electron yarn executable yourself:
+``
 cd electron
 
 npm run build-windows
@@ -57,7 +60,7 @@ npm run build-windows
 or
 
 npm run build-linux
-
+``
 
 # Examples
 
