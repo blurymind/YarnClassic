@@ -167,10 +167,14 @@ export var Node = function() {
       );
     self.drag();
 
-    $(self.element).on('dblclick touchstart', function() {
+    // OPEN NODE
+    $(self.element).on('dblclick', function() {
       if (self.canDoubleClick) app.editNode(self);
     });
-
+    Utils.addDoubleTapDetector(self.element, function(){
+      if (self.canDoubleClick) app.editNode(self);
+    });
+    
     $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
         if (self.selected) app.removeNodeSelection(self);
@@ -263,18 +267,21 @@ export var Node = function() {
     var offset = [0, 0];
     var moved = false;
 
-    $(document.body).on('mousemove', function(e) {
+    $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
         var parent = $(self.element).parent();
-        var newX = e.pageX / self.getScale() - offset[0];
-        var newY = e.pageY / self.getScale() - offset[1];
+        const pageX = app.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageX : e.pageX
+        const pageY = app.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageY : e.pageY
+
+        var newX = pageX / self.getScale() - offset[0];
+        var newY = pageY / self.getScale() - offset[1];
         var movedX = newX - self.x();
         var movedY = newY - self.y();
 
         moved = true;
         self.x(newX);
         self.y(newY);
-
+        
         if (groupDragging) {
           var nodes = [];
           if (self.selected) {
@@ -297,7 +304,7 @@ export var Node = function() {
       }
     });
 
-    $(self.element).on('mousedown', function(e) {
+    $(self.element).on('pointerdown', function(e) {
       if (!dragging && self.active()) {
         var parent = $(self.element).parent();
 
@@ -312,18 +319,17 @@ export var Node = function() {
       }
     });
 
-    $(self.element).on('mousedown', function(e) {
+    $(self.element).on('pointerdown', function(e) {
       e.stopPropagation();
     });
 
-    $(self.element).on('mouseup', function(e) {
-      // alert("" + e.target.nodeName);
+    $(self.element).on('pointerup', function(e) {
       if (!moved) app.mouseUpOnNodeNotMoved();
 
       moved = false;
     });
 
-    $(document.body).on('mouseup', function(e) {
+    $(document.body).on('pointerup', function(e) {
       dragging = false;
       groupDragging = false;
       moved = false;
@@ -430,7 +436,7 @@ ko.bindingHandlers.nodeBind = {
     viewModel,
     bindingContext
   ) {
-    $(element).on('mousedown', function() {
+    $(element).on('pointerdown', function() {
       Utils.pushToTop($(element));
     });
   }

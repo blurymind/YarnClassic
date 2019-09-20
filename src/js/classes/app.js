@@ -44,6 +44,7 @@ export var App = function(name, version) {
   this.speachInstance = null;
   this.selectedLanguageIndex = 6;
   this.language = null;
+  this.hasTouchScreen = false;
   // this.fs = fs;
 
   this.UPDATE_ARROWS_THROTTLE_MS = 25;
@@ -77,7 +78,11 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Mac') != -1) osName = 'MacOS';
     if (navigator.platform.indexOf('X11') != -1) osName = 'UNIX';
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
+    if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
+    window.addEventListener('touchstart', function() {
+     self.hasTouchScreen = true
+    });
 
     if (osName == 'Windows') self.zoomSpeed = 0.1;
 
@@ -137,7 +142,7 @@ export var App = function(name, version) {
       var MarqueeOffset = [0, 0];
       var midClickHeld = false;
 
-      $('.nodes').on('mousedown', function(e) {
+      $('.nodes').on('pointerdown', function(e) {
         if (e.button == 1) {
           midClickHeld = true;
         }
@@ -156,60 +161,55 @@ export var App = function(name, version) {
         if (!e.altKey && !e.shiftKey) self.deselectAllNodes();
       });
 
-      $('.nodes').on('pointermove', function(e) {
+      $('.nodes').on('mousemove touchmove', function(e) {
         if (dragging) {
-          if (e.altKey || midClickHeld) {
+          const pageX = self.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageX : e.pageX
+          const pageY = self.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageY : e.pageY
+
+          if (e.altKey || midClickHeld || self.hasTouchScreen) {
             //prevents jumping straight back to standard dragging
             if (MarqueeOn) {
               MarqueeSelection = [];
               MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
               $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
             } else {
-              // self.transformOrigin[0] += e.pageX - offset.x;
-              // self.transformOrigin[1] += e.pageY - offset.y;
-
-              // self.translate();
-
-              // offset.x = e.pageX;
-              // offset.y = e.pageY;
-
               var nodes = self.nodes();
               for (var i in nodes) {
                 nodes[i].x(
-                  nodes[i].x() + (e.pageX - offset.x) / self.cachedScale
+                  nodes[i].x() + (pageX - offset.x) / self.cachedScale
                 );
                 nodes[i].y(
-                  nodes[i].y() + (e.pageY - offset.y) / self.cachedScale
+                  nodes[i].y() + (pageY - offset.y) / self.cachedScale
                 );
               }
-              offset.x = e.pageX;
-              offset.y = e.pageY;
+              offset.x = pageX;
+              offset.y = pageY;
             }
           } else {
             MarqueeOn = true;
 
             var scale = self.cachedScale;
 
-            if (e.pageX > offset.x && e.pageY < offset.y) {
+            if (pageX > offset.x && pageY < offset.y) {
               MarqRect.x1 = offset.x;
-              MarqRect.y1 = e.pageY;
-              MarqRect.x2 = e.pageX;
+              MarqRect.y1 = pageY;
+              MarqRect.x2 = pageX;
               MarqRect.y2 = offset.y;
-            } else if (e.pageX > offset.x && e.pageY > offset.y) {
+            } else if (pageX > offset.x && pageY > offset.y) {
               MarqRect.x1 = offset.x;
               MarqRect.y1 = offset.y;
-              MarqRect.x2 = e.pageX;
-              MarqRect.y2 = e.pageY;
-            } else if (e.pageX < offset.x && e.pageY < offset.y) {
-              MarqRect.x1 = e.pageX;
-              MarqRect.y1 = e.pageY;
+              MarqRect.x2 = pageX;
+              MarqRect.y2 = pageY;
+            } else if (pageX < offset.x && pageY < offset.y) {
+              MarqRect.x1 = pageX;
+              MarqRect.y1 = pageY;
               MarqRect.x2 = offset.x;
               MarqRect.y2 = offset.y;
             } else {
-              MarqRect.x1 = e.pageX;
+              MarqRect.x1 = pageX;
               MarqRect.y1 = offset.y;
               MarqRect.x2 = offset.x;
-              MarqRect.y2 = e.pageY;
+              MarqRect.y2 = pageY;
             }
 
             $('#marquee').css({
@@ -717,7 +717,7 @@ export var App = function(name, version) {
         .catch(error => console.warn(error.message));
     };
 
-    $(document).on('mousemove', function(e) {
+    $(document).on('pointermove', function(e) {
       self.mouseX = e.pageX;
       self.mouseY = e.pageY;
     });
@@ -954,6 +954,7 @@ export var App = function(name, version) {
   };
 
   this.addNodeSelected = function(node) {
+    console.log("added to selected:", node)
     var index = self.nodeSelection.indexOf(node);
     if (index < 0) {
       self.nodeSelection.push(node);

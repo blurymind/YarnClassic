@@ -37,7 +37,27 @@ export var Utils = {
       }
     };
   },
-
+  addDoubleTapDetector: function(element, callback){
+    element.lastTap = 0;
+    element.tapTimeout = 0;
+    element.addEventListener('touchend', function(event) {
+      var currentTime = new Date().getTime();
+      var tapLength = currentTime - element.lastTap;
+      clearTimeout(element.tapTimeout);
+      if (tapLength < 500 && tapLength > 0) {
+          // console.log("TAPPED twice")
+          callback()
+          event.preventDefault();
+      } else {
+          // elm2.innerHTML = 'Single Tap';
+          element.tapTimeout = setTimeout(function() {
+              // elm2.innerHTML = 'Single Tap (timeout)';
+              clearTimeout(element.tapTimeout);
+          }, 500);
+      }
+      element.lastTap = currentTime;
+  });
+  },
   pushToTop: function(element) {
     var current = element.css("z-index");
     if (current == "auto") current = 0;
