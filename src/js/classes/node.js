@@ -171,10 +171,10 @@ export var Node = function() {
     $(self.element).on('dblclick', function() {
       if (self.canDoubleClick) app.editNode(self);
     });
-    Utils.addDoubleTapDetector(self.element, function(){
+    Utils.addDoubleTapDetector(self.element, function() {
       if (self.canDoubleClick) app.editNode(self);
     });
-    
+
     $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
         if (self.selected) app.removeNodeSelection(self);
@@ -270,8 +270,14 @@ export var Node = function() {
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
         var parent = $(self.element).parent();
-        const pageX = app.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageX : e.pageX
-        const pageY = app.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageY : e.pageY
+        const pageX =
+          app.hasTouchScreen && e.changedTouches
+            ? e.changedTouches[0].pageX
+            : e.pageX;
+        const pageY =
+          app.hasTouchScreen && e.changedTouches
+            ? e.changedTouches[0].pageY
+            : e.pageY;
 
         var newX = pageX / self.getScale() - offset[0];
         var newY = pageY / self.getScale() - offset[1];
@@ -281,7 +287,7 @@ export var Node = function() {
         moved = true;
         self.x(newX);
         self.y(newY);
-        
+
         if (groupDragging) {
           var nodes = [];
           if (self.selected) {

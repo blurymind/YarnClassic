@@ -81,8 +81,16 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
     window.addEventListener('touchstart', function() {
-     self.hasTouchScreen = true
+      self.hasTouchScreen = true;
     });
+
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    if (
+      /android|iPad|iPhone|iPod/.test(userAgent.toLowerCase()) &&
+      !window.MSStream
+    ) {
+      osName = 'mobile';
+    }
 
     if (osName == 'Windows') self.zoomSpeed = 0.1;
 
@@ -104,6 +112,9 @@ export var App = function(name, version) {
 
     // Load json app settings from home folder
     // data.tryLoadConfigFile()
+
+    // set default zoom level for mobile users
+    if (osName === 'mobile') self.zoom(3);
 
     // prevent click bubbling
     ko.bindingHandlers.preventBubble = {
@@ -163,8 +174,14 @@ export var App = function(name, version) {
 
       $('.nodes').on('mousemove touchmove', function(e) {
         if (dragging) {
-          const pageX = self.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageX : e.pageX
-          const pageY = self.hasTouchScreen && e.changedTouches ? e.changedTouches[0].pageY : e.pageY
+          const pageX =
+            self.hasTouchScreen && e.changedTouches
+              ? e.changedTouches[0].pageX
+              : e.pageX;
+          const pageY =
+            self.hasTouchScreen && e.changedTouches
+              ? e.changedTouches[0].pageY
+              : e.pageY;
 
           if (e.altKey || midClickHeld || self.hasTouchScreen) {
             //prevents jumping straight back to standard dragging
@@ -954,7 +971,6 @@ export var App = function(name, version) {
   };
 
   this.addNodeSelected = function(node) {
-    console.log("added to selected:", node)
     var index = self.nodeSelection.indexOf(node);
     if (index < 0) {
       self.nodeSelection.push(node);
