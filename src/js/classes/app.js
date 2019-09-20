@@ -116,6 +116,14 @@ export var App = function(name, version) {
     // set default zoom level for mobile users
     if (osName === 'mobile') self.zoom(3);
 
+    // Add dropbox chooser
+    Utils.createDropboxChooser(
+      document.getElementById('dropbox-container'),
+      file => {
+        console.log(file);
+      }
+    );
+
     // prevent click bubbling
     ko.bindingHandlers.preventBubble = {
       init: function(element, valueAccessor) {

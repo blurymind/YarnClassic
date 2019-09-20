@@ -1,10 +1,10 @@
 export var FILETYPE = {
-  JSON: "json",
-  XML: "xml",
-  TWEE: "twee",
-  TWEE2: "tw2",
-  UNKNOWN: "none",
-  YARNTEXT: "yarn.txt"
+  JSON: 'json',
+  XML: 'xml',
+  TWEE: 'twee',
+  TWEE2: 'tw2',
+  UNKNOWN: 'none',
+  YARNTEXT: 'yarn.txt'
 };
 
 export var Utils = {
@@ -37,7 +37,7 @@ export var Utils = {
       }
     };
   },
-  addDoubleTapDetector: function(element, callback){
+  addDoubleTapDetector: function(element, callback) {
     element.lastTap = 0;
     element.tapTimeout = 0;
     element.addEventListener('touchend', function(event) {
@@ -45,22 +45,22 @@ export var Utils = {
       var tapLength = currentTime - element.lastTap;
       clearTimeout(element.tapTimeout);
       if (tapLength < 500 && tapLength > 0) {
-          // console.log("TAPPED twice")
-          callback()
-          event.preventDefault();
+        // console.log("TAPPED twice")
+        callback();
+        event.preventDefault();
       } else {
-          // elm2.innerHTML = 'Single Tap';
-          element.tapTimeout = setTimeout(function() {
-              // elm2.innerHTML = 'Single Tap (timeout)';
-              clearTimeout(element.tapTimeout);
-          }, 500);
+        // elm2.innerHTML = 'Single Tap';
+        element.tapTimeout = setTimeout(function() {
+          // elm2.innerHTML = 'Single Tap (timeout)';
+          clearTimeout(element.tapTimeout);
+        }, 500);
       }
       element.lastTap = currentTime;
-  });
+    });
   },
   pushToTop: function(element) {
-    var current = element.css("z-index");
-    if (current == "auto") current = 0;
+    var current = element.css('z-index');
+    if (current == 'auto') current = 0;
 
     var highZ = parseInt(current);
     var above = true;
@@ -68,8 +68,8 @@ export var Utils = {
       .parent()
       .children()
       .each(function() {
-        var otherCurrent = $(this).css("z-index");
-        if (otherCurrent == "auto") otherCurrent = 0;
+        var otherCurrent = $(this).css('z-index');
+        if (otherCurrent == 'auto') otherCurrent = 0;
         var other = parseInt(otherCurrent);
 
         if (this != element[0]) {
@@ -79,12 +79,12 @@ export var Utils = {
           }
         }
       });
-    if (!above) element.css("z-index", highZ + 1);
+    if (!above) element.css('z-index', highZ + 1);
   },
 
   stripHtml: function(html) {
-    while (html.indexOf("<") >= 0) html = html.replace("<", "&lt;");
-    while (html.indexOf(">") >= 0) html = html.replace(">", "&gt");
+    while (html.indexOf('<') >= 0) html = html.replace('<', '&lt;');
+    while (html.indexOf('>') >= 0) html = html.replace('>', '&gt');
     return html;
   },
 
@@ -103,11 +103,11 @@ export var Utils = {
           var found = false;
           for (var j = 0; j < node.childNodes.length; j++) {
             var subitem = node.childNodes.item(j);
-            if (subitem.nodeName != "#text") {
+            if (subitem.nodeName != '#text') {
               found = true;
               if (subitem.hasChildNodes())
                 obj[subitem.nodeName] = subitem.childNodes.item(0).nodeValue;
-              else obj[subitem.nodeName] = "";
+              else obj[subitem.nodeName] = '';
 
               if (subitem.attributes.length > 0) {
                 obj[subitem.nodeName] = {};
@@ -177,74 +177,91 @@ export var Utils = {
     };
   },
   langs: [
-    ["Afrikaans", ["af-ZA"]],
-    ["Bahasa Indonesia", ["id-ID"]],
-    ["Bahasa Melayu", ["ms-MY"]],
-    ["Català", ["ca-ES"]],
-    ["Čeština", ["cs-CZ"]],
-    ["Deutsch", ["de-DE"]],
+    ['Afrikaans', ['af-ZA']],
+    ['Bahasa Indonesia', ['id-ID']],
+    ['Bahasa Melayu', ['ms-MY']],
+    ['Català', ['ca-ES']],
+    ['Čeština', ['cs-CZ']],
+    ['Deutsch', ['de-DE']],
     [
-      "English",
-      ["en-AU", "Australia"],
-      ["en-CA", "Canada"],
-      ["en-IN", "India"],
-      ["en-NZ", "New Zealand"],
-      ["en-ZA", "South Africa"],
-      ["en-GB", "United Kingdom"],
-      ["en-US", "United States"]
+      'English',
+      ['en-AU', 'Australia'],
+      ['en-CA', 'Canada'],
+      ['en-IN', 'India'],
+      ['en-NZ', 'New Zealand'],
+      ['en-ZA', 'South Africa'],
+      ['en-GB', 'United Kingdom'],
+      ['en-US', 'United States']
     ],
     [
-      "Español",
-      ["es-AR", "Argentina"],
-      ["es-BO", "Bolivia"],
-      ["es-CL", "Chile"],
-      ["es-CO", "Colombia"],
-      ["es-CR", "Costa Rica"],
-      ["es-EC", "Ecuador"],
-      ["es-SV", "El Salvador"],
-      ["es-ES", "España"],
-      ["es-US", "Estados Unidos"],
-      ["es-GT", "Guatemala"],
-      ["es-HN", "Honduras"],
-      ["es-MX", "México"],
-      ["es-NI", "Nicaragua"],
-      ["es-PA", "Panamá"],
-      ["es-PY", "Paraguay"],
-      ["es-PE", "Perú"],
-      ["es-PR", "Puerto Rico"],
-      ["es-DO", "República Dominicana"],
-      ["es-UY", "Uruguay"],
-      ["es-VE", "Venezuela"]
+      'Español',
+      ['es-AR', 'Argentina'],
+      ['es-BO', 'Bolivia'],
+      ['es-CL', 'Chile'],
+      ['es-CO', 'Colombia'],
+      ['es-CR', 'Costa Rica'],
+      ['es-EC', 'Ecuador'],
+      ['es-SV', 'El Salvador'],
+      ['es-ES', 'España'],
+      ['es-US', 'Estados Unidos'],
+      ['es-GT', 'Guatemala'],
+      ['es-HN', 'Honduras'],
+      ['es-MX', 'México'],
+      ['es-NI', 'Nicaragua'],
+      ['es-PA', 'Panamá'],
+      ['es-PY', 'Paraguay'],
+      ['es-PE', 'Perú'],
+      ['es-PR', 'Puerto Rico'],
+      ['es-DO', 'República Dominicana'],
+      ['es-UY', 'Uruguay'],
+      ['es-VE', 'Venezuela']
     ],
-    ["Euskara", ["eu-ES"]],
-    ["Français", ["fr-FR"]],
-    ["Galego", ["gl-ES"]],
-    ["Hrvatski", ["hr_HR"]],
-    ["IsiZulu", ["zu-ZA"]],
-    ["Íslenska", ["is-IS"]],
-    ["Italiano", ["it-IT", "Italia"], ["it-CH", "Svizzera"]],
-    ["Magyar", ["hu-HU"]],
-    ["Nederlands", ["nl-NL"]],
-    ["Norsk bokmål", ["nb-NO"]],
-    ["Polski", ["pl-PL"]],
-    ["Português", ["pt-BR", "Brasil"], ["pt-PT", "Portugal"]],
-    ["Română", ["ro-RO"]],
-    ["Slovenčina", ["sk-SK"]],
-    ["Suomi", ["fi-FI"]],
-    ["Svenska", ["sv-SE"]],
-    ["Türkçe", ["tr-TR"]],
-    ["български", ["bg-BG"]],
-    ["Pусский", ["ru-RU"]],
-    ["Српски", ["sr-RS"]],
-    ["한국어", ["ko-KR"]],
+    ['Euskara', ['eu-ES']],
+    ['Français', ['fr-FR']],
+    ['Galego', ['gl-ES']],
+    ['Hrvatski', ['hr_HR']],
+    ['IsiZulu', ['zu-ZA']],
+    ['Íslenska', ['is-IS']],
+    ['Italiano', ['it-IT', 'Italia'], ['it-CH', 'Svizzera']],
+    ['Magyar', ['hu-HU']],
+    ['Nederlands', ['nl-NL']],
+    ['Norsk bokmål', ['nb-NO']],
+    ['Polski', ['pl-PL']],
+    ['Português', ['pt-BR', 'Brasil'], ['pt-PT', 'Portugal']],
+    ['Română', ['ro-RO']],
+    ['Slovenčina', ['sk-SK']],
+    ['Suomi', ['fi-FI']],
+    ['Svenska', ['sv-SE']],
+    ['Türkçe', ['tr-TR']],
+    ['български', ['bg-BG']],
+    ['Pусский', ['ru-RU']],
+    ['Српски', ['sr-RS']],
+    ['한국어', ['ko-KR']],
     [
-      "中文",
-      ["cmn-Hans-CN", "普通话 (中国大陆)"],
-      ["cmn-Hans-HK", "普通话 (香港)"],
-      ["cmn-Hant-TW", "中文 (台灣)"],
-      ["yue-Hant-HK", "粵語 (香港)"]
+      '中文',
+      ['cmn-Hans-CN', '普通话 (中国大陆)'],
+      ['cmn-Hans-HK', '普通话 (香港)'],
+      ['cmn-Hant-TW', '中文 (台灣)'],
+      ['yue-Hant-HK', '粵語 (香港)']
     ],
-    ["日本語", ["ja-JP"]],
-    ["Lingua latīna", ["la"]]
-  ]
+    ['日本語', ['ja-JP']],
+    ['Lingua latīna', ['la']]
+  ],
+  createDropboxChooser: function(dropboxButton, onSuccess) {
+    var options = {
+      success: function(files) {
+        files.forEach(function(file) {
+          onSuccess(file);
+        });
+      },
+      cancel: function() {
+        //optional
+      },
+      linkType: 'preview', // "preview" or "direct"
+      multiselect: true // true or false
+    };
+
+    var button = Dropbox.createChooseButton(options);
+    dropboxButton.appendChild(button);
+  }
 };

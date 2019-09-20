@@ -179,7 +179,8 @@ a:hover {
 .app-menu .dropdown {
   transition: max-height 0.5s;
   max-height: 0px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   float: left;
 }
 
@@ -188,7 +189,21 @@ a:hover {
   float: left;
   display: block;
   width: 100%;
-  padding: 10px;
+  padding: 7px;
+}
+
+.dropbox-dropin-btn {
+  display: unset !important;
+  border: unset !important;
+  border-bottom-color: unset !important;
+  height: 30px !important;
+  background: unset;
+  font-weight: 500 !important;
+  font-family: unset !important;
+  /* width: 100% !important;
+  padding: 0px 15px 15px 15px !important;
+  
+  height: 21px !important; */
 }
 
 .app-menu .dropdown .item:hover {
