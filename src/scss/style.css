@@ -814,6 +814,15 @@ a:hover {
     top: 40px !important;
   }
 
+  .tooltip {
+    top: 15% !important;
+    left: 15% !important;
+  }
+  .emojipicker-container {
+    top: 15% !important;
+    left: 15% !important;
+  }
+
   .app-undo-redo span {
     display: inline;
   }
