@@ -570,19 +570,13 @@ a:hover {
   background-position: -64px 0px;
 }
 
-.node-editor .form input[type='text']:focus {
-  font-size: 1em;
-  padding: 5px 0px 5px 10px;
-  margin-top: 0.3em;
-}
-
 .node-editor .form input[type='text'] {
   box-sizing: border-box;
   width: 100%;
   font-size: 1.2em;
   color: #666;
   padding: 10px 0px 10px 0px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border: none;
   border-bottom: 2px solid #eee;
   font-family: 'Lucida Console', Monaco, monospace;
@@ -790,8 +784,8 @@ a:hover {
     font-size: 0.8em;
   }
   .app-menu .title {
-    height: 40px;
-    line-height: 15px;
+    height: 30px;
+    line-height: 0px;
   }
   .app-search {
     top: 5px;
@@ -804,7 +798,7 @@ a:hover {
   }
 
   .node-editor .form {
-    top: 8%;
+    top: 7%;
     padding: 5px 5px 10px 5px;
     border-radius: 4px;
   }
@@ -812,7 +806,7 @@ a:hover {
     font-size: 0.9em;
     padding: 2px 0px 2px 5px;
     margin-top: 0.1em;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px;
   }
 
   .context-menu-visible > .context-menu-list {
