@@ -46,6 +46,11 @@
 				<span data-bind="click: app.sortAlphabetical" title="Sort Alphabetically" ></span>
 			</div>
 
+			<div class="app-undo-redo">
+				<span data-bind="click: function() { app.historyDirection('undo'); }"></span>
+				<span data-bind="click: function() { app.historyDirection('redo'); }"></span>
+			</div>
+
 			<div class="app-zoom">
 					<span data-bind="click: function() { app.zoom(4); }" title="Zoom 1:1"></span>
 					<span data-bind="click: function() { app.zoom(3); }" title="Zoom 2:1"></span>
