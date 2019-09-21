@@ -12,7 +12,7 @@ alt="Yarn web app"  height="480" border="10" /></a>
 # 📲 Install the Web App on your mobile device 🧶
 1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/> with your smartphone or tablet
-2. Click on the web browser's menu's and select "Add to home screen" 
+2. Open the web browser's menu and select "Add to home screen" 
 3. When you run Yarn from the home screen, it will work in full screen mode!
 
 # BBcode styling in editor, Spellchecking, Autocompletion, and more!
