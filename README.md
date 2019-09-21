@@ -1,13 +1,19 @@
-# Yarn
+# Yarn 🐱 🧺
 
 Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 
-# Live APP (Use it in the browser)
+# 🧶 Live Web APP (Use it in the browser) 🧶
 <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/>
 <a href="https://yarnspinnertool.github.io/YarnEditor/
 " target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png" 
 alt="Yarn web app"  height="480" border="10" /></a>
+
+# 📲 Install the Web App on your mobile device 🧶
+1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
+<br/> with your smartphone or tablet
+2. Click on the web browser's menu's and select "Add to home screen" 
+3. When you run Yarn from the home screen, it will work in full screen mode!
 
 # BBcode styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
