@@ -119,9 +119,7 @@ export var App = function(name, version) {
     // Add dropbox chooser
     Utils.createDropboxChooser(
       document.getElementById('dropbox-container'),
-      file => {
-        console.log(file);
-      }
+      file => data.tryLoadFromDropbox(file)
     );
 
     // prevent click bubbling

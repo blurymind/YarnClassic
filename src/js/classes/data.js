@@ -1,27 +1,27 @@
-const path = require("path");
-const saveAs = require("file-saver");
-import { Node } from "./node";
-import { Utils, FILETYPE } from "./utils";
+const path = require('path');
+const saveAs = require('file-saver');
+import { Node } from './node';
+import { Utils, FILETYPE } from './utils';
 
 export var data = {
   editingPath: ko.observable(null),
-  editingName: ko.observable("NewFile"),
-  editingType: ko.observable(""),
+  editingName: ko.observable('NewFile'),
+  editingType: ko.observable(''),
   editingFolder: ko.observable(null),
-  editingFileFolder: function(addSubPath = "") {
-    const filePath = data.editingPath() ? data.editingPath() : "";
+  editingFileFolder: function(addSubPath = '') {
+    const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
       ? path.join(path.dirname(filePath), addSubPath)
       : path.dirname(filePath);
   },
   tryLoadConfigFile: function() {
     app.configFilePath = path.join(
-      remote.app.getPath("home"),
-      ".yarn-story-editor.json"
+      remote.app.getPath('home'),
+      '.yarn-story-editor.json'
     );
     if (fs.existsSync(app.configFilePath)) {
       app.config = JSON.parse(fs.readFileSync(app.configFilePath));
-      console.log("Settings loaded from:\n" + app.configFilePath);
+      console.log('Settings loaded from:\n' + app.configFilePath);
       // if autosaving has a value in the config - value is in minutes
       if (app.config && app.config.settings && app.config.settings.autoSave) {
         if (app.config.settings.autoSave < 0.1) {
@@ -30,7 +30,7 @@ export var data = {
         setInterval(function() {
           if (data.editingPath()) {
             data.trySaveCurrent();
-            console.log("Autosaved:\n" + data.editingPath());
+            console.log('Autosaved:\n' + data.editingPath());
           }
         }, app.config.settings.autoSave * 60000);
       }
@@ -42,7 +42,7 @@ export var data = {
     reader.onload = function(e) {
       // fileDisplayArea.innerText = reader.result;
       var type = data.getFileType(filename);
-      if (type == FILETYPE.UNKNOWN) alert("Unknown filetype!");
+      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
       else {
         // console.log("reading-", type, filename, reader);
         data.editingPath(file.path);
@@ -57,15 +57,15 @@ export var data = {
     if (data.editingPath()) {
       if (
         !confirm(
-          "Are you sure you want to close \n" +
+          'Are you sure you want to close \n' +
             data.editingPath() +
-            "\nAny unsaved progress will be lost..."
+            '\nAny unsaved progress will be lost...'
         )
       ) {
         return;
       }
     }
-    data.editingName(filename.replace(/^.*[\\\/]/, ""));
+    data.editingName(filename.replace(/^.*[\\\/]/, ''));
     document.title = file.path ? file.path : data.editingName();
     data.readFile(file, filename, true);
     app.refreshWindowTitle(filename);
@@ -74,7 +74,7 @@ export var data = {
   openFolder: function(e, foldername) {
     editingFolder = foldername;
     alert(
-      "openFolder not yet implemented e: " + e + " foldername: " + foldername
+      'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername
     );
   },
 
@@ -85,15 +85,15 @@ export var data = {
   getFileType: function(filename) {
     var clone = filename;
 
-    if (filename.toLowerCase().indexOf(".json") > -1) return FILETYPE.JSON;
-    else if (filename.toLowerCase().indexOf(".yarn.txt") > -1)
+    if (filename.toLowerCase().indexOf('.json') > -1) return FILETYPE.JSON;
+    else if (filename.toLowerCase().indexOf('.yarn.txt') > -1)
       return FILETYPE.YARNTEXT;
-    else if (filename.toLowerCase().indexOf(".yarn") > -1)
+    else if (filename.toLowerCase().indexOf('.yarn') > -1)
       return FILETYPE.YARNTEXT;
-    else if (filename.toLowerCase().indexOf(".xml") > -1) return FILETYPE.XML;
-    else if (filename.toLowerCase().indexOf(".txt") > -1) return FILETYPE.TWEE;
-    else if (filename.toLowerCase().indexOf(".tw2") > -1) return FILETYPE.TWEE2;
-    else if (filename.toLowerCase().indexOf(".twee") > -1)
+    else if (filename.toLowerCase().indexOf('.xml') > -1) return FILETYPE.XML;
+    else if (filename.toLowerCase().indexOf('.txt') > -1) return FILETYPE.TWEE;
+    else if (filename.toLowerCase().indexOf('.tw2') > -1) return FILETYPE.TWEE2;
+    else if (filename.toLowerCase().indexOf('.twee') > -1)
       return FILETYPE.TWEE2;
     return FILETYPE.UNKNOWN;
   },
@@ -116,33 +116,33 @@ export var data = {
       var index = 0;
       var readingBody = false;
       for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() == "===") {
+        if (lines[i].trim() == '===') {
           readingBody = false;
           if (obj != null) {
             objects.push(obj);
             obj = null;
           }
         } else if (readingBody) {
-          obj.body += lines[i] + "\n";
+          obj.body += lines[i] + '\n';
         } else {
-          if (lines[i].indexOf("title:") > -1) {
+          if (lines[i].indexOf('title:') > -1) {
             if (obj == null) obj = {};
             obj.title = lines[i].substr(7, lines[i].length - 7);
-          } else if (lines[i].indexOf("position:") > -1) {
+          } else if (lines[i].indexOf('position:') > -1) {
             if (obj == null) obj = {};
-            var xy = lines[i].substr(9, lines[i].length - 9).split(",");
+            var xy = lines[i].substr(9, lines[i].length - 9).split(',');
             obj.position = { x: Number(xy[0].trim()), y: Number(xy[1].trim()) };
-          } else if (lines[i].indexOf("colorID:") > -1) {
+          } else if (lines[i].indexOf('colorID:') > -1) {
             if (obj == null) obj = {};
             obj.colorID = Number(
               lines[i].substr(9, lines[i].length - 9).trim()
             );
-          } else if (lines[i].indexOf("tags:") > -1) {
+          } else if (lines[i].indexOf('tags:') > -1) {
             if (obj == null) obj = {};
             obj.tags = lines[i].substr(6, lines[i].length - 6);
-          } else if (lines[i].trim() == "---") {
+          } else if (lines[i].trim() == '---') {
             readingBody = true;
-            obj.body = "";
+            obj.body = '';
           }
         }
       }
@@ -150,24 +150,24 @@ export var data = {
         objects.push(obj);
       }
     } else if (type == FILETYPE.TWEE || type == FILETYPE.TWEE2) {
-      var lines = content.split("\n");
+      var lines = content.split('\n');
       var obj = null;
       var index = 0;
       for (var i = 0; i < lines.length; i++) {
         lines[i] = lines[i].trim();
-        if (lines[i].substr(0, 2) == "::") {
+        if (lines[i].substr(0, 2) == '::') {
           if (obj != null) objects.push(obj);
 
           obj = {};
           index++;
 
-          var title = "";
-          var tags = "";
+          var title = '';
+          var tags = '';
           var position = { x: index * 80, y: index * 80 };
 
           // check if there are tags
-          var openBracket = lines[i].indexOf("[");
-          var closeBracket = lines[i].indexOf("]");
+          var openBracket = lines[i].indexOf('[');
+          var closeBracket = lines[i].indexOf(']');
           if (openBracket > 0 && closeBracket > 0) {
             tags = lines[i].substr(
               openBracket + 1,
@@ -176,13 +176,13 @@ export var data = {
           }
 
           // check if there are positions (Twee2)
-          var openPosition = lines[i].indexOf("<");
-          var closePosition = lines[i].indexOf(">");
+          var openPosition = lines[i].indexOf('<');
+          var closePosition = lines[i].indexOf('>');
 
           if (openPosition > 0 && closePosition > 0) {
             var coordinates = lines[i]
               .substr(openPosition + 1, closePosition - openPosition - 1)
-              .split(",");
+              .split(',');
             position.x = parseInt(coordinates[0]);
             position.y = parseInt(coordinates[1]);
           }
@@ -207,10 +207,10 @@ export var data = {
 
           obj.title = title;
           obj.tags = tags;
-          obj.body = "";
+          obj.body = '';
           obj.position = position;
         } else if (obj != null) {
-          if (obj.body.length > 0) lines[i] += "\n";
+          if (obj.body.length > 0) lines[i] += '\n';
           obj.body += lines[i];
         }
       }
@@ -218,7 +218,7 @@ export var data = {
       if (obj != null) objects.push(obj);
     } else if (type == FILETYPE.XML) {
       var oParser = new DOMParser();
-      var xml = oParser.parseFromString(content, "text/xml");
+      var xml = oParser.parseFromString(content, 'text/xml');
       content = Utils.xmlToObject(xml);
 
       if (content != undefined)
@@ -252,13 +252,13 @@ export var data = {
       app.warpToNodeXY(avgX / numAvg, avgY / numAvg);
     }
 
-    $(".arrows")
+    $('.arrows')
       .css({ opacity: 0 })
       .transition({ opacity: 1 }, 500);
     app.updateNodeLinks();
 
     // Callback for embedding in other webapps
-    var event = new CustomEvent("yarnLoadedData");
+    var event = new CustomEvent('yarnLoadedData');
     event.document = document;
     event.data = data;
     event.app = app;
@@ -266,7 +266,7 @@ export var data = {
   },
 
   getSaveData: function(type) {
-    var output = "";
+    var output = '';
     var content = [];
     var nodes = app.nodes();
 
@@ -281,59 +281,59 @@ export var data = {
     }
 
     if (type == FILETYPE.JSON) {
-      output = JSON.stringify(content, null, "\t");
+      output = JSON.stringify(content, null, '\t');
     } else if (type == FILETYPE.YARNTEXT) {
       for (i = 0; i < content.length; i++) {
-        output += "title: " + content[i].title + "\n";
-        output += "tags: " + content[i].tags + "\n";
-        output += "colorID: " + content[i].colorID + "\n";
+        output += 'title: ' + content[i].title + '\n';
+        output += 'tags: ' + content[i].tags + '\n';
+        output += 'colorID: ' + content[i].colorID + '\n';
         output +=
-          "position: " +
+          'position: ' +
           content[i].position.x +
-          "," +
+          ',' +
           content[i].position.y +
-          "\n";
-        output += "---\n";
+          '\n';
+        output += '---\n';
         output += content[i].body;
         var body = content[i].body;
-        if (!(body.length > 0 && body[body.length - 1] == "\n")) {
-          output += "\n";
+        if (!(body.length > 0 && body[body.length - 1] == '\n')) {
+          output += '\n';
         }
-        output += "===\n";
+        output += '===\n';
       }
     } else if (type == FILETYPE.TWEE) {
       for (i = 0; i < content.length; i++) {
-        var tags = "";
-        if (content[i].tags.length > 0) tags = " [" + content[i].tags + "]";
-        output += ":: " + content[i].title + tags + "\n";
-        output += content[i].body + "\n\n";
+        var tags = '';
+        if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
+        output += ':: ' + content[i].title + tags + '\n';
+        output += content[i].body + '\n\n';
       }
     } else if (type == FILETYPE.TWEE2) {
       for (i = 0; i < content.length; i++) {
-        var tags = "";
-        if (content[i].tags.length > 0) tags = " [" + content[i].tags + "]";
+        var tags = '';
+        if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
         var position =
-          " <" + content[i].position.x + "," + content[i].position.y + ">";
-        output += ":: " + content[i].title + tags + position + "\n";
-        output += content[i].body + "\n\n";
+          ' <' + content[i].position.x + ',' + content[i].position.y + '>';
+        output += ':: ' + content[i].title + tags + position + '\n';
+        output += content[i].body + '\n\n';
       }
     } else if (type == FILETYPE.XML) {
-      output += "<nodes>\n";
+      output += '<nodes>\n';
       for (i = 0; i < content.length; i++) {
-        output += "\t<node>\n";
-        output += "\t\t<title>" + content[i].title + "</title>\n";
-        output += "\t\t<tags>" + content[i].tags + "</tags>\n";
-        output += "\t\t<body>" + content[i].body + "</body>\n";
+        output += '\t<node>\n';
+        output += '\t\t<title>' + content[i].title + '</title>\n';
+        output += '\t\t<tags>' + content[i].tags + '</tags>\n';
+        output += '\t\t<body>' + content[i].body + '</body>\n';
         output +=
           '\t\t<position x="' +
           content[i].position.x +
           '" y="' +
           content[i].position.y +
           '"></position>\n';
-        output += "\t\t<colorID>" + content[i].colorID + "</colorID>\n";
-        output += "\t</node>\n";
+        output += '\t\t<colorID>' + content[i].colorID + '</colorID>\n';
+        output += '\t</node>\n';
       }
-      output += "</nodes>\n";
+      output += '</nodes>\n';
     }
 
     return output;
@@ -341,73 +341,90 @@ export var data = {
 
   saveTo: function(path, content, callback = null) {
     if (app.fs != undefined) {
-      app.fs.writeFile(path, content, { encoding: "utf-8" }, function(err) {
+      app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
-        if (err) alert("Error Saving Data to " + path + ": " + err);
+        if (err) alert('Error Saving Data to ' + path + ': ' + err);
       });
     }
   },
 
   openFileDialog: function(dialog, callback) {
-    dialog.bind("change", function(e) {
+    dialog.bind('change', function(e) {
       // make callback
       callback(e.currentTarget.files[0], dialog.val());
 
       // replace input field with a new identical one, with the value cleared
       // (html can't edit file field values)
-      var saveas = "";
-      var accept = "";
-      if (dialog.attr("nwsaveas") != undefined)
-        saveas = 'nwsaveas="' + dialog.attr("nwsaveas") + '"';
-      if (dialog.attr("accept") != undefined)
-        saveas = 'accept="' + dialog.attr("accept") + '"';
+      var saveas = '';
+      var accept = '';
+      if (dialog.attr('nwsaveas') != undefined)
+        saveas = 'nwsaveas="' + dialog.attr('nwsaveas') + '"';
+      if (dialog.attr('accept') != undefined)
+        saveas = 'accept="' + dialog.attr('accept') + '"';
 
       dialog
         .parent()
         .append(
           '<input type="file" id="' +
-            dialog.attr("id") +
+            dialog.attr('id') +
             '" ' +
             accept +
-            " " +
+            ' ' +
             saveas +
-            ">"
+            '>'
         );
-      dialog.unbind("change");
+      dialog.unbind('change');
       dialog.remove();
     });
 
-    dialog.trigger("click");
+    dialog.trigger('click');
   },
 
   saveFileDialog: function(dialog, type, content) {
-    var blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, data.editingName().replace(/\.[^/.]+$/, "") + "." + type);
+    var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, data.editingName().replace(/\.[^/.]+$/, '') + '.' + type);
   },
 
   insertImageFileName: function() {
-    data.openFileDialog($("#open-image"), function(e, path) {
+    data.openFileDialog($('#open-image'), function(e, path) {
       app.insertTextAtCursor(e.path ? e.path : e.name);
     });
   },
 
   tryOpenFile: function() /// Refactor to send signal to the main process
   {
-    data.openFileDialog($("#open-file"), data.openFile);
+    data.openFileDialog($('#open-file'), data.openFile);
+  },
+
+  tryLoadFromDropbox: function(dropboxObject) {
+    console.log('fetched from db', dropboxObject);
+    $.get(dropboxObject.link, function(textData) {
+      var type = data.getFileType(dropboxObject.name);
+      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
+      else {
+        data.editingPath(dropboxObject.link);
+        data.editingType(type);
+        data.loadData(textData, type, true);
+      }
+    });
+  },
+
+  trySaveDropbox: function() {
+    console.log('Saving db', Dropbox.save);
   },
 
   tryOpenFolder: function() {
-    data.openFileDialog($("#open-folder"), data.openFolder);
+    data.openFileDialog($('#open-folder'), data.openFolder);
   },
 
   tryAppend: function() {
-    data.openFileDialog($("#open-file"), data.appendFile);
+    data.openFileDialog($('#open-file'), data.appendFile);
   },
 
   trySave: function(type) {
     data.editingType(type);
-    data.saveFileDialog($("#save-file"), type, data.getSaveData(type));
+    data.saveFileDialog($('#save-file'), type, data.getSaveData(type));
   },
 
   trySaveCurrent: function() {

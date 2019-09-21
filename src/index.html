@@ -76,10 +76,12 @@
 						<!-- ko if:data.editingPath() != null -->
 						<span class="item" data-bind="click: app.data.trySaveCurrent">Save</span>
 						<!-- /ko -->
-						<div class="container">
+						<!-- <div class="container">
 							<a href="https://www.dropbox.com/s/cezy4cu46vexx97/C_sharp_from_one_video.mp4?dl=0" class="dropbox-saver item"></a> 
 							<div id="dropbox-container" class="item"></div>
-						</div>
+						</div> -->
+						<div id="dropbox-container" class="item"></div>
+						<span class="item" data-bind="click: function() { app.data.trySaveDropbox();}">Save to dropbox...</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('json');}">Save As Json...</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('yarn.txt'); }">Save As Yarn...</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">Save As Twee...</span>

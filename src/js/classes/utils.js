@@ -257,8 +257,8 @@ export var Utils = {
       cancel: function() {
         //optional
       },
-      linkType: 'preview', // "preview" or "direct"
-      multiselect: true // true or false
+      linkType: 'direct', // "preview" or "direct"
+      multiselect: false // true or false
     };
 
     var button = Dropbox.createChooseButton(options);
