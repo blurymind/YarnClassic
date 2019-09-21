@@ -664,7 +664,7 @@ export var App = function(name, version) {
             if (transcript === 'open') {
               console.log('try open...');
               var firstFoundTitle = self
-                .getFirstFoundNode(self.$searchField.val())
+                .getFirstFoundNode(self.$searchField.val().toLowerCase())
                 .title();
               console.log('try open:', firstFoundTitle);
               self.openNodeByTitle(firstFoundTitle);

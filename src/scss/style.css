@@ -260,10 +260,6 @@ a:hover {
   cursor: pointer;
 }
 
-.app-search .search-item {
-  display: inline;
-}
-
 /* --- ZOOM --- */
 
 .app-zoom {
@@ -623,14 +619,14 @@ a:hover {
 }
 
 /* SPECIAL CHECKBOX START */
-.node-editor .form .bbcode-toolbar .styled-checkbox input {
+.styled-checkbox input {
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
   outline: none;
   opacity: 0;
   display: none;
 }
-.node-editor .form .bbcode-toolbar .styled-checkbox label {
+.styled-checkbox label {
   padding-right: 4px;
   padding-left: 4px;
   color: grey;
@@ -638,7 +634,7 @@ a:hover {
   border: 2px solid rgba(0, 0, 0, 0);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
 }
-.node-editor .form .bbcode-toolbar .styled-checkbox input:checked + label {
+.styled-checkbox input:checked + label {
   padding-right: 5px;
   padding-left: 5px;
   color: black;
@@ -802,6 +798,11 @@ a:hover {
     left: 10px;
     padding: 5px 10px 5px 5px;
   }
+  .app-search > input {
+    padding: unset;
+    width: 170px;
+  }
+
   .node-editor .form {
     top: 8%;
     padding: 5px 5px 10px 5px;
@@ -819,9 +820,6 @@ a:hover {
     top: 40px !important;
   }
 
-  .app-sort {
-    display: none;
-  }
   .app-undo-redo span {
     display: inline;
   }

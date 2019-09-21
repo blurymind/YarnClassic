@@ -22,8 +22,20 @@
 			<div class="app-search">
 				<input id="nodeSearchInput" type="text" class="search-field"/>
 				
-				<span class="hide-when-narrow">
-					<div class="search-title search-item">
+				<span>
+						<span class="search-title styled-checkbox">
+								<input type="checkbox" checked="checked" id="search-title" />
+								<label for="search-title">Title</label>
+						</span>
+						<span class="search-body styled-checkbox">
+								<input type="checkbox" id="search-body" />
+								<label for="search-body">Body</label>
+						</span>
+						<span class="search-tags styled-checkbox">
+								<input type="checkbox" id="search-tags" />
+								<label for="search-tags">Tags</label>
+						</span>
+					<!-- <div class="search-title search-item">
 						<input type="checkbox" checked="checked" id="search-title" />
 						<label for="search-title">Title</label>
 					</div>
@@ -34,12 +46,12 @@
 					<div class="search-tags search-item">
 						<input type="checkbox" id="search-tags" />
 						<label for="search-tags">Tags</label>
-					</div>
+					</div> -->
 				</span>
 			</div>
 
 			<!-- zoom controls -->
-			<div class="app-sort">
+			<div class="app-sort hide-when-narrow">
 				<span data-bind="click: app.arrangeX" title="Arrange H"></span>
 				<span data-bind="click: app.arrangeY" title="Arrange V"></span>
 				<span data-bind="click: app.arrangeSpiral" title="Arrange Spiral"></span>
