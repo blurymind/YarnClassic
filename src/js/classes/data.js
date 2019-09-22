@@ -6,7 +6,7 @@ import { Utils, FILETYPE } from './utils';
 export var data = {
   editingPath: ko.observable(null),
   editingName: ko.observable('NewFile'),
-  editingType: ko.observable(''),
+  editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
@@ -411,7 +411,24 @@ export var data = {
   },
 
   trySaveDropbox: function() {
-    console.log('Saving db', Dropbox.save);
+    const editingType = data.editingType();
+    const editingName =
+      data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
+    const yarnData = data.getSaveData(editingType);
+    // console.log(editingType, yarnData, editingName);
+    const yarnTextFileUrl = Utils.makeTextFile(yarnData);
+    var options = {
+      files: [
+        {
+          url: yarnTextFileUrl,
+          filename: editingName
+        }
+      ],
+      success: function() {
+        alert('Success! Files saved to your Dropbox.');
+      }
+    };
+    Dropbox.save(yarnTextFileUrl, editingName, options);
   },
 
   tryOpenFolder: function() {

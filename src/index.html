@@ -35,18 +35,6 @@
 								<input type="checkbox" id="search-tags" />
 								<label for="search-tags">Tags</label>
 						</span>
-					<!-- <div class="search-title search-item">
-						<input type="checkbox" checked="checked" id="search-title" />
-						<label for="search-title">Title</label>
-					</div>
-					<div class="search-body search-item">
-						<input type="checkbox" id="search-body" />
-						<label for="search-body">Body</label>
-					</div>
-					<div class="search-tags search-item">
-						<input type="checkbox" id="search-tags" />
-						<label for="search-tags">Tags</label>
-					</div> -->
 				</span>
 			</div>
 
@@ -94,12 +82,16 @@
 						<span class="item" data-bind="click: app.data.trySaveCurrent">Save</span>
 						<!-- /ko -->
 						<div id="dropbox-container" class="item"></div>
-						<span class="item" data-bind="click: function() { app.data.trySaveDropbox();}">Save to dropbox...</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('json');}">Save As Json...</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('yarn.txt'); }">Save As Yarn...</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">Save As Twee...</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">Save As Twee2...</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">Save As Xml...</span>
+						<span class="item" data-bind="click: function() { app.data.trySaveDropbox();}">
+							<img width="12px"src="https://cfl.dropboxstatic.com/static/images/favicon.ico"></img>
+							&nbsp;
+							Save to dropbox
+						</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('json');}">Save As Json</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('yarn.txt'); }">Save As Yarn</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">Save As Twee</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">Save As Twee2</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">Save As Xml</span>
 					</div>
 				</div>
 			</div>
