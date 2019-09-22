@@ -541,7 +541,7 @@ export var App = function(name, version) {
       }
     });
 
-    $(window).on('resize', self.updateArrowsThrottled);
+    $(window).on('resize touchend', self.updateArrowsThrottled);
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {
