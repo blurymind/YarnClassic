@@ -75,9 +75,9 @@
 				<div class="menu">
 					<span class="title">File</span>
 					<div class="dropdown">
-						<span class="item" data-bind="click: app.data.tryOpenFile">Open...</span>
+						<span class="item" data-bind="click: app.data.tryOpenFile">🧺 Open</span>
 						<!--<span class="item" data-bind="click: data.tryOpenFolder">Open Folder...</span>-->
-						<span class="item" data-bind="click: app.data.tryAppend">Append...</span>
+						<span class="item" data-bind="click: app.data.tryAppend">🧵 Append</span>
 						<!-- ko if:data.editingPath() != null -->
 						<span class="item" data-bind="click: app.data.trySaveCurrent">Save</span>
 						<!-- /ko -->
@@ -87,10 +87,18 @@
 							&nbsp;
 							Save to dropbox
 						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('json');}">Save As Json</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('yarn.txt'); }">Save As Yarn</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">Save As Twee</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">Save As Twee2</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('json');}">🧶Save As Json</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('yarn.txt'); }">🧶Save As Yarn</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">
+								<img width="12px"src="http://twinery.org/homepage/img/favicon-152.png"></img>
+								&nbsp;
+							Save As Twee
+						</span>
+						<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">
+								<img width="12px"src="http://twinery.org/homepage/img/favicon-152.png"></img>
+								&nbsp;
+							Save As Twee2
+						</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">Save As Xml</span>
 					</div>
 				</div>
