@@ -116,11 +116,15 @@ export var App = function(name, version) {
     // set default zoom level for mobile users
     if (osName === 'mobile') self.zoom(3);
 
-    // Add dropbox chooser
-    Utils.createDropboxChooser(
-      document.getElementById('dropbox-container'),
-      file => data.tryLoadFromDropbox(file)
-    );
+    if (!self.isElectron) {
+      // Add dropbox chooser
+      Utils.createDropboxChooser(
+        document.getElementById('dropbox-container'),
+        file => data.tryLoadFromDropbox(file)
+      );
+    } else {
+      document.getElementById('dropboxIO').style.display = 'none';
+    }
 
     // prevent click bubbling
     ko.bindingHandlers.preventBubble = {
