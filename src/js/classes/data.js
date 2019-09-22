@@ -405,6 +405,7 @@ export var data = {
       else {
         data.editingPath(dropboxObject.link);
         data.editingType(type);
+        data.editingName(dropboxObject.name.replace(/\.[^/.]+$/, ''));
         data.loadData(textData, type, true);
       }
     });
@@ -412,6 +413,12 @@ export var data = {
 
   trySaveDropbox: function() {
     const editingType = data.editingType();
+    if (data.editingName() === 'NewFile') {
+      var fileNameAsk = prompt('Please enter your name:', 'NewFile');
+      if (fileNameAsk !== null || fileNameAsk !== '') {
+        data.editingName(fileNameAsk);
+      }
+    }
     const editingName =
       data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
     const yarnData = data.getSaveData(editingType);
@@ -426,6 +433,7 @@ export var data = {
       ],
       success: function() {
         alert('Success! Files saved to your Dropbox.');
+        data.editingName(editingName.replace(/\.[^/.]+$/, ''));
       }
     };
     Dropbox.save(yarnTextFileUrl, editingName, options);
