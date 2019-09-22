@@ -252,7 +252,6 @@ export var App = function(name, version) {
               var inMarqueeSelection = index >= 0;
 
               //test the Marque scaled to the nodes x,y values
-
               var holder = $('.nodes-holder').offset();
               var marqueeOverNode =
                 (MarqRect.x2 - holder.left) / scale > nodes[i].x() &&
@@ -541,7 +540,7 @@ export var App = function(name, version) {
       }
     });
 
-    $(window).on('resize touchend', self.updateArrowsThrottled);
+    $(window).on('resize', self.updateArrowsThrottled);
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {

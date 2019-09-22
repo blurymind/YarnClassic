@@ -331,14 +331,17 @@ export var Node = function() {
 
     $(self.element).on('pointerup', function(e) {
       if (!moved) app.mouseUpOnNodeNotMoved();
-
       moved = false;
     });
 
-    $(document.body).on('pointerup', function(e) {
+    $(document.body).on('pointerup touchend', function(e) {
       dragging = false;
       groupDragging = false;
       moved = false;
+
+      if (app.hasTouchScreen) {
+        app.deselectAllNodes();
+      }
 
       app.updateArrowsThrottled();
     });
