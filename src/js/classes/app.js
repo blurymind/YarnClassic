@@ -2,7 +2,7 @@ import {
   enable_spellcheck,
   disable_spellcheck,
   suggest_word_for_misspelled,
-  load_dictionary
+  load_dictionary,
 } from '../libs/spellcheck_ace.js';
 import { Node } from './node';
 import { data } from './data';
@@ -59,11 +59,11 @@ export var App = function(name, version) {
     autocompleteWordsEnabled: true,
     autocompleteEnabled: true,
     overwrites: {
-      makeNewNodesFromLinks: true
+      makeNewNodesFromLinks: true,
     },
     settings: {
-      autoSave: -1
-    }
+      autoSave: -1,
+    },
   };
 
   this.editingPath = ko.observable(null);
@@ -134,7 +134,7 @@ export var App = function(name, version) {
           event.cancelBubble = true;
           if (event.stopPropagation) event.stopPropagation();
         });
-      }
+      },
     };
     ko.bindingHandlers.mousedown = {
       init: function(
@@ -148,7 +148,7 @@ export var App = function(name, version) {
         $(element).mousedown(function() {
           value();
         });
-      }
+      },
     };
     // updateArrows
     // setInterval(function() { self.updateArrows(); }, 16);
@@ -243,7 +243,7 @@ export var App = function(name, version) {
               x: MarqRect.x1,
               y: MarqRect.y1,
               width: Math.abs(MarqRect.x1 - MarqRect.x2),
-              height: Math.abs(MarqRect.y1 - MarqRect.y2)
+              height: Math.abs(MarqRect.y1 - MarqRect.y2),
             });
 
             //Select nodes which are within the marquee
@@ -580,7 +580,7 @@ export var App = function(name, version) {
       self.editor.session.insert(
         {
           column: selectRange.end.column + tag.length,
-          row: selectRange.end.row
+          row: selectRange.end.row,
         },
         tagClose
       );
@@ -594,12 +594,12 @@ export var App = function(name, version) {
         self.editor.selection.setRange({
           start: {
             row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1
+            column: self.editor.selection.getRange().start.column - 1,
           },
           end: {
             row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1
-          }
+            column: self.editor.selection.getRange().start.column - 1,
+          },
         });
         self.insertColorCode();
       } else if (self.editor.getSelectedText().length === 0) {
@@ -610,8 +610,8 @@ export var App = function(name, version) {
           end: {
             row: self.editor.selection.getRange().end.row,
             column:
-              self.editor.selection.getRange().end.column - tagClose.length
-          }
+              self.editor.selection.getRange().end.column - tagClose.length,
+          },
         });
       }
       self.editor.focus();
@@ -622,7 +622,7 @@ export var App = function(name, version) {
       self.togglePreviewMode(true);
       $('#emojiPicker-container').css({
         top: self.mouseY - 125,
-        left: self.mouseX - 200
+        left: self.mouseX - 200,
       });
       $('#emojiPicker-container').show();
     };
@@ -757,7 +757,7 @@ export var App = function(name, version) {
       $('#colorPicker').spectrum('toggle');
       $('#colorPicker-container').css({
         top: self.mouseY - 50,
-        left: self.mouseX - 70
+        left: self.mouseX - 70,
       });
       $('#colorPicker-container').show();
       $('#colorPicker').on('dragstop.spectrum', function(e, color) {
@@ -778,8 +778,8 @@ export var App = function(name, version) {
         start: self.editor.getCursorPosition(),
         end: {
           row: self.editor.getCursorPosition().row,
-          column: self.editor.getCursorPosition().column - colorCode.length
-        }
+          column: self.editor.getCursorPosition().column - colorCode.length,
+        },
       });
       self.togglePreviewMode(true);
     };
@@ -897,7 +897,7 @@ export var App = function(name, version) {
       action: action,
       node: node,
       lastX: node.x(),
-      lastY: node.y()
+      lastY: node.y(),
     };
 
     if (action == 'removed') {
@@ -1067,7 +1067,7 @@ export var App = function(name, version) {
       data: 'method=getQuote&format=jsonp&lang=en&jsonp=?',
       success: function(response) {
         alert(response.quoteText + '\n\n-' + response.quoteAuthor);
-      }
+      },
     });
   };
 
@@ -1124,8 +1124,8 @@ export var App = function(name, version) {
             '#d0e0e3',
             '#cfe2f3',
             '#d9d2e9',
-            '#ead1dc'
-          ]
+            '#ead1dc',
+          ],
         ],
         change: function(color) {
           if ($('#colorPicker-container').is(':visible')) {
@@ -1136,7 +1136,7 @@ export var App = function(name, version) {
             app.togglePreviewMode(false);
           }
         },
-        clickoutFiresChange: true
+        clickoutFiresChange: true,
       });
 
       /// Enable autocompletion for node links (borked atm)
@@ -1151,6 +1151,49 @@ export var App = function(name, version) {
       if (!self.nodeVisitHistory.includes(node.title())) {
         self.nodeVisitHistory.push(node.title());
       }
+
+      // close tag autocompletion
+      self.editor.getSession().on('change', function(evt) {
+        if (evt.action === 'insert') {
+          var autoCompleteButton = document.getElementById('toglAutocomplete');
+          if (autoCompleteButton.checked) {
+            setTimeout(() => {
+              switch (self.getTagBeforeCursor()) {
+                case '[[':
+                  self.insertTextAtCursor(' answer: | ]] ');
+                  self.moveEditCursor(-4);
+                  break;
+                case '<<':
+                  self.insertTextAtCursor(' >> ');
+                  self.moveEditCursor(-3);
+                  break;
+                case '[colo':
+                  self.insertTextAtCursor('r=#][/color] ');
+                  self.moveEditCursor(-10);
+                  self.insertColorCode();
+                  break;
+                case '[b':
+                  self.insertTextAtCursor('][/b] ');
+                  self.moveEditCursor(-5);
+                  break;
+                case '[i]':
+                  self.insertTextAtCursor('[/i] ');
+                  self.moveEditCursor(-5);
+                  break;
+                case '[img':
+                  self.insertTextAtCursor('][/img] ');
+                  self.moveEditCursor(-7);
+                  break;
+                case '[u':
+                  self.insertTextAtCursor('][/u] ');
+                  self.moveEditCursor(-5);
+                  break;
+              }
+            }, 200);
+            return;
+          }
+        }
+      });
 
       /// init emoji picker
       this.emPicker = new EmojiPicker(
@@ -1221,7 +1264,7 @@ export var App = function(name, version) {
           icon: 'edit',
           callback: key => {
             self.insertTextAtCursor(key);
-          }
+          },
         };
       });
       return suggestionObject;
@@ -1250,7 +1293,7 @@ export var App = function(name, version) {
           icon: 'edit',
           callback: key => {
             self.insertTextAtCursor(key);
-          }
+          },
         };
       });
       return suggestionObject;
@@ -1290,11 +1333,11 @@ export var App = function(name, version) {
     self.config.showCounter = showCounterButton.checked;
     if (self.config.showCounter) {
       $('.node-editor .form .bbcode-toolbar .editor-counter').css({
-        display: 'initial'
+        display: 'initial',
       });
     } else {
       $('.node-editor .form .bbcode-toolbar .editor-counter').css({
-        display: 'none'
+        display: 'none',
       });
     }
   };
@@ -1304,7 +1347,7 @@ export var App = function(name, version) {
     self.config.autocompleteWordsEnabled = wordCompletionButton.checked;
     self.editor.setOptions({
       enableBasicAutocompletion: self.config.autocompleteWordsEnabled,
-      enableLiveAutocompletion: self.config.autocompleteWordsEnabled
+      enableLiveAutocompletion: self.config.autocompleteWordsEnabled,
     });
   };
 
@@ -1378,8 +1421,6 @@ export var App = function(name, version) {
           )
         : '';
 
-    // if (tagBeforeCursor.includes(']')) { tagBeforeCursor = "" }
-
     if (
       textBeforeCursor.substring(
         textBeforeCursor.length - 2,
@@ -1399,52 +1440,6 @@ export var App = function(name, version) {
 
     return tagBeforeCursor;
   };
-
-  // close tag autocompletion
-  $(document).on('keyup', function(e) {
-    var autoCompleteButton = document.getElementById('toglAutocomplete');
-    if (self.editing() && autoCompleteButton.checked) {
-      var key = e.keyCode || e.charCode || e.which;
-      if (key === 37 || key === 38 || key === 39 || key === 40) {
-        return;
-      } // Dont trigger if moved cursor using arrow keys
-      if (key === 8 || key === 46 || key === 17 || key === 90) {
-        return;
-      } // Dont trigger if backspace or ctrl+z pressed
-
-      switch (self.getTagBeforeCursor()) {
-        case '[[':
-          self.insertTextAtCursor(' answer: | ]] ');
-          self.moveEditCursor(-4);
-          break;
-        case '<<':
-          self.insertTextAtCursor(' >> ');
-          self.moveEditCursor(-3);
-          break;
-        case '[colo':
-          self.insertTextAtCursor('r=#][/color] ');
-          self.moveEditCursor(-10);
-          self.insertColorCode();
-          break;
-        case '[b':
-          self.insertTextAtCursor('][/b] ');
-          self.moveEditCursor(-5);
-          break;
-        case '[i]':
-          self.insertTextAtCursor('[/i] ');
-          self.moveEditCursor(-5);
-          break;
-        case '[img':
-          self.insertTextAtCursor('][/img] ');
-          self.moveEditCursor(-7);
-          break;
-        case '[u':
-          self.insertTextAtCursor('][/u] ');
-          self.moveEditCursor(-5);
-          break;
-      }
-    }
-  });
 
   this.testRunFrom = function(startTestNode) {
     ipc.send(
@@ -1676,7 +1671,7 @@ export var App = function(name, version) {
           );
           var normal = {
             x: (toX - fromX) / distance,
-            y: (toY - fromY) / distance
+            y: (toY - fromY) / distance,
           };
 
           var dist =
@@ -1685,11 +1680,11 @@ export var App = function(name, version) {
           // get from / to
           var from = {
             x: fromX + normal.x * dist * scale,
-            y: fromY + normal.y * dist * scale
+            y: fromY + normal.y * dist * scale,
           };
           var to = {
             x: toX - normal.x * dist * scale,
-            y: toY - normal.y * dist * scale
+            y: toY - normal.y * dist * scale,
           };
 
           self.context.strokeStyle =
@@ -1884,7 +1879,7 @@ export var App = function(name, version) {
             self.editingHistory.push({
               text: text,
               start: startOffset,
-              end: endOffset
+              end: endOffset,
             });
           clearTimeout(self.editingSaveHistoryTimeout);
           self.editingSaveHistoryTimeout = setTimeout(function() {
@@ -1969,7 +1964,7 @@ export var App = function(name, version) {
           self.transformOrigin[0] +
           ',' +
           self.transformOrigin[1] +
-          ')'
+          ')',
       },
       speed || 0,
       'easeInQuad',
