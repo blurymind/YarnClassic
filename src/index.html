@@ -151,7 +151,10 @@
 						<button class="bbcode-button" style="color:green" onclick="app.insertBBcodeTags('color=#')"><text color="pink" title="Color">🌈</text></button>
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('img')" title="Image">🦄</button>
 						<button class="bbcode-button" style="color:purple" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
-						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
+						<span class="hide-when-narrow">
+							<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
+						</span> 
+						
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertEmoji()" title="Emoji">😉</button>
 
 						<div class="app-menu" style="position: absolute;">
@@ -164,22 +167,25 @@
 							</div>
 						</div>
 						&nbsp;
-						<span class="styled-checkbox">
+						<span class="styled-checkbox hide-when-narrow">
 								<input type="checkbox" id="toglShowCounter" onclick="app.toggleShowCounter()"></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
 						<span class="editor-counter">
-							&nbsp;
-							Length: <span class="character-count">0</span>
-							&nbsp;
-							Lines: <span class="line-count">0</span>
-							&nbsp;
-							<span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
-							&nbsp;
-							Line: <span class="row-index">0</span>
-							&nbsp;
-							Col: <span class="column-index">0</span>
+							<span class="hide-when-narrow">
+									&nbsp;
+									Length: <span class="character-count">0</span>
+									&nbsp;
+									Lines: <span class="line-count">0</span>
+									&nbsp;
+									<span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
+									&nbsp;
+									Line: <span class="row-index">0</span>
+									&nbsp;
+									Col: <span class="column-index">0</span>
+							</span>
 						</span>
+
 						<span class="styled-checkbox">
 							<input type="checkbox" id="toglAutocomplete"></input>
 							<label for="toglAutocomplete" title="Auto Close tags" style="color:#292929">🔮</label>

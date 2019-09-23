@@ -660,7 +660,7 @@ a:hover {
 .node-editor .form .editor-container {
   margin-top: 2px;
   width: 100%;
-  height: calc(100% - 120px);
+  height: calc(100% - 85px);
   float: left;
   overflow: hidden;
   position: relative;
@@ -769,9 +769,15 @@ a:hover {
   }
 }
 
+.show-when-narrow {
+  display: none !important;
+}
 @media only screen and (max-width: 500px) {
   .hide-when-narrow {
-    display: none;
+    display: none !important;
+  }
+  .show-when-narrow {
+    display: visible !important;
   }
   /* portrait mode css */
   .app-menu {
@@ -798,15 +804,18 @@ a:hover {
   }
 
   .node-editor .form {
-    top: 7%;
-    padding: 5px 5px 10px 5px;
+    top: 5%;
+    height: 95%;
+    padding: 2px 2px 5px 2px;
+    line-height: 0em;
     border-radius: 4px;
   }
   .node-editor .form input[type='text'] {
-    font-size: 0.9em;
-    padding: 2px 0px 2px 5px;
-    margin-top: 0.1em;
-    border-bottom: 1px;
+    font-size: 1em !important;
+    padding: 0px 0px 0px 0px !important;
+    margin-top: 0em !important;
+    margin-bottom: 0px !important;
+    border-bottom: 0px !important;
   }
 
   .context-menu-visible > .context-menu-list {
