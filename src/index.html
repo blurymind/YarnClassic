@@ -20,7 +20,7 @@
 
 			<!-- search form -->
 			<div class="app-search">
-				<input id="nodeSearchInput" type="text" class="search-field"/>
+				<input id="nodeSearchInput" type="text" class="search-field" placeholder="Search"/>
 				
 				<span>
 						<span class="search-title styled-checkbox">
@@ -139,8 +139,8 @@
 			<div class="node-editor" data-bind="mousedown:app.saveNode">				
 			
 				<div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-					<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)">
-					<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)">
+					<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
+					<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
 					<div class="bbcode-toolbar">
 						<button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
