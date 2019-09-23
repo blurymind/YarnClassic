@@ -807,8 +807,8 @@ a:hover {
   }
 
   .node-editor .form {
-    top: 5%;
-    height: 95%;
+    top: 8%;
+    height: 92%;
     padding: 2px 2px 5px 2px;
     line-height: 0em;
     border-radius: 4px;
@@ -838,6 +838,12 @@ a:hover {
   .app-undo-redo span {
     display: inline;
   }
+  /* .ace_gutter {
+    left: -10px !important;
+  }
+  .ace_scroller {
+    left: 30px !important;
+  } */
 }
 
 .tooltip {
