@@ -34,7 +34,7 @@ The runtime is a library that allows your game engine to parse the files that ya
 - YarnSpinner : A C# library for interactive dialogue in games! Ideal  if you are using Unity3d or another C# game engine!
 https://github.com/YarnSpinnerTool/YarnSpinner
 
-- Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop uses it).
+- Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop and ctjs use it).
 https://github.com/hylyh/bondage.js
 
 # 🐬 Features 🦄
