@@ -25,10 +25,11 @@ const config = {
   // },
   module: {
     rules: [
-      {
-        test: /\.html$/,
-        loader: 'html-loader',
-      },
+      // This seems to ignore the minification settings set in HtmlWebPackPlugin
+      // {
+      //   test: /\.html$/,
+      //   loader: 'html-loader',
+      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -53,7 +54,7 @@ const config = {
           {
             loader: 'url-loader',
             options: {
-              limit: 8192,
+              limit: 1024,
               name: '[name].[ext]',
               fallback: 'file-loader',
               outputPath: 'public/images'
@@ -132,7 +133,6 @@ const config = {
       background_color: '#3367D6',
       theme_color: "#3367D6",
       display: "fullscreen",
-      scope: "/",
       crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
       icons: [
         {
@@ -149,14 +149,15 @@ const config = {
       template: path.resolve(__dirname, './src/index.html'),
       minify: {
         collapseWhitespace: true,
-        useShortDoctype: true
+        removeComments: false,  // This is mandatory, due to knockout's virtual bindings
+        useShortDoctype: true,
       }
     }),
-    new FaviconsWebpackPlugin(path.resolve(__dirname, 'src/public/icon.png')),
-    // new WorkboxPlugin.GenerateSW({
-    //   clientsClaim: true,
-    //   skipWaiting: true,
-    // }),
+    new FaviconsWebpackPlugin({
+      publicPath: "./",
+      logo: path.resolve(__dirname, 'src/public/icon.png'),
+      cache: true,
+    }),
     new OfflinePlugin({
       // responseStrategy: 'network-first',
       externals: [
