@@ -15,11 +15,31 @@ alt="Yarn web app"  height="480" border="10" /></a>
 2. Open the web browser's menu and select "Add to home screen" 
 3. When you run Yarn from the home screen, it will work in full screen mode!
 
-# Roadmap
+# 🚧 Roadmap
 You can see planned features, vote for features or see how you can contribute at the roadmap here:
 https://trello.com/b/ZXhhOzDl/yarn-roadmap
 
-# BBcode styling in editor, Spellchecking, Autocompletion, and more!
+# 🎮 Game engines that bundle Yarn editor
+There are a few game engines that have YarnEditor bundled with their IDE. That means that you can use it straight in those engines, without need to save files and open files and so on. It's directly integratedin their workflow!
+
+- Gdevelop : A full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
+https://github.com/4ian/GDevelop
+
+- Ct.js : A desktop game editor that makes learning programming fun and game development easy by its visual editors and well-documented code library.
+https://github.com/ct-js/ct-js
+
+# 🧠 Yarn runtimes
+The runtime is a library that allows your game engine to parse the files that yarn creates. There are a couple of popular ones that you can use. If you have created a runtime, you are working on one or want to get one included with your game engine, these can be of some use to you
+
+- YarnSpinner : A C# library for interactive dialogue in games! Ideal  if you are using Unity3d or another C# game engine!
+https://github.com/YarnSpinnerTool/YarnSpinner
+
+- Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop uses it).
+https://github.com/hylyh/bondage.js
+
+# 🐬 Features 🦄
+
+### BBcode styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
 - preview of bbcode tag effects and goto in trimmed nodes
 - optional spell checking
@@ -36,9 +56,9 @@ https://trello.com/b/ZXhhOzDl/yarn-roadmap
 - Button to go back to the previous edited node. If there is no previous - save and close the current one
 ![yarn-0 3 5-newfeatures](https://user-images.githubusercontent.com/6495061/50045609-b646e900-008d-11e9-9f17-2ac6b01908f6.gif)
 
-# Builds
+# Electron Builds
 
-Win64 and MacOS: https://github.com/blurymind/Yarn/releases/latest
+Win64 and MacOS: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
 
 # To compile and run web app on localhost from source:
 Make sure you have nodejs installed. Then from the root folder
