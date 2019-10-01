@@ -1177,7 +1177,7 @@ export var App = function(name, version) {
                   self.moveEditCursor(-5);
                   break;
                 case '[i]':
-                  self.insertTextAtCursor('[/i] ');
+                  self.insertTextAtCursor('][/i] ');
                   self.moveEditCursor(-5);
                   break;
                 case '[img':
