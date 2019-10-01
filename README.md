@@ -23,11 +23,9 @@ https://trello.com/b/ZXhhOzDl/yarn-roadmap
 There are a few game engines that have YarnEditor bundled with their IDE. That means that you can use it straight in those engines, without need to save files and open files and so on. It's directly integratedin their workflow!
 
 - Gdevelop : A full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
-
 https://github.com/4ian/GDevelop
 
 - Ct.js : A desktop game editor that makes learning programming fun and game development easy by its visual editors and well-documented code library.
-
 https://github.com/ct-js/ct-js
 
 # 🧠 Yarn runtimes
@@ -37,7 +35,6 @@ The runtime is a library that allows your game engine to parse the files that ya
 https://github.com/YarnSpinnerTool/YarnSpinner
 
 - Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop uses it).
-
 https://github.com/hylyh/bondage.js
 
 # 🐬 Features 🦄
