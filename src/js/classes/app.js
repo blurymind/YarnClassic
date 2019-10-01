@@ -1176,7 +1176,7 @@ export var App = function(name, version) {
                   self.insertTextAtCursor('][/b] ');
                   self.moveEditCursor(-5);
                   break;
-                case '[i]':
+                case '[i':
                   self.insertTextAtCursor('][/i] ');
                   self.moveEditCursor(-5);
                   break;
