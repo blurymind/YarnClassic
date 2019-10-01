@@ -60,7 +60,7 @@ https://github.com/hylyh/bondage.js
 
 Win64 and MacOS: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
 
-# To compile and run web app on localhost from source:
+# ⚙️ To compile and run web app on localhost from source:
 Make sure you have nodejs installed. Then from the root folder
 ```
 npm install
@@ -92,7 +92,7 @@ or
 npm run build-linux
 ```
 
-# Examples
+# 😮 Examples
 
 Games built with Unity and Yarn.
 
