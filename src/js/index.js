@@ -1,4 +1,8 @@
 import "../scss/index.scss";
+
+import * as OfflinePluginRuntime from 'offline-plugin/runtime';
+OfflinePluginRuntime.install();
+
 import ko from "knockout";
 window.ko = ko;
 
