@@ -60,19 +60,24 @@ https://github.com/hylyh/bondage.js
 
 Win64 and MacOS: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
 
-# ⚙️ To compile and run web app on localhost from source:
+# ⚙️ Compile and run web app on localhost:
 Make sure you have nodejs installed. Then from the root folder
 ```
 npm install
 
 npm start
 ```
+You can access it on your smartphone too if it is on the same wifi network
+
 # To build web app:
 ```
 npm run build
 
 ```
+you will find it in the /dist folder
+
 # To compile and run electron app:
+First of all you need to have compiled the web app (see previous steps)
 ```
 cd electron
 
