@@ -167,7 +167,7 @@ const config = {
     }),
   ],
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.join(__dirname, 'src'),
     host: '0.0.0.0' //this will allow you to run it on a smartphone with 8080 port. Use ipconfig or ifconfig to see broadcast address
   },
   optimization: {
