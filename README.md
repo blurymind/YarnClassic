@@ -15,6 +15,10 @@ alt="Yarn web app"  height="480" border="10" /></a>
 2. Open the web browser's menu and select "Add to home screen" 
 3. When you run Yarn from the home screen, it will work in full screen mode!
 
+# Roadmap
+You can see planned features, vote for features or see how you can contribute at the roadmap here:
+https://trello.com/b/ZXhhOzDl/yarn-roadmap
+
 # BBcode styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
 - preview of bbcode tag effects and goto in trimmed nodes
