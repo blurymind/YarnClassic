@@ -2,14 +2,14 @@
 
 Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 
-# 🧶 Live Web APP (Use it in the browser) 🧶
+# 🧶 Live Web APP (Use it in the browser)
 <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/>
 <a href="https://yarnspinnertool.github.io/YarnEditor/
 " target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png" 
 alt="Yarn web app"  height="480" border="10" /></a>
 
-# 📲 Install the Web App on your mobile device 🧶
+# 📲 Install the Web App on your mobile device
 1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/> with your smartphone or tablet
 2. Open the web browser's menu and select "Add to home screen" 
@@ -23,9 +23,11 @@ https://trello.com/b/ZXhhOzDl/yarn-roadmap
 There are a few game engines that have YarnEditor bundled with their IDE. That means that you can use it straight in those engines, without need to save files and open files and so on. It's directly integratedin their workflow!
 
 - Gdevelop : A full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
+
 https://github.com/4ian/GDevelop
 
 - Ct.js : A desktop game editor that makes learning programming fun and game development easy by its visual editors and well-documented code library.
+
 https://github.com/ct-js/ct-js
 
 # 🧠 Yarn runtimes
@@ -35,6 +37,7 @@ The runtime is a library that allows your game engine to parse the files that ya
 https://github.com/YarnSpinnerTool/YarnSpinner
 
 - Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop uses it).
+
 https://github.com/hylyh/bondage.js
 
 # 🐬 Features 🦄
