@@ -423,8 +423,9 @@ export var App = function(name, version) {
         }
         // ctrl + x
         else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          app.clipboard = app.editor.getSelectedText();
-          app.insertTextAtCursor('');
+          document.execCommand('copy');
+          self.clipboard = self.editor.getSelectedText();
+          self.insertTextAtCursor('');
         }
       } else {
         // ctrl + c NODES
