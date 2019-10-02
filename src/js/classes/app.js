@@ -471,28 +471,33 @@ export var App = function(name, version) {
     });
 
     $(document).on('keyup', function(e) {
-      if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
-        // ctrl + v NODES
-        if (!self.editing() && self.nodeClipboard.length) {
-          self.deselectAllNodes();
-          self.nodeClipboard.forEach(function(node) {
-            self.nodes.push(node);
-            self.addNodeSelected(node);
-            self.recordNodeAction('created', node);
-          });
-          self.updateNodeLinks();
+      // console.log(e.keyCode);
+      if (!self.editing()) {
+        // ctrl + a
+        if ((e.metaKey || e.ctrlKey) && e.keyCode == 65) {
+          self.selectAllNodes();
         }
-      }
-      // console.log(e.keyCode+"-"+e.key)
-      if (e.keyCode === 46 || e.key === 'Delete') {
-        // Delete selected
-        if (self.editing() === null) {
+        if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
+          // ctrl + v NODES
+          if (self.nodeClipboard.length) {
+            self.deselectAllNodes();
+            self.nodeClipboard.forEach(function(node) {
+              self.nodes.push(node);
+              self.addNodeSelected(node);
+              self.recordNodeAction('created', node);
+            });
+            self.updateNodeLinks();
+          }
+        }
+        // console.log(e.keyCode+"-"+e.key)
+        if (e.keyCode === 46 || e.key === 'Delete') {
+          // Delete selected
           self.deleteSelectedNodes();
         }
       }
+
       if (e.keyCode === 31 || e.key === 'Enter') {
         // Open active node, if already active, close it
-
         if (self.editing() === null) {
           var activeNode = self.nodes()[self.focusedNodeIdx];
           if (activeNode !== undefined) {
@@ -976,6 +981,13 @@ export var App = function(name, version) {
     var nodes = self.nodes();
     for (var i in nodes) {
       self.removeNodeSelection(nodes[i]);
+    }
+  };
+
+  this.selectAllNodes = function() {
+    var nodes = self.nodes();
+    for (var i in nodes) {
+      self.addNodeSelected(nodes[i]);
     }
   };
 
@@ -2034,9 +2046,12 @@ export var App = function(name, version) {
   };
 
   this.arrangeSpiral = function() {
-    const selectedNodes = self.getSelectedNodes().length
-      ? self.getSelectedNodes()
-      : self.nodes();
+    const selectedNodes = self.getSelectedNodes();
+
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
 
     for (var i in selectedNodes) {
       var node = selectedNodes[i];
@@ -2047,9 +2062,12 @@ export var App = function(name, version) {
   };
 
   this.sortAlphabetical = function() {
-    const selectedNodes = self.getSelectedNodes().length
-      ? self.getSelectedNodes()
-      : self.nodes();
+    const selectedNodes = self.getSelectedNodes();
+
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
 
     selectedNodes.sort(function(a, b) {
       return a.title().localeCompare(b.title());
