@@ -147,7 +147,7 @@ https://github.com/InfiniteAmmoInc/yarn-test
 
 You can find a more advanced Yarn interpreter here: 
 
-https://github.com/thesecretlab/YarnSpinner
+https://github.com/YarnSpinnerTool/YarnSpinner
 
 # Yarn Icon
 
