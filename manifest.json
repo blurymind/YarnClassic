@@ -1,14 +1,48 @@
 {
-  "short_name": "Yarn",
-  "name": "Yarn Story Editor",
   "icons": [
     {
-      "src": "./icon.ico",
-      "sizes": "32x32"
+      "src": "icon_32x32.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icon_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
     }
   ],
-  "background_color": "#3367D6",
+  "name": "Yarn Story Editor",
+  "short_name": "Yarn",
+  "orientation": "portrait",
   "display": "fullscreen",
-  "scope": "/",
+  "start_url": ".",
+  "dir": "auto",
+  "description": "Yarn Story Editor",
+  "background_color": "#3367D6",
   "theme_color": "#3367D6"
 }
