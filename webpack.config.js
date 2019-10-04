@@ -8,7 +8,6 @@ const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const OfflinePlugin = require('offline-plugin');
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
 
@@ -25,11 +24,6 @@ const config = {
   // },
   module: {
     rules: [
-      // This seems to ignore the minification settings set in HtmlWebPackPlugin
-      // {
-      //   test: /\.html$/,
-      //   loader: 'html-loader',
-      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -102,10 +96,6 @@ const config = {
       ko: 'exports-loader?!knockout'
     }),
     new CopyWebpackPlugin([
-      // {
-      //   from: './src/___manifest.json',
-      //   to: ''
-      // },
       {
         from: path.resolve(__dirname, 'src', 'public'),
         to: 'public'
@@ -137,7 +127,7 @@ const config = {
       icons: [
         {
           src: path.resolve('src/public/icon.png'),
-          sizes: [96, 128, 192, 256, 384, 512] // multiple sizes
+          sizes: [96, 128] // multiple sizes
         },
         {
           src: path.resolve('src/public/icon.ico'),
@@ -147,16 +137,12 @@ const config = {
     }),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, './src/index.html'),
+      favicon: path.resolve('src/public/icon.ico'),
       minify: {
         collapseWhitespace: true,
         removeComments: false,  // This is mandatory, due to knockout's virtual bindings
         useShortDoctype: true,
       }
-    }),
-    new FaviconsWebpackPlugin({
-      publicPath: "./",
-      logo: path.resolve(__dirname, 'src/public/icon.png'),
-      cache: true,
     }),
     new OfflinePlugin({
       // responseStrategy: 'network-first',
