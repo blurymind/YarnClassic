@@ -6,14 +6,15 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
-const glob = require('glob');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
+const OfflinePlugin = require('offline-plugin');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
 
 const config = {
   mode: IS_DEV ? 'development' : 'production',
   devtool: IS_DEV ? 'eval' : 'source-map',
-  entry: './src/js/index.js',
+  entry: path.resolve(__dirname, 'src', "js", "index.js"),
   output: {
     filename: 'js/[name].[hash].js',
     path: path.resolve(__dirname, 'dist')
@@ -47,7 +48,7 @@ const config = {
           {
             loader: 'url-loader',
             options: {
-              limit: 8192,
+              limit: 1024,
               name: '[name].[ext]',
               fallback: 'file-loader',
               outputPath: 'public/images'
@@ -75,7 +76,7 @@ const config = {
         ]
       },
       {
-        test: /\.(ttf|eot|woff|woff2)$/,
+        test: /\.(ttf|eot|woff|woff2|ico)$/,
         use: {
           loader: 'file-loader',
           options: {
@@ -96,23 +97,60 @@ const config = {
     }),
     new CopyWebpackPlugin([
       {
-        from: './src/manifest.json',
-        to: ''
-      },
-      {
-        from: './src/public',
+        from: path.resolve(__dirname, 'src', 'public'),
         to: 'public'
       }
     ]),
     new MiniCssExtractPlugin({
-      filename: IS_DEV ? 'css/[name].css' : 'css/[name].[contenthash].css',
+      filename: IS_DEV
+        ? 'css/[name].css'
+        : 'css/[name].[contenthash].css',
       chunkFilename: 'css/[id].css'
     }),
     new webpack.HashedModuleIdsPlugin(),
     new PreloadWebpackPlugin({
       include: 'initial'
     }),
-    new CssUrlRelativePlugin()
+    new CssUrlRelativePlugin(),
+    new WebpackPwaManifest({
+      filename: "manifest.json",
+      inject: true,
+      fingerprints: false,
+      dir: 'auto',
+      name: 'Yarn Story Editor',
+      short_name: 'Yarn',
+      description: 'Yarn Story Editor',
+      background_color: '#3367D6',
+      theme_color: "#3367D6",
+      display: "fullscreen",
+      crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+      icons: [
+        {
+          src: path.resolve('src/public/icon.png'),
+          sizes: [96, 128] // multiple sizes
+        },
+        {
+          src: path.resolve('src/public/icon.ico'),
+          sizes: [32] // you can also use the specifications pattern
+        }
+      ]
+    }),
+    new HtmlWebPackPlugin({
+      template: path.resolve(__dirname, './src/index.html'),
+      favicon: path.resolve('src/public/icon.ico'),
+      minify: {
+        collapseWhitespace: true,
+        removeComments: false,  // This is mandatory, due to knockout's virtual bindings
+        useShortDoctype: true,
+      }
+    }),
+    new OfflinePlugin({
+      // responseStrategy: 'network-first',
+      externals: [
+        'https://www.dropbox.com/static/api/2/dropins.js',
+        'https://www.dropbox.com/static/images/widgets/dbx-saver-status.png',
+      ],
+    }),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
@@ -143,21 +181,5 @@ if (!IS_DEV) {
     new OptimizeCSSAssetsPlugin({})
   );
 }
-
-const files = glob.sync('./src/*.html');
-
-files.forEach(file => {
-  config.plugins.push(
-    new HtmlWebPackPlugin({
-      filename: path.basename(file),
-      template: file,
-      favicon: path.resolve(__dirname, './src/public/icon.ico'),
-      minify: {
-        collapseWhitespace: true,
-        useShortDoctype: true
-      }
-    })
-  );
-});
 
 module.exports = config;
