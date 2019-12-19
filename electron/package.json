@@ -18,7 +18,8 @@
     "build-web-app": "cd .. && npm run build && npm run copy-web-app",
     "start": "npm run build-web-app-dev && electron --no-sandbox .",
     "build-linux": "npm run build-web-app && electron-builder --linux",
-    "build-windows": "npm run build-web-app && electron-builder --windows"
+    "build-windows": "npm run build-web-app && electron-builder --windows",
+    "build-mac": "npm run build-web-app && electron-builder --macos"
   },
   "dependencies": {
     "electron-is": "^3.0.0"
