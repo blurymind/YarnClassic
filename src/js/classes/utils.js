@@ -4,7 +4,7 @@ export var FILETYPE = {
   TWEE: 'twee',
   TWEE2: 'tw2',
   UNKNOWN: 'none',
-  YARNTEXT: 'yarn.txt'
+  YARN: 'yarn'
 };
 
 export var Utils = {

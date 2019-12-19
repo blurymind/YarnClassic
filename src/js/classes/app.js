@@ -391,7 +391,7 @@ export var App = function(name, version) {
         } else if (e.altKey) {
           switch (e.keyCode) {
             case 83:
-              data.trySave(FILETYPE.YARNTEXT);
+              data.trySave(FILETYPE.YARN);
               self.fileKeyPressed = true;
               break;
           }

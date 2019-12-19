@@ -87,9 +87,9 @@ export var data = {
 
     if (filename.toLowerCase().indexOf('.json') > -1) return FILETYPE.JSON;
     else if (filename.toLowerCase().indexOf('.yarn.txt') > -1)
-      return FILETYPE.YARNTEXT;
+      return FILETYPE.YARN;
     else if (filename.toLowerCase().indexOf('.yarn') > -1)
-      return FILETYPE.YARNTEXT;
+      return FILETYPE.YARN;
     else if (filename.toLowerCase().indexOf('.xml') > -1) return FILETYPE.XML;
     else if (filename.toLowerCase().indexOf('.txt') > -1) return FILETYPE.TWEE;
     else if (filename.toLowerCase().indexOf('.tw2') > -1) return FILETYPE.TWEE2;
@@ -110,7 +110,7 @@ export var data = {
         return;
       }
       for (i = 0; i < content.length; i++) objects.push(content[i]);
-    } else if (type == FILETYPE.YARNTEXT) {
+    } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
       var index = 0;
@@ -282,7 +282,7 @@ export var data = {
 
     if (type == FILETYPE.JSON) {
       output = JSON.stringify(content, null, '\t');
-    } else if (type == FILETYPE.YARNTEXT) {
+    } else if (type == FILETYPE.YARN) {
       for (i = 0; i < content.length; i++) {
         output += 'title: ' + content[i].title + '\n';
         output += 'tags: ' + content[i].tags + '\n';
