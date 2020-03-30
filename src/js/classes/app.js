@@ -1159,7 +1159,7 @@ export var App = function(name, version) {
         self.getOtherNodeTitles(),
         'Node Link'
       );
-      langTools.addCompleter(nodeLinksCompleter);
+      langTools.setCompleters([nodeLinksCompleter]);
 
       if (!self.nodeVisitHistory.includes(node.title())) {
         self.nodeVisitHistory.push(node.title());
