@@ -404,10 +404,13 @@ export var Node = function() {
   };
 
   this.updateLinksFromParents = function() {
-    self.linkedFrom.removeAll();
+    // If title didn't change there's nothing we need to update on parents
     if ( !self.oldTitle || (self.oldTitle === self.title()) ) {
-      return
+      return;
     }
+
+    self.linkedFrom.removeAll();
+
     app.nodes().forEach( parent => {
       var parentLinks = self.getLinksInNode(parent);
       if (parentLinks && parentLinks.includes(self.oldTitle)) {
@@ -417,6 +420,7 @@ export var Node = function() {
         self.linkedFrom.push(parent);
       }
     });
+
     self.oldTitle = undefined;
   }
 
