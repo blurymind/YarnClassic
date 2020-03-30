@@ -1594,7 +1594,7 @@ export var App = function(name, version) {
   };
 
   this.trimBodyLinks = function ( body ) {
-    var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g
+    var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g;
     return body.replace(re, '[[$1\|$2]]');
   };
 
