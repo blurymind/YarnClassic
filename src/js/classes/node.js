@@ -7,8 +7,9 @@ const NodeExpandHeight = 150;
 const ClipNodeTextLength = 1024;
 const bbcode = require('bbcode');
 
-export var Node = function() {
+export var Node = function(options = {}) {
   var self = this;
+
   this.titleColorValues = [
     '#eee',
     '#6EA5E0',
@@ -18,23 +19,24 @@ export var Node = function() {
     '#C47862',
     '#97E1E9'
   ];
+
   // primary values
   this.index = ko.observable(globalNodeIndex++);
-  this.title = ko.observable('Node' + this.index());
-  this.tags = ko.observable('');
-  this.body = ko.observable('Empty Text');
+  this.title = ko.observable(options.title || 'Node_' + this.index());
+  this.tags = ko.observable(options.tags || '');
+  this.body = ko.observable(options.body || 'Empty Text');
   //this.x = ko.observable(128);
   //this.y = ko.observable(128);
-  this.active = ko.observable(true);
-  this.tempWidth;
-  this.tempHeight;
-  this.tempOpacity;
-  this.style;
-  this.colorID = ko.observable(0);
+  this.active = ko.observable(options.active || true);
+  this.tempWidth = null;
+  this.tempHeight = null;
+  this.tempOpacity = null;
+  this.style = null;
+  this.colorID = ko.observable(options.colorID || 0);
   this.checked = false;
   this.selected = false;
-  this.createX = null;
-  this.createY = null;
+  this.createX = options.x || null;
+  this.createY = options.y || null;
 
   // clipped values for display
   this.clippedTags = ko.computed(function() {
