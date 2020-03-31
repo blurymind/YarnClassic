@@ -373,9 +373,7 @@ export var Node = function() {
   };
 
   this.getLinksInNode = function(node) {
-    node = node || self;
-
-    var links = node.body().match(/\[\[(.*?)\]\]/g);
+    var links = (node || self).body().match(/\[\[(.*?)\]\]/g);
 
     if (links != undefined) {
       var exists = {};
