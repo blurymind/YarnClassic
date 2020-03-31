@@ -1085,7 +1085,7 @@ export var App = function(name, version) {
   };
 
   this.editNode = function(node) {
-    if ( !node.active() ) {
+    if (!node.active()) {
       return;
     }
 
@@ -1520,8 +1520,8 @@ export var App = function(name, version) {
 
   this.saveNode = function() {
     if (self.editing() != null) {
-      self.editing().title ( document.getElementById('editorTitle').value.trim() );
-      self.editing().body ( self.trimBodyLinks( self.editing().body() ) );
+      self.editing().title (document.getElementById('editorTitle').value.trim());
+      self.editing().body (self.trimBodyLinks(self.editing().body()));
 
       self.makeNewNodesFromLinks();
       self.updateNodeLinksStartingFromNode(self.editing());
@@ -1593,7 +1593,7 @@ export var App = function(name, version) {
     }
   };
 
-  this.trimBodyLinks = function ( body ) {
+  this.trimBodyLinks = function(body) {
     var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g;
     return body.replace(re, '[[$1\|$2]]');
   };
@@ -1610,24 +1610,24 @@ export var App = function(name, version) {
 
     toUpdate.push(node);
 
-    while (node = toUpdate.pop() ) {
-      if ( updated.includes(node) ) {
+    while (node = toUpdate.pop()) {
+      if (updated.includes(node)) {
         continue;
       }
 
-      updated.push( node );
+      updated.push(node);
 
       node.updateLinks();
 
-      node.linkedTo().forEach( child => {
-        if ( !updated.includes ( child ) ) {
-          toUpdate.push( child );
+      node.linkedTo().forEach(child => {
+        if (!updated.includes(child)) {
+          toUpdate.push(child);
         }
       });
 
-      node.linkedFrom().forEach( parent => {
-        if ( !updated.includes ( parent ) )
-          toUpdate.push( parent );
+      node.linkedFrom().forEach(parent => {
+        if (!updated.includes(parent))
+          toUpdate.push(parent);
       });
     }
   };

@@ -405,18 +405,18 @@ export var Node = function() {
 
   this.updateLinksFromParents = function() {
     // If title didn't change there's nothing we need to update on parents
-    if ( !self.oldTitle || (self.oldTitle === self.title()) ) {
+    if(!self.oldTitle || (self.oldTitle === self.title())) {
       return;
     }
 
     self.linkedFrom.removeAll();
 
-    app.nodes().forEach( parent => {
+    app.nodes().forEach(parent => {
       var parentLinks = self.getLinksInNode(parent);
       if (parentLinks && parentLinks.includes(self.oldTitle)) {
         var re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
         var newBody = parent.body().replace(re, '|' + self.title() + ']]');
-        parent.body( newBody );
+        parent.body(newBody);
         self.linkedFrom.push(parent);
       }
     });
