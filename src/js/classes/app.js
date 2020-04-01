@@ -350,8 +350,8 @@ export var App = function(name, version) {
         var x = (self.transformOrigin[0] * -1) / self.cachedScale,
           y = (self.transformOrigin[1] * -1) / self.cachedScale;
 
-        x += event.pageX / self.cachedScale;
-        y += event.pageY / self.cachedScale;
+        x += e.pageX / self.cachedScale;
+        y += e.pageY / self.cachedScale;
 
         self.newNodeAt(x, y);
       }
