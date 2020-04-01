@@ -1103,9 +1103,13 @@ export var App = function(name, version) {
   };
 
   this.editNode = function(node) {
-    if (node.active()) {
-      // console.log(node)
-      self.editing(node);
+    if (!node.active()) {
+      return;
+    }
+
+    node.oldTitle = node.title(); // To check later if "title" changed
+
+    self.editing(node);
 
       $('.node-editor')
         .css({ opacity: 0 })
@@ -1177,7 +1181,7 @@ export var App = function(name, version) {
         self.getOtherNodeTitles(),
         'Node Link'
       );
-      langTools.addCompleter(nodeLinksCompleter);
+      langTools.setCompleters([nodeLinksCompleter]);
 
       if (!self.nodeVisitHistory.includes(node.title())) {
         self.nodeVisitHistory.push(node.title());
@@ -1252,7 +1256,6 @@ export var App = function(name, version) {
 
       self.toggleSpellCheck();
       self.updateEditorStats();
-    }
   };
 
   this.chooseRelativePathImage = function(imagePath) {
@@ -1535,9 +1538,12 @@ export var App = function(name, version) {
 
   this.saveNode = function() {
     if (self.editing() != null) {
+      self.editing().title (document.getElementById('editorTitle').value.trim());
+      self.editing().body (self.trimBodyLinks(self.editing().body()));
+
       self.makeNewNodesFromLinks();
-      self.updateNodeLinks();
-      self.editing().title(self.trim(self.editing().title()));
+      self.updateNodeLinksStartingFromNode(self.editing());
+
       $('.node-editor').transition({ opacity: 0 }, 250);
       $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
         self.editing(null);
@@ -1605,8 +1611,43 @@ export var App = function(name, version) {
     }
   };
 
+  this.trimBodyLinks = function(body) {
+    var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g;
+    return body.replace(re, '[[$1\|$2]]');
+  };
+
   this.updateNodeLinks = function() {
     for (var i in self.nodes()) self.nodes()[i].updateLinks();
+  };
+
+  // TODO: probably 'updateNodeLinksStartingFromNode' can be used as a
+  // replacement for 'updateNodeLinks'. I'll check it in next iterations.
+  this.updateNodeLinksStartingFromNode = function(node) {
+    var toUpdate = [];
+    var updated = [];
+
+    toUpdate.push(node);
+
+    while (node = toUpdate.pop()) {
+      if (updated.includes(node)) {
+        continue;
+      }
+
+      updated.push(node);
+
+      node.updateLinks();
+
+      node.linkedTo().forEach(child => {
+        if (!updated.includes(child)) {
+          toUpdate.push(child);
+        }
+      });
+
+      node.linkedFrom().forEach(parent => {
+        if (!updated.includes(parent))
+          toUpdate.push(parent);
+      });
+    }
   };
 
   this.makeNewNodesFromLinks = function() {

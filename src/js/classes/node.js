@@ -374,9 +374,8 @@ export var Node = function(options = {}) {
     return false;
   };
 
-  this.getLinksInNode = function() {
-    // find all the links
-    var links = self.body().match(/\[\[(.*?)\]\]/g);
+  this.getLinksInNode = function(node) {
+    var links = (node || self).body().match(/\[\[(.*?)\]\]/g);
 
     if (links != undefined) {
       var exists = {};
@@ -400,24 +399,50 @@ export var Node = function(options = {}) {
 
   this.updateLinks = function() {
     self.resetDoubleClick();
-    // clear existing links
+    self.updateLinksFromParents();
+    self.updateLinksToChildren();
+  };
+
+  this.updateLinksFromParents = function() {
+    // If title didn't change there's nothing we need to update on parents
+    if(!self.oldTitle || (self.oldTitle === self.title())) {
+      return;
+    }
+
+    self.linkedFrom.removeAll();
+
+    app.nodes().forEach(parent => {
+      var parentLinks = self.getLinksInNode(parent);
+      if (parentLinks && parentLinks.includes(self.oldTitle)) {
+        var re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
+        var newBody = parent.body().replace(re, '|' + self.title() + ']]');
+        parent.body(newBody);
+        self.linkedFrom.push(parent);
+      }
+    });
+
+    self.oldTitle = undefined;
+  }
+
+  this.updateLinksToChildren = function() {
     self.linkedTo.removeAll();
-    // find all the links
+
     var links = self.getLinksInNode();
 
-    if (links != undefined) {
-      // update links
-      for (var index in app.nodes()) {
-        var other = app.nodes()[index];
-        for (var i = 0; i < links.length; i++) {
-          // if (other != self && other.title().toLowerCase() == links[i])
-          if (other != self && other.title().trim() == links[i].trim()) {
-            self.linkedTo.push(other);
-          }
+    if (!links) {
+      return;
+    }
+
+    for (var index in app.nodes()) {
+      var other = app.nodes()[index];
+      for (var i = 0; i < links.length; i++) {
+
+      if (other != self && other.title().trim() === links[i].trim()) {
+          self.linkedTo.push(other);
         }
       }
     }
-  };
+  }
 
   this.getScale = function() {
     if (app && typeof app.cachedScale === 'number') {
