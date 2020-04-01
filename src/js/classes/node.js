@@ -21,8 +21,9 @@ export var Node = function(options = {}) {
   ];
 
   // primary values
+  // TODO: I strongly think "this.index" is now unused
   this.index = ko.observable(globalNodeIndex++);
-  this.title = ko.observable(options.title || 'Node_' + this.index());
+  this.title = ko.observable(options.title || app.getUniqueTitle());
   this.tags = ko.observable(options.tags || '');
   this.body = ko.observable(options.body || 'Empty Text');
   //this.x = ko.observable(128);

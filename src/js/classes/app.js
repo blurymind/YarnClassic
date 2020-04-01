@@ -994,7 +994,7 @@ export var App = function(name, version) {
 
     self.nodeClipboard.forEach(function(copiedNode) {
       var node = new Node({
-        title: self.createTitleForCopiedNode(copiedNode.title()),
+        title: self.getUniqueTitle(copiedNode.title()),
         body: copiedNode.body(),
         tags: copiedNode.tags(),
         colorID: copiedNode.colorID(),
@@ -1538,11 +1538,26 @@ export var App = function(name, version) {
 
   this.saveNode = function() {
     if (self.editing() != null) {
-      self.editing().title (document.getElementById('editorTitle').value.trim());
-      self.editing().body (self.trimBodyLinks(self.editing().body()));
+      // Trim spaces from the title.
+      // I use document.getElementById because self.title() still returns the
+      // old title. I would like not having to do this. Any ideas?
+      var title = document.getElementById('editorTitle').value.trim();
+
+      // Make sure the new title is unique. Otherwise, put a trailing number
+      // or increment the existing one if any
+      title = self.getUniqueTitle(title);
+
+      // Update the title in the UI
+      // I use document.getElementById because self.title(title)
+      // does not immediatly change the value. I would like not having to do
+      // this. Any ideas?
+      document.getElementById('editorTitle').value = title;
+      self.editing().title(title);
+
+      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
 
       self.makeNewNodesFromLinks();
-      self.updateNodeLinksStartingFromNode(self.editing());
+      self.propagateUpdateFromNode(self.editing());
 
       $('.node-editor').transition({ opacity: 0 }, 250);
       $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
@@ -1620,9 +1635,9 @@ export var App = function(name, version) {
     for (var i in self.nodes()) self.nodes()[i].updateLinks();
   };
 
-  // TODO: probably 'updateNodeLinksStartingFromNode' can be used as a
+  // TODO: probably 'propagateUpdateFromNode' can be used as a
   // replacement for 'updateNodeLinks'. I'll check it in next iterations.
-  this.updateNodeLinksStartingFromNode = function(node) {
+  this.propagateUpdateFromNode = function(node) {
     var toUpdate = [];
     var updated = [];
 
@@ -2252,11 +2267,7 @@ export var App = function(name, version) {
     $('.editor-counter .column-index').html(cursor.column);
   };
 
-  this.createTitleForCopiedNode = function(originalTitle) {
-    return self.createUniqueTitle(originalTitle);
-  }
-
-  this.createUniqueTitle = function(desiredTitle) {
+  this.getUniqueTitle = function(desiredTitle) {
     var baseTitle = desiredTitle || 'Node';
     var counter = 2;
 
