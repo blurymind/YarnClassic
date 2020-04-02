@@ -2274,7 +2274,7 @@ export var App = function(name, version) {
     // If the title ends with "_[number]" use the same prefix with next number
     const re = /^(.*)(_([0-9]+))$/;
     const matches = baseTitle.match(re);
-    if (matches && matches.length===4) {
+    if (matches && matches.length === 4) {
       baseTitle = matches[1];
       counter = Number(matches[3]);
     }
