@@ -1539,8 +1539,6 @@ export var App = function(name, version) {
   this.saveNode = function() {
     if (self.editing() != null) {
       // Trim spaces from the title.
-      // I use document.getElementById because self.title() still returns the
-      // old title. I would like not having to do this. Any ideas?
       var title = document.getElementById('editorTitle').value.trim();
 
       // Make sure the new title is unique. Otherwise, put a trailing number
@@ -1548,9 +1546,6 @@ export var App = function(name, version) {
       title = self.getUniqueTitle(title);
 
       // Update the title in the UI
-      // I use document.getElementById because self.title(title)
-      // does not immediatly change the value. I would like not having to do
-      // this. Any ideas?
       document.getElementById('editorTitle').value = title;
       self.editing().title(title);
 
