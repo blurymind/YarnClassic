@@ -1538,15 +1538,17 @@ export var App = function(name, version) {
 
   this.saveNode = function() {
     if (self.editing() != null) {
+      const editorTitleElement = document.getElementById('editorTitle');
+
       // Trim spaces from the title.
-      var title = document.getElementById('editorTitle').value.trim();
+      var title = editorTitleElement.value.trim();
 
       // Make sure the new title is unique. Otherwise, put a trailing number
       // or increment the existing one if any
       title = self.getUniqueTitle(title);
 
       // Update the title in the UI
-      document.getElementById('editorTitle').value = title;
+      editorTitleElement.value = title;
       self.editing().title(title);
 
       self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
