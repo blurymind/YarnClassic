@@ -999,7 +999,7 @@ export var App = function(name, version) {
         tags: copiedNode.tags(),
         colorID: copiedNode.colorID(),
         x: copiedNode.createX,
-        y: copiedNode.createY
+        y: copiedNode.createY,
       });
 
       self.nodes.push(node);
@@ -1008,7 +1008,7 @@ export var App = function(name, version) {
     });
 
     self.updateNodeLinks();
-  }
+  };
 
   this.addNodeSelected = function(node) {
     var index = self.nodeSelection.indexOf(node);
@@ -1111,151 +1111,151 @@ export var App = function(name, version) {
 
     self.editing(node);
 
-      $('.node-editor')
-        .css({ opacity: 0 })
-        .transition({ opacity: 1 }, 250);
-      $('.node-editor .form')
-        .css({ y: '-100' })
-        .transition({ y: '0' }, 250);
-      self.editor = ace.edit('editor');
-      self.editor.navigateFileEnd();
+    $('.node-editor')
+      .css({ opacity: 0 })
+      .transition({ opacity: 1 }, 250);
+    $('.node-editor .form')
+      .css({ y: '-100' })
+      .transition({ y: '0' }, 250);
+    self.editor = ace.edit('editor');
+    self.editor.navigateFileEnd();
 
-      var autoCompleteButton = document.getElementById('toglAutocomplete');
-      autoCompleteButton.checked = self.config.autocompleteEnabled;
-      var autoCompleteWordsButton = document.getElementById(
-        'toglAutocompleteWords'
-      );
-      autoCompleteWordsButton.checked = self.config.autocompleteWordsEnabled;
-      var spellCheckButton = document.getElementById('toglSpellCheck');
-      spellCheckButton.checked = self.config.spellcheckEnabled;
-      var transcribeButton = document.getElementById('toglTranscribing');
-      transcribeButton.checked = self.config.transcribeEnabled;
-      self.toglTranscribing();
-      var nightModeButton = document.getElementById('toglNightMode');
-      nightModeButton.checked = self.config.nightModeEnabled;
-      self.toggleNightMode();
-      var showCounterButton = document.getElementById('toglShowCounter');
-      showCounterButton.checked = self.config.showCounter;
-      self.toggleShowCounter();
-      self.toggleWordCompletion();
+    var autoCompleteButton = document.getElementById('toglAutocomplete');
+    autoCompleteButton.checked = self.config.autocompleteEnabled;
+    var autoCompleteWordsButton = document.getElementById(
+      'toglAutocompleteWords'
+    );
+    autoCompleteWordsButton.checked = self.config.autocompleteWordsEnabled;
+    var spellCheckButton = document.getElementById('toglSpellCheck');
+    spellCheckButton.checked = self.config.spellcheckEnabled;
+    var transcribeButton = document.getElementById('toglTranscribing');
+    transcribeButton.checked = self.config.transcribeEnabled;
+    self.toglTranscribing();
+    var nightModeButton = document.getElementById('toglNightMode');
+    nightModeButton.checked = self.config.nightModeEnabled;
+    self.toggleNightMode();
+    var showCounterButton = document.getElementById('toglShowCounter');
+    showCounterButton.checked = self.config.showCounter;
+    self.toggleShowCounter();
+    self.toggleWordCompletion();
 
-      //// warn if titlealready exists
-      self.validateTitle();
-      /// set color picker
-      $('#colorPicker').spectrum({
-        flat: true,
-        showButtons: false,
-        showInput: true,
-        showPalette: true,
-        preferredFormat: 'hex',
-        palette: [
-          ['#000', '#444', '#666', '#999', '#ccc', '#eee', '#f3f3f3', '#fff'],
-          ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f', '#f0f'],
-          [
-            '#f4cccc',
-            '#fce5cd',
-            '#fff2cc',
-            '#d9ead3',
-            '#d0e0e3',
-            '#cfe2f3',
-            '#d9d2e9',
-            '#ead1dc',
-          ],
+    //// warn if titlealready exists
+    self.validateTitle();
+    /// set color picker
+    $('#colorPicker').spectrum({
+      flat: true,
+      showButtons: false,
+      showInput: true,
+      showPalette: true,
+      preferredFormat: 'hex',
+      palette: [
+        ['#000', '#444', '#666', '#999', '#ccc', '#eee', '#f3f3f3', '#fff'],
+        ['#f00', '#f90', '#ff0', '#0f0', '#0ff', '#00f', '#90f', '#f0f'],
+        [
+          '#f4cccc',
+          '#fce5cd',
+          '#fff2cc',
+          '#d9ead3',
+          '#d0e0e3',
+          '#cfe2f3',
+          '#d9d2e9',
+          '#ead1dc',
         ],
-        change: function(color) {
-          if ($('#colorPicker-container').is(':visible')) {
-            app.applyPickerColorEditor(color);
-            $('#colorPicker').spectrum('hide');
-            $('#colorPicker-container').hide();
-            app.moveEditCursor(color.toHexString().length);
-            app.togglePreviewMode(false);
-          }
-        },
-        clickoutFiresChange: true,
-      });
-
-      /// Enable autocompletion for node links (borked atm)
-      var langTools = ace.require('ace/ext/language_tools');
-      var nodeLinksCompleter = Utils.createAutocompleter(
-        ['string.llink', 'string.rlink'],
-        self.getOtherNodeTitles(),
-        'Node Link'
-      );
-      langTools.setCompleters([nodeLinksCompleter]);
-
-      if (!self.nodeVisitHistory.includes(node.title())) {
-        self.nodeVisitHistory.push(node.title());
-      }
-
-      // close tag autocompletion
-      self.editor.getSession().on('change', function(evt) {
-        if (evt.action === 'insert') {
-          var autoCompleteButton = document.getElementById('toglAutocomplete');
-          if (autoCompleteButton.checked) {
-            setTimeout(() => {
-              switch (self.getTagBeforeCursor()) {
-                case '[[':
-                  self.insertTextAtCursor(' answer: | ]] ');
-                  self.moveEditCursor(-4);
-                  break;
-                case '<<':
-                  self.insertTextAtCursor(' >> ');
-                  self.moveEditCursor(-3);
-                  break;
-                case '[colo':
-                  self.insertTextAtCursor('r=#][/color] ');
-                  self.moveEditCursor(-10);
-                  self.insertColorCode();
-                  break;
-                case '[b':
-                  self.insertTextAtCursor('][/b] ');
-                  self.moveEditCursor(-5);
-                  break;
-                case '[i':
-                  self.insertTextAtCursor('][/i] ');
-                  self.moveEditCursor(-5);
-                  break;
-                case '[img':
-                  self.insertTextAtCursor('][/img] ');
-                  self.moveEditCursor(-7);
-                  break;
-                case '[u':
-                  self.insertTextAtCursor('][/u] ');
-                  self.moveEditCursor(-5);
-                  break;
-              }
-            }, 200);
-            return;
-          }
+      ],
+      change: function(color) {
+        if ($('#colorPicker-container').is(':visible')) {
+          app.applyPickerColorEditor(color);
+          $('#colorPicker').spectrum('hide');
+          $('#colorPicker-container').hide();
+          app.moveEditCursor(color.toHexString().length);
+          app.togglePreviewMode(false);
         }
-      });
+      },
+      clickoutFiresChange: true,
+    });
 
-      /// init emoji picker
-      this.emPicker = new EmojiPicker(
-        document.getElementById('emojiPickerDom'),
-        emoji => {
-          self.insertTextAtCursor(emoji.char);
-          this.emPicker.toggle();
-          self.togglePreviewMode(false);
+    /// Enable autocompletion for node links (borked atm)
+    var langTools = ace.require('ace/ext/language_tools');
+    var nodeLinksCompleter = Utils.createAutocompleter(
+      ['string.llink', 'string.rlink'],
+      self.getOtherNodeTitles(),
+      'Node Link'
+    );
+    langTools.setCompleters([nodeLinksCompleter]);
+
+    if (!self.nodeVisitHistory.includes(node.title())) {
+      self.nodeVisitHistory.push(node.title());
+    }
+
+    // close tag autocompletion
+    self.editor.getSession().on('change', function(evt) {
+      if (evt.action === 'insert') {
+        var autoCompleteButton = document.getElementById('toglAutocomplete');
+        if (autoCompleteButton.checked) {
+          setTimeout(() => {
+            switch (self.getTagBeforeCursor()) {
+              case '[[':
+                self.insertTextAtCursor(' answer: | ]] ');
+                self.moveEditCursor(-4);
+                break;
+              case '<<':
+                self.insertTextAtCursor(' >> ');
+                self.moveEditCursor(-3);
+                break;
+              case '[colo':
+                self.insertTextAtCursor('r=#][/color] ');
+                self.moveEditCursor(-10);
+                self.insertColorCode();
+                break;
+              case '[b':
+                self.insertTextAtCursor('][/b] ');
+                self.moveEditCursor(-5);
+                break;
+              case '[i':
+                self.insertTextAtCursor('][/i] ');
+                self.moveEditCursor(-5);
+                break;
+              case '[img':
+                self.insertTextAtCursor('][/img] ');
+                self.moveEditCursor(-7);
+                break;
+              case '[u':
+                self.insertTextAtCursor('][/u] ');
+                self.moveEditCursor(-5);
+                break;
+            }
+          }, 200);
+          return;
         }
-      );
-
-      /// init language selector
-      var select_language = document.getElementById('select_language');
-      for (var i = 0; i < Utils.langs.length; i++) {
-        var option = document.createElement('option');
-        option.text = Utils.langs[i][0];
-        select_language.add(option);
       }
+    });
 
-      select_language.selectedIndex = self.selectedLanguageIndex;
-      if (!self.language) {
-        self.language = 'en-US';
-        self.updateCountry();
+    /// init emoji picker
+    this.emPicker = new EmojiPicker(
+      document.getElementById('emojiPickerDom'),
+      emoji => {
+        self.insertTextAtCursor(emoji.char);
+        this.emPicker.toggle();
+        self.togglePreviewMode(false);
       }
+    );
 
-      self.toggleSpellCheck();
-      self.updateEditorStats();
+    /// init language selector
+    var select_language = document.getElementById('select_language');
+    for (var i = 0; i < Utils.langs.length; i++) {
+      var option = document.createElement('option');
+      option.text = Utils.langs[i][0];
+      select_language.add(option);
+    }
+
+    select_language.selectedIndex = self.selectedLanguageIndex;
+    if (!self.language) {
+      self.language = 'en-US';
+      self.updateCountry();
+    }
+
+    self.toggleSpellCheck();
+    self.updateEditorStats();
   };
 
   this.chooseRelativePathImage = function(imagePath) {
@@ -1543,15 +1543,24 @@ export var App = function(name, version) {
       // Trim spaces from the title.
       var title = editorTitleElement.value.trim();
 
+      console.log(title);
       // Make sure the new title is unique. Otherwise, put a trailing number
       // or increment the existing one if any
       title = self.getUniqueTitle(title);
 
+      console.log(title);
       // Update the title in the UI
       editorTitleElement.value = title;
       self.editing().title(title);
 
-      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+      self.editing().body(
+        self.trimBodyLinks(
+          self
+            .editing()
+            .body()
+            .trim()
+        )
+      );
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
@@ -1625,7 +1634,7 @@ export var App = function(name, version) {
 
   this.trimBodyLinks = function(body) {
     var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g;
-    return body.replace(re, '[[$1\|$2]]');
+    return body.replace(re, '[[$1|$2]]');
   };
 
   this.updateNodeLinks = function() {
@@ -1640,7 +1649,7 @@ export var App = function(name, version) {
 
     toUpdate.push(node);
 
-    while (node = toUpdate.pop()) {
+    while ((node = toUpdate.pop())) {
       if (updated.includes(node)) {
         continue;
       }
@@ -1656,8 +1665,7 @@ export var App = function(name, version) {
       });
 
       node.linkedFrom().forEach(parent => {
-        if (!updated.includes(parent))
-          toUpdate.push(parent);
+        if (!updated.includes(parent)) toUpdate.push(parent);
       });
     }
   };
@@ -2265,6 +2273,11 @@ export var App = function(name, version) {
   };
 
   this.getUniqueTitle = function(desiredTitle) {
+    var currentlyUsedTitles = self.getOtherNodeTitles();
+    if (desiredTitle && !currentlyUsedTitles.includes(desiredTitle)) {
+      return desiredTitle;
+    }
+
     var baseTitle = desiredTitle || 'Node';
     var counter = 2;
 
@@ -2276,13 +2289,12 @@ export var App = function(name, version) {
       counter = Number(matches[3]);
     }
 
-    var currentlyUsedTitles = self.getOtherNodeTitles();
     if (!currentlyUsedTitles.includes(baseTitle)) {
       return baseTitle;
     }
 
-    for (;; ++counter) {
-      var newTitle = baseTitle + "_" + counter;
+    for (; ; ++counter) {
+      var newTitle = baseTitle + '_' + counter;
       if (!currentlyUsedTitles.includes(newTitle)) {
         return newTitle;
       }
