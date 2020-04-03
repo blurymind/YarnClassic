@@ -6,6 +6,7 @@ import {
 } from '../libs/spellcheck_ace.js';
 import { Node } from './node';
 import { data } from './data';
+import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
 export var App = function(name, version) {
@@ -27,6 +28,7 @@ export var App = function(name, version) {
   this.editingHistory = [];
   //this.appleCmdKey = false;
   this.editingSaveHistoryTimeout = null;
+  this.previewStory = new yarnRender();
   this.dirty = false;
   this.focusedNodeIdx = -1;
   this.zoomSpeed = 0.005;
@@ -427,6 +429,15 @@ export var App = function(name, version) {
           self.clipboard = self.editor.getSelectedText();
           self.insertTextAtCursor('');
         }
+
+        // If previewing the story, speed up scrolling when holding z
+        if (!self.previewStory.finished)
+          switch (e.key) {
+            case 'z': {
+              self.previewStory.changeTextScrollSpeed(20);
+              return;
+            }
+          }
       } else {
         // ctrl + c NODES
         if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
@@ -487,6 +498,30 @@ export var App = function(name, version) {
           // Delete selected
           self.deleteSelectedNodes();
         }
+      } else {
+        // Input event listeners for story preview
+        if (!self.previewStory.finished)
+          switch (e.key) {
+            case 'z': {
+              self.previewStory.changeTextScrollSpeed(200);
+              if (self.previewStory.vnSelectedChoice != -1) {
+                self.previewStory.vnSelectChoice();
+              }
+              return;
+            }
+            case 'ArrowUp': {
+              if (self.previewStory.vnSelectedChoice != -1) {
+                self.previewStory.vnUpdateChoice(-1);
+              }
+              return;
+            }
+            case 'ArrowDown': {
+              if (self.previewStory.vnSelectedChoice != -1) {
+                self.previewStory.vnUpdateChoice(1);
+              }
+              return;
+            }
+          }
       }
 
       if (e.keyCode === 31 || e.key === 'Enter') {
@@ -1385,13 +1420,51 @@ export var App = function(name, version) {
     });
   };
 
+  this.togglePlayMode = function(playModeOverwrite) {
+    var editor = $('.editor')[0];
+    var editorPlayPreviewer = document.getElementById('editor-play');
+    if (playModeOverwrite) {
+      self.togglePreviewMode(false);
+      //preview play mode
+      editor.style.display = 'none';
+      editorPlayPreviewer.style.display = 'flex';
+
+      if (!self.previewStory.finished) {
+        self.togglePlayMode(false);
+        return;
+      }
+      self.previewStory.emiter.on('finished', function() {
+        self.togglePlayMode(false);
+      });
+      self.previewStory.initYarn(
+        JSON.parse(data.getSaveData(FILETYPE.JSON)),
+        self
+          .editing()
+          .title()
+          .trim(),
+        'NVrichTextLabel',
+        false,
+        'commandDebugLabel'
+      );
+    } else {
+      //edit mode
+      self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
+      editorPlayPreviewer.style.display = 'none';
+      editor.style.display = 'flex';
+      self.previewStory.finished = true;
+      if (self.editing().title() !== self.previewStory.node.title)
+        self.openNodeByTitle(self.previewStory.node.title);
+    }
+  };
+
   this.togglePreviewMode = function(previewModeOverwrite) {
     var editor = $('.editor')[0];
     var editorPreviewer = document.getElementById('editor-preview');
     if (previewModeOverwrite) {
+      self.togglePlayMode(false);
       //preview mode
-      editor.style.visibility = 'hidden';
-      editorPreviewer.style.visibility = 'visible';
+      editor.style.display = 'none';
+      editorPreviewer.style.display = 'flex';
       editorPreviewer.innerHTML = self
         .editing()
         .textToHtml(self.editing().body(), true);
@@ -1400,8 +1473,8 @@ export var App = function(name, version) {
       //edit mode
       self.editor.session.setScrollTop(editorPreviewer.scrollTop);
       editorPreviewer.innerHTML = '';
-      editorPreviewer.style.visibility = 'hidden';
-      editor.style.visibility = 'visible';
+      editorPreviewer.style.display = 'none';
+      editor.style.display = 'flex';
       self.editor.focus();
       //close any pop up helpers tooltip class
       if ($('#colorPicker-container').is(':visible')) {
@@ -1543,12 +1616,10 @@ export var App = function(name, version) {
       // Trim spaces from the title.
       var title = editorTitleElement.value.trim();
 
-      console.log(title);
       // Make sure the new title is unique. Otherwise, put a trailing number
       // or increment the existing one if any
       title = self.getUniqueTitle(title);
 
-      console.log(title);
       // Update the title in the UI
       editorTitleElement.value = title;
       self.editing().title(title);

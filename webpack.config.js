@@ -14,20 +14,20 @@ const IS_DEV = process.env.NODE_ENV === 'dev';
 const config = {
   mode: IS_DEV ? 'development' : 'production',
   devtool: IS_DEV ? 'eval' : 'source-map',
-  entry: path.resolve(__dirname, 'src', "js", "index.js"),
+  entry: path.resolve(__dirname, 'src', 'js', 'index.js'),
   output: {
     filename: 'js/[name].[hash].js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
   },
-  // node: {
-  //   fs: "empty"
-  // },
+  node: {
+    fs: 'empty',
+  },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
       },
       {
         test: /\.(css|scss)$/,
@@ -35,12 +35,12 @@ const config = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              hmr: IS_DEV
-            }
+              hmr: IS_DEV,
+            },
           },
           'css-loader',
-          'sass-loader'
-        ]
+          'sass-loader',
+        ],
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
@@ -51,40 +51,40 @@ const config = {
               limit: 1024,
               name: '[name].[ext]',
               fallback: 'file-loader',
-              outputPath: 'public/images'
-            }
+              outputPath: 'public/images',
+            },
           },
           {
             loader: 'image-webpack-loader',
             options: {
               mozjpeg: {
                 progressive: true,
-                quality: 65
+                quality: 65,
               },
               pngquant: {
                 quality: '65-90',
-                speed: 4
+                speed: 4,
               },
               gifsicle: {
-                interlaced: false
+                interlaced: false,
               },
               webp: {
-                quality: 75
-              }
-            }
-          }
-        ]
+                quality: 75,
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.(ttf|eot|woff|woff2|ico)$/,
         use: {
           loader: 'file-loader',
           options: {
-            name: 'fonts/[name].[ext]'
-          }
-        }
-      }
-    ]
+            name: 'fonts/[name].[ext]',
+          },
+        },
+      },
+    ],
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -93,27 +93,25 @@ const config = {
       jQuery: 'jquery',
       'windows.jQuery': 'jquery',
       Util: 'exports-loader?Util!bootstrap/js/dist/util',
-      ko: 'exports-loader?!knockout'
+      ko: 'exports-loader?!knockout',
     }),
     new CopyWebpackPlugin([
       {
         from: path.resolve(__dirname, 'src', 'public'),
-        to: 'public'
-      }
+        to: 'public',
+      },
     ]),
     new MiniCssExtractPlugin({
-      filename: IS_DEV
-        ? 'css/[name].css'
-        : 'css/[name].[contenthash].css',
-      chunkFilename: 'css/[id].css'
+      filename: IS_DEV ? 'css/[name].css' : 'css/[name].[contenthash].css',
+      chunkFilename: 'css/[id].css',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new PreloadWebpackPlugin({
-      include: 'initial'
+      include: 'initial',
     }),
     new CssUrlRelativePlugin(),
     new WebpackPwaManifest({
-      filename: "manifest.json",
+      filename: 'manifest.json',
       inject: true,
       fingerprints: false,
       dir: 'auto',
@@ -121,28 +119,28 @@ const config = {
       short_name: 'Yarn',
       description: 'Yarn Story Editor',
       background_color: '#3367D6',
-      theme_color: "#3367D6",
-      display: "fullscreen",
+      theme_color: '#3367D6',
+      display: 'fullscreen',
       crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
       icons: [
         {
           src: path.resolve('src/public/icon.png'),
-          sizes: [96, 128] // multiple sizes
+          sizes: [96, 128], // multiple sizes
         },
         {
           src: path.resolve('src/public/icon.ico'),
-          sizes: [32] // you can also use the specifications pattern
-        }
-      ]
+          sizes: [32], // you can also use the specifications pattern
+        },
+      ],
     }),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, './src/index.html'),
       favicon: path.resolve('src/public/icon.ico'),
       minify: {
         collapseWhitespace: true,
-        removeComments: false,  // This is mandatory, due to knockout's virtual bindings
+        removeComments: false, // This is mandatory, due to knockout's virtual bindings
         useShortDoctype: true,
-      }
+      },
     }),
     new OfflinePlugin({
       // responseStrategy: 'network-first',
@@ -154,7 +152,7 @@ const config = {
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
-    host: '0.0.0.0' //this will allow you to run it on a smartphone with 8080 port. Use ipconfig or ifconfig to see broadcast address
+    host: '0.0.0.0', //this will allow you to run it on a smartphone with 8080 port. Use ipconfig or ifconfig to see broadcast address
   },
   optimization: {
     runtimeChunk: 'single',
@@ -165,12 +163,12 @@ const config = {
           chunks: 'initial',
           name: 'vendor',
           priority: 10,
-          enforce: true
-        }
-      }
+          enforce: true,
+        },
+      },
     },
-    minimizer: []
-  }
+    minimizer: [],
+  },
 };
 
 if (!IS_DEV) {

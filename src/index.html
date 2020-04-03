@@ -210,6 +210,7 @@
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
 						<button  class="bbcode-button" style="color:#19a4a8" onclick="app.speakText()" title="Hear text">🔊</button>
+						<button  class="bbcode-button" style="color:#19a4a8" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
 
 						<span class="show-when-narrow">
 							|
@@ -220,7 +221,11 @@
 					</div>
 
 					<div class="editor-container">
-						<div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)"></div>
+						<div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
+						<div class="editor-play" id="editor-play" onclick="app.togglePlayMode(false)">
+							<p id="NVrichTextLabel"></p>
+							<div id="commandDebugLabel"></div>
+						</div>
 						<div class="editor" id="editor"
 						data-bind="
 						ace: app.editing().body, 
