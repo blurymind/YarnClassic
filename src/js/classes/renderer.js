@@ -1,7 +1,7 @@
-const bondage = require("bondage");
-const bbcode = require("bbcode");
+const bondage = require('bondage');
+const bbcode = require('bbcode');
 const yarnRunner = new bondage.Runner();
-const EventEmitter = require("events").EventEmitter;
+const EventEmitter = require('events').EventEmitter;
 // const path = require('path')
 // const fs = require('fs');
 
@@ -14,18 +14,18 @@ export var yarnRender = function() {
   this.emiter = emiter;
   let commandsPassedLog = [];
   this.commandsPassedLog = commandsPassedLog;
-  let commandPassed = "";
+  let commandPassed = '';
   this.commandPassed = commandPassed;
   let finished = null;
   this.finished = finished;
 
   this.visitedChapters = []; // to keep track of all visited start chapters
   this.self = this;
-  this.vnChoiceSelectionCursor = ">";
+  this.vnChoiceSelectionCursor = '>';
   this.startTimeWait;
   this.vnSelectedChoice = -1;
   this.vnTextScrollInterval;
-  this.storyChapter = ""; // current chapter choices
+  this.storyChapter = ''; // current chapter choices
   this.choices = {}; // all choices from all start chapters
 
   let vnChoices,
@@ -48,15 +48,15 @@ export var yarnRender = function() {
       attemptChoice = vnResult.options.length - 1;
     }
     this.vnSelectedChoice = attemptChoice;
-    vnChoices = "";
+    vnChoices = '';
     vnResult.options.forEach((choice, i) => {
-      vnChoices += "\n ";
+      vnChoices += '\n ';
       if (i == this.vnSelectedChoice) {
         vnChoices += this.vnChoiceSelectionCursor;
       } else {
-        vnChoices += "   ";
+        vnChoices += '   ';
       }
-      vnChoices += " [" + choice + "] ";
+      vnChoices += ' [' + choice + '] ';
     });
     self.updateVNHud();
   };
@@ -70,9 +70,9 @@ export var yarnRender = function() {
       vnResult.options[this.vnSelectedChoice]
     );
     vnResult.select(this.vnSelectedChoice);
-    this.emiter.emit("choiceMade", vnResult.options[this.vnSelectedChoice]);
-    vnText = "";
-    vnChoices = "";
+    this.emiter.emit('choiceMade', vnResult.options[this.vnSelectedChoice]);
+    vnText = '';
+    vnChoices = '';
     vnResult = self.goToNext();
     this.vnSelectedChoice = -1;
     this.changeTextScrollSpeed(111);
@@ -90,16 +90,16 @@ export var yarnRender = function() {
     if (vnTextScrollIdx < 0) {
       // when below 0, its on standby for input to continue
       if (this.isFinishedParsing(vnResult)) {
-        emiter.emit("finished");
+        emiter.emit('finished');
         return;
       }
-      if (vnResult.constructor.name === "TextResult") {
+      if (vnResult.constructor.name === 'TextResult') {
         vnText = vnResult.text;
         vnTextScrollIdx = 0;
         this.changeTextScrollSpeed(220);
         return;
       }
-      if (vnResult.constructor.name === "OptionsResult") {
+      if (vnResult.constructor.name === 'OptionsResult') {
         // Add choices to text
         if (this.vnSelectedChoice === -1) {
           this.vnSelectedChoice = 0;
@@ -117,7 +117,7 @@ export var yarnRender = function() {
   self.goToNext = () => {
     const nextNode = VNdata.next().value;
     if (!this.isFinishedParsing(nextNode)) {
-      if (nextNode.constructor.name === "TextResult") {
+      if (nextNode.constructor.name === 'TextResult') {
         /// bbcode local images with path relative to the resourcesPath specified on init
         // if (this.resourcesPath.length) {
         // 	const resourcesPath = this.resourcesPath;
@@ -138,7 +138,7 @@ export var yarnRender = function() {
         if (nextNode.data && this.node.title !== nextNode.data.title) {
           this.node = self.jsonCopy(nextNode.data);
           this.visitedNodes.push(nextNode.data.title);
-          this.emiter.emit("startedNode", this.node);
+          this.emiter.emit('startedNode', this.node);
         }
       }
       return nextNode;
@@ -159,7 +159,7 @@ export var yarnRender = function() {
   };
 
   this.runCommand = () => {
-    emiter.emit("commandCall", vnResult.text);
+    emiter.emit('commandCall', vnResult.text);
     commandsPassedLog.push(vnResult.text);
     commandsPassed = vnResult.text;
 
@@ -167,8 +167,8 @@ export var yarnRender = function() {
     if (this.isFinishedParsing(vnResult)) {
       return;
     }
-    if (vnResult.constructor.name === "TextResult") {
-      vnText += "<br>" + vnResult.text;
+    if (vnResult.constructor.name === 'TextResult') {
+      vnText += '<br>' + vnResult.text;
       this.changeTextScrollSpeed(111);
     }
   };
@@ -178,26 +178,26 @@ export var yarnRender = function() {
       return;
     }
     if (vnTextScrollIdx < 0) {
-      if (vnResult.constructor.name === "CommandResult") {
+      if (vnResult.constructor.name === 'CommandResult') {
         this.runCommand();
       }
     } else if (vnTextScrollIdx > vnText.length) {
-      if (vnResult.constructor.name === "TextResult") {
+      if (vnResult.constructor.name === 'TextResult') {
         vnResult = self.goToNext();
         if (this.isFinishedParsing(vnResult)) {
           return;
         }
-        if (vnResult.constructor.name === "CommandResult") {
+        if (vnResult.constructor.name === 'CommandResult') {
           this.runCommand();
-        } else if (vnResult.constructor.name === "TextResult") {
+        } else if (vnResult.constructor.name === 'TextResult') {
           vnTextScrollIdx = -1;
-        } else if (vnResult.constructor.name === "OptionsResult") {
+        } else if (vnResult.constructor.name === 'OptionsResult') {
           vnTextScrollIdx = -1;
         }
-      } else if (vnResult.constructor.name === "CommandResult") {
+      } else if (vnResult.constructor.name === 'CommandResult') {
         this.runCommand();
       }
-    } else if (vnResult.constructor.name === "TextResult") {
+    } else if (vnResult.constructor.name === 'TextResult') {
       // update text
       vnTextScrollIdx += 1;
       vnTextResult = vnText.substring(0, vnTextScrollIdx);
@@ -208,31 +208,31 @@ export var yarnRender = function() {
   // trigger this only on text update
   self.updateVNHud = () => {
     let bbcodeHtml = vnTextResult;
-    if (vnResult.constructor.name === "TextResult") {
+    if (vnResult.constructor.name === 'TextResult') {
       while (
-        vnTextResult.lastIndexOf("[img]") > vnTextResult.lastIndexOf("[/img]")
+        vnTextResult.lastIndexOf('[img]') > vnTextResult.lastIndexOf('[/img]')
       ) {
         vnTextScrollIdx += 1;
         vnTextResult = vnText.substring(0, vnTextScrollIdx);
       }
-      while (vnTextResult.lastIndexOf("[") > vnTextResult.lastIndexOf("]")) {
+      while (vnTextResult.lastIndexOf('[') > vnTextResult.lastIndexOf(']')) {
         vnTextScrollIdx += 1;
         vnTextResult = vnText.substring(0, vnTextScrollIdx);
       }
     }
     let RenderHtml =
       "<div style ='color: white; width:90%;position:fixed;bottom:10px;padding:10px;font:50px arial,calibri;border-radius: 25px;border: 3px solid #73AD21 ;background:rgba(1,1,1,0.5)'>";
-    RenderHtml += bbcode.parse(vnTextResult) + "<br>";
+    RenderHtml += bbcode.parse(vnTextResult) + '<br>';
     if (vnChoices !== undefined) {
       RenderHtml +=
-        "<p style='padding:20px;font:30px arial,calibri'>" + vnChoices + "</p>";
+        "<p style='padding:20px;font:30px arial,calibri'>" + vnChoices + '</p>';
     }
-    RenderHtml += "</div>";
+    RenderHtml += '</div>';
     document.getElementById(htmIDtoAttachYarnTo).innerHTML = RenderHtml;
   };
 
   this.terminate = () => {
-    document.getElementById(htmIDtoAttachYarnTo).innerHTML = "";
+    document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
     VNdata = null;
     vnResult = null;
     finished = false;

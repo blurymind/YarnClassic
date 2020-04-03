@@ -88,8 +88,7 @@ export var data = {
     if (filename.toLowerCase().indexOf('.json') > -1) return FILETYPE.JSON;
     else if (filename.toLowerCase().indexOf('.yarn.txt') > -1)
       return FILETYPE.YARN;
-    else if (filename.toLowerCase().indexOf('.yarn') > -1)
-      return FILETYPE.YARN;
+    else if (filename.toLowerCase().indexOf('.yarn') > -1) return FILETYPE.YARN;
     else if (filename.toLowerCase().indexOf('.xml') > -1) return FILETYPE.XML;
     else if (filename.toLowerCase().indexOf('.txt') > -1) return FILETYPE.TWEE;
     else if (filename.toLowerCase().indexOf('.tw2') > -1) return FILETYPE.TWEE2;
@@ -276,7 +275,7 @@ export var data = {
         tags: nodes[i].tags(),
         body: nodes[i].body(),
         position: { x: nodes[i].x(), y: nodes[i].y() },
-        colorID: nodes[i].colorID()
+        colorID: nodes[i].colorID(),
       });
     }
 
@@ -428,13 +427,13 @@ export var data = {
       files: [
         {
           url: yarnTextFileUrl,
-          filename: editingName
-        }
+          filename: editingName,
+        },
       ],
       success: function() {
         alert('Success! Files saved to your Dropbox.');
         data.editingName(editingName.replace(/\.[^/.]+$/, ''));
-      }
+      },
     };
     Dropbox.save(yarnTextFileUrl, editingName, options);
   },
@@ -464,5 +463,5 @@ export var data = {
       return false;
     }
     return fs.lstatSync(filePath).isFile();
-  }
+  },
 };

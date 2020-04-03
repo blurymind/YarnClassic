@@ -4,7 +4,7 @@ export var FILETYPE = {
   TWEE: 'twee',
   TWEE2: 'tw2',
   UNKNOWN: 'none',
-  YARN: 'yarn'
+  YARN: 'yarn',
 };
 
 export var Utils = {
@@ -30,11 +30,11 @@ export var Utils = {
             return {
               caption: word,
               value: word,
-              meta: meta
+              meta: meta,
             };
           })
         );
-      }
+      },
     };
   },
   addDoubleTapDetector: function(element, callback) {
@@ -191,7 +191,7 @@ export var Utils = {
       ['en-NZ', 'New Zealand'],
       ['en-ZA', 'South Africa'],
       ['en-GB', 'United Kingdom'],
-      ['en-US', 'United States']
+      ['en-US', 'United States'],
     ],
     [
       'Español',
@@ -214,7 +214,7 @@ export var Utils = {
       ['es-PR', 'Puerto Rico'],
       ['es-DO', 'República Dominicana'],
       ['es-UY', 'Uruguay'],
-      ['es-VE', 'Venezuela']
+      ['es-VE', 'Venezuela'],
     ],
     ['Euskara', ['eu-ES']],
     ['Français', ['fr-FR']],
@@ -242,10 +242,10 @@ export var Utils = {
       ['cmn-Hans-CN', '普通话 (中国大陆)'],
       ['cmn-Hans-HK', '普通话 (香港)'],
       ['cmn-Hant-TW', '中文 (台灣)'],
-      ['yue-Hant-HK', '粵語 (香港)']
+      ['yue-Hant-HK', '粵語 (香港)'],
     ],
     ['日本語', ['ja-JP']],
-    ['Lingua latīna', ['la']]
+    ['Lingua latīna', ['la']],
   ],
   createDropboxChooser: function(dropboxButton, onSuccess) {
     var options = {
@@ -258,7 +258,7 @@ export var Utils = {
         //optional
       },
       linkType: 'direct', // "preview" or "direct"
-      multiselect: false // true or false
+      multiselect: false, // true or false
     };
 
     var button = Dropbox.createChooseButton(options);
@@ -278,5 +278,5 @@ export var Utils = {
       'data:text/plain;charset=utf-11,' + encodeURIComponent(text);
     // returns the url of the created text file
     return appTextfile;
-  }
+  },
 };

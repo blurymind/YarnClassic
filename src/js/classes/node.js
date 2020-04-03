@@ -17,7 +17,7 @@ export var Node = function(options = {}) {
     '#FFE374',
     '#F7A666',
     '#C47862',
-    '#97E1E9'
+    '#97E1E9',
   ];
 
   // primary values
@@ -158,7 +158,7 @@ export var Node = function(options = {}) {
           opacity: 1,
           scale: 1,
           y: '+=80px',
-          rotate: '0deg'
+          rotate: '0deg',
         },
         250,
         'easeInQuad',
@@ -354,7 +354,7 @@ export var Node = function(options = {}) {
     $(self.element).transition(
       {
         x: newX,
-        y: newY
+        y: newY,
       },
       app.updateArrowsThrottled,
       500
@@ -405,7 +405,7 @@ export var Node = function(options = {}) {
 
   this.updateLinksFromParents = function() {
     // If title didn't change there's nothing we need to update on parents
-    if(!self.oldTitle || (self.oldTitle === self.title())) {
+    if (!self.oldTitle || self.oldTitle === self.title()) {
       return;
     }
 
@@ -422,7 +422,7 @@ export var Node = function(options = {}) {
     });
 
     self.oldTitle = undefined;
-  }
+  };
 
   this.updateLinksToChildren = function() {
     self.linkedTo.removeAll();
@@ -436,13 +436,12 @@ export var Node = function(options = {}) {
     for (var index in app.nodes()) {
       var other = app.nodes()[index];
       for (var i = 0; i < links.length; i++) {
-
-      if (other != self && other.title().trim() === links[i].trim()) {
+        if (other != self && other.title().trim() === links[i].trim()) {
           self.linkedTo.push(other);
         }
       }
     }
-  }
+  };
 
   this.getScale = function() {
     if (app && typeof app.cachedScale === 'number') {
@@ -475,5 +474,5 @@ ko.bindingHandlers.nodeBind = {
     $(element).on('pointerdown', function() {
       Utils.pushToTop($(element));
     });
-  }
+  },
 };
