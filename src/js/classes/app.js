@@ -1454,6 +1454,10 @@ export var App = function(name, version) {
       self.previewStory.finished = true;
       if (self.editing().title() !== self.previewStory.node.title)
         self.openNodeByTitle(self.previewStory.node.title);
+
+      setTimeout(() => {
+        self.editor.focus();
+      }, 1000);
     }
   };
 
