@@ -195,8 +195,6 @@ export var yarnRender = function() {
         } else if (vnResult.constructor.name === 'OptionsResult') {
           vnTextScrollIdx = -1;
         }
-      } else if (vnResult.constructor.name === 'CommandResult') {
-        this.runCommand();
       }
     } else if (vnResult.constructor.name === 'TextResult') {
       // update text
