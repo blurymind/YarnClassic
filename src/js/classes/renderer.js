@@ -16,7 +16,7 @@ export var yarnRender = function() {
   this.commandsPassedLog = commandsPassedLog;
   let commandPassed = '';
   this.commandPassed = commandPassed;
-  let finished = null;
+  let finished = true;
   this.finished = finished;
 
   this.visitedChapters = []; // to keep track of all visited start chapters
