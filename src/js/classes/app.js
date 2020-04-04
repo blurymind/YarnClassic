@@ -1466,7 +1466,7 @@ export var App = function(name, version) {
       self.togglePlayMode(false);
       //preview mode
       editor.style.display = 'none';
-      editorPreviewer.style.display = 'flex';
+      editorPreviewer.style.display = 'block';
       editorPreviewer.innerHTML = self
         .editing()
         .textToHtml(self.editing().body(), true);
