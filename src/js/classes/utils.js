@@ -248,6 +248,7 @@ export var Utils = {
     ['Lingua latīna', ['la']],
   ],
   createDropboxChooser: function(dropboxButton, onSuccess) {
+    if (!dropboxButton) return;
     var options = {
       success: function(files) {
         files.forEach(function(file) {
