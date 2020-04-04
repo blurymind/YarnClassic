@@ -904,3 +904,9 @@ a:hover {
   bottom: 30px;
   position: absolute;
 }
+
+.disabled {
+  opacity: 0.65;
+  pointer-events: none;
+  cursor: not-allowed;
+}

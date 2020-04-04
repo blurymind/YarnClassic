@@ -1422,17 +1422,14 @@ export var App = function(name, version) {
 
   this.togglePlayMode = function(playModeOverwrite) {
     var editor = $('.editor')[0];
+    var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
     if (playModeOverwrite) {
       self.togglePreviewMode(false);
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
-
-      if (!self.previewStory.finished) {
-        self.togglePlayMode(false);
-        return;
-      }
+      storyPreviewPlayButton.className = 'bbcode-button disabled';
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
       });
@@ -1451,6 +1448,7 @@ export var App = function(name, version) {
       self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
+      storyPreviewPlayButton.className = 'bbcode-button';
       self.previewStory.finished = true;
       if (self.editing().title() !== self.previewStory.node.title)
         self.openNodeByTitle(self.previewStory.node.title);
