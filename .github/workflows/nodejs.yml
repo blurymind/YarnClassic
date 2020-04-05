@@ -34,8 +34,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+    - name: get-npm-version
+      uses: martinbeentjes/npm-get-version-action@v1
+
     - name: Archive production artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: dist
-        path: ./electron/dist
+        name: yarn-editor_${{ steps.get-npm-version.outputs.current-version}}_amd64.snap
+        path: ./electron/dist/*.snap
