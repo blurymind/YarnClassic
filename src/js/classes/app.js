@@ -1613,27 +1613,20 @@ export var App = function(name, version) {
 
   this.saveNode = function() {
     if (self.editing() != null) {
-      const editorTitleElement = document.getElementById('editorTitle');
+      const editorTitleElement = $('#editorTitle')[0];
 
-      // Trim spaces from the title.
-      var title = editorTitleElement.value.trim();
-
-      // Make sure the new title is unique. Otherwise, put a trailing number
-      // or increment the existing one if any
-      title = self.getUniqueTitle(title);
+      // Ensure the title is unique
+      const title = self.getUniqueTitle(editorTitleElement.value.trim());
 
       // Update the title in the UI
       editorTitleElement.value = title;
       self.editing().title(title);
 
-      self.editing().body(
-        self.trimBodyLinks(
-          self
-            .editing()
-            .body()
-            .trim()
-        )
-      );
+      // Remove leading and trailing spaces from the body links
+      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+
+      // Update NodeVisitHistory just in case the node's title changed
+      self.updateNodeVisitHistory(self.editing());
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
@@ -1643,15 +1636,27 @@ export var App = function(name, version) {
         self.editing(null);
       });
 
-      var autoCompleteButton = document.getElementById('toglAutocomplete');
+      const autoCompleteButton = document.getElementById('toglAutocomplete');
       self.config.autocompleteEnabled = autoCompleteButton.checked;
 
-      var autoCompleteWordsButton = document.getElementById(
+      const autoCompleteWordsButton = document.getElementById(
         'toglAutocompleteWords'
       );
       self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
 
       setTimeout(self.updateSearch, 600);
+    }
+  };
+
+  this.updateNodeVisitHistory = function(node) {
+    const currentTitle = node.title();
+
+    if (node.oldTitle !== currentTitle) {
+      self.nodeVisitHistory.forEach(function(_, index, theArray) {
+        if (theArray[index] === node.oldTitle) {
+          theArray[index] = currentTitle;
+        }
+      });
     }
   };
 
