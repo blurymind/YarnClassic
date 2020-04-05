@@ -1311,12 +1311,12 @@ export var App = function(name, version) {
   };
 
   this.openLastEditedNode = function() {
-    if (self.nodeVisitHistory.length < 2) {
+    if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
-      return;
     } else {
-      self.nodeVisitHistory.pop();
-      self.openNodeByTitle(self.nodeVisitHistory.pop());
+      const title = self.nodeVisitHistory.pop()
+      self.propagateUpdateFromNode(self.editing());
+      self.openNodeByTitle(title);
     }
   };
 
@@ -1616,7 +1616,7 @@ export var App = function(name, version) {
       const editorTitleElement = $('#editorTitle')[0];
 
       // Ensure the title is unique
-      const title = self.getUniqueTitle(editorTitleElement.value.trim());
+      const title = self.getFutureEditedNodeTitle();
 
       // Update the title in the UI
       editorTitleElement.value = title;
@@ -1624,9 +1624,6 @@ export var App = function(name, version) {
 
       // Remove leading and trailing spaces from the body links
       self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
-
-      // Update NodeVisitHistory just in case the node's title changed
-      self.updateNodeVisitHistory(self.editing());
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
@@ -1645,18 +1642,6 @@ export var App = function(name, version) {
       self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
 
       setTimeout(self.updateSearch, 600);
-    }
-  };
-
-  this.updateNodeVisitHistory = function(node) {
-    const currentTitle = node.title();
-
-    if (node.oldTitle !== currentTitle) {
-      self.nodeVisitHistory.forEach(function(_, index, theArray) {
-        if (theArray[index] === node.oldTitle) {
-          theArray[index] = currentTitle;
-        }
-      });
     }
   };
 
@@ -1791,6 +1776,13 @@ export var App = function(name, version) {
       app.nodes().filter(node => node.title().trim() === title.trim()).length >
       1
     );
+  };
+
+  this.getFutureEditedNodeTitle = function(){
+    // Ensure the title is unique
+    const editorTitleElement = $('#editorTitle')[0];
+    // Return the title that will be used when changes are applied
+    return self.getUniqueTitle(editorTitleElement.value.trim());
   };
 
   this.getOtherNodeTitles = function() {
