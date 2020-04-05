@@ -1,5 +1,3 @@
-![Yarn Editor CI](https://github.com/daviddq/YarnEditor/workflows/Yarn%20Editor%20CI/badge.svg)
-
 # Yarn 🐱 🧺
 
 Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
@@ -8,13 +6,13 @@ Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB
 <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/>
 <a href="https://yarnspinnertool.github.io/YarnEditor/
-" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png" 
+" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png"
 alt="Yarn web app"  height="480" border="10" /></a>
 
 # 📲 Install the Web App on your mobile device
 1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/> with your smartphone or tablet
-2. Open the web browser's menu and select "Add to home screen" 
+2. Open the web browser's menu and select "Add to home screen"
 3. When you run Yarn from the home screen, it will work in full screen mode!
 
 # 🚧 Roadmap
@@ -147,7 +145,7 @@ You can find basic Yarn parsing and playback example code here:
 
 https://github.com/InfiniteAmmoInc/yarn-test
 
-You can find a more advanced Yarn interpreter here: 
+You can find a more advanced Yarn interpreter here:
 
 https://github.com/YarnSpinnerTool/YarnSpinner
 
