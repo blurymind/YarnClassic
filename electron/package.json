@@ -17,7 +17,7 @@
     "build-web-app-dev": "cd .. && npm run build-dev && npm run copy-web-app",
     "build-web-app": "cd .. && npm run build && npm run copy-web-app",
     "start": "npm run build-web-app-dev && electron --no-sandbox .",
-    "build-linux": "npm run build-web-app && electron-builder --linux",
+    "build-linux": "npm run build-web-app && electron-builder --linux --publish never",
     "build-windows": "npm run build-web-app && electron-builder --windows",
     "build-mac": "npm run build-web-app && electron-builder --macos"
   },
@@ -40,6 +40,6 @@
     ]
   },
   "build": {
-    "productName": "Yarn Editor"    
+    "productName": "Yarn Editor"
   }
 }
