@@ -2,7 +2,6 @@ const electron = require("electron");
 const ipcMain = electron.ipcMain;
 const { dialog } = electron;
 const isDev = require("electron-is").dev();
-const version = require("../package.json").version;
 
 // Module to control application life.
 const app = electron.app;
@@ -14,7 +13,7 @@ const BrowserWindow = electron.BrowserWindow;
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let yarnRunnerWindow;
-let yarnVersion = version;
+let yarnVersion = app.getVersion();
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
