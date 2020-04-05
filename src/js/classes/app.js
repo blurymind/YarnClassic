@@ -105,11 +105,9 @@ export var App = function(name, version) {
 
     // search field enter
     self.$searchField.on('keyup', function(e) {
-      // enter
-      self.searchWarp();
-      // if (e.keyCode == 13) self.searchWarp();
       // escape
       if (e.keyCode == 27) self.clearSearch();
+      else self.searchWarp();
     });
 
     // Load json app settings from home folder
@@ -362,16 +360,15 @@ export var App = function(name, version) {
     });
 
     $(document).on('keydown', function(e) {
-      //global ctrl+z
       if ((e.metaKey || e.ctrlKey) && !self.editing()) {
         switch (e.keyCode) {
-          case 90:
+          case 90: // ctrl+z
             self.historyDirection('undo');
             break;
-          case 89:
+          case 89: // ctrl+y
             self.historyDirection('redo');
             break;
-          case 68:
+          case 68: // ctrl+d
             self.deselectAllNodes();
         }
       }
@@ -381,25 +378,25 @@ export var App = function(name, version) {
       if (e.ctrlKey || e.metaKey) {
         if (e.shiftKey) {
           switch (e.keyCode) {
-            case 83:
+            case 83: // ctrl+shift+s
               data.trySave(FILETYPE.JSON);
               self.fileKeyPressed = true;
               break;
-            case 65:
+            case 65: // ctrl+shift+a
               data.tryAppend();
               self.fileKeyPressed = true;
               break;
           }
         } else if (e.altKey) {
           switch (e.keyCode) {
-            case 83:
+            case 83: //alt+s
               data.trySave(FILETYPE.YARN);
               self.fileKeyPressed = true;
               break;
           }
         } else {
           switch (e.keyCode) {
-            case 83:
+            case 83: // ctrl+s
               if (data.editingPath() != null) {
                 data.trySaveCurrent();
               } else {
@@ -407,7 +404,7 @@ export var App = function(name, version) {
               }
               self.fileKeyPressed = true;
               break;
-            case 79:
+            case 79: // ctrl+o
               data.tryOpenFile();
               self.fileKeyPressed = true;
               break;
@@ -428,6 +425,9 @@ export var App = function(name, version) {
           document.execCommand('copy');
           self.clipboard = self.editor.getSelectedText();
           self.insertTextAtCursor('');
+        } // escape
+        else if (e.keyCode == 27) {
+          self.saveNode();
         }
 
         // If previewing the story, speed up scrolling when holding z
