@@ -19,16 +19,23 @@ jobs:
         node-version: [12.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - run: npm ci
-    - run: cd electron && yarn install && yarn run build-linux
+
+    - name: npm install and build
+      run: cd electron && yarn install && yarn run build-linux
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-    # - uses: actions/upload-artifact@v1
-    #   with:
-    #     name: yarnEditorLinux
-    #     path: ./electron/dist/yarn-editor_*_amd64.snap
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: dist
+        path: ./electron/dist
