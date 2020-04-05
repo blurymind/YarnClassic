@@ -42,4 +42,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-        path: ./electron/dist/*.snap
+        path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
