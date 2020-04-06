@@ -75,5 +75,5 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Mac - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-        path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+        name: Mac - Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
+        path: ./electron/dist/Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
