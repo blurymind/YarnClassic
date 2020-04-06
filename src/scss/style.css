@@ -556,7 +556,7 @@ a:hover {
   top: 5%;
   width: 90%;
   height: 90%;
-  padding: 20px 20px 40px 20px;
+  padding: 15px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
@@ -666,8 +666,9 @@ a:hover {
   position: relative;
 }
 
+.node-editor .form .editor-container .editor-play,
 .node-editor .form .editor-container .editor-preview {
-  visibility: hidden;
+  display: none;
   max-height: 100%;
   width: 100%;
   overflow-y: scroll;
@@ -680,6 +681,25 @@ a:hover {
   cursor: pointer;
   height: 100%;
   position: absolute;
+}
+
+#commandDebugLabel {
+  overflow-y: auto;
+  max-height: 80%;
+  width: 100%;
+  resize: none;
+  font: normal arial, calibri;
+}
+#NVrichTextLabel {
+  color: white;
+  width: 90%;
+  position: fixed;
+  bottom: 10px;
+  padding: 10px;
+  border-radius: 25px;
+  border: 3px solid #73ad21;
+  background: rgba(1, 1, 1, 0.5);
+  font: x-large arial, calibri;
 }
 
 /* --- EDITOR HIGHLIGHTING --- */
@@ -883,4 +903,10 @@ a:hover {
   left: 45%;
   bottom: 30px;
   position: absolute;
+}
+
+.disabled {
+  opacity: 0.65;
+  pointer-events: none;
+  cursor: not-allowed;
 }
