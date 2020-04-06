@@ -45,68 +45,68 @@ jobs:
         name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
         path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
 
-  # build-linux:
-  #   runs-on: ubuntu-latest
+  build-linux:
+    runs-on: ubuntu-latest
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x]
+    strategy:
+      matrix:
+        node-version: [12.x]
 
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
 
-  #   - run: npm ci
+    - run: npm ci
 
-  #   - name: npm install and build
-  #     run: cd electron && yarn install && yarn run build-linux
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: npm install and build
+      run: cd electron && yarn install && yarn run build-linux
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  #   - name: Read package.json
-  #     uses: tyankatsu0105/read-package-version-actions@v1
-  #     id: package-version
+    - name: Read package.json
+      uses: tyankatsu0105/read-package-version-actions@v1
+      id: package-version
 
-  #   - name: Archive production artifacts
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-  #       path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+        path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
 
-  # build-mac:
-  #   runs-on: macos-latest
+  build-mac:
+    runs-on: macos-latest
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x]
+    strategy:
+      matrix:
+        node-version: [12.x]
 
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
 
-  #   - run: npm ci
+    - run: npm ci
 
-  #   - name: npm install and build
-  #     run: cd electron && yarn install && yarn run build-mac
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: npm install and build
+      run: cd electron && yarn install && yarn run build-mac
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  #   - name: Read package.json
-  #     uses: tyankatsu0105/read-package-version-actions@v1
-  #     id: package-version
+    - name: Read package.json
+      uses: tyankatsu0105/read-package-version-actions@v1
+      id: package-version
 
-  #   - name: Archive production artifacts
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: Mac - Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
-  #       path: ./electron/dist/Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Mac - Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
+        path: ./electron/dist/Yarn\ Editor-${{ steps.package-version.outputs.version }}.dmg
