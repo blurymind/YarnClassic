@@ -1217,10 +1217,6 @@ export var App = function(name, version) {
     );
     langTools.setCompleters([nodeLinksCompleter]);
 
-    if (!self.nodeVisitHistory.includes(node.title())) {
-      self.nodeVisitHistory.push(node.title());
-    }
-
     // close tag autocompletion
     self.editor.getSession().on('change', function(evt) {
       if (evt.action === 'insert') {
