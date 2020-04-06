@@ -42,8 +42,8 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Windows - Yarn\ Editor\ Setup\ ${{ steps.package-version.outputs.version }}.exe
-        path: ./electron/dist/Yarn\ Editor\ Setup\ ${{ steps.package-version.outputs.version }}.exe
+        name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+        path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
 
   # build-linux:
   #   runs-on: ubuntu-latest
