@@ -25,7 +25,7 @@ import "lightweight-emoji-picker/dist/picker.js";
 import spoken from "spoken";
 
 import { App } from "./classes/app.js";
-import { version } from "../../package.json";
+import { version } from "../public/version.json";
 
 window.app = new App("Yarn", version);
 window.app.run();

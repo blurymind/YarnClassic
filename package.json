@@ -11,17 +11,19 @@
   "bugs": {
     "url": "https://github.com/YarnSpinnerTool/YarnEditor/issues"
   },
-  "version": "0.4.2",
+  "version": "0.4.3",
   "scripts": {
-    "build": "webpack -p --progress --mode production --config webpack.config.js",
-    "build-dev": "cross-env NODE_ENV=dev webpack -p --progress --config webpack.config.js",
+    "build": "npm run copy-version && webpack -p --progress --mode production --config webpack.config.js",
+    "build-dev": "npm run copy-version && cross-env NODE_ENV=dev webpack -p --progress --config webpack.config.js",
+    "copy-version": "node ./scripts/copy-version.js",
     "copy-web-app": "cd dist && copyfiles *.html ../electron/app && copyfiles **/* ../electron/app && copyfiles **/*/**/* ../electron/app",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "dev": "cross-env NODE_ENV=dev webpack-dev-server --open --config webpack.config.js",
+    "dev": "npm run copy-version && cross-env NODE_ENV=dev webpack-dev-server --open --config webpack.config.js",
     "lint": "eslint src/js",
     "lint:fix": "npm run lint -- --fix",
-    "start": "npm run dev"
+    "start": "npm run dev",
+    "update-version": "node ./scripts/copy-version.js --update"
   },
   "dependencies": {
     "ace-builds": "^1.4.5",
