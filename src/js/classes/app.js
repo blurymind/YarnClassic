@@ -1222,10 +1222,6 @@ export var App = function(name, version) {
     );
     langTools.setCompleters([nodeLinksCompleter]);
 
-    if (!self.nodeVisitHistory.includes(node.title())) {
-      self.nodeVisitHistory.push(node.title());
-    }
-
     // close tag autocompletion
     self.editor.getSession().on('change', function(evt) {
       if (evt.action === 'insert') {
@@ -1316,12 +1312,12 @@ export var App = function(name, version) {
   };
 
   this.openLastEditedNode = function() {
-    if (self.nodeVisitHistory.length < 2) {
+    if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
-      return;
     } else {
-      self.nodeVisitHistory.pop();
-      self.openNodeByTitle(self.nodeVisitHistory.pop());
+      const title = self.nodeVisitHistory.pop()
+      self.propagateUpdateFromNode(self.editing());
+      self.openNodeByTitle(title);
     }
   };
 
@@ -1618,36 +1614,26 @@ export var App = function(name, version) {
 
   this.saveNode = function(closeEditor=true) {
     if (self.editing() != null) {
-      const editorTitleElement = document.getElementById('editorTitle');
+      const editorTitleElement = $('#editorTitle')[0];
 
-      // Trim spaces from the title.
-      var title = editorTitleElement.value.trim();
-
-      // Make sure the new title is unique. Otherwise, put a trailing number
-      // or increment the existing one if any
-      title = self.getUniqueTitle(title);
+      // Ensure the title is unique
+      const title = self.getFutureEditedNodeTitle();
 
       // Update the title in the UI
       editorTitleElement.value = title;
       self.editing().title(title);
 
-      self.editing().body(
-        self.trimBodyLinks(
-          self
-            .editing()
-            .body()
-            .trim()
-        )
-      );
+      // Remove leading and trailing spaces from the body links
+      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
 
       // Save user settings
-      var autoCompleteButton = document.getElementById('toglAutocomplete');
+      const autoCompleteButton = document.getElementById('toglAutocomplete');
       self.config.autocompleteEnabled = autoCompleteButton.checked;
 
-      var autoCompleteWordsButton = document.getElementById(
+      const autoCompleteWordsButton = document.getElementById(
         'toglAutocompleteWords'
       );
       self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
@@ -1795,6 +1781,13 @@ export var App = function(name, version) {
       app.nodes().filter(node => node.title().trim() === title.trim()).length >
       1
     );
+  };
+
+  this.getFutureEditedNodeTitle = function(){
+    // Ensure the title is unique
+    const editorTitleElement = $('#editorTitle')[0];
+    // Return the title that will be used when changes are applied
+    return self.getUniqueTitle(editorTitleElement.value.trim());
   };
 
   this.getOtherNodeTitles = function() {
