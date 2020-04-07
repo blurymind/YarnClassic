@@ -188,8 +188,10 @@ export var Node = function(options = {}) {
   this.setSelected = function(select) {
     self.selected = select;
 
-    if (self.selected) $(self.element).css({ border: '1px solid #49eff1' });
-    else $(self.element).css({ border: 'none' });
+    // if (self.selected) $(self.element).css({ border: '1px solid #49eff1' });
+    // else $(self.element).css({ border: 'none' });
+    if (self.selected) $(self.element).addClass('selected');
+    else $(self.element).removeClass('selected');
   };
 
   this.toggleSelected = function() {
