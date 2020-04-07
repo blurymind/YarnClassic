@@ -1142,6 +1142,11 @@ export var App = function(name, version) {
       return;
     }
 
+    // Make sure we save the currently node being edited before editing a new
+    // one using the context menu
+    if ( self.editing() &&  self.editing()!== node )
+      self.saveNode(false);
+
     node.oldTitle = node.title(); // To check later if "title" changed
 
     self.editing(node);
@@ -1611,7 +1616,7 @@ export var App = function(name, version) {
     });
   };
 
-  this.saveNode = function() {
+  this.saveNode = function(closeEditor=true) {
     if (self.editing() != null) {
       const editorTitleElement = document.getElementById('editorTitle');
 
@@ -1638,11 +1643,7 @@ export var App = function(name, version) {
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
 
-      $('.node-editor').transition({ opacity: 0 }, 250);
-      $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
-        self.editing(null);
-      });
-
+      // Save user settings
       var autoCompleteButton = document.getElementById('toglAutocomplete');
       self.config.autocompleteEnabled = autoCompleteButton.checked;
 
@@ -1652,6 +1653,14 @@ export var App = function(name, version) {
       self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
 
       setTimeout(self.updateSearch, 600);
+
+      // Close editor. SaveNode and CloseEditor should be different functions
+      if (closeEditor) {
+        $('.node-editor').transition({ opacity: 0 }, 250);
+        $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
+          self.editing(null);
+        });
+      }
     }
   };
 
