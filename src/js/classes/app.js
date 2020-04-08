@@ -1144,7 +1144,7 @@ export var App = function(name, version) {
 
     // Make sure we save the currently node being edited before editing a new
     // one using the context menu
-    if (self.editing() && self.editing()!== node)
+    if (self.editing() && self.editing() !== node)
       self.saveNode(false);
 
     node.oldTitle = node.title(); // To check later if "title" changed
