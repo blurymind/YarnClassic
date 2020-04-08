@@ -162,6 +162,7 @@ export var App = function(name, version) {
       var MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
       var MarqueeOffset = [0, 0];
       var midClickHeld = false;
+      var updateArrowsInterval;
 
       $('.nodes').on('pointerdown', function(e) {
         if (e.button == 1) {
@@ -180,6 +181,8 @@ export var App = function(name, version) {
         MarqueeOffset[1] = 0;
 
         if (!e.altKey && !e.shiftKey) self.deselectAllNodes();
+
+        updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
       });
 
       $('.nodes').on('mousemove touchmove', function(e) {
@@ -282,6 +285,8 @@ export var App = function(name, version) {
       });
 
       $('.nodes').on('pointerup', function(e) {
+        clearInterval(updateArrowsInterval);
+
         // console.log("finished dragging");
         if (e.button == 1) {
           midClickHeld = false;
