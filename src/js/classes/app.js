@@ -1612,7 +1612,7 @@ export var App = function(name, version) {
     });
   };
 
-  this.saveNode = function(closeEditor=true) {
+  this.saveNode = function(closeEditor = true) {
     if (self.editing() != null) {
       const editorTitleElement = $('#editorTitle')[0];
 
