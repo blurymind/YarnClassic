@@ -416,6 +416,10 @@ a:hover {
   transition: border 0.25s;
 }
 
+.node.selected {
+  border: 1px solid #49eff1;
+}
+
 .node:hover {
   border: 1px solid #49eff1;
 }
