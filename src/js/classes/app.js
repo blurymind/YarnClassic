@@ -49,7 +49,19 @@ export var App = function(name, version) {
   this.hasTouchScreen = false;
   // this.fs = fs;
 
-  this.UPDATE_ARROWS_THROTTLE_MS = 25;
+  this.UPDATE_ARROWS_THROTTLE_MS = 16;
+
+  this.timer = undefined;
+  this.startUpdatingArrows = () => {
+    self.stopUpdatingArrows();
+    self.timer = setInterval(self.updateArrows, this.UPDATE_ARROWS_THROTTLE_MS);
+  };
+  this.stopUpdatingArrows = () => {
+    if (self.timer) {
+      window.clearInterval(self.timer);
+      self.timer = undefined;
+    }
+  }
 
   // this.parser = new ini.Parser();
   this.configFilePath = null;
@@ -182,7 +194,8 @@ export var App = function(name, version) {
 
         if (!e.altKey && !e.shiftKey) self.deselectAllNodes();
 
-        updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
+        // updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
+        self.startUpdatingArrows();
       });
 
       $('.nodes').on('mousemove touchmove', function(e) {
@@ -285,7 +298,8 @@ export var App = function(name, version) {
       });
 
       $('.nodes').on('pointerup', function(e) {
-        clearInterval(updateArrowsInterval);
+        self.stopUpdatingArrows();
+        // clearInterval(updateArrowsInterval);
 
         // console.log("finished dragging");
         if (e.button == 1) {
@@ -341,6 +355,7 @@ export var App = function(name, version) {
       self.transformOrigin[1] += deltaY;
 
       self.translate();
+      self.updateArrows();
     });
 
     $(document).on('keyup keydown', function(e) {
@@ -583,7 +598,8 @@ export var App = function(name, version) {
       }
     });
 
-    $(window).on('resize', self.updateArrowsThrottled);
+    // $(window).on('resize', self.updateArrowsThrottled);
+    $(window).on('resize', self.updateArrows);
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {
@@ -2123,7 +2139,8 @@ export var App = function(name, version) {
   };
 
   this.translate = function(speed) {
-    var updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
+    // var updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
+    self.startUpdatingArrows();
 
     $('.nodes-holder').transition(
       {
@@ -2141,8 +2158,9 @@ export var App = function(name, version) {
       speed || 0,
       'easeInQuad',
       function() {
-        clearInterval(updateArrowsInterval);
-        self.updateArrowsThrottled();
+        self.stopUpdatingArrows();
+        // clearInterval(updateArrowsInterval);
+        // self.updateArrowsThrottled();
       }
     );
   };
