@@ -56,17 +56,17 @@ export const Workspace = function(app) {
 
     for (let node of nodes) {
       node.halfWidth = $(node.element).width() / 2;
-      node.halfHeigth = $(node.element).height() / 2;
+      node.halfHeight = $(node.element).height() / 2;
     }
 
     for (let node of nodes) {
       if (node.linkedTo().length) {
         const fromX = (node.x() + node.halfWidth) * scale + offset.left;
-        const fromY = (node.y() + node.halfHeigth) * scale + offset.top;
+        const fromY = (node.y() + node.halfHeight) * scale + offset.top;
 
         for (let linked of node.linkedTo()) {
           const toX = (linked.x() + linked.halfWidth) * scale + offset.left;
-          const toY = (linked.y() + linked.halfHeigth) * scale + offset.top;
+          const toY = (linked.y() + linked.halfHeight) * scale + offset.top;
 
           // Get the normalized direction from -> to
           const distance = Math.sqrt(
