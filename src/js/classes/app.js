@@ -1597,9 +1597,7 @@ export var App = function(name, version) {
       ) {
         var p = document.createElement('span');
         p.innerHTML = node.title();
-        p.setAttribute('class', 'item');
-        var pColor = node.titleColorValues[app.nodes()[i].colorID()];
-        p.setAttribute('style', 'background:' + pColor + ';');
+        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
 
         if (action == 'link') {
           if (node.title() !== self.editing().title()) {
