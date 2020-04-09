@@ -587,7 +587,7 @@ export var App = function(name, version) {
     });
 
     this.guessPopUpHelper = function() {
-      if (self.getTagBeforeCursor().match(/\[color=#/)) {
+      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
         self.insertColorCode();
         // return
       } else if (self.getTagBeforeCursor().match(/\[img\]/)) {
@@ -1205,10 +1205,8 @@ export var App = function(name, version) {
       ],
       change: function(color) {
         if ($('#colorPicker-container').is(':visible')) {
-          $('#colorPicker').spectrum('hide');
-          $('#colorPicker-container').hide();
-          app.moveEditCursor(color.toHexString().length);
-          app.togglePreviewMode(false);
+          app.applyPickerColorEditor(color);
+          $('#colorPicker').spectrum.set(color.toHexString());
         }
       },
       clickoutFiresChange: true,

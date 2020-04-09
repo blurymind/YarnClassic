@@ -98,7 +98,7 @@ define("ace/mode/yarn", [
       };
 
       // color picker is being called instead
-      if (app.getTagBeforeCursor().match(/\[color=#/)) {
+      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(app.getTagBeforeCursor())) {
         return;
       }
       // There is some text selected
