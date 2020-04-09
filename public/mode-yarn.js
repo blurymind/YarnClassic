@@ -98,7 +98,7 @@ define("ace/mode/yarn", [
       };
 
       // color picker is being called instead
-      if (app.getTagBeforeCursor().match(/\[color=#/)) {
+      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(app.getTagBeforeCursor())) {
         return;
       }
       // There is some text selected
@@ -132,6 +132,11 @@ define("ace/mode/yarn", [
           options.items["go to node"] = {
             name: "Edit node: " + app.editor.getSelectedText(),
             callback: () => {
+              const title = app.getFutureEditedNodeTitle();
+              // We add the node to visited nodes history before navigating to the next node
+              if (!app.nodeVisitHistory.includes(title)) {
+                app.nodeVisitHistory.push(title);
+              }
               app.openNodeByTitle(app.editor.getSelectedText());
             }
           };
