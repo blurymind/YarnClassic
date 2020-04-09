@@ -100,11 +100,7 @@ export var App = function(name, version) {
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
 
-    for (let i=0; i<200; ++i) {
-      self.newNode().title('Node'+i).body('[[link|Node' + (i+1) +']][[link|Node' + (i+5) + ']]');
-    }
-
-    // self.newNode().title('Start');
+    self.newNode().title('Start');
 
     // search field enter
     self.$searchField.on('keyup', function(e) {
