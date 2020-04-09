@@ -7,6 +7,7 @@ export const Workspace = function(app) {
   this.context = self.canvas.getContext('2d');
 
   this.updateArrowsInterval = undefined;
+  this.isDrawingArrows = false;
 
   // startUpdatingArrows
   //
@@ -30,6 +31,12 @@ export const Workspace = function(app) {
   //
   // Redraws all the arrows on the workspace
   this.updateArrows = function() {
+    if (self.isDrawingArrows)
+      return;
+
+    self.isDrawingArrows = true;
+
+    this.isDrawingArrows = false;
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
     const scale = app.cachedScale;
@@ -80,12 +87,17 @@ export const Workspace = function(app) {
             )
           ) * scale;
 
+          const from = {
+            x: fromX + normal.x * dist,
+            y: fromY + normal.y * dist,
+          };
+
           const to = {
             x: toX - normal.x * dist,
             y: toY - normal.y * dist,
           };
 
-          linePoints.push({x1: fromX, y1: fromY, x2: to.x, y2: to.y});
+          linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
           arrowPoints.push({
             x1: to.x + normal.x * arrowLength,
             y1: to.y + normal.y * arrowLength,
@@ -94,25 +106,6 @@ export const Workspace = function(app) {
             x3: to.x - normal.x * arrowWidth + normal.y * arrowHeight,
             y3: to.y - normal.y * arrowWidth - normal.x * arrowHeight
           });
-
-          // // draw line
-          // self.context.beginPath();
-          // self.context.moveTo(from.x, from.y);
-          // self.context.lineTo(to.x, to.y);
-          // self.context.stroke();
-
-          // // draw arrow
-          // self.context.beginPath();
-          // self.context.moveTo(to.x + normal.x * 10, to.y + normal.y * 10);
-          // self.context.lineTo(
-          //   to.x - normal.x * arrowWidth - normal.y * arrowHeight,
-          //   to.y - normal.y * arrowWidth + normal.x * arrowHeight
-          // );
-          // self.context.lineTo(
-          //   to.x - normal.x * arrowWidth + normal.y * arrowHeight,
-          //   to.y - normal.y * arrowWidth - normal.x * arrowHeight
-          // );
-          // self.context.fill();
         }
       }
     }
@@ -133,5 +126,7 @@ export const Workspace = function(app) {
       self.context.lineTo(arrow.x3, arrow.y3);
     }
     self.context.fill();
+
+    self.isDrawingArrows = false;
   };
 };

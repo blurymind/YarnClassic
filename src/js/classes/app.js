@@ -2049,10 +2049,10 @@ export var App = function(name, version) {
       speed || 0,
       'easeInQuad',
       function() {
-        if (speed)
+        if (speed) {
           self.workspace.stopUpdatingArrows();
-        else
-          self.workspace.updateArrows();
+        }
+        self.workspace.updateArrows();
       }
     );
   };
