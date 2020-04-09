@@ -36,7 +36,6 @@ export const Workspace = function(app) {
 
     self.isDrawingArrows = true;
 
-    this.isDrawingArrows = false;
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
     const scale = app.cachedScale;
