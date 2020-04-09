@@ -166,6 +166,7 @@ export var Node = function(options = {}) {
         'easeInQuad',
         function() {
           app.workspace.stopUpdatingArrows();
+          app.workspace.updateArrows();
         }
       );
     self.drag();
