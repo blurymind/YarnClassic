@@ -151,7 +151,7 @@ export var Node = function(options = {}) {
       self.y(-parent.offset().top + $(window).height() / 2 - 100);
     }
 
-    var updateArrowsInterval = setInterval(app.updateArrowsThrottled, 16);
+    app.workspace.startUpdatingArrows();
 
     $(self.element)
       .css({ opacity: 0, scale: 0.8, y: '-=80px', rotate: '45deg' })
@@ -165,8 +165,7 @@ export var Node = function(options = {}) {
         250,
         'easeInQuad',
         function() {
-          clearInterval(updateArrowsInterval);
-          app.updateArrowsThrottled();
+          app.workspace.stopUpdatingArrows();
         }
       );
     self.drag();
@@ -258,7 +257,7 @@ export var Node = function(options = {}) {
       'easeInQuad',
       function() {
         app.removeNode(self);
-        app.updateArrowsThrottled();
+        app.workspace.updateArrows();
       }
     );
     app.deleting(null);
@@ -309,8 +308,7 @@ export var Node = function(options = {}) {
           }
         }
 
-        //app.refresh();
-        app.updateArrowsThrottled();
+        app.workspace.updateArrows();
       }
     });
 
@@ -347,18 +345,20 @@ export var Node = function(options = {}) {
         app.deselectAllNodes();
       }
 
-      app.updateArrowsThrottled();
+      app.workspace.updateArrows();
     });
   };
 
   this.moveTo = function(newX, newY) {
+    app.workspace.startUpdatingArrows();
+
     $(self.element).clearQueue();
     $(self.element).transition(
       {
         x: newX,
         y: newY,
       },
-      app.updateArrowsThrottled,
+      app.stopUpdatingArrows,
       500
     );
   };

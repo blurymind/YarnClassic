@@ -5,14 +5,16 @@ import {
   load_dictionary,
 } from '../libs/spellcheck_ace.js';
 import { Node } from './node';
+import { Workspace } from './workspace';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
 export var App = function(name, version) {
-  var self = this;
+  const self = this;
 
-  // self
+  this.workspace = new Workspace(self);
+
   this.instance = this;
   this.data = data;
   this.name = ko.observable(name);
@@ -21,7 +23,6 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.cachedScale = 1;
-  this.canvas;
   this.context;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -49,19 +50,7 @@ export var App = function(name, version) {
   this.hasTouchScreen = false;
   // this.fs = fs;
 
-  this.UPDATE_ARROWS_THROTTLE_MS = 16;
 
-  this.timer = undefined;
-  this.startUpdatingArrows = () => {
-    self.stopUpdatingArrows();
-    self.timer = setInterval(self.updateArrows, this.UPDATE_ARROWS_THROTTLE_MS);
-  };
-  this.stopUpdatingArrows = () => {
-    if (self.timer) {
-      window.clearInterval(self.timer);
-      self.timer = undefined;
-    }
-  }
 
   // this.parser = new ini.Parser();
   this.configFilePath = null;
@@ -111,9 +100,11 @@ export var App = function(name, version) {
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
 
-    self.canvas = $('.arrows')[0];
-    self.context = self.canvas.getContext('2d');
-    self.newNode().title('Start');
+    for (let i=0; i<200; ++i) {
+      self.newNode().title('Node'+i).body('[[link|Node' + (i+1) +']][[link|Node' + (i+5) + ']]');
+    }
+
+    // self.newNode().title('Start');
 
     // search field enter
     self.$searchField.on('keyup', function(e) {
@@ -162,8 +153,6 @@ export var App = function(name, version) {
         });
       },
     };
-    // updateArrows
-    // setInterval(function() { self.updateArrows(); }, 16);
 
     // drag node holder around
     (function() {
@@ -174,7 +163,6 @@ export var App = function(name, version) {
       var MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
       var MarqueeOffset = [0, 0];
       var midClickHeld = false;
-      var updateArrowsInterval;
 
       $('.nodes').on('pointerdown', function(e) {
         if (e.button == 1) {
@@ -192,10 +180,9 @@ export var App = function(name, version) {
         MarqueeOffset[0] = 0;
         MarqueeOffset[1] = 0;
 
-        if (!e.altKey && !e.shiftKey) self.deselectAllNodes();
-
-        // updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
-        self.startUpdatingArrows();
+        if (!e.altKey && !e.shiftKey) {
+          self.deselectAllNodes();
+        }
       });
 
       $('.nodes').on('mousemove touchmove', function(e) {
@@ -227,6 +214,8 @@ export var App = function(name, version) {
               }
               offset.x = pageX;
               offset.y = pageY;
+
+              self.workspace.updateArrows();
             }
           } else {
             MarqueeOn = true;
@@ -298,10 +287,6 @@ export var App = function(name, version) {
       });
 
       $('.nodes').on('pointerup', function(e) {
-        self.stopUpdatingArrows();
-        // clearInterval(updateArrowsInterval);
-
-        // console.log("finished dragging");
         if (e.button == 1) {
           midClickHeld = false;
         }
@@ -355,7 +340,6 @@ export var App = function(name, version) {
       self.transformOrigin[1] += deltaY;
 
       self.translate();
-      self.updateArrows();
     });
 
     $(document).on('keyup keydown', function(e) {
@@ -598,8 +582,7 @@ export var App = function(name, version) {
       }
     });
 
-    // $(window).on('resize', self.updateArrowsThrottled);
-    $(window).on('resize', self.updateArrows);
+    $(window).on('resize', self.workspace.updateArrows);
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {
@@ -1103,10 +1086,11 @@ export var App = function(name, version) {
     });
   };
 
-  this.newNode = function(updateArrows) {
+  this.newNode = function(updateLinks=true) {
     var node = new Node();
     self.nodes.push(node);
-    if (updateArrows == undefined || updateArrows == true)
+
+    if (updateLinks)
       self.updateNodeLinks();
 
     self.recordNodeAction('created', node);
@@ -1725,7 +1709,9 @@ export var App = function(name, version) {
   };
 
   this.updateNodeLinks = function() {
-    for (var i in self.nodes()) self.nodes()[i].updateLinks();
+    for (let node of self.nodes()) {
+      node.updateLinks();
+    }
   };
 
   // TODO: probably 'propagateUpdateFromNode' can be used as a
@@ -1818,93 +1804,6 @@ export var App = function(name, version) {
     });
     return result;
   };
-
-  this.updateArrows = function() {
-    self.canvas.width = $(window).width();
-    self.canvas.height = $(window).height();
-
-    var scale = self.cachedScale;
-    var offset = $('.nodes-holder').offset();
-
-    self.context.clearRect(0, 0, $(window).width(), $(window).height());
-    self.context.lineWidth = 4 * scale;
-
-    var nodes = self.nodes();
-
-    for (var i in nodes) {
-      var node = nodes[i];
-      nodes[i].tempWidth = $(node.element).width();
-      nodes[i].tempHeight = $(node.element).height();
-      nodes[i].tempOpacity = $(node.element).css('opacity');
-    }
-
-    for (var index in nodes) {
-      var node = nodes[index];
-      if (node.linkedTo().length > 0) {
-        for (var link in node.linkedTo()) {
-          link = link.trim();
-          var linked = node.linkedTo()[link];
-
-          // get origins
-          var fromX = (node.x() + node.tempWidth / 2) * scale + offset.left;
-          var fromY = (node.y() + node.tempHeight / 2) * scale + offset.top;
-          var toX = (linked.x() + linked.tempWidth / 2) * scale + offset.left;
-          var toY = (linked.y() + linked.tempHeight / 2) * scale + offset.top;
-
-          // get the normal
-          var distance = Math.sqrt(
-            (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
-          );
-          var normal = {
-            x: (toX - fromX) / distance,
-            y: (toY - fromY) / distance,
-          };
-
-          var dist =
-            110 + 160 * (1 - Math.max(Math.abs(normal.x), Math.abs(normal.y)));
-
-          // get from / to
-          var from = {
-            x: fromX + normal.x * dist * scale,
-            y: fromY + normal.y * dist * scale,
-          };
-          var to = {
-            x: toX - normal.x * dist * scale,
-            y: toY - normal.y * dist * scale,
-          };
-
-          self.context.strokeStyle =
-            'rgba(0, 0, 0, ' + node.tempOpacity * 0.6 + ')';
-          self.context.fillStyle =
-            'rgba(0, 0, 0, ' + node.tempOpacity * 0.6 + ')';
-
-          // draw line
-          self.context.beginPath();
-          self.context.moveTo(from.x, from.y);
-          self.context.lineTo(to.x, to.y);
-          self.context.stroke();
-
-          // draw arrow
-          self.context.beginPath();
-          self.context.moveTo(to.x + normal.x * 4, to.y + normal.y * 4);
-          self.context.lineTo(
-            to.x - normal.x * 16 * scale - normal.y * 12 * scale,
-            to.y - normal.y * 16 * scale + normal.x * 12 * scale
-          );
-          self.context.lineTo(
-            to.x - normal.x * 16 * scale + normal.y * 12 * scale,
-            to.y - normal.y * 16 * scale - normal.x * 12 * scale
-          );
-          self.context.fill();
-        }
-      }
-    }
-  };
-
-  this.updateArrowsThrottled = Utils.throttle(
-    this.updateArrows,
-    this.UPDATE_ARROWS_THROTTLE_MS
-  );
 
   this.getHighlightedText = function(text) {
     text = text.replace(/\</g, '&lt;');
@@ -2137,8 +2036,8 @@ export var App = function(name, version) {
   };
 
   this.translate = function(speed) {
-    // var updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
-    self.startUpdatingArrows();
+    if (speed)
+      self.workspace.startUpdatingArrows();
 
     $('.nodes-holder').transition(
       {
@@ -2156,9 +2055,10 @@ export var App = function(name, version) {
       speed || 0,
       'easeInQuad',
       function() {
-        self.stopUpdatingArrows();
-        // clearInterval(updateArrowsInterval);
-        // self.updateArrowsThrottled();
+        if (speed)
+          self.workspace.stopUpdatingArrows();
+        else
+          self.workspace.updateArrows();
       }
     );
   };
