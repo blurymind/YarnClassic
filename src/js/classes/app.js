@@ -23,7 +23,6 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.cachedScale = 1;
-  this.context;
   this.nodeHistory = [];
   this.nodeFuture = [];
   this.editingHistory = [];
