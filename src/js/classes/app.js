@@ -1209,6 +1209,7 @@ export var App = function(name, version) {
       ],
       change: function(color) {
         if ($('#colorPicker-container').is(':visible')) {
+          app.applyPickerColorEditor(color);
           $('#colorPicker').spectrum('hide');
           $('#colorPicker-container').hide();
           app.moveEditCursor(color.toHexString().length);
