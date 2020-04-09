@@ -587,7 +587,7 @@ export var App = function(name, version) {
     });
 
     this.guessPopUpHelper = function() {
-      if (self.getTagBeforeCursor().match(/\[color=#/)) {
+      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
         self.insertColorCode();
         // return
       } else if (self.getTagBeforeCursor().match(/\[img\]/)) {
