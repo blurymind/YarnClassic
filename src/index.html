@@ -118,8 +118,7 @@
 			<div class="nodes">
 				<div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
 					<div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
-						<div class="title" data-bind="text: node.title, style: {background:
-						node.titleColorValues[node.colorID()]}"></div>
+						<div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
 						<div class="body" data-bind="html: node.clippedBody"></div>
 						<div class="tags" data-bind="html: node.clippedTags"></div>
 						<div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>

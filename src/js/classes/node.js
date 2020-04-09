@@ -10,14 +10,16 @@ const bbcode = require('bbcode');
 export var Node = function(options = {}) {
   var self = this;
 
-  this.titleColorValues = [
-    '#eee',
-    '#6EA5E0',
-    '#9EDE74',
-    '#FFE374',
-    '#F7A666',
-    '#C47862',
-    '#97E1E9',
+  this.titleStyles = [
+    'title-style-1',
+    'title-style-2',
+    'title-style-3',
+    'title-style-4',
+    'title-style-5',
+    'title-style-6',
+    'title-style-7',
+    'title-style-8',
+    'title-style-9',
   ];
 
   // primary values
@@ -188,8 +190,8 @@ export var Node = function(options = {}) {
   this.setSelected = function(select) {
     self.selected = select;
 
-    if (self.selected) $(self.element).css({ border: '1px solid #49eff1' });
-    else $(self.element).css({ border: 'none' });
+    if (self.selected) $(self.element).addClass('selected');
+    else $(self.element).removeClass('selected');
   };
 
   this.toggleSelected = function() {
@@ -241,12 +243,12 @@ export var Node = function(options = {}) {
 
   this.doCycleColorDown = function() {
     self.colorID(self.colorID() - 1);
-    if (self.colorID() < 0) self.colorID(6);
+    if (self.colorID() < 0) self.colorID(8);
   };
 
   this.doCycleColorUp = function() {
     self.colorID(self.colorID() + 1);
-    if (self.colorID() > 6) self.colorID(0);
+    if (self.colorID() > 8) self.colorID(0);
   };
 
   this.remove = function() {

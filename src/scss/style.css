@@ -416,6 +416,10 @@ a:hover {
   transition: border 0.25s;
 }
 
+.node.selected {
+  border: 1px solid #49eff1;
+}
+
 .node:hover {
   border: 1px solid #49eff1;
 }
@@ -426,12 +430,41 @@ a:hover {
   padding: 0px 10px 0px 10px;
   height: 40px;
   line-height: 40px;
-  background: #eee;
-  color: #666;
   font-size: 0.9em;
   font-weight: bold;
   transition: color 0.25s, background 0.25s;
   overflow: hidden;
+}
+
+.title-style-1 {
+  background-color: #eee;
+}
+.title-style-2 {
+  background-color: #6EA5E0;
+}
+.title-style-3 {
+  background-color: #9EDE74;
+}
+.title-style-4 {
+  background-color: #FFE374;
+}
+
+.title-style-5 {
+  background-color: #F7A666;
+}
+.title-style-6 {
+  background-color: #C47862;
+}
+.title-style-7 {
+  background-color: #97E1E9;
+}
+.title-style-8 {
+  background-color: #576574;
+  color: white;
+}
+.title-style-9 {
+  background-color: black;
+  color: white;
 }
 
 .node .body {

@@ -105,11 +105,9 @@ export var App = function(name, version) {
 
     // search field enter
     self.$searchField.on('keyup', function(e) {
-      // enter
-      self.searchWarp();
-      // if (e.keyCode == 13) self.searchWarp();
       // escape
       if (e.keyCode == 27) self.clearSearch();
+      else self.searchWarp();
     });
 
     // Load json app settings from home folder
@@ -164,6 +162,7 @@ export var App = function(name, version) {
       var MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
       var MarqueeOffset = [0, 0];
       var midClickHeld = false;
+      var updateArrowsInterval;
 
       $('.nodes').on('pointerdown', function(e) {
         if (e.button == 1) {
@@ -182,6 +181,8 @@ export var App = function(name, version) {
         MarqueeOffset[1] = 0;
 
         if (!e.altKey && !e.shiftKey) self.deselectAllNodes();
+
+        updateArrowsInterval = setInterval(self.updateArrowsThrottled, 16);
       });
 
       $('.nodes').on('mousemove touchmove', function(e) {
@@ -284,6 +285,8 @@ export var App = function(name, version) {
       });
 
       $('.nodes').on('pointerup', function(e) {
+        clearInterval(updateArrowsInterval);
+
         // console.log("finished dragging");
         if (e.button == 1) {
           midClickHeld = false;
@@ -362,16 +365,15 @@ export var App = function(name, version) {
     });
 
     $(document).on('keydown', function(e) {
-      //global ctrl+z
       if ((e.metaKey || e.ctrlKey) && !self.editing()) {
         switch (e.keyCode) {
-          case 90:
+          case 90: // ctrl+z
             self.historyDirection('undo');
             break;
-          case 89:
+          case 89: // ctrl+y
             self.historyDirection('redo');
             break;
-          case 68:
+          case 68: // ctrl+d
             self.deselectAllNodes();
         }
       }
@@ -381,25 +383,25 @@ export var App = function(name, version) {
       if (e.ctrlKey || e.metaKey) {
         if (e.shiftKey) {
           switch (e.keyCode) {
-            case 83:
+            case 83: // ctrl+shift+s
               data.trySave(FILETYPE.JSON);
               self.fileKeyPressed = true;
               break;
-            case 65:
+            case 65: // ctrl+shift+a
               data.tryAppend();
               self.fileKeyPressed = true;
               break;
           }
         } else if (e.altKey) {
           switch (e.keyCode) {
-            case 83:
+            case 83: //alt+s
               data.trySave(FILETYPE.YARN);
               self.fileKeyPressed = true;
               break;
           }
         } else {
           switch (e.keyCode) {
-            case 83:
+            case 83: // ctrl+s
               if (data.editingPath() != null) {
                 data.trySaveCurrent();
               } else {
@@ -407,7 +409,7 @@ export var App = function(name, version) {
               }
               self.fileKeyPressed = true;
               break;
-            case 79:
+            case 79: // ctrl+o
               data.tryOpenFile();
               self.fileKeyPressed = true;
               break;
@@ -428,6 +430,9 @@ export var App = function(name, version) {
           document.execCommand('copy');
           self.clipboard = self.editor.getSelectedText();
           self.insertTextAtCursor('');
+        } // escape
+        else if (e.keyCode == 27) {
+          self.saveNode();
         }
 
         // If previewing the story, speed up scrolling when holding z
@@ -1142,6 +1147,11 @@ export var App = function(name, version) {
       return;
     }
 
+    // Make sure we save the currently node being edited before editing a new
+    // one using the context menu
+    if (self.editing() && self.editing() !== node)
+      self.saveNode(false);
+
     node.oldTitle = node.title(); // To check later if "title" changed
 
     self.editing(node);
@@ -1216,10 +1226,6 @@ export var App = function(name, version) {
       'Node Link'
     );
     langTools.setCompleters([nodeLinksCompleter]);
-
-    if (!self.nodeVisitHistory.includes(node.title())) {
-      self.nodeVisitHistory.push(node.title());
-    }
 
     // close tag autocompletion
     self.editor.getSession().on('change', function(evt) {
@@ -1311,12 +1317,12 @@ export var App = function(name, version) {
   };
 
   this.openLastEditedNode = function() {
-    if (self.nodeVisitHistory.length < 2) {
+    if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
-      return;
     } else {
-      self.nodeVisitHistory.pop();
-      self.openNodeByTitle(self.nodeVisitHistory.pop());
+      const title = self.nodeVisitHistory.pop()
+      self.propagateUpdateFromNode(self.editing());
+      self.openNodeByTitle(title);
     }
   };
 
@@ -1575,9 +1581,7 @@ export var App = function(name, version) {
       ) {
         var p = document.createElement('span');
         p.innerHTML = node.title();
-        p.setAttribute('class', 'item');
-        var pColor = node.titleColorValues[app.nodes()[i].colorID()];
-        p.setAttribute('style', 'background:' + pColor + ';');
+        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
 
         if (action == 'link') {
           if (node.title() !== self.editing().title()) {
@@ -1611,47 +1615,41 @@ export var App = function(name, version) {
     });
   };
 
-  this.saveNode = function() {
+  this.saveNode = function(closeEditor = true) {
     if (self.editing() != null) {
-      const editorTitleElement = document.getElementById('editorTitle');
+      const editorTitleElement = $('#editorTitle')[0];
 
-      // Trim spaces from the title.
-      var title = editorTitleElement.value.trim();
-
-      // Make sure the new title is unique. Otherwise, put a trailing number
-      // or increment the existing one if any
-      title = self.getUniqueTitle(title);
+      // Ensure the title is unique
+      const title = self.getFutureEditedNodeTitle();
 
       // Update the title in the UI
       editorTitleElement.value = title;
       self.editing().title(title);
 
-      self.editing().body(
-        self.trimBodyLinks(
-          self
-            .editing()
-            .body()
-            .trim()
-        )
-      );
+      // Remove leading and trailing spaces from the body links
+      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(self.editing());
 
-      $('.node-editor').transition({ opacity: 0 }, 250);
-      $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
-        self.editing(null);
-      });
-
-      var autoCompleteButton = document.getElementById('toglAutocomplete');
+      // Save user settings
+      const autoCompleteButton = document.getElementById('toglAutocomplete');
       self.config.autocompleteEnabled = autoCompleteButton.checked;
 
-      var autoCompleteWordsButton = document.getElementById(
+      const autoCompleteWordsButton = document.getElementById(
         'toglAutocompleteWords'
       );
       self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
 
       setTimeout(self.updateSearch, 600);
+
+      // Close editor. SaveNode and CloseEditor should be different functions
+      if (closeEditor) {
+        $('.node-editor').transition({ opacity: 0 }, 250);
+        $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
+          self.editing(null);
+        });
+      }
     }
   };
 
@@ -1786,6 +1784,13 @@ export var App = function(name, version) {
       app.nodes().filter(node => node.title().trim() === title.trim()).length >
       1
     );
+  };
+
+  this.getFutureEditedNodeTitle = function(){
+    // Ensure the title is unique
+    const editorTitleElement = $('#editorTitle')[0];
+    // Return the title that will be used when changes are applied
+    return self.getUniqueTitle(editorTitleElement.value.trim());
   };
 
   this.getOtherNodeTitles = function() {
