@@ -257,7 +257,7 @@ export var yarnRender = function() {
     this.finished = false;
     emiter.on('startedNode', function(nodeData) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML = 
-        "<br/><font color='red'>Press/Hold Z or Click/Tap to advance</font><br/>";
+        "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/>";
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='CADETBLUE'>Title: " + nodeData.title + '</font>';
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
