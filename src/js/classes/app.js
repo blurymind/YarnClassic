@@ -1423,7 +1423,11 @@ export var App = function(name, version) {
     });
   };
 
-  this.togglePlayMode = function(playModeOverwrite) {
+  this.advanceStoryPlayMode = function(speed) {
+    self.previewStory.changeTextScrollSpeed(speed);
+  };
+
+  this.togglePlayMode = function(playModeOverwrite = false) {
     if (!playModeOverwrite && self.previewStory.finished) return;
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
@@ -1454,7 +1458,6 @@ export var App = function(name, version) {
       editor.style.display = 'flex';
       storyPreviewPlayButton.className = 'bbcode-button';
       self.previewStory.finished = true;
-      console.log(self.previewStory.finished);
       setTimeout(() => {
         if (self.editing().title() !== self.previewStory.node.title)
           self.openNodeByTitle(self.previewStory.node.title);

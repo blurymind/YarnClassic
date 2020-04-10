@@ -221,7 +221,7 @@
 
 					<div class="editor-container">
 						<div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
-						<div class="editor-play" id="editor-play" onclick="app.togglePlayMode(false)">
+						<div class="editor-play" id="editor-play" onpointermove="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode(5)">
 							<p id="NVrichTextLabel"></p>
 							<div id="commandDebugLabel"></div>
 						</div>

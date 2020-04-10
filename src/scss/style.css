@@ -943,3 +943,8 @@ a:hover {
   pointer-events: none;
   cursor: not-allowed;
 }
+
+.storyPreviewChoiceButton {
+  color: #f5ff6f;
+  font-size: 1.2em;
+}

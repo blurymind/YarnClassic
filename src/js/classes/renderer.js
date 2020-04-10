@@ -38,6 +38,23 @@ export var yarnRender = function() {
     debugLabelIdToAttachTo,
     vnTextScrollIdx = null;
 
+  this.vnSelectChoice = () => {
+    let endTimeWait = new Date().getTime();
+    if (endTimeWait - this.startTimeWait < 1000) {
+      return;
+    } // we need to wait for user to see the questions
+    this.choices[this.storyChapter].push(
+      vnResult.options[this.vnSelectedChoice]
+    );
+    vnResult.select(this.vnSelectedChoice);
+    this.emiter.emit('choiceMade', vnResult.options[this.vnSelectedChoice]);
+    vnText = '';
+    vnChoices = undefined;
+    vnResult = self.goToNext();
+    this.vnSelectedChoice = -1;
+    this.changeTextScrollSpeed(111);
+  };
+
   this.vnUpdateChoice = (direction = 0) => {
     // direction: -1 or 1
     if (this.vnSelectedChoice < 0) {
@@ -50,34 +67,23 @@ export var yarnRender = function() {
       attemptChoice = vnResult.options.length - 1;
     }
     this.vnSelectedChoice = attemptChoice;
-    vnChoices = '';
+    vnChoices = document.createElement("DIV"); 
     vnResult.options.forEach((choice, i) => {
-      vnChoices += '\n ';
+      const btn = document.createElement("DIV");
       if (i == this.vnSelectedChoice) {
-        vnChoices += this.vnChoiceSelectionCursor;
+        btn.innerHTML = `${this.vnChoiceSelectionCursor} [${choice}]`; 
       } else {
-        vnChoices += '   ';
+        btn.innerHTML = `${this.vnChoiceSelectionCursor.replace(/.*/gm, '&nbsp;')} [${choice}]`; 
       }
-      vnChoices += ' [' + choice + '] ';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        this.vnSelectedChoice = i;
+        this.vnSelectChoice();
+      }
+      btn.className = "storyPreviewChoiceButton";
+      vnChoices.appendChild(btn)
     });
     self.updateVNHud();
-  };
-
-  this.vnSelectChoice = () => {
-    let endTimeWait = new Date().getTime();
-    if (endTimeWait - this.startTimeWait < 1000) {
-      return;
-    } // we need to wait for user to see the questions
-    this.choices[this.storyChapter].push(
-      vnResult.options[this.vnSelectedChoice]
-    );
-    vnResult.select(this.vnSelectedChoice);
-    this.emiter.emit('choiceMade', vnResult.options[this.vnSelectedChoice]);
-    vnText = '';
-    vnChoices = '';
-    vnResult = self.goToNext();
-    this.vnSelectedChoice = -1;
-    this.changeTextScrollSpeed(111);
   };
 
   // this function is triggered on key press/release
@@ -206,7 +212,6 @@ export var yarnRender = function() {
 
   // trigger this only on text update
   self.updateVNHud = () => {
-    let bbcodeHtml = vnTextResult;
     if (vnResult.constructor.name === 'TextResult') {
       while (
         vnTextResult.lastIndexOf('[img]') > vnTextResult.lastIndexOf('[/img]')
@@ -219,13 +224,10 @@ export var yarnRender = function() {
         vnTextResult = vnText.substring(0, vnTextScrollIdx);
       }
     }
-    let RenderHtml = '<div>';
-    RenderHtml += bbcode.parse(vnTextResult) + '<br>';
+    document.getElementById(htmIDtoAttachYarnTo).innerHTML = bbcode.parse(vnTextResult) + '<br>';
     if (vnChoices !== undefined) {
-      RenderHtml += "<p style='padding:20px;'>" + vnChoices + '</p>';
+      document.getElementById(htmIDtoAttachYarnTo).appendChild(vnChoices);
     }
-    RenderHtml += '</div>';
-    document.getElementById(htmIDtoAttachYarnTo).innerHTML = RenderHtml;
   };
 
   this.terminate = () => {
