@@ -10,10 +10,17 @@ import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
+// TODO: proposed classes:
+//
+// Settings: manages user settings using window.localStorage
+// UI: manages UI elements like menus, buttons, search, settings dialog...
+
 export var App = function(name, version) {
   const self = this;
 
+  // Ideally this dependencies should be injected by index.js
   this.workspace = new Workspace(self);
+  this.previewStory = new yarnRender();
 
   this.instance = this;
   this.data = data;
@@ -26,9 +33,7 @@ export var App = function(name, version) {
   this.nodeHistory = [];
   this.nodeFuture = [];
   this.editingHistory = [];
-  //this.appleCmdKey = false;
   this.editingSaveHistoryTimeout = null;
-  this.previewStory = new yarnRender();
   this.dirty = false;
   this.focusedNodeIdx = -1;
   this.zoomSpeed = 0.005;
@@ -65,9 +70,6 @@ export var App = function(name, version) {
   };
 
   this.editingPath = ko.observable(null);
-
-  this.nodeSelection = [];
-
   this.$searchField = $('.search-field');
 
   this.run = function() {
@@ -172,7 +174,7 @@ export var App = function(name, version) {
         MarqueeOffset[1] = 0;
 
         if (!e.altKey && !e.shiftKey) {
-          self.deselectAllNodes();
+          self.workspace.deselectAll();
         }
       });
 
@@ -263,12 +265,12 @@ export var App = function(name, version) {
 
               if (marqueeOverNode) {
                 if (!inMarqueeSelection) {
-                  self.addNodeSelected(nodes[i]);
+                  self.workspace.addNodesToSelection(nodes[i]);
                   MarqueeSelection.push(nodes[i]);
                 }
               } else {
                 if (inMarqueeSelection) {
-                  self.removeNodeSelection(nodes[i]);
+                  self.workspace.removeNodesFromSelection(nodes[i]);
                   MarqueeSelection.splice(index, 1);
                 }
               }
@@ -284,7 +286,7 @@ export var App = function(name, version) {
         dragging = false;
 
         if (MarqueeOn && MarqueeSelection.length == 0) {
-          self.deselectAllNodes();
+          self.workspace.deselectAll();
         }
 
         MarqueeSelection = [];
@@ -364,7 +366,7 @@ export var App = function(name, version) {
             self.historyDirection('redo');
             break;
           case 68: // ctrl+d
-            self.deselectAllNodes();
+            self.workspace.deselectAll();
         }
       }
     });
@@ -482,7 +484,7 @@ export var App = function(name, version) {
       if (!self.editing()) {
         // ctrl + a
         if ((e.metaKey || e.ctrlKey) && e.keyCode == 65) {
-          self.selectAllNodes();
+          self.workspace.selectAll();
         }
         // ctrl + v NODES
         if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
@@ -575,7 +577,7 @@ export var App = function(name, version) {
 
     $(window).on('resize', self.workspace.updateArrows);
 
-    $(document).on('keyup keydown pointerdown pointerup', function(e) {
+    $('document').on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {
         self.updateEditorStats();
       }
@@ -872,7 +874,7 @@ export var App = function(name, version) {
   };
 
   this.mouseUpOnNodeNotMoved = function() {
-    self.deselectAllNodes();
+    self.workspace.deselectAll();
   };
 
   this.matchConnectedColorID = function(fromNode) {
@@ -991,36 +993,12 @@ export var App = function(name, version) {
     for (var i in nodes) nodes[i].colorID(node.colorID());
   };
 
-  this.getSelectedNodes = function() {
-    var selectedNode = [];
-
-    for (var i in self.nodeSelection) {
-      selectedNode.push(self.nodeSelection[i]);
-    }
-
-    return selectedNode;
-  };
-
-  this.deselectAllNodes = function() {
-    var nodes = self.nodes();
-    for (var i in nodes) {
-      self.removeNodeSelection(nodes[i]);
-    }
-  };
-
-  this.selectAllNodes = function() {
-    var nodes = self.nodes();
-    for (var i in nodes) {
-      self.addNodeSelected(nodes[i]);
-    }
-  };
-
   this.pasteNodes = function() {
     if (!self.nodeClipboard.length) {
       return;
     }
 
-    self.deselectAllNodes();
+    self.workspace.deselectAll();
 
     self.nodeClipboard.forEach(function(copiedNode) {
       var node = new Node({
@@ -1033,33 +1011,17 @@ export var App = function(name, version) {
       });
 
       self.nodes.push(node);
-      self.addNodeSelected(node);
+      self.workspace.addNodesToSelection(node);
       self.recordNodeAction('created', node);
     });
 
     self.updateNodeLinks();
   };
 
-  this.addNodeSelected = function(node) {
-    var index = self.nodeSelection.indexOf(node);
-    if (index < 0) {
-      self.nodeSelection.push(node);
-      node.setSelected(true);
-    }
-  };
-
-  this.removeNodeSelection = function(node) {
-    var index = self.nodeSelection.indexOf(node);
-    if (index >= 0) {
-      self.nodeSelection.splice(index, 1);
-      node.setSelected(false);
-    }
-  };
-
   this.deleteSelectedNodes = function() {
     var nodes = self.getSelectedNodes();
     for (var i in nodes) {
-      self.removeNodeSelection(nodes[i]);
+      self.workspace.removeNodesFromSelection(nodes[i]);
       nodes[i].remove();
     }
   };

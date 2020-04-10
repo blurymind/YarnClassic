@@ -9,6 +9,7 @@ export const Workspace = function(app) {
 
   this.updateArrowsInterval = undefined;
   this.isDrawingArrows = false;
+  this.selectedNodes = [];
 
   // startUpdatingArrows
   //
@@ -137,5 +138,56 @@ export const Workspace = function(app) {
     const e = $(element);
     const highestZ = Utils.getHighestZ(e.parent());
     e.css('z-index', highestZ + 1);
+  };
+
+  // selectAll
+  //
+  // Select all nodes on the workspace
+  this.selectAll = function() {
+    self.addNodesToSelection(app.nodes());
+  };
+
+  // deselectAll
+  //
+  // Deselect all nodes on the workspace
+  this.deselectAll = function() {
+    self.removeNodesFromSelection(app.nodes());
+  };
+
+  // addNodesToSelection
+  //
+  // Adds nodes to the list of selected nodes
+  this.addNodesToSelection = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    for(let node of list) {
+      if (!self.selectedNodes.includes(node)){
+        self.selectedNodes.push(node);
+        node.setSelected(true);
+      }
+    }
+  };
+
+  // removeNodesFromSelection
+  //
+  // Removes nodes from the list of selected nodes
+  this.removeNodesFromSelection = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    for(let node of list) {
+      const index = self.selectedNodes.indexOf(node);
+      if (index >= 0) {
+        self.selectedNodes.splice(index, 1);
+        node.setSelected(false);
+      }
+    }
+  };
+
+  // getSelectedNodes
+  //
+  // Returns a copy of the selected nodes array
+  // TODO: is it necesssary to always clone the array? Do some research
+  this.getSelectedNodes = function() {
+    return self.selectedNodes.length === 1 ?
+      [self.selectedNodes[0]] :
+      Array.apply(this, self.selectedNodes);
   };
 };
