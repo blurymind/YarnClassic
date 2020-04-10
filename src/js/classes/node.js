@@ -267,13 +267,11 @@ export var Node = function(options = {}) {
   this.drag = function() {
     var dragging = false;
     var groupDragging = false;
-
     var offset = [0, 0];
     var moved = false;
 
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
-        var parent = $(self.element).parent();
         const pageX =
           app.hasTouchScreen && e.changedTouches
             ? e.changedTouches[0].pageX
@@ -332,21 +330,13 @@ export var Node = function(options = {}) {
       e.stopPropagation();
     });
 
-    $(self.element).on('pointerup', function(e) {
-      if (!moved) app.mouseUpOnNodeNotMoved();
-      moved = false;
-    });
+    $(self.element).on('pointerup touchend', function(e) {
+      if (!moved)
+        app.mouseUpOnNodeNotMoved();
 
-    $(document.body).on('pointerup touchend', function(e) {
+      moved = false;
       dragging = false;
       groupDragging = false;
-      moved = false;
-
-      if (app.hasTouchScreen) {
-        app.deselectAllNodes();
-      }
-
-      app.workspace.updateArrows();
     });
   };
 
