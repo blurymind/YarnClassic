@@ -10,10 +10,14 @@ import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
-// TODO: proposals
+// TODO: refactoring proposals
 //
 // Create Settings class: manages user settings using window.localStorage
 // Create UI class: manages menus, buttons, search, settings dialog...
+// Create:
+//   RichTextFormater interface
+//   RichTextFormaterBbcode implementation
+//   RichTextFormaterXml implementation
 // Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
@@ -2013,112 +2017,6 @@ export var App = function(name, version) {
         self.workspace.updateArrows();
       }
     );
-  };
-
-  /**
-   * Align selected nodes relative to a node with the lowest x-value
-   */
-  this.arrangeX = function() {
-    var SPACING = 210;
-
-    var selectedNodes = self
-        .nodes()
-        .filter(function(el) {
-          return el.selected;
-        })
-        .sort(function(a, b) {
-          if (a.x() > b.x()) return 1;
-          if (a.x() < b.x()) return -1;
-          return 0;
-        }),
-      referenceNode = selectedNodes.shift();
-
-    if (!selectedNodes.length) {
-      alert('Select nodes to align');
-      return;
-    }
-
-    selectedNodes.forEach(function(node, i) {
-      var x = referenceNode.x() + SPACING * (i + 1);
-      node.moveTo(x, referenceNode.y());
-    });
-  };
-
-  /**
-   * Align selected nodes relative to a node with the lowest y-value
-   */
-  this.arrangeY = function() {
-    var SPACING = 210;
-
-    var selectedNodes = self
-        .nodes()
-        .filter(function(el) {
-          return el.selected;
-        })
-        .sort(function(a, b) {
-          if (a.y() > b.y()) return 1;
-          if (a.y() < b.y()) return -1;
-          return 0;
-        }),
-      referenceNode = selectedNodes.shift();
-
-    if (!selectedNodes.length) {
-      alert('Select nodes to align');
-      return;
-    }
-
-    selectedNodes.forEach(function(node, i) {
-      var y = referenceNode.y() + SPACING * (i + 1);
-      node.moveTo(referenceNode.x(), y);
-    });
-  };
-
-  this.arrangeSpiral = function() {
-    const selectedNodes = self.workspace.getSelectedNodes();
-
-    if (!selectedNodes.length) {
-      alert('Select nodes to align');
-      return;
-    }
-
-    for (var i in selectedNodes) {
-      var node = selectedNodes[i];
-      var y = Math.sin(i * 0.5) * (600 + i * 30);
-      var x = Math.cos(i * 0.5) * (600 + i * 30);
-      node.moveTo(x, y);
-    }
-  };
-
-  this.sortAlphabetical = function() {
-    const selectedNodes = self.workspace.getSelectedNodes();
-
-    if (!selectedNodes.length) {
-      alert('Select nodes to align');
-      return;
-    }
-
-    selectedNodes.sort(function(a, b) {
-      return a.title().localeCompare(b.title());
-    });
-
-    var arrayWidth = Math.round(selectedNodes.length / 2);
-    var arrayX = 0;
-    var arrayY = 0;
-    selectedNodes.forEach(function(node, i) {
-      if (i % arrayWidth === 0) {
-        arrayY += 1;
-        arrayX = 0;
-      } else {
-        arrayX += 1;
-      }
-      if (i === 1) arrayY = 0;
-      node.moveTo(
-        selectedNodes[0].x() + 210 * arrayX,
-        selectedNodes[0].y() + arrayY * 210
-      );
-    });
-
-    self.workspace.warpToNodeByIdx(self.nodes.indexOf(selectedNodes[0]));
   };
 
   this.moveNodes = function(offX, offY) {

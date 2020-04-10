@@ -232,4 +232,141 @@ export const Workspace = function(app) {
 
     app.translate(100);
   };
+
+  // // alignY
+  // //
+  // // Align selected nodes relative to a node with the lowest y-value
+  // this.alignY = function() {
+  //   const minY = self.selectedNodes.reduce(
+  //     (minY, node) => Math.min(minY, node.y()),
+  //     Number.POSITIVE_INFINITY
+  //   );
+
+  //   self.selectedNodes.forEach( (node) => {
+  //     node.moveTo(node.x(), minY);
+  //   });
+  // };
+
+  // // alignX
+  // //
+  // // Align selected nodes relative to a node with the lowest x-value
+  // this.alignX = function() {
+  //   const minX = self.selectedNodes.reduce(
+  //     (minX, node) => Math.min(minX, node.x()),
+  //     Number.POSITIVE_INFINITY
+  //   );
+
+  //   self.selectedNodes.forEach( (node) => {
+  //     node.moveTo(minX, node.y());
+  //   });
+  // };
+
+  // alignHorizontally
+  //
+  // Align selected nodes relative to a node with the lowest y-value
+  // and equaly distributes the space between left most and right most nodes
+  this.distributeHorizontally = function() {
+    const minX = self.selectedNodes.reduce(
+      (minX, node) => Math.min(minX, node.x()),
+      Number.POSITIVE_INFINITY
+    );
+
+    const maxX = self.selectedNodes.reduce(
+      (maxX, node) => Math.max(maxX, node.x()),
+      Number.NEGATIVE_INFINITY
+    );
+
+    const minY = self.selectedNodes.reduce(
+      (minY, node) => Math.min(minY, node.y()),
+      Number.POSITIVE_INFINITY
+    );
+
+    const deltaX = (maxX - minX) / (self.selectedNodes.length - 1);
+    let currentX = minX;
+
+    self.selectedNodes.forEach( (node) => {
+      node.moveTo(currentX, minY);
+      currentX += deltaX;
+    });
+  };
+
+  // distributeVertically
+  //
+  // Align selected nodes relative to a node with the lowest x-value
+  // and equaly distributes the space between top most and bottom most nodes
+  this.distributeVertically = function() {
+    const minY = self.selectedNodes.reduce(
+      (minY, node) => Math.min(minY, node.y()),
+      Number.POSITIVE_INFINITY
+    );
+
+    const maxY = self.selectedNodes.reduce(
+      (maxY, node) => Math.max(maxY, node.y()),
+      Number.NEGATIVE_INFINITY
+    );
+
+    const minX = self.selectedNodes.reduce(
+      (minX, node) => Math.min(minX, node.x()),
+      Number.POSITIVE_INFINITY
+    );
+
+    const deltaY = (maxY - minY) / (self.selectedNodes.length - 1);
+    let currentY = minY;
+
+    self.selectedNodes.forEach( (node) => {
+      node.moveTo(minX, currentY);
+      currentY += deltaY;
+    });
+  };
+
+
+  // arrangeSpiral
+  //
+  // Arranges selected nodes in an spiral shape
+  this.arrangeSpiral = function() {
+    self.getSelectedNodes().forEach( (node, i) => {
+      node.moveTo(
+        Math.cos(i * 0.5) * (600 + i * 30),
+        Math.sin(i * 0.5) * (600 + i * 30)
+      );
+    });
+  };
+
+  // sortAlphabetical
+  //
+  // Sorts selected nodes in alphabetical order
+  this.sortAlphabetical = function() {
+    const selectedNodes = self.getSelectedNodes().sort((a, b) => {
+      return a.title().localeCompare(b.title());
+    });
+
+    if (!selectedNodes.length)
+      return;
+
+    let arrayWidth = Math.round(selectedNodes.length / 2);
+    let currentX = 0;
+    let currentY = 0;
+
+    const horizontalSpacing = $(selectedNodes[0].element).width() + 30;
+    const verticalSpacing = $(selectedNodes[0].element).height() + 30;
+
+    selectedNodes.forEach((node, i) => {
+      if (i % arrayWidth) {
+        currentX += 1;
+      } else {
+        currentY += 1;
+        currentX = 0;
+      }
+
+      if (i === 1)
+        currentY = 0;
+
+      node.moveTo(
+        selectedNodes[0].x() + currentX * horizontalSpacing,
+        selectedNodes[0].y() + currentY * verticalSpacing
+      );
+    });
+
+    self.warpToNode(selectedNodes[0]);
+  };
 };
