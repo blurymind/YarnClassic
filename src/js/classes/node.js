@@ -182,7 +182,7 @@ export var Node = function(options = {}) {
     $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
         if (self.selected) app.workspace.removeNodesFromSelection(self);
-        else app.addNodesToSelection(self);
+        else app.workspace.addNodesToSelection(self);
       }
     });
   };
