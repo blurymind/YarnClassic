@@ -582,7 +582,7 @@ export var App = function(name, version) {
 
     $(window).on('resize', self.workspace.updateArrows);
 
-    $('document').on('keyup keydown pointerdown pointerup', function(e) {
+    $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (self.editing() != null) {
         self.updateEditorStats();
       }
