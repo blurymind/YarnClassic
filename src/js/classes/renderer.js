@@ -249,7 +249,9 @@ export var yarnRender = function() {
     this.resourcesPath = resourcesPath;
     this.finished = false;
     emiter.on('startedNode', function(nodeData) {
-      document.getElementById(debugLabelIdToAttachTo).innerHTML =
+      document.getElementById(debugLabelIdToAttachTo).innerHTML = 
+        "<br/><font color='red'>Press/Hold Z to advance</font><br/>";
+      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='CADETBLUE'>Title: " + nodeData.title + '</font>';
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='deeppink'>Tags: " + nodeData.tags + '</font>';
