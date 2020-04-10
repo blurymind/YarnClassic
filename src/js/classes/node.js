@@ -151,7 +151,7 @@ export var Node = function(options = {}) {
       self.y(-parent.offset().top + $(window).height() / 2 - 100);
     }
 
-    var updateArrowsInterval = setInterval(app.updateArrowsThrottled, 16);
+    app.workspace.startUpdatingArrows();
 
     $(self.element)
       .css({ opacity: 0, scale: 0.8, y: '-=80px', rotate: '45deg' })
@@ -165,8 +165,8 @@ export var Node = function(options = {}) {
         250,
         'easeInQuad',
         function() {
-          clearInterval(updateArrowsInterval);
-          app.updateArrowsThrottled();
+          app.workspace.stopUpdatingArrows();
+          app.workspace.updateArrows();
         }
       );
     self.drag();
@@ -258,7 +258,7 @@ export var Node = function(options = {}) {
       'easeInQuad',
       function() {
         app.removeNode(self);
-        app.updateArrowsThrottled();
+        app.workspace.updateArrows();
       }
     );
     app.deleting(null);
@@ -267,13 +267,11 @@ export var Node = function(options = {}) {
   this.drag = function() {
     var dragging = false;
     var groupDragging = false;
-
     var offset = [0, 0];
     var moved = false;
 
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
-        var parent = $(self.element).parent();
         const pageX =
           app.hasTouchScreen && e.changedTouches
             ? e.changedTouches[0].pageX
@@ -309,8 +307,7 @@ export var Node = function(options = {}) {
           }
         }
 
-        //app.refresh();
-        app.updateArrowsThrottled();
+        app.workspace.updateArrows();
       }
     });
 
@@ -333,32 +330,26 @@ export var Node = function(options = {}) {
       e.stopPropagation();
     });
 
-    $(self.element).on('pointerup', function(e) {
-      if (!moved) app.mouseUpOnNodeNotMoved();
-      moved = false;
-    });
+    $(self.element).on('pointerup touchend', function(e) {
+      if (!moved)
+        app.mouseUpOnNodeNotMoved();
 
-    $(document.body).on('pointerup touchend', function(e) {
+      moved = false;
       dragging = false;
       groupDragging = false;
-      moved = false;
-
-      if (app.hasTouchScreen) {
-        app.deselectAllNodes();
-      }
-
-      app.updateArrowsThrottled();
     });
   };
 
   this.moveTo = function(newX, newY) {
+    app.workspace.startUpdatingArrows();
+
     $(self.element).clearQueue();
     $(self.element).transition(
       {
         x: newX,
         y: newY,
       },
-      app.updateArrowsThrottled,
+      app.stopUpdatingArrows,
       500
     );
   };
