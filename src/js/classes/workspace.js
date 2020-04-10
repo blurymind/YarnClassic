@@ -1,6 +1,7 @@
+import memoizeOne from 'memoize-one';
 
 export const Workspace = function(app) {
-  const UPDATE_ARROWS_THROTTLE_MS = 16;
+  const UPDATE_ARROWS_THROTTLE_MS = 5;
   const self = this;
 
   this.canvas = $('.arrows')[0];
@@ -25,7 +26,45 @@ export const Workspace = function(app) {
       window.clearInterval(self.updateArrowsInterval);
       self.updateArrowsInterval = undefined;
     }
-  }
+  };
+
+  this.getNodeHalfSize = memoizeOne(function(size) {
+    return size / 2;
+  });
+
+  this.getNormal = memoizeOne(function(fromX, toX, fromY, toY){
+    const distance = Math.sqrt(
+      (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
+    );
+    return {
+      x: (toX - fromX) / distance,
+      y: (toY - fromY) / distance,
+    }
+  });
+
+  this.getDist = memoizeOne(function(normal, scale){
+    return (
+      110 + (
+        160 * (
+          1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
+        )
+      )
+    ) * scale;
+  });
+
+  this.getFrom = memoizeOne(function(fromX, fromY, dist, normal){
+    return {
+      x: fromX + normal.x * dist,
+      y: fromY + normal.y * dist,
+    };
+  });
+
+  this.getTo = memoizeOne(function(toX, toY, dist, normal){
+    return {
+      x: toX - normal.x * dist,
+      y: toY - normal.y * dist,
+    };
+  });
 
   // updateArrows
   //
@@ -55,11 +94,9 @@ export const Workspace = function(app) {
     self.context.strokeStyle = self.context.fillStyle = 'rgba(0, 0, 0, 1)';
 
     for (let node of nodes) {
-      node.halfWidth = $(node.element).width() / 2;
-      node.halfHeight = $(node.element).height() / 2;
-    }
+      node.halfWidth = self.getNodeHalfSize($(node.element).width());
+      node.halfHeight = self.getNodeHalfSize($(node.element).width());
 
-    for (let node of nodes) {
       if (node.linkedTo().length) {
         const fromX = (node.x() + node.halfWidth) * scale + offset.left;
         const fromY = (node.y() + node.halfHeight) * scale + offset.top;
@@ -69,32 +106,10 @@ export const Workspace = function(app) {
           const toY = (linked.y() + linked.halfHeight) * scale + offset.top;
 
           // Get the normalized direction from -> to
-          const distance = Math.sqrt(
-            (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
-          );
-
-          const normal = {
-            x: (toX - fromX) / distance,
-            y: (toY - fromY) / distance,
-          };
-
-          const dist = (
-            110 + (
-              160 * (
-                1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
-              )
-            )
-          ) * scale;
-
-          const from = {
-            x: fromX + normal.x * dist,
-            y: fromY + normal.y * dist,
-          };
-
-          const to = {
-            x: toX - normal.x * dist,
-            y: toY - normal.y * dist,
-          };
+          const normal = self.getNormal(fromX, toX, fromY, toY);
+          const dist = self.getDist(normal, scale);
+          const from = self.getFrom(fromX, fromY, dist, normal);
+          const to = self.getTo(toX, toY, dist, normal);
 
           linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
           arrowPoints.push({

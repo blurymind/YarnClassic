@@ -37,6 +37,7 @@
     "knockout": "3.3.0",
     "knockout-ace": "^1.0.1",
     "lightweight-emoji-picker": "0.0.2",
+    "memoize-one": "^5.1.1",
     "nspell": "^2.1.2",
     "spectrum-colorpicker": "^1.8.0",
     "spoken": "^1.1.17",
