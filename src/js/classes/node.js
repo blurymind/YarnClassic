@@ -295,7 +295,7 @@ export var Node = function(options = {}) {
         if (groupDragging) {
           var nodes = [];
           if (self.selected) {
-            nodes = app.getSelectedNodes();
+            nodes = app.workspace.getSelectedNodes();
             nodes.splice(nodes.indexOf(self), 1);
           } else {
             nodes = app.getNodesConnectedTo(self);

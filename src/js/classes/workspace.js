@@ -14,7 +14,7 @@ export const Workspace = function(app) {
   // startUpdatingArrows
   //
   // Keeps updating arrows during transition
-  this.startUpdatingArrows = () => {
+  this.startUpdatingArrows = function() {
     self.stopUpdatingArrows();
     self.updateArrowsInterval = setInterval(self.updateArrows, UPDATE_ARROWS_THROTTLE_MS);
   };
@@ -22,7 +22,7 @@ export const Workspace = function(app) {
   // stopUpdatingArrows
   //
   // Stops updating arrows after transition
-  this.stopUpdatingArrows = () => {
+  this.stopUpdatingArrows = function() {
     if (self.updateArrowsInterval) {
       window.clearInterval(self.updateArrowsInterval);
       self.updateArrowsInterval = undefined;
@@ -189,5 +189,47 @@ export const Workspace = function(app) {
     return self.selectedNodes.length === 1 ?
       [self.selectedNodes[0]] :
       Array.apply(this, self.selectedNodes);
+  };
+
+  // warpToNodeByIdx
+  //
+  // Moves the viewport to focus a node from the general nodes list
+  this.warpToNodeByIdx = function(idx) {
+    self.warpToNode(app.nodes()[idx]);
+    app.focusedNodeIdx = idx;
+  };
+
+  // warpToSelectedNodeByIdx
+  //
+  // Moves the viewport to focus a node from the selected nodes list
+  this.warpToSelectedNodeByIdx = function(idx) {
+    self.warpToNode(self.getSelectedNodes()[idx]);
+    app.focusedNodeIdx = idx;
+  };
+
+  // warpToNode
+  //
+  // Moves the viewport to focus the specified node
+  this.warpToNode = function(node) {
+    node && self.warpToXY(node.x(), node.y());
+  }
+
+  // warpToNode
+  //
+  // Moves the viewport to focus the x,y position
+  this.warpToXY = function(x, y) {
+    const nodeWidth = 100;
+    const nodeHeight = 100;
+    const nodeXScaled = -(x * app.cachedScale);
+    const nodeYScaled = -(y * app.cachedScale);
+    const winXCenter = $(window).width() / 2;
+    const winYCenter = $(window).height() / 2;
+    const nodeWidthShift = (nodeWidth * app.cachedScale) / 2;
+    const nodeHeightShift = (nodeHeight * app.cachedScale) / 2;
+
+    app.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
+    app.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
+
+    app.translate(100);
   };
 };

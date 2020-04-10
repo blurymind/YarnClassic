@@ -10,10 +10,11 @@ import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
-// TODO: proposed classes:
+// TODO: proposals
 //
-// Settings: manages user settings using window.localStorage
-// UI: manages UI elements like menus, buttons, search, settings dialog...
+// Create Settings class: manages user settings using window.localStorage
+// Create UI class: manages menus, buttons, search, settings dialog...
+// Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
   const self = this;
@@ -438,11 +439,11 @@ export var App = function(name, version) {
       } else {
         // ctrl + c NODES
         if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-          self.nodeClipboard = app.cloneNodeArray(self.getSelectedNodes());
+          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
         }
         // ctrl + x NODES
         else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          self.nodeClipboard = app.cloneNodeArray(self.getSelectedNodes());
+          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
           self.deleteSelectedNodes();
         }
       }
@@ -541,7 +542,7 @@ export var App = function(name, version) {
         if (self.editing() !== null && !e.altKey) {
           return; // alt+spacebar to toggle between open nodes
         }
-        var selectedNodes = self.getSelectedNodes();
+        var selectedNodes = self.workspace.getSelectedNodes();
         var nodes = selectedNodes.length > 0 ? selectedNodes : self.nodes();
         var isNodeSelected = selectedNodes.length > 0;
         if (
@@ -564,9 +565,9 @@ export var App = function(name, version) {
         }
         self.cachedScale = 1;
         if (isNodeSelected) {
-          self.warpToSelectedNodeIdx(self.focusedNodeIdx);
+          self.workspace.warpToSelectedNodeByIdx(self.focusedNodeIdx);
         } else {
-          self.warpToNodeIdx(self.focusedNodeIdx);
+          self.workspace.warpToNodeByIdx(self.focusedNodeIdx);
         }
 
         if (self.editing() !== null) {
@@ -987,7 +988,7 @@ export var App = function(name, version) {
   };
 
   this.setSelectedColors = function(node) {
-    var nodes = self.getSelectedNodes();
+    var nodes = self.workspace.getSelectedNodes();
     nodes.splice(nodes.indexOf(node), 1);
 
     for (var i in nodes) nodes[i].colorID(node.colorID());
@@ -1019,7 +1020,7 @@ export var App = function(name, version) {
   };
 
   this.deleteSelectedNodes = function() {
-    var nodes = self.getSelectedNodes();
+    var nodes = self.workspace.getSelectedNodes();
     for (var i in nodes) {
       self.workspace.removeNodesFromSelection(nodes[i]);
       nodes[i].remove();
@@ -1557,7 +1558,7 @@ export var App = function(name, version) {
             p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
             p.setAttribute(
               'onmouseover',
-              `app.warpToNodeIdx(${self.nodes.indexOf(node)})`
+              `app.workspace.warpToNodeByIdx(${self.nodes.indexOf(node)})`
             );
             rootMenu.appendChild(p);
           }
@@ -2073,7 +2074,7 @@ export var App = function(name, version) {
   };
 
   this.arrangeSpiral = function() {
-    const selectedNodes = self.getSelectedNodes();
+    const selectedNodes = self.workspace.getSelectedNodes();
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');
@@ -2089,7 +2090,7 @@ export var App = function(name, version) {
   };
 
   this.sortAlphabetical = function() {
-    const selectedNodes = self.getSelectedNodes();
+    const selectedNodes = self.workspace.getSelectedNodes();
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');
@@ -2117,47 +2118,13 @@ export var App = function(name, version) {
       );
     });
 
-    self.warpToNodeIdx(self.nodes.indexOf(selectedNodes[0]));
+    self.workspace.warpToNodeByIdx(self.nodes.indexOf(selectedNodes[0]));
   };
 
   this.moveNodes = function(offX, offY) {
     for (var i in self.nodes()) {
       var node = self.nodes()[i];
       node.moveTo(node.x() + offX, node.y() + offY);
-    }
-  };
-
-  this.warpToNodeIdx = function(idx) {
-    if (self.nodes().length > idx) {
-      var node = self.nodes()[idx];
-      var nodeXScaled = -(node.x() * self.cachedScale),
-        nodeYScaled = -(node.y() * self.cachedScale),
-        winXCenter = $(window).width() / 2,
-        winYCenter = $(window).height() / 2,
-        nodeWidthShift = (node.tempWidth * self.cachedScale) / 2,
-        nodeHeightShift = (node.tempHeight * self.cachedScale) / 2;
-
-      self.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
-      self.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
-      self.translate(100);
-      self.focusedNodeIdx = idx;
-    }
-  };
-
-  this.warpToSelectedNodeIdx = function(idx) {
-    if (self.getSelectedNodes().length > idx) {
-      var node = self.getSelectedNodes()[idx];
-      var nodeXScaled = -(node.x() * self.cachedScale),
-        nodeYScaled = -(node.y() * self.cachedScale),
-        winXCenter = $(window).width() / 2,
-        winYCenter = $(window).height() / 2,
-        nodeWidthShift = (node.tempWidth * self.cachedScale) / 2,
-        nodeHeightShift = (node.tempHeight * self.cachedScale) / 2;
-
-      self.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
-      self.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
-      self.translate(100);
-      self.focusedNodeIdx = idx;
     }
   };
 
@@ -2169,23 +2136,6 @@ export var App = function(name, version) {
         .includes(search)
     );
   };
-  this.warpToNodeXY = function(x, y) {
-    //alert("warp to x, y: " + x + ", " + y);
-    const nodeWidth = 100,
-      nodeHeight = 100;
-    var nodeXScaled = -(x * self.cachedScale),
-      nodeYScaled = -(y * self.cachedScale),
-      winXCenter = $(window).width() / 2,
-      winYCenter = $(window).height() / 2,
-      nodeWidthShift = (nodeWidth * self.cachedScale) / 2,
-      nodeHeightShift = (nodeHeight * self.cachedScale) / 2;
-
-    self.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
-    self.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
-
-    //alert("self.transformOrigin[0]: " + self.transformOrigin[0]);
-    self.translate(100);
-  };
 
   this.searchWarp = function() {
     // if search field is empty
@@ -2196,10 +2146,10 @@ export var App = function(name, version) {
 
     if (search === '') {
       // warp to the first node
-      self.warpToNodeIdx(0);
+      self.workspace.warpToNodeByIdx(0);
     } else {
       const foundNode = self.getFirstFoundNode(search);
-      self.warpToNodeIdx(self.nodes.indexOf(foundNode));
+      self.workspace.warpToNodeByIdx(self.nodes.indexOf(foundNode));
     }
   };
 
