@@ -1,3 +1,4 @@
+import { Utils } from './utils';
 
 export const Workspace = function(app) {
   const UPDATE_ARROWS_THROTTLE_MS = 16;
@@ -127,5 +128,14 @@ export const Workspace = function(app) {
     self.context.fill();
 
     self.isDrawingArrows = false;
+  };
+
+  // bringToFront
+  //
+  // Brings the specified node to the top of the nodes stack
+  this.bringToFront = function(element) {
+    const e = $(element);
+    const highestZ = Utils.getHighestZ(e.parent());
+    e.css('z-index', highestZ + 1);
   };
 };

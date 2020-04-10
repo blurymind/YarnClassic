@@ -139,7 +139,6 @@ export var Node = function(options = {}) {
   this.canDoubleClick = true;
 
   this.create = function() {
-    Utils.pushToTop($(self.element));
     self.style = window.getComputedStyle($(self.element).get(0));
 
     if (self.createX && self.createY) {
@@ -151,6 +150,7 @@ export var Node = function(options = {}) {
       self.y(-parent.offset().top + $(window).height() / 2 - 100);
     }
 
+    app.workspace.bringToFront(self.element);
     app.workspace.startUpdatingArrows();
 
     $(self.element)
@@ -475,7 +475,7 @@ ko.bindingHandlers.nodeBind = {
     bindingContext
   ) {
     $(element).on('pointerdown', function() {
-      Utils.pushToTop($(element));
+      app.workspace.bringToFront(element);
     });
   },
 };
