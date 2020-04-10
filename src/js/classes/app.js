@@ -47,11 +47,7 @@ export var App = function(name, version) {
   this.selectedLanguageIndex = 6;
   this.language = null;
   this.hasTouchScreen = false;
-  // this.fs = fs;
 
-
-
-  // this.parser = new ini.Parser();
   this.configFilePath = null;
   this.config = {
     nightModeEnabled: false,
