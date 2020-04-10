@@ -78,6 +78,11 @@ export var yarnRender = function() {
       btn.onclick = (e) => {
         e.stopPropagation();
         this.vnSelectedChoice = i;
+        this.vnUpdateChoice();
+      }
+      btn.ondblclick = (e) => {
+        e.stopPropagation();
+        this.vnSelectedChoice = i;
         this.vnSelectChoice();
       }
       btn.className = "storyPreviewChoiceButton";
@@ -252,7 +257,7 @@ export var yarnRender = function() {
     this.finished = false;
     emiter.on('startedNode', function(nodeData) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML = 
-        "<br/><font color='red'>Press/Hold Z to advance</font><br/>";
+        "<br/><font color='red'>Press/Hold Z or Click/Tap to advance</font><br/>";
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='CADETBLUE'>Title: " + nodeData.title + '</font>';
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=

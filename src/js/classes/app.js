@@ -1423,7 +1423,7 @@ export var App = function(name, version) {
     });
   };
 
-  this.advanceStoryPlayMode = function(speed) {
+  this.advanceStoryPlayMode = function(speed = 5) {
     self.previewStory.changeTextScrollSpeed(speed);
   };
 
