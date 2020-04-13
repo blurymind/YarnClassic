@@ -49,8 +49,6 @@ export var App = function(name, version) {
   this.hasTouchScreen = false;
   // this.fs = fs;
 
-
-
   // this.parser = new ini.Parser();
   this.configFilePath = null;
   this.config = {
@@ -84,6 +82,13 @@ export var App = function(name, version) {
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
     window.addEventListener('touchstart', function() {
       self.hasTouchScreen = true;
+    });
+    window.addEventListener("yarnLoadedData", e => {
+      $('.arrows')
+        .css({ opacity: 0 })
+        .transition({ opacity: 1 }, 500);
+
+      self.updateNodeLinks();
     });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
