@@ -17,7 +17,7 @@
 			<!-- search form -->
 			<div class="app-search">
 				<input id="nodeSearchInput" type="text" class="search-field" placeholder="Search"/>
-				
+
 				<span>
 						<span class="search-title styled-checkbox">
 								<input type="checkbox" checked="checked" id="search-title" />
@@ -57,7 +57,7 @@
 			<!-- navigation / menu -->
 			<div class="app-menu">
 				<div class="menu">
-					<span class="title" data-bind="click:app.newNode">+ Node</span>
+					<span class="title" data-bind="click:app.openSettingsDialog">+ Node</span>
 				</div>
 
 				<div class="menu">
@@ -131,8 +131,8 @@
 			</div>
 
 			<!-- ko if:app.editing() != null -->
-			<div class="node-editor" data-bind="mousedown:app.saveNode">				
-			
+			<div class="node-editor" data-bind="mousedown:app.saveNode">
+
 				<div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 					<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
 					<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
@@ -148,8 +148,8 @@
 						<button class="bbcode-button" style="color:purple" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
 						<span class="hide-when-narrow">
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
-						</span> 
-						
+						</span>
+
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertEmoji()" title="Emoji">😉</button>
 
 						<div class="app-menu" style="position: absolute;">
@@ -197,7 +197,7 @@
 						|
 						<span>
 							<select class="styled-dropdown" id="select_language" onchange="app.updateCountry()">
-								</select>
+							</select>
 							</span>
 							<span class="styled-checkbox">
 								<input class="styled-checkbox" type="checkbox" id="toglSpellCheck" onclick="app.toggleSpellCheck()"></input>
@@ -216,7 +216,7 @@
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.undo()" title="Undo">↶</button>
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.redo()" title="Redo">↷</button>
 						</span>
-					 
+
 					</div>
 
 					<div class="editor-container">
@@ -227,12 +227,12 @@
 						</div>
 						<div class="editor" id="editor"
 						data-bind="
-						ace: app.editing().body, 
+						ace: app.editing().body,
 						aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
 						enableBasicAutocompletion: true,
 						enableLiveAutocompletion: true }"
 						>
-						</div> 
+						</div>
 					</div>
 					<!--<div class="icon close" data-bind="click:app.saveNode"></div>-->
 
@@ -274,7 +274,46 @@
 
 			<!-- marquee -->
 			<div id="marquee"></div>
+
+			<!-- ko if:app.settings() === true -->
+			<div class="settings-dialog">
+				<div class="form">
+					Settings
+					<hr/> <!-- ------------------------------------------------------ -->
+          <!-- Language -->
+					<p>
+						<label for="language">
+							Dictionary language:
+							<select>
+								<option value="es">Español</option>
+								<option value="en">English</option>
+							</select>
+						</label>
+					</p>
+
+					<!-- Theme -->
+					<p>
+						<label for="theme">
+							Theme:
+							<select>
+								<option value="a">Yarn Editor Classic</option>
+								<option value="b">Twine-like</option>
+								<option value="c">Modern</option>
+							</select>
+						</label>
+					</p>
+
+					<!-- Throttle threshold -->
+					<p>
+						<label for="throttle-threshold">
+							Redraw throttle threshold (ms):<input type="number" size="5" min="16" max="250" value="50">
+						</label>
+					</p>
+				</div>
+			</div>
+			<!-- /ko -->
 		</div>
+
 
 		<!-- Hidden fields, file dialogs, and elements -->
 		<div class="hidden">

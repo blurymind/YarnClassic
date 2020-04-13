@@ -20,6 +20,7 @@ export var App = function(name, version) {
   this.name = ko.observable(name);
   this.version = ko.observable(version);
   this.editing = ko.observable(null);
+  this.settings = ko.observable(false);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.cachedScale = 1;
@@ -437,7 +438,13 @@ export var App = function(name, version) {
               return;
             }
           }
-      } else {
+      }
+      else if (self.settings() === true) {
+        if (e.keyCode == 27) {
+          self.closeSettingsDialog();
+        }
+      }
+      else {
         // ctrl + c NODES
         if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
           self.nodeClipboard = app.cloneNodeArray(self.getSelectedNodes());
@@ -1136,6 +1143,29 @@ export var App = function(name, version) {
       },
     });
   };
+
+  this.openSettingsDialog = function() {
+    self.settings(true);
+
+    $('.settings-dialog')
+      .css({ opacity: 0 })
+      .transition({ opacity: 1 }, 250);
+    $('.settings-dialog .form')
+      .css({ y: '-100' })
+      .transition({ y: '0' }, 250);
+  }
+
+  this.closeSettingsDialog = function() {
+    self.settings(true);
+    $('.settings-dialog')
+      .css({ opacity: 1 })
+      .transition({ opacity: 0 }, 250);
+    $('.settings-dialog .form')
+      .css({ y: '0' })
+      .transition({ y: '-100' }, 250, e => {
+        self.settings(false);
+      });
+  }
 
   this.editNode = function(node) {
     if (!node.active()) {
