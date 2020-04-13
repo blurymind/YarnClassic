@@ -1,15 +1,17 @@
-import memoizeOne from 'memoize-one';
 import { Utils } from './utils';
 
 export const Workspace = function(app) {
-  const UPDATE_ARROWS_THROTTLE_MS = 5;
+  const UPDATE_ARROWS_THROTTLE_MS = 50;
   const self = this;
 
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
 
   this.updateArrowsInterval = undefined;
+  this.deferredArrowsDrawInterval = undefined;
+  this.nextArrowsUpdate = Number.NEGATIVE_INFINITY;
   this.isDrawingArrows = false;
+
   this.selectedNodes = [];
 
   // startUpdatingArrows
@@ -30,44 +32,6 @@ export const Workspace = function(app) {
     }
   };
 
-  this.getNodeHalfSize = memoizeOne(function(size) {
-    return size / 2;
-  });
-
-  this.getNormal = memoizeOne(function(fromX, toX, fromY, toY){
-    const distance = Math.sqrt(
-      (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
-    );
-    return {
-      x: (toX - fromX) / distance,
-      y: (toY - fromY) / distance,
-    }
-  });
-
-  this.getDist = memoizeOne(function(normal, scale){
-    return (
-      110 + (
-        160 * (
-          1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
-        )
-      )
-    ) * scale;
-  });
-
-  this.getFrom = memoizeOne(function(fromX, fromY, dist, normal){
-    return {
-      x: fromX + normal.x * dist,
-      y: fromY + normal.y * dist,
-    };
-  });
-
-  this.getTo = memoizeOne(function(toX, toY, dist, normal){
-    return {
-      x: toX - normal.x * dist,
-      y: toY - normal.y * dist,
-    };
-  });
-
   // updateArrows
   //
   // Redraws all the arrows on the workspace
@@ -75,7 +39,20 @@ export const Workspace = function(app) {
     if (self.isDrawingArrows)
       return;
 
+    // Limit the number of calls to updateArrows
+    const now = (new Date()).getTime();
+    if (now < self.nextArrowsUpdate) {
+      if (!self.deferredArrowsDrawInterval) {
+        self.deferredArrowsDrawInterval =
+          window.setTimeout(self.updateArrows, (self.nextArrowsUpdate + UPDATE_ARROWS_THROTTLE_MS) - now);
+      }
+      return;
+    }
+
     self.isDrawingArrows = true;
+    self.nextArrowsUpdate = (now + UPDATE_ARROWS_THROTTLE_MS);
+    window.clearInterval(self.deferredArrowsDrawInterval);
+    self.deferredArrowsDrawInterval = undefined;
 
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
@@ -96,8 +73,8 @@ export const Workspace = function(app) {
     self.context.strokeStyle = self.context.fillStyle = 'rgba(0, 0, 0, 1)';
 
     for (let node of nodes) {
-      node.halfWidth = self.getNodeHalfSize($(node.element).width());
-      node.halfHeight = self.getNodeHalfSize($(node.element).width());
+      node.halfWidth = $(node.element).width() / 2;
+      node.halfHeight = $(node.element).height() / 2;
 
       if (node.linkedTo().length) {
         const fromX = (node.x() + node.halfWidth) * scale + offset.left;
@@ -108,10 +85,32 @@ export const Workspace = function(app) {
           const toY = (linked.y() + linked.halfHeight) * scale + offset.top;
 
           // Get the normalized direction from -> to
-          const normal = self.getNormal(fromX, toX, fromY, toY);
-          const dist = self.getDist(normal, scale);
-          const from = self.getFrom(fromX, fromY, dist, normal);
-          const to = self.getTo(toX, toY, dist, normal);
+          const distance = Math.sqrt(
+            (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
+          );
+
+          const normal = {
+            x: (toX - fromX) / distance,
+            y: (toY - fromY) / distance,
+          }
+
+          const dist = (
+            110 + (
+              160 * (
+                1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
+              )
+            )
+          ) * scale;
+
+          const from = {
+            x: fromX + normal.x * dist,
+            y: fromY + normal.y * dist,
+          };
+
+          const to = {
+            x: toX - normal.x * dist,
+            y: toY - normal.y * dist,
+          }
 
           linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
           arrowPoints.push({
@@ -333,7 +332,6 @@ export const Workspace = function(app) {
       currentY += deltaY;
     });
   };
-
 
   // arrangeSpiral
   //
