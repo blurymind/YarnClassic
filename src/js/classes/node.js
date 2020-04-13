@@ -42,13 +42,8 @@ export var Node = function(options = {}) {
 
   // clipped values for display
   this.clippedTags = ko.computed(function() {
-    var tags = this.tags().split(' ');
-    var output = '';
-    if (this.tags().length > 0) {
-      for (var i = 0; i < tags.length; i++)
-        output += '<span>' + tags[i] + '</span>';
-    }
-    return output;
+    const tags = self.tags().split(' ');
+    return ((tags.length===0) || (tags.length===1 && !tags[0])) ? null : tags;
   }, this);
 
   this.textToHtml = function(text, showRowNumbers = false) {

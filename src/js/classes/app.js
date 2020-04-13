@@ -1612,7 +1612,8 @@ export var App = function(name, version) {
   };
 
   this.saveNode = function(closeEditor = true) {
-    if (self.editing() != null) {
+    const node = self.editing();
+    if (node) {
       const editorTitleElement = $('#editorTitle')[0];
 
       // Ensure the title is unique
@@ -1620,13 +1621,16 @@ export var App = function(name, version) {
 
       // Update the title in the UI
       editorTitleElement.value = title;
-      self.editing().title(title);
+      node.title(title);
 
       // Remove leading and trailing spaces from the body links
-      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+      node.body(self.trimBodyLinks(node.body().trim()));
+
+      // Remove duplicated tags
+      node.tags([...new Set(node.tags().split(' '))].join(' '));
 
       self.makeNewNodesFromLinks();
-      self.propagateUpdateFromNode(self.editing());
+      self.propagateUpdateFromNode(node);
 
       // Save user settings
       const autoCompleteButton = document.getElementById('toglAutocomplete');
