@@ -1626,9 +1626,6 @@ export var App = function(name, version) {
       // Remove leading and trailing spaces from the body links
       node.body(self.trimBodyLinks(node.body().trim()));
 
-      // Remove duplicated tags
-      node.tags([...new Set(node.tags().split(' '))].join(' '));
-
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(node);
 

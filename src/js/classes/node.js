@@ -42,8 +42,8 @@ export var Node = function(options = {}) {
 
   // clipped values for display
   this.clippedTags = ko.computed(function() {
-    const tags = self.tags().split(' ');
-    return ((tags.length===0) || (tags.length===1 && !tags[0])) ? null : tags;
+    const tags = self.tags().split(' ').filter(item => item);
+    return [...(new Set(tags))]
   }, this);
 
   this.textToHtml = function(text, showRowNumbers = false) {
