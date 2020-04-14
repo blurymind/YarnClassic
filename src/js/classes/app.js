@@ -1382,7 +1382,8 @@ export var App = function(name, version) {
   };
 
   this.advanceStoryPlayMode = function(speed = 5) {
-    self.previewStory.changeTextScrollSpeed(speed);
+    if (!self.previewStory.finished)
+      self.previewStory.changeTextScrollSpeed(speed);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
@@ -1577,6 +1578,7 @@ export var App = function(name, version) {
   this.saveNode = function(closeEditor = true) {
     if (self.editing() != null) {
       const editorTitleElement = $('#editorTitle')[0];
+      self.previewStory.terminate();
 
       // Ensure the title is unique
       const title = self.getFutureEditedNodeTitle();
