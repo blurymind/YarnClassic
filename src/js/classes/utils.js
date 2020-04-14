@@ -58,28 +58,16 @@ export var Utils = {
       element.lastTap = currentTime;
     });
   },
-  pushToTop: function(element) {
-    var current = element.css('z-index');
-    if (current == 'auto') current = 0;
 
-    var highZ = parseInt(current);
-    var above = true;
-    element
-      .parent()
-      .children()
-      .each(function() {
-        var otherCurrent = $(this).css('z-index');
-        if (otherCurrent == 'auto') otherCurrent = 0;
-        var other = parseInt(otherCurrent);
-
-        if (this != element[0]) {
-          if (other >= highZ) {
-            highZ = other;
-            above = false;
-          }
-        }
-      });
-    if (!above) element.css('z-index', highZ + 1);
+  getHighestZ: function(container) {
+    let highestZ = Number.NEGATIVE_INFINITY;
+    $(container).children().each(function() {
+      let z = parseInt($(this).css('z-index')) || 0;
+      if (z > highestZ) {
+        highestZ = z;
+      }
+    });
+    return highestZ;
   },
 
   stripHtml: function(html) {
