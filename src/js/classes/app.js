@@ -1415,7 +1415,7 @@ export var App = function(name, version) {
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       storyPreviewPlayButton.className = 'bbcode-button';
-      self.previewStory.finished = true;
+      self.previewStory.terminate();
       setTimeout(() => {
         if (self.editing().title() !== self.previewStory.node.title)
           self.openNodeByTitle(self.previewStory.node.title);

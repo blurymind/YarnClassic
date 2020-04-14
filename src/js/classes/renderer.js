@@ -238,10 +238,10 @@ export var yarnRender = function() {
   };
 
   this.terminate = () => {
-    // document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
-    VNdata = null;
-    vnResult = null;
-    finished = true;
+    document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
+    document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
+    emiter.removeAllListeners();
+    this.finished = true;
   };
 
   this.initYarn = (
