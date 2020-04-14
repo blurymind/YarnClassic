@@ -247,89 +247,63 @@ export const Workspace = function(app) {
     app.translate(100);
   };
 
-  // // alignY
-  // //
-  // // Align selected nodes relative to a node with the lowest y-value
-  // this.alignY = function() {
-  //   const minY = self.selectedNodes.reduce(
-  //     (minY, node) => Math.min(minY, node.y()),
-  //     Number.POSITIVE_INFINITY
-  //   );
-
-  //   self.selectedNodes.forEach( (node) => {
-  //     node.moveTo(node.x(), minY);
-  //   });
-  // };
-
-  // // alignX
-  // //
-  // // Align selected nodes relative to a node with the lowest x-value
-  // this.alignX = function() {
-  //   const minX = self.selectedNodes.reduce(
-  //     (minX, node) => Math.min(minX, node.x()),
-  //     Number.POSITIVE_INFINITY
-  //   );
-
-  //   self.selectedNodes.forEach( (node) => {
-  //     node.moveTo(minX, node.y());
-  //   });
-  // };
-
-  // alignHorizontally
+  // alignY
   //
   // Align selected nodes relative to a node with the lowest y-value
-  // and equaly distributes the space between left most and right most nodes
-  this.distributeHorizontally = function() {
-    const minX = self.selectedNodes.reduce(
-      (minX, node) => Math.min(minX, node.x()),
-      Number.POSITIVE_INFINITY
-    );
+  this.alignY = function() {
+    const SPACING = 210;
 
-    const maxX = self.selectedNodes.reduce(
-      (maxX, node) => Math.max(maxX, node.x()),
-      Number.NEGATIVE_INFINITY
-    );
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.y() > b.y()) return 1;
+        if (a.y() < b.y()) return -1;
+        return 0;
+      }),
 
-    const minY = self.selectedNodes.reduce(
-      (minY, node) => Math.min(minY, node.y()),
-      Number.POSITIVE_INFINITY
-    );
+    referenceNode = selectedNodes.shift();
 
-    const deltaX = (maxX - minX) / (self.selectedNodes.length - 1);
-    let currentX = minX;
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
 
-    self.selectedNodes.forEach( (node) => {
-      node.moveTo(currentX, minY);
-      currentX += deltaX;
+    selectedNodes.forEach((node, i) => {
+      const y = referenceNode.y() + SPACING * (i + 1);
+      node.moveTo(referenceNode.x(), y);
     });
   };
 
-  // distributeVertically
+  // alignX
   //
   // Align selected nodes relative to a node with the lowest x-value
-  // and equaly distributes the space between top most and bottom most nodes
-  this.distributeVertically = function() {
-    const minY = self.selectedNodes.reduce(
-      (minY, node) => Math.min(minY, node.y()),
-      Number.POSITIVE_INFINITY
-    );
+  this.alignX = function() {
+   const SPACING = 210;
 
-    const maxY = self.selectedNodes.reduce(
-      (maxY, node) => Math.max(maxY, node.y()),
-      Number.NEGATIVE_INFINITY
-    );
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.x() > b.x()) return 1;
+        if (a.x() < b.x()) return -1;
+        return 0;
+      }),
 
-    const minX = self.selectedNodes.reduce(
-      (minX, node) => Math.min(minX, node.x()),
-      Number.POSITIVE_INFINITY
-    );
+    referenceNode = selectedNodes.shift();
 
-    const deltaY = (maxY - minY) / (self.selectedNodes.length - 1);
-    let currentY = minY;
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
 
-    self.selectedNodes.forEach( (node) => {
-      node.moveTo(minX, currentY);
-      currentY += deltaY;
+    selectedNodes.forEach((node, i) => {
+      const x = referenceNode.x() + SPACING * (i + 1);
+      node.moveTo(x, referenceNode.y());
     });
   };
 
