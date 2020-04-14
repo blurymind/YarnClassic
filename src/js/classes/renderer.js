@@ -149,6 +149,8 @@ export var yarnRender = function() {
         // }
         /// emit debug signal
         if (nextNode.data && this.node.title !== nextNode.data.title) {
+          vnText = '';
+          vnTextScrollIdx = -1;
           this.node = self.jsonCopy(nextNode.data);
           this.visitedNodes.push(nextNode.data.title);
           this.emiter.emit('startedNode', this.node);
@@ -180,8 +182,8 @@ export var yarnRender = function() {
       return;
     }
     if (vnResult.constructor.name === 'TextResult') {
-      vnText += '<br>' + vnResult.text;
-      this.changeTextScrollSpeed(111);
+      vnText += vnResult.text;
+      // this.changeTextScrollSpeed(111);
     }
   };
 
@@ -249,15 +251,27 @@ export var yarnRender = function() {
     resourcesPath,
     debugLabelId
   ) => {
+    const randomAscii = ["__̴ı̴̴̡̡̡ ̡͌l̡̡̡ ̡͌l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡| ̲▫̲͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡ ̴̡ı̴̡̡ ̡͌l̡̡̡̡.___", "°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸", "(===||:::::::::::::::>",
+    "¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>", "=^..^=", "|==|iiii|>-----", " ¦̵̱ ̵̱ ̵̱ ̵̱ ̵̱(̢ ̡͇̅└͇̅┘͇̅ (▤8כ−◦", "(♥_♥)", "龴ↀ◡ↀ龴", "☁ ▅▒░☼‿☼░▒▅ ☁,",
+    "▓⚗_⚗▓", "<:3 )~~~", "(╯°□°）╯︵ ┻━┻", "●▬▬▬▬๑۩۩๑▬▬▬▬▬●", "(\/)(Ö,,,,Ö)(\/)", "/)^3^(\\", "(  . Y .  )",
+    "< )))) ><", "(ノಠ益ಠ)ノ彡", "d(^o^)b¸¸♬·¯·♩¸¸♪·¯·♫¸¸", "O=('-'Q)", "-`ღ´-", "ˁ(⦿ᴥ⦿)ˀ", "(╥﹏╥)", "✲´*。.❄¨¯`*✲。❄。*。¨¯`*✲",
+    "▂▃▅▇█▓▒░۩۞۩        ۩۞۩░▒▓█▇▅▃▂", "( •_•)O*¯`·.¸.·´¯`°Q(•_• )", "┻━┻︵  \(°□°)/ ︵ ┻━┻", "|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡ ̴̡ı̴̡̡ ̡͌l̡ ̴̡ı̴̴̡ ̡l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ |",
+    "❤◦.¸¸.  ◦✿", "ʕʘ̅͜ʘ̅ʔ", "( ๏ Y ๏ )", "ʕ•̫͡•ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ-̫͡-ʔ", "(っ◕‿◕)っ", "❚█══█❚", "─=≡Σ((( つ◕ل͜◕)つ", "^ↀᴥↀ^",
+    "༼ つ ͡◕ Ѿ ͡◕ ༽つ", "ᕦ(ò_óˇ)ᕤ"
+    ];
     debugLabelIdToAttachTo = debugLabelId;
     htmIDtoAttachYarnTo = htmlIdToAttachTo;
     this.yarnDataObject = yarnDataObject;
     this.startChapter = startChapter;
     this.resourcesPath = resourcesPath;
     this.finished = false;
+    document.getElementById(debugLabelIdToAttachTo).innerHTML =
+      "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/><br/>";
     emiter.on('startedNode', function(nodeData) {
-      document.getElementById(debugLabelIdToAttachTo).innerHTML = 
-        "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/>";
+      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+        "<font color='#581845'> --- Loaded next node ---</font>";
+      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+        `<font color='deeppink'>  ${randomAscii[Math.floor(Math.random() * randomAscii.length)]}</font>`;
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='CADETBLUE'>Title: " + nodeData.title + '</font>';
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
