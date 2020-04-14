@@ -238,10 +238,14 @@ export var yarnRender = function() {
   };
 
   this.terminate = () => {
-    document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
-    document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
-    emiter.removeAllListeners();
-    this.finished = true;
+    try{
+      document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
+      document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
+      emiter.removeAllListeners();
+      this.finished = true;
+    }catch(e){
+      console.warn(e);
+    } 
   };
 
   this.initYarn = (
@@ -277,8 +281,9 @@ export var yarnRender = function() {
         `<font color='${randomColour[Math.floor(Math.random() * randomColour.length)]}'>  ${randomAscii[Math.floor(Math.random() * randomAscii.length)]}</font>`;
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><font color='CADETBLUE'>&ensp;&ensp;&ensp;Title: " + nodeData.title + '</font>';
-      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='deeppink'>&ensp;&ensp;&ensp;Tags: " + nodeData.tags + '</font>';
+      if (nodeData.tags.length > 0 && nodeData.tags[0].length > 0)
+        document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+          "<br/><font color='deeppink'>&ensp;&ensp;&ensp;Tags: " + nodeData.tags + '</font>';
     });
     emiter.on('choiceMade', function(choice) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
