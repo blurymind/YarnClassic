@@ -17,7 +17,7 @@
 			<!-- search form -->
 			<div class="app-search">
 				<input id="nodeSearchInput" type="text" class="search-field" placeholder="Search"/>
-				
+
 				<span>
 						<span class="search-title styled-checkbox">
 								<input type="checkbox" checked="checked" id="search-title" />
@@ -36,10 +36,10 @@
 
 			<!-- zoom controls -->
 			<div class="app-sort hide-when-narrow">
-				<span data-bind="click: app.arrangeX" title="Arrange H"></span>
-				<span data-bind="click: app.arrangeY" title="Arrange V"></span>
-				<span data-bind="click: app.arrangeSpiral" title="Arrange Spiral"></span>
-				<span data-bind="click: app.sortAlphabetical" title="Sort Alphabetically" ></span>
+				<span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
+				<span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
+				<span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
+				<span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
 			</div>
 
 			<div class="app-undo-redo">
@@ -131,8 +131,8 @@
 			</div>
 
 			<!-- ko if:app.editing() != null -->
-			<div class="node-editor" data-bind="mousedown:app.saveNode">				
-			
+			<div class="node-editor" data-bind="mousedown:app.saveNode">
+
 				<div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 					<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
 					<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
@@ -148,8 +148,8 @@
 						<button class="bbcode-button" style="color:purple" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
 						<span class="hide-when-narrow">
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
-						</span> 
-						
+						</span>
+
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertEmoji()" title="Emoji">😉</button>
 
 						<div class="app-menu" style="position: absolute;">
@@ -216,7 +216,7 @@
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.undo()" title="Undo">↶</button>
 							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.redo()" title="Redo">↷</button>
 						</span>
-					 
+
 					</div>
 
 					<div class="editor-container">
@@ -227,12 +227,12 @@
 						</div>
 						<div class="editor" id="editor"
 						data-bind="
-						ace: app.editing().body, 
+						ace: app.editing().body,
 						aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
 						enableBasicAutocompletion: true,
 						enableLiveAutocompletion: true }"
 						>
-						</div> 
+						</div>
 					</div>
 					<!--<div class="icon close" data-bind="click:app.saveNode"></div>-->
 
