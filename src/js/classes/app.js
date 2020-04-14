@@ -6,6 +6,7 @@ import {
 } from '../libs/spellcheck_ace.js';
 import { Node } from './node';
 import { Workspace } from './workspace';
+import { Input } from './input';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
@@ -14,6 +15,10 @@ import { Utils, FILETYPE } from './utils';
 //
 // Create Settings class: manages user settings using window.localStorage
 // Create UI class: manages menus, buttons, search, settings dialog...
+// Create Input class: manages user input (keys, mouse...)
+// Create Platform class: provides platform specific info and abstractions
+// Create History class: handles command history navigation (undo/redo)
+// Create Editor class: handles editor setup and events
 // Create:
 //   RichTextFormater interface
 //   RichTextFormaterBbcode implementation
@@ -25,6 +30,7 @@ export var App = function(name, version) {
 
   // Ideally this dependencies should be injected by index.js
   this.workspace = new Workspace(self);
+  this.input = new Input(self);
   this.previewStory = new yarnRender();
 
   this.instance = this;
@@ -49,8 +55,6 @@ export var App = function(name, version) {
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
-  this.mouseX = 0;
-  this.mouseY = 0;
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
@@ -327,12 +331,12 @@ export var App = function(name, version) {
         self.cachedScale += scaleChange;
       }
 
-      var mouseX = event.pageX - self.transformOrigin[0],
-        mouseY = event.pageY - self.transformOrigin[1],
-        newX = mouseX * (self.cachedScale / lastZoom),
-        newY = mouseY * (self.cachedScale / lastZoom),
-        deltaX = mouseX - newX,
-        deltaY = mouseY - newY;
+      const mouseX = event.pageX - self.transformOrigin[0];
+      const mouseY = event.pageY - self.transformOrigin[1];
+      const newX = mouseX * (self.cachedScale / lastZoom);
+      const newY = mouseY * (self.cachedScale / lastZoom);
+      const deltaX = mouseX - newX;
+      const deltaY = mouseY - newY;
 
       self.transformOrigin[0] += deltaX;
       self.transformOrigin[1] += deltaY;
@@ -657,8 +661,8 @@ export var App = function(name, version) {
       this.emPicker.toggle();
       self.togglePreviewMode(true);
       $('#emojiPicker-container').css({
-        top: self.mouseY - 125,
-        left: self.mouseX - 200,
+        left: self.input.mouse.x - 200,
+        top: self.input.mouse.y - 125
       });
       $('#emojiPicker-container').show();
     };
@@ -779,11 +783,6 @@ export var App = function(name, version) {
         .catch(error => console.warn(error.message));
     };
 
-    $(document).on('pointermove', function(e) {
-      self.mouseX = e.pageX;
-      self.mouseY = e.pageY;
-    });
-
     this.insertColorCode = function() {
       if ($('#colorPicker-container').is(':visible')) {
         return;
@@ -792,8 +791,8 @@ export var App = function(name, version) {
       $('#colorPicker').spectrum('set', self.editor.getSelectedText());
       $('#colorPicker').spectrum('toggle');
       $('#colorPicker-container').css({
-        top: self.mouseY - 50,
-        left: self.mouseX - 70,
+        left: self.input.mouse.x - 70,
+        top: self.input.mouse.y - 50
       });
       $('#colorPicker-container').show();
       $('#colorPicker').on('dragstop.spectrum', function(e, color) {
@@ -887,6 +886,7 @@ export var App = function(name, version) {
     for (var i in nodes) nodes[i].colorID(fromNode.colorID());
   };
 
+  // TODO: useless. Delete
   this.quit = function() {
     if (self.isElectron) {
       // remote.app.quit();
@@ -1453,6 +1453,7 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO: why a reimplementation of trim? Delete
   this.trim = function(x) {
     return x.replace(/^\s+|\s+$/gm, '');
   };
@@ -1515,6 +1516,7 @@ export var App = function(name, version) {
     return tagBeforeCursor;
   };
 
+  // TODO: seems to be unused. Delete
   this.testRunFrom = function(startTestNode) {
     ipc.send(
       'testYarnStoryFrom',
