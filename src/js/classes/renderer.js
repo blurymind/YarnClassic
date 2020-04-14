@@ -286,7 +286,7 @@ export var yarnRender = function() {
     });
     emiter.on('commandCall', function(call) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='green'>🐣Command call: " + call + '</font>';
+        `<br/><font color='green'>🐣Command call:</font> <font color='red'>&lt;&lt;${call}&gt;&gt;</font>`;
     });
     emiter.on('finished', function() {
       finished = true;
