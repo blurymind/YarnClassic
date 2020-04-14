@@ -266,10 +266,10 @@ export var yarnRender = function() {
     this.resourcesPath = resourcesPath;
     this.finished = false;
     document.getElementById(debugLabelIdToAttachTo).innerHTML =
-      "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/><br/>";
+      "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/>";
     emiter.on('startedNode', function(nodeData) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<font color='#581845'> --- Loaded next node ---</font>";
+        "<br/><br/><font color='#581845'> --- Loaded next node ---</font>";
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         `<font color='deeppink'>  ${randomAscii[Math.floor(Math.random() * randomAscii.length)]}</font>`;
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
