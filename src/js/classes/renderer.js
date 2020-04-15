@@ -67,7 +67,7 @@ export var yarnRender = function() {
       attemptChoice = vnResult.options.length - 1;
     }
     this.vnSelectedChoice = attemptChoice;
-    vnChoices = document.createElement("DIV"); 
+    vnChoices = document.createElement("DIV");
     vnResult.options.forEach((choice, i) => {
       const btn = document.createElement("DIV");
       if (i == this.vnSelectedChoice) {
@@ -182,7 +182,7 @@ export var yarnRender = function() {
       return;
     }
     if (vnResult.constructor.name === 'TextResult') {
-      vnText += vnResult.text;
+      vnText += '\n' + vnResult.text;
       // this.changeTextScrollSpeed(111);
     }
   };
@@ -238,14 +238,16 @@ export var yarnRender = function() {
   };
 
   this.terminate = () => {
-    try{
+    try {
       document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
       document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
+      vnChoices = undefined;
+      
       emiter.removeAllListeners();
       this.finished = true;
-    }catch(e){
+    } catch(e) {
       console.warn(e);
-    } 
+    }
   };
 
   this.initYarn = (
@@ -258,7 +260,7 @@ export var yarnRender = function() {
     const randomColour = ["#f5ff6f", "#44fe66", "#e00ec0", "#e93ecf", "#0ec0e0", "#3ecfe9", "#e4dbcb", "#978e7e", "#666", "#2f919a", "deeppink", "black", "#97E1E9", "#576574", "#6EA5E0", "#9EDE74", "#FFE374", "#F7A666", "#C47862"];
     const randomAscii = ["__̴ı̴̴̡̡̡ ̡͌l̡̡̡ ̡͌l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡| ̲▫̲͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡, ̴̡ı̴̡̡ ̡͌l̡̡̡̡.___", "°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸", "(===||:::::::::::::::>",
     "¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>", "=^..^=", "|==|iiii|>-----", " ¦̵̱ ̵̱ ̵̱ ̵̱ ̵̱(̢ ̡͇̅└͇̅┘͇̅ (▤8כ−◦", "(♥_♥)", "龴ↀ◡ↀ龴", "☁ ▅▒░☼‿☼░▒▅ ☁,",
-    "▓⚗_⚗▓", "<:3 )~~~", "(╯°□°）╯︵ ┻━┻", "●▬▬▬▬๑۩۩๑▬▬▬▬▬●", "(\/)(Ö,,,,Ö)(\/)", "/)^3^(\\", "(  . Y .  )",
+    "▓⚗_⚗▓", "<:3 )~~~", "(╯°□°）╯︵ ┻━┻", "●▬▬▬▬๑۩۩๑▬▬▬▬▬●", "(\/)(Ö,,,,Ö)(\/)", "/)^3^(\\", "( . Y . )",
     "< )))) ><", "(ノಠ益ಠ)ノ彡", "d(^o^)b¸¸♬·¯·♩¸¸♪·¯·♫¸¸", "O=('-'Q)", "-`ღ´-", "ˁ(⦿ᴥ⦿)ˀ", "(╥﹏╥)", "✲´*。.❄¨¯`*✲。❄。*。¨¯`*✲",
     "▂▃▅▇█▓▒░۩۞۩        ۩۞۩░▒▓█▇▅▃▂", "( •_•)O*¯`·.¸.·´¯`°Q(•_• )", "┻━┻︵  \(°□°)/ ︵ ┻━┻", "|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡ ̴̡ı̴̡̡ ̡͌l̡ ̴̡ı̴̴̡ ̡l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ |",
     "❤◦.¸¸.  ◦✿", "ʕʘ̅͜ʘ̅ʔ", "( ๏ Y ๏ )", "ʕ•̫͡•ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ-̫͡-ʔ", "(っ◕‿◕)っ", "❚█══█❚", "─=≡Σ((( つ◕ل͜◕)つ", "^ↀᴥↀ^",
@@ -273,7 +275,7 @@ export var yarnRender = function() {
     this.resourcesPath = resourcesPath;
     this.finished = false;
     document.getElementById(debugLabelIdToAttachTo).innerHTML =
-      "<br/><font color='red'>🚥 Press/Hold Z or 📱Double-click/Tap to advance</font><br/>";
+      "<br/><font color='red'>🚥Press/Hold Z or 📱Double-click/Tap to advance</font><br/>";
     emiter.on('startedNode', function(nodeData) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         "<br/><br/><font color='#581845'>📜 --- Loaded next node ---</font>";
