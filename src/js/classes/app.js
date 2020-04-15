@@ -505,10 +505,7 @@ export var App = function(name, version) {
         if (!self.previewStory.finished)
           switch (e.key) {
             case 'z': {
-              self.previewStory.changeTextScrollSpeed(200);
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnSelectChoice();
-              }
+              self.advanceStoryPlayMode();
               return;
             }
             case 'ArrowUp': {
@@ -1382,12 +1379,16 @@ export var App = function(name, version) {
   };
 
   this.advanceStoryPlayMode = function(speed = 5) {
-    if (!self.previewStory.finished)
-      self.previewStory.changeTextScrollSpeed(speed);
+    if (!self.previewStory.finished) {
+      self.previewStory.changeTextScrollSpeed(speed)
+      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
+        self.previewStory.vnSelectChoice();
+      }
+    }
+    else self.togglePlayMode(false);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    if (!playModeOverwrite && self.previewStory.finished) return;
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
