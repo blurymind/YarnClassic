@@ -733,6 +733,7 @@ a:hover {
   border: 3px solid #73ad21;
   background: rgba(1, 1, 1, 0.5);
   font: x-large arial, calibri;
+  white-space: break-spaces;
 }
 
 /* --- EDITOR HIGHLIGHTING --- */
