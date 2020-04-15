@@ -1,8 +1,12 @@
 import { Utils } from './utils';
 
 export const Workspace = function(app) {
-  const UPDATE_ARROWS_THROTTLE_MS = 50;
   const self = this;
+
+  const UPDATE_ARROWS_THROTTLE_MS = 50;
+  const PAN_SMALL_STEP = 100;
+  const PAN_BIG_STEP = 500;
+  const PAN_TRANSITION_TIME = 100;
 
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
@@ -13,6 +17,236 @@ export const Workspace = function(app) {
   this.isDrawingArrows = false;
 
   this.selectedNodes = [];
+
+  this.offset = { x: 0, y: 0 };
+
+  this.isMarqueeEnabled = false;
+  this.marqueeSelection = [];
+  this.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
+  this.marqueeOffset = [0, 0];
+
+  // onPanLeft
+  //
+  //
+  this.onPanLeft = function() {
+    app.transformOrigin[0] += self.getPanAmount();
+    app.translate(PAN_TRANSITION_TIME);
+  }
+
+  // onPanRight
+  //
+  //
+  this.onPanRight = function() {
+    app.transformOrigin[0] -= self.getPanAmount();
+    app.translate(PAN_TRANSITION_TIME);
+  }
+
+  // onPanUp
+  //
+  //
+  this.onPanUp = function() {
+    app.transformOrigin[1] += self.getPanAmount();
+    app.translate(PAN_TRANSITION_TIME);
+  }
+
+  // onPanDown
+  //
+  //
+  this.onPanDown = function() {
+    app.transformOrigin[1] -= self.getPanAmount();
+    app.translate(PAN_TRANSITION_TIME);
+  }
+
+  // getPanAmount
+  //
+  //
+  this.getPanAmount = function() {
+    const scale = self.cachedScale || 1;
+    return app.input.isShiftDown ?
+      scale * PAN_SMALL_STEP :
+      scale * PAN_BIG_STEP;
+  }
+
+  // onZoom
+  //
+  //
+  this.onZoom = function(x, y, delta) {
+    const previousScale = app.cachedScale;
+    const scaleChange = delta * app.zoomSpeed * app.cachedScale;
+
+    app.cachedScale = Utils.clamp(
+      app.cachedScale + scaleChange,
+      app.zoomLimitMin,
+      app.zoomLimitMax
+    );
+
+    const mouseX = x - app.transformOrigin[0];
+    const mouseY = y - app.transformOrigin[1];
+    const newX = mouseX * (app.cachedScale / previousScale);
+    const newY = mouseY * (app.cachedScale / previousScale);
+    const deltaX = mouseX - newX;
+    const deltaY = mouseY - newY;
+
+    app.transformOrigin[0] += deltaX;
+    app.transformOrigin[1] += deltaY;
+
+    app.translate();
+  };
+
+  // onDragStart
+  //
+  //
+  this.onDragStart = function(offset) {
+    self.offset.x = offset.x;
+    self.offset.y = offset.y;
+  };
+
+  // onDrag
+  //
+  // Handles the drag event depending on the state
+  this.onDragUpdate = function(position) {
+    if (self.isMarqueeEnabled) {
+      app.workspace.onMarqueeEnd();
+    }
+
+    app.workspace.shiftNodes(position);
+  };
+
+  // onDragEnd
+  //
+  //
+  this.onDragEnd = function() {
+  }
+
+
+  // onMarqueeStart
+  //
+  // Starts drawing the selection marquee
+  this.onMarqueeStart = function(offset) {
+    self.isMarqueeEnabled = true;
+
+    self.offset.x = offset.x;
+    self.offset.y = offset.y;
+
+    self.marqueeSelection = [];
+    self.marqueeOffset[0] = 0;
+    self.marqueeOffset[1] = 0;
+    self.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
+
+    $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
+  };
+
+  // onMarqueeUpdate
+  //
+  // Updates the selection marquee
+  this.onMarqueeUpdate = function(position) {
+    if (!self.isMarqueeEnabled)
+      return;
+
+    self.updateMarqueeRect(position);
+    self.selectNodesInsideMarquee();
+  };
+
+  // updateMarqueeRect
+  //
+  //
+  this.updateMarqueeRect = function(position) {
+    if (position.x > self.offset.x && position.y < self.offset.y) {
+      self.marqueeRect.x1 = self.offset.x;
+      self.marqueeRect.y1 = position.y;
+      self.marqueeRect.x2 = position.x;
+      self.marqueeRect.y2 = self.offset.y;
+    } else if (position.x > self.offset.x && position.y > self.offset.y) {
+      self.marqueeRect.x1 = self.offset.x;
+      self.marqueeRect.y1 = self.offset.y;
+      self.marqueeRect.x2 = position.x;
+      self.marqueeRect.y2 = position.y;
+    } else if (position.x < self.offset.x && position.y < self.offset.y) {
+      self.marqueeRect.x1 = position.x;
+      self.marqueeRect.y1 = position.y;
+      self.marqueeRect.x2 = self.offset.x;
+      self.marqueeRect.y2 = self.offset.y;
+    } else {
+      self.marqueeRect.x1 = position.x;
+      self.marqueeRect.y1 = self.offset.y;
+      self.marqueeRect.x2 = self.offset.x;
+      self.marqueeRect.y2 = position.y;
+    }
+
+    $('#marquee').css({
+      x: self.marqueeRect.x1,
+      y: self.marqueeRect.y1,
+      width: Math.abs(self.marqueeRect.x1 - self.marqueeRect.x2),
+      height: Math.abs(self.marqueeRect.y1 - self.marqueeRect.y2)
+    });
+  };
+
+  // selectNodesInsideMarquee
+  //
+  // Select nodes which are within the marquee.
+  // MarqueeSelection is used to prevent it from deselecting already
+  // selected nodes and deselecting onces which have been selected
+  // by the marquee.
+  this.selectNodesInsideMarquee = function () {
+    const scale = app.cachedScale;
+    app.nodes().forEach(node => {
+      const index = self.marqueeSelection.indexOf(node);
+      const inMarqueeSelection = index >= 0;
+
+      const holder = $('.nodes-holder').offset();
+      const marqueeOverNode =
+        (self.marqueeRect.x2 - holder.left) / scale > node.x() &&
+        (self.marqueeRect.x1 - holder.left) / scale < node.x() + node.tempWidth &&
+        (self.marqueeRect.y2 - holder.top)  / scale > node.y() &&
+        (self.marqueeRect.y1 - holder.top)  / scale < node.y() + node.tempHeight;
+
+      if (marqueeOverNode) {
+        if (!inMarqueeSelection) {
+          self.addNodesToSelection(node);
+          self.marqueeSelection.push(node);
+        }
+      } else {
+        if (inMarqueeSelection) {
+          self.removeNodesFromSelection(node);
+          self.marqueeSelection.splice(index, 1);
+        }
+      }
+    });
+  };
+
+  // onMarqueeEnd
+  //
+  //
+  this.onMarqueeEnd = function() {
+    if (!self.isMarqueeEnabled)
+      return;
+
+    if (self.marqueeSelection.length == 0) {
+      self.deselectAll();
+    }
+
+    self.isMarqueeEnabled = false;
+    self.marqueeSelection = [];
+    self.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
+
+    $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
+  };
+
+  // shiftNodes
+  //
+  // Moves all nodes by a relative offset.
+  // TODO: move the nodes' holder instead of moving all nodes
+  this.shiftNodes = function(position) {
+    app.nodes().forEach( node => {
+      node.x(node.x() + (position.x - self.offset.x) / app.cachedScale);
+      node.y(node.y() + (position.y - self.offset.y) / app.cachedScale);
+    });
+
+    self.offset.x = position.x;
+    self.offset.y = position.y;
+
+    self.updateArrows();
+  };
 
   // startUpdatingArrows
   //

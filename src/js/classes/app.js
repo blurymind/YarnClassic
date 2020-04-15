@@ -15,7 +15,6 @@ import { Utils, FILETYPE } from './utils';
 //
 // Create Settings class: manages user settings using window.localStorage
 // Create UI class: manages menus, buttons, search, settings dialog...
-// Create Input class: manages user input (keys, mouse...)
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
@@ -51,7 +50,6 @@ export var App = function(name, version) {
   this.zoomLimitMin = 0.05;
   this.zoomLimitMax = 1;
   this.transformOrigin = [0, 0];
-  this.shifted = false;
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
@@ -60,7 +58,6 @@ export var App = function(name, version) {
   this.speachInstance = null;
   this.selectedLanguageIndex = 6;
   this.language = null;
-  this.hasTouchScreen = false;
 
   this.configFilePath = null;
   this.config = {
@@ -81,6 +78,19 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
 
+  // inEditor
+  //
+  // Indicates if we are in the editor view
+  this.inEditor = () => self.editing();
+
+  // inWorkspace
+  //
+  // Indicates if we are in the workspace view
+  this.inWorkspace = () => !self.editing();
+
+  // run
+  //
+  // Initializes the application
   this.run = function() {
     var osName = 'Unknown OS';
     if (navigator.platform.indexOf('Win') != -1) osName = 'Windows';
@@ -89,9 +99,6 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
-    window.addEventListener('touchstart', function() {
-      self.hasTouchScreen = true;
-    });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (
@@ -131,466 +138,13 @@ export var App = function(name, version) {
       document.getElementById('dropboxIO').style.display = 'none';
     }
 
-    // prevent click bubbling
-    ko.bindingHandlers.preventBubble = {
-      init: function(element, valueAccessor) {
-        var eventName = ko.utils.unwrapObservable(valueAccessor());
-        ko.utils.registerEventHandler(element, eventName, function(event) {
-          event.cancelBubble = true;
-          if (event.stopPropagation) event.stopPropagation();
-        });
-      },
-    };
-    ko.bindingHandlers.mousedown = {
-      init: function(
-        element,
-        valueAccessor,
-        allBindings,
-        viewModel,
-        bindingContext
-      ) {
-        var value = ko.unwrap(valueAccessor());
-        $(element).mousedown(function() {
-          value();
-        });
-      },
-    };
-
-    // drag node holder around
-    (function() {
-      var dragging = false;
-      var offset = { x: 0, y: 0 };
-      var MarqueeOn = false;
-      var MarqueeSelection = [];
-      var MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-      var MarqueeOffset = [0, 0];
-      var midClickHeld = false;
-
-      $('.nodes').on('pointerdown', function(e) {
-        if (e.button == 1) {
-          midClickHeld = true;
-        }
-        $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-        dragging = true;
-        offset.x = e.pageX;
-        offset.y = e.pageY;
-        MarqueeSelection = [];
-        MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-
-        var scale = self.cachedScale;
-
-        MarqueeOffset[0] = 0;
-        MarqueeOffset[1] = 0;
-
-        if (!e.altKey && !e.shiftKey) {
-          self.workspace.deselectAll();
-        }
-      });
-
-      $('.nodes').on('mousemove touchmove', function(e) {
-        if (dragging) {
-          const pageX =
-            self.hasTouchScreen && e.changedTouches
-              ? e.changedTouches[0].pageX
-              : e.pageX;
-          const pageY =
-            self.hasTouchScreen && e.changedTouches
-              ? e.changedTouches[0].pageY
-              : e.pageY;
-
-          if (e.altKey || midClickHeld || self.hasTouchScreen) {
-            //prevents jumping straight back to standard dragging
-            if (MarqueeOn) {
-              MarqueeSelection = [];
-              MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-              $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-            } else {
-              var nodes = self.nodes();
-              for (var i in nodes) {
-                nodes[i].x(
-                  nodes[i].x() + (pageX - offset.x) / self.cachedScale
-                );
-                nodes[i].y(
-                  nodes[i].y() + (pageY - offset.y) / self.cachedScale
-                );
-              }
-              offset.x = pageX;
-              offset.y = pageY;
-
-              self.workspace.updateArrows();
-            }
-          } else {
-            MarqueeOn = true;
-
-            var scale = self.cachedScale;
-
-            if (pageX > offset.x && pageY < offset.y) {
-              MarqRect.x1 = offset.x;
-              MarqRect.y1 = pageY;
-              MarqRect.x2 = pageX;
-              MarqRect.y2 = offset.y;
-            } else if (pageX > offset.x && pageY > offset.y) {
-              MarqRect.x1 = offset.x;
-              MarqRect.y1 = offset.y;
-              MarqRect.x2 = pageX;
-              MarqRect.y2 = pageY;
-            } else if (pageX < offset.x && pageY < offset.y) {
-              MarqRect.x1 = pageX;
-              MarqRect.y1 = pageY;
-              MarqRect.x2 = offset.x;
-              MarqRect.y2 = offset.y;
-            } else {
-              MarqRect.x1 = pageX;
-              MarqRect.y1 = offset.y;
-              MarqRect.x2 = offset.x;
-              MarqRect.y2 = pageY;
-            }
-
-            $('#marquee').css({
-              x: MarqRect.x1,
-              y: MarqRect.y1,
-              width: Math.abs(MarqRect.x1 - MarqRect.x2),
-              height: Math.abs(MarqRect.y1 - MarqRect.y2),
-            });
-
-            //Select nodes which are within the marquee
-            // MarqueeSelection is used to prevent it from deselecting already
-            // selected nodes and deselecting onces which have been selected
-            // by the marquee
-            var nodes = self.nodes();
-            for (var i in nodes) {
-              var index = MarqueeSelection.indexOf(nodes[i]);
-              var inMarqueeSelection = index >= 0;
-
-              //test the Marque scaled to the nodes x,y values
-              var holder = $('.nodes-holder').offset();
-              var marqueeOverNode =
-                (MarqRect.x2 - holder.left) / scale > nodes[i].x() &&
-                (MarqRect.x1 - holder.left) / scale <
-                  nodes[i].x() + nodes[i].tempWidth &&
-                (MarqRect.y2 - holder.top) / scale > nodes[i].y() &&
-                (MarqRect.y1 - holder.top) / scale <
-                  nodes[i].y() + nodes[i].tempHeight;
-
-              if (marqueeOverNode) {
-                if (!inMarqueeSelection) {
-                  self.workspace.addNodesToSelection(nodes[i]);
-                  MarqueeSelection.push(nodes[i]);
-                }
-              } else {
-                if (inMarqueeSelection) {
-                  self.workspace.removeNodesFromSelection(nodes[i]);
-                  MarqueeSelection.splice(index, 1);
-                }
-              }
-            }
-          }
-        }
-      });
-
-      $('.nodes').on('pointerup', function(e) {
-        if (e.button == 1) {
-          midClickHeld = false;
-        }
-        dragging = false;
-
-        if (MarqueeOn && MarqueeSelection.length == 0) {
-          self.workspace.deselectAll();
-        }
-
-        MarqueeSelection = [];
-        MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-        $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-        MarqueeOn = false;
-      });
-    })();
-
     // search field
     self.$searchField.on('input', self.updateSearch);
     $('.search-title input').click(self.updateSearch);
     $('.search-body input').click(self.updateSearch);
     $('.search-tags input').click(self.updateSearch);
 
-    // using the event helper
-    $('.nodes').mousewheel(function(event) {
-      // https://github.com/InfiniteAmmoInc/Yarn/issues/40
-      if (event.altKey) {
-        return;
-      } else {
-        event.preventDefault();
-      }
-
-      var lastZoom = self.cachedScale,
-        scaleChange = event.deltaY * self.zoomSpeed * self.cachedScale;
-
-      if (self.cachedScale + scaleChange > self.zoomLimitMax) {
-        self.cachedScale = self.zoomLimitMax;
-      } else if (self.cachedScale + scaleChange < self.zoomLimitMin) {
-        self.cachedScale = self.zoomLimitMin;
-      } else {
-        self.cachedScale += scaleChange;
-      }
-
-      const mouseX = event.pageX - self.transformOrigin[0];
-      const mouseY = event.pageY - self.transformOrigin[1];
-      const newX = mouseX * (self.cachedScale / lastZoom);
-      const newY = mouseY * (self.cachedScale / lastZoom);
-      const deltaX = mouseX - newX;
-      const deltaY = mouseY - newY;
-
-      self.transformOrigin[0] += deltaX;
-      self.transformOrigin[1] += deltaY;
-
-      self.translate();
-    });
-
-    $(document).on('keyup keydown', function(e) {
-      self.shifted = e.shiftKey;
-    });
-
-    $(document).contextmenu(function(e) {
-      var isAllowedEl =
-        $(e.target).hasClass('nodes') || $(e.target).parents('.nodes').length;
-
-      if (e.button == 2 && isAllowedEl) {
-        var x = (self.transformOrigin[0] * -1) / self.cachedScale,
-          y = (self.transformOrigin[1] * -1) / self.cachedScale;
-
-        x += e.pageX / self.cachedScale;
-        y += e.pageY / self.cachedScale;
-
-        self.newNodeAt(x, y);
-      }
-
-      return !isAllowedEl;
-    });
-
-    $(document).on('keydown', function(e) {
-      if ((e.metaKey || e.ctrlKey) && !self.editing()) {
-        switch (e.keyCode) {
-          case 90: // ctrl+z
-            self.historyDirection('undo');
-            break;
-          case 89: // ctrl+y
-            self.historyDirection('redo');
-            break;
-          case 68: // ctrl+d
-            self.workspace.deselectAll();
-        }
-      }
-    });
-
-    $(document).on('keydown', function(e) {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.shiftKey) {
-          switch (e.keyCode) {
-            case 83: // ctrl+shift+s
-              data.trySave(FILETYPE.JSON);
-              self.fileKeyPressed = true;
-              break;
-            case 65: // ctrl+shift+a
-              data.tryAppend();
-              self.fileKeyPressed = true;
-              break;
-          }
-        } else if (e.altKey) {
-          switch (e.keyCode) {
-            case 83: //alt+s
-              data.trySave(FILETYPE.YARN);
-              self.fileKeyPressed = true;
-              break;
-          }
-        } else {
-          switch (e.keyCode) {
-            case 83: // ctrl+s
-              if (data.editingPath() != null) {
-                data.trySaveCurrent();
-              } else {
-                data.trySave(FILETYPE.JSON);
-              }
-              self.fileKeyPressed = true;
-              break;
-            case 79: // ctrl+o
-              data.tryOpenFile();
-              self.fileKeyPressed = true;
-              break;
-          }
-        }
-      }
-    });
-
-    $(document).on('keydown', function(e) {
-      // clipboard manual saving to get around browser security bs
-      if (self.editing()) {
-        // ctrl + c
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-          self.clipboard = self.editor.getSelectedText();
-        }
-        // ctrl + x
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          document.execCommand('copy');
-          self.clipboard = self.editor.getSelectedText();
-          self.insertTextAtCursor('');
-        } // escape
-        else if (e.keyCode == 27) {
-          self.saveNode();
-        }
-
-        // If previewing the story, speed up scrolling when holding z
-        if (!self.previewStory.finished)
-          switch (e.key) {
-            case 'z': {
-              self.previewStory.changeTextScrollSpeed(20);
-              return;
-            }
-          }
-      } else {
-        // ctrl + c NODES
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
-        }
-        // ctrl + x NODES
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
-          self.deleteSelectedNodes();
-        }
-      }
-    });
-    $(document).on('keydown', function(e) {
-      if (
-        self.editing() ||
-        self.$searchField.is(':focus') ||
-        e.ctrlKey ||
-        e.metaKey
-      )
-        return;
-      var scale = self.cachedScale || 1,
-        movement = scale * 500;
-
-      if (e.shiftKey) {
-        movement = scale * 100;
-      }
-
-      if (e.keyCode === 65 || e.keyCode === 37) {
-        // a or left arrow
-        self.transformOrigin[0] += movement;
-      } else if (e.keyCode === 68 || e.keyCode === 39) {
-        // d or right arrow
-        self.transformOrigin[0] -= movement;
-      } else if (e.keyCode === 87 || e.keyCode === 38) {
-        // w or up arrow
-        self.transformOrigin[1] += movement;
-      } else if (e.keyCode === 83 || e.keyCode === 40) {
-        // w or down arrow
-        self.transformOrigin[1] -= movement;
-      }
-
-      self.translate(100);
-    });
-
-    $(document).on('keyup', function(e) {
-      // console.log(e.keyCode);
-      if (!self.editing()) {
-        // ctrl + a
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 65) {
-          self.workspace.selectAll();
-        }
-        // ctrl + v NODES
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
-          self.pasteNodes();
-        }
-        // console.log(e.keyCode+"-"+e.key)
-        if (e.keyCode === 46 || e.key === 'Delete') {
-          // Delete selected
-          self.deleteSelectedNodes();
-        }
-      } else {
-        // Input event listeners for story preview
-        if (!self.previewStory.finished)
-          switch (e.key) {
-            case 'z': {
-              self.previewStory.changeTextScrollSpeed(200);
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnSelectChoice();
-              }
-              return;
-            }
-            case 'ArrowUp': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(-1);
-              }
-              return;
-            }
-            case 'ArrowDown': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(1);
-              }
-              return;
-            }
-          }
-      }
-
-      if (e.keyCode === 31 || e.key === 'Enter') {
-        // Open active node, if already active, close it
-        if (self.editing() === null) {
-          var activeNode = self.nodes()[self.focusedNodeIdx];
-          if (activeNode !== undefined) {
-            self.editNode(activeNode);
-          } else {
-            self.editNode(self.nodes()[0]);
-          }
-        } else if (e.ctrlKey && e.altKey) {
-          //ctrl+alt+ enter closes/saves an open node
-          self.saveNode();
-        }
-      }
-
-      // Spacebar toggle between nodes
-      if (e.keyCode === 32) {
-        if (self.editing() !== null && !e.altKey) {
-          return; // alt+spacebar to toggle between open nodes
-        }
-        var selectedNodes = self.workspace.getSelectedNodes();
-        var nodes = selectedNodes.length > 0 ? selectedNodes : self.nodes();
-        var isNodeSelected = selectedNodes.length > 0;
-        if (
-          self.focusedNodeIdx > -1 &&
-          nodes.length > self.focusedNodeIdx &&
-          (self.transformOrigin[0] !=
-            -nodes[self.focusedNodeIdx].x() +
-              $(window).width() / 2 -
-              $(nodes[self.focusedNodeIdx].element).width() / 2 ||
-            self.transformOrigin[1] !=
-              -nodes[self.focusedNodeIdx].y() +
-                $(window).height() / 2 -
-                $(nodes[self.focusedNodeIdx].element).height() / 2)
-        ) {
-          self.focusedNodeIdx = -1;
-        }
-
-        if (++self.focusedNodeIdx >= nodes.length) {
-          self.focusedNodeIdx = 0;
-        }
-        self.cachedScale = 1;
-        if (isNodeSelected) {
-          self.workspace.warpToSelectedNodeByIdx(self.focusedNodeIdx);
-        } else {
-          self.workspace.warpToNodeByIdx(self.focusedNodeIdx);
-        }
-
-        if (self.editing() !== null) {
-          self.editNode(self.nodes()[self.focusedNodeIdx]);
-        }
-      }
-    });
-
     $(window).on('resize', self.workspace.updateArrows);
-
-    $(document).on('keyup keydown pointerdown pointerup', function(e) {
-      if (self.editing() != null) {
-        self.updateEditorStats();
-      }
-    });
 
     this.guessPopUpHelper = function() {
       if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
@@ -832,10 +386,6 @@ export var App = function(name, version) {
       }
     });
 
-    // apple command key
-    //$(window).on('keydown', function(e) { if (e.keyCode == 91 || e.keyCode == 93) { self.appleCmdKey = true; } });
-    //$(window).on('keyup', function(e) { if (e.keyCode == 91 || e.keyCode == 93) { self.appleCmdKey = false; } });
-
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
       e.preventDefault();
@@ -877,16 +427,11 @@ export var App = function(name, version) {
     return connectedNodes;
   };
 
-  this.mouseUpOnNodeNotMoved = function() {
-    self.workspace.deselectAll();
-  };
-
   this.matchConnectedColorID = function(fromNode) {
     var nodes = self.getNodesConnectedTo(fromNode);
     for (var i in nodes) nodes[i].colorID(fromNode.colorID());
   };
 
-  // TODO: useless. Delete
   this.quit = function() {
     if (self.isElectron) {
       // remote.app.quit();
@@ -1451,11 +996,6 @@ export var App = function(name, version) {
         $('#emojiPicker-container').hide();
       }
     }
-  };
-
-  // TODO: why a reimplementation of trim? Delete
-  this.trim = function(x) {
-    return x.replace(/^\s+|\s+$/gm, '');
   };
 
   this.appendText = function(textToAppend) {
