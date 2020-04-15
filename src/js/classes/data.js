@@ -248,7 +248,7 @@ export var data = {
     }
 
     if (numAvg > 0) {
-      app.warpToNodeXY(avgX / numAvg, avgY / numAvg);
+      app.workspace.warpToXY(avgX / numAvg, avgY / numAvg);
     }
 
     $('.arrows')

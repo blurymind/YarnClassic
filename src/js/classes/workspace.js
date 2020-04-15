@@ -1,18 +1,23 @@
+import { Utils } from './utils';
 
 export const Workspace = function(app) {
-  const UPDATE_ARROWS_THROTTLE_MS = 16;
+  const UPDATE_ARROWS_THROTTLE_MS = 50;
   const self = this;
 
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
 
   this.updateArrowsInterval = undefined;
+  this.deferredArrowsDrawInterval = undefined;
+  this.nextArrowsUpdate = Number.NEGATIVE_INFINITY;
   this.isDrawingArrows = false;
+
+  this.selectedNodes = [];
 
   // startUpdatingArrows
   //
   // Keeps updating arrows during transition
-  this.startUpdatingArrows = () => {
+  this.startUpdatingArrows = function() {
     self.stopUpdatingArrows();
     self.updateArrowsInterval = setInterval(self.updateArrows, UPDATE_ARROWS_THROTTLE_MS);
   };
@@ -20,12 +25,12 @@ export const Workspace = function(app) {
   // stopUpdatingArrows
   //
   // Stops updating arrows after transition
-  this.stopUpdatingArrows = () => {
+  this.stopUpdatingArrows = function() {
     if (self.updateArrowsInterval) {
       window.clearInterval(self.updateArrowsInterval);
       self.updateArrowsInterval = undefined;
     }
-  }
+  };
 
   // updateArrows
   //
@@ -34,7 +39,20 @@ export const Workspace = function(app) {
     if (self.isDrawingArrows)
       return;
 
+    // Limit the number of calls to updateArrows
+    const now = (new Date()).getTime();
+    if (now < self.nextArrowsUpdate) {
+      if (!self.deferredArrowsDrawInterval) {
+        self.deferredArrowsDrawInterval =
+          window.setTimeout(self.updateArrows, (self.nextArrowsUpdate + UPDATE_ARROWS_THROTTLE_MS) - now);
+      }
+      return;
+    }
+
     self.isDrawingArrows = true;
+    self.nextArrowsUpdate = (now + UPDATE_ARROWS_THROTTLE_MS);
+    window.clearInterval(self.deferredArrowsDrawInterval);
+    self.deferredArrowsDrawInterval = undefined;
 
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
@@ -57,9 +75,7 @@ export const Workspace = function(app) {
     for (let node of nodes) {
       node.halfWidth = $(node.element).width() / 2;
       node.halfHeight = $(node.element).height() / 2;
-    }
 
-    for (let node of nodes) {
       if (node.linkedTo().length) {
         const fromX = (node.x() + node.halfWidth) * scale + offset.left;
         const fromY = (node.y() + node.halfHeight) * scale + offset.top;
@@ -76,7 +92,7 @@ export const Workspace = function(app) {
           const normal = {
             x: (toX - fromX) / distance,
             y: (toY - fromY) / distance,
-          };
+          }
 
           const dist = (
             110 + (
@@ -94,7 +110,7 @@ export const Workspace = function(app) {
           const to = {
             x: toX - normal.x * dist,
             y: toY - normal.y * dist,
-          };
+          }
 
           linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
           arrowPoints.push({
@@ -127,5 +143,217 @@ export const Workspace = function(app) {
     self.context.fill();
 
     self.isDrawingArrows = false;
+  };
+
+  // bringToFront
+  //
+  // Brings the specified node to the top of the nodes stack
+  this.bringToFront = function(element) {
+    const e = $(element);
+    const highestZ = Utils.getHighestZ(e.parent());
+    e.css('z-index', highestZ + 1);
+  };
+
+  // selectAll
+  //
+  // Select all nodes on the workspace
+  this.selectAll = function() {
+    self.addNodesToSelection(app.nodes());
+  };
+
+  // deselectAll
+  //
+  // Deselect all nodes on the workspace
+  this.deselectAll = function() {
+    self.removeNodesFromSelection(app.nodes());
+  };
+
+  // addNodesToSelection
+  //
+  // Adds nodes to the list of selected nodes
+  this.addNodesToSelection = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    for(let node of list) {
+      if (!self.selectedNodes.includes(node)){
+        self.selectedNodes.push(node);
+        node.setSelected(true);
+      }
+    }
+  };
+
+  // removeNodesFromSelection
+  //
+  // Removes nodes from the list of selected nodes
+  this.removeNodesFromSelection = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    for(let node of list) {
+      const index = self.selectedNodes.indexOf(node);
+      if (index >= 0) {
+        self.selectedNodes.splice(index, 1);
+        node.setSelected(false);
+      }
+    }
+  };
+
+  // getSelectedNodes
+  //
+  // Returns a copy of the selected nodes array
+  // TODO: is it necesssary to always clone the array? Do some research
+  this.getSelectedNodes = function() {
+    return self.selectedNodes.length === 1 ?
+      [self.selectedNodes[0]] :
+      Array.apply(this, self.selectedNodes);
+  };
+
+  // warpToNodeByIdx
+  //
+  // Moves the viewport to focus a node from the general nodes list
+  this.warpToNodeByIdx = function(idx) {
+    self.warpToNode(app.nodes()[idx]);
+    app.focusedNodeIdx = idx;
+  };
+
+  // warpToSelectedNodeByIdx
+  //
+  // Moves the viewport to focus a node from the selected nodes list
+  this.warpToSelectedNodeByIdx = function(idx) {
+    self.warpToNode(self.getSelectedNodes()[idx]);
+    app.focusedNodeIdx = idx;
+  };
+
+  // warpToNode
+  //
+  // Moves the viewport to focus the specified node
+  this.warpToNode = function(node) {
+    node && self.warpToXY(node.x(), node.y());
+  }
+
+  // warpToNode
+  //
+  // Moves the viewport to focus the x,y position
+  this.warpToXY = function(x, y) {
+    const nodeWidth = 100;
+    const nodeHeight = 100;
+    const nodeXScaled = -(x * app.cachedScale);
+    const nodeYScaled = -(y * app.cachedScale);
+    const winXCenter = $(window).width() / 2;
+    const winYCenter = $(window).height() / 2;
+    const nodeWidthShift = (nodeWidth * app.cachedScale) / 2;
+    const nodeHeightShift = (nodeHeight * app.cachedScale) / 2;
+
+    app.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
+    app.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
+
+    app.translate(100);
+  };
+
+  // alignY
+  //
+  // Align selected nodes relative to a node with the lowest y-value
+  this.alignY = function() {
+    const SPACING = 210;
+
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.y() > b.y()) return 1;
+        if (a.y() < b.y()) return -1;
+        return 0;
+      }),
+
+    referenceNode = selectedNodes.shift();
+
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
+
+    selectedNodes.forEach((node, i) => {
+      const y = referenceNode.y() + SPACING * (i + 1);
+      node.moveTo(referenceNode.x(), y);
+    });
+  };
+
+  // alignX
+  //
+  // Align selected nodes relative to a node with the lowest x-value
+  this.alignX = function() {
+   const SPACING = 210;
+
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.x() > b.x()) return 1;
+        if (a.x() < b.x()) return -1;
+        return 0;
+      }),
+
+    referenceNode = selectedNodes.shift();
+
+    if (!selectedNodes.length) {
+      alert('Select nodes to align');
+      return;
+    }
+
+    selectedNodes.forEach((node, i) => {
+      const x = referenceNode.x() + SPACING * (i + 1);
+      node.moveTo(x, referenceNode.y());
+    });
+  };
+
+  // arrangeSpiral
+  //
+  // Arranges selected nodes in an spiral shape
+  this.arrangeSpiral = function() {
+    self.getSelectedNodes().forEach( (node, i) => {
+      node.moveTo(
+        Math.cos(i * 0.5) * (600 + i * 30),
+        Math.sin(i * 0.5) * (600 + i * 30)
+      );
+    });
+  };
+
+  // sortAlphabetical
+  //
+  // Sorts selected nodes in alphabetical order
+  this.sortAlphabetical = function() {
+    const selectedNodes = self.getSelectedNodes().sort((a, b) => {
+      return a.title().localeCompare(b.title());
+    });
+
+    if (!selectedNodes.length)
+      return;
+
+    let arrayWidth = Math.round(selectedNodes.length / 2);
+    let currentX = 0;
+    let currentY = 0;
+
+    const horizontalSpacing = $(selectedNodes[0].element).width() + 30;
+    const verticalSpacing = $(selectedNodes[0].element).height() + 30;
+
+    selectedNodes.forEach((node, i) => {
+      if (i % arrayWidth) {
+        currentX += 1;
+      } else {
+        currentY += 1;
+        currentX = 0;
+      }
+
+      if (i === 1)
+        currentY = 0;
+
+      node.moveTo(
+        selectedNodes[0].x() + currentX * horizontalSpacing,
+        selectedNodes[0].y() + currentY * verticalSpacing
+      );
+    });
+
+    self.warpToNode(selectedNodes[0]);
   };
 };

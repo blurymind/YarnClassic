@@ -134,7 +134,6 @@ export var Node = function(options = {}) {
   this.canDoubleClick = true;
 
   this.create = function() {
-    Utils.pushToTop($(self.element));
     self.style = window.getComputedStyle($(self.element).get(0));
 
     if (self.createX && self.createY) {
@@ -146,6 +145,7 @@ export var Node = function(options = {}) {
       self.y(-parent.offset().top + $(window).height() / 2 - 100);
     }
 
+    app.workspace.bringToFront(self.element);
     app.workspace.startUpdatingArrows();
 
     $(self.element)
@@ -176,8 +176,8 @@ export var Node = function(options = {}) {
 
     $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
-        if (self.selected) app.removeNodeSelection(self);
-        else app.addNodeSelected(self);
+        if (self.selected) app.workspace.removeNodesFromSelection(self);
+        else app.workspace.addNodesToSelection(self);
       }
     });
   };
@@ -288,7 +288,7 @@ export var Node = function(options = {}) {
         if (groupDragging) {
           var nodes = [];
           if (self.selected) {
-            nodes = app.getSelectedNodes();
+            nodes = app.workspace.getSelectedNodes();
             nodes.splice(nodes.indexOf(self), 1);
           } else {
             nodes = app.getNodesConnectedTo(self);
@@ -460,7 +460,7 @@ ko.bindingHandlers.nodeBind = {
     bindingContext
   ) {
     $(element).on('pointerdown', function() {
-      Utils.pushToTop($(element));
+      app.workspace.bringToFront(element);
     });
   },
 };
