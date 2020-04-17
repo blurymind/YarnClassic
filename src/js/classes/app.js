@@ -34,6 +34,7 @@ export var App = function(name, version) {
   this.editing = ko.observable(null);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
+  this.tags = ko.observableArray([]);
   this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -1593,6 +1594,7 @@ export var App = function(name, version) {
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(node);
+      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
@@ -1613,7 +1615,6 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
-
     }
   };
 
@@ -1704,6 +1705,44 @@ export var App = function(name, version) {
       node.linkedFrom().forEach(parent => {
         if (!updated.includes(parent)) toUpdate.push(parent);
       });
+    }
+  };
+
+  this.updateTagsRepository = function() {
+    const findFirstFreeId = () => {
+      const usedIds = self.tags().map( tag => tag.id );
+      for (let id = 1; ;++id)
+        if (!usedIds.includes(id))
+          return id;
+    };
+
+    // Reset count
+    self.tags().forEach(tag => tag.count = 0);
+
+    // Recount tags and add new
+    self.nodes().forEach(node => {
+      Utils.uniqueSplit(node.tags(), ' ').forEach(tag => {
+        const found = self.tags().find(e => e.text == tag);
+        if (found) {
+          ++found.count;
+        }
+        else {
+          const id = findFirstFreeId();
+          self.tags.push({
+            id: id,
+            style: 'tag-style-' + id,
+            text: tag,
+            count: 1
+          });
+        }
+      });
+    });
+
+    // Remove unused tags
+    let i = app.tags().length;
+    while (i--) {
+      if(app.tags()[i].count === 0)
+        app.tags().splice(i, 1);
     }
   };
 

@@ -40,10 +40,16 @@ export var Node = function(options = {}) {
   this.createX = options.x || null;
   this.createY = options.y || null;
 
-  // clipped values for display
+  // clippedTags
+  //
+  // Returns an array of tags objects with id, style and count
   this.clippedTags = ko.computed(function() {
-    const tags = self.tags().split(' ').filter(item => item);
-    return [...(new Set(tags))]
+    return Utils
+      .uniqueSplit(self.tags(), ' ')
+      .map (
+        tag => app.tags().find (e => e.text === tag)
+      )
+      .filter (item => item);
   }, this);
 
   this.textToHtml = function(text, showRowNumbers = false) {

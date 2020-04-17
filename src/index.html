@@ -121,7 +121,7 @@
 						<div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
 						<div class="body" data-bind="html: node.clippedBody"></div>
 						<div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }">
-							<span data-bind="text: tag, css: node.titleStyles[node.colorID()]"></span>
+							<span data-bind="text: tag.text, css: tag.style"></span>
 						</div>
 						<div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>
 						<div class="icon colorUp" data-bind="click: node.cycleColorUp"></div>
