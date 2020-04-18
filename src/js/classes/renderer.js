@@ -185,6 +185,9 @@ export var yarnRender = function() {
       vnText += '\n' + vnResult.text;
       // this.changeTextScrollSpeed(111);
     }
+    if (vnResult.constructor.name === 'OptionsResult') {
+      vnTextScrollIdx = -1;
+    }
   };
 
   this.scrollUpdateText = () => {
