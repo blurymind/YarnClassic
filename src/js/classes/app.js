@@ -1,3 +1,6 @@
+/* eslint-disable jquery/no-hide */
+/* eslint-disable jquery/no-ajax */
+/* eslint-disable jquery/no-show */
 import {
   enable_spellcheck,
   disable_spellcheck,
@@ -34,6 +37,7 @@ export var App = function(name, version) {
   this.editing = ko.observable(null);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
+  this.tags = ko.observableArray([]);
   this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -512,10 +516,7 @@ export var App = function(name, version) {
         if (!self.previewStory.finished)
           switch (e.key) {
             case 'z': {
-              self.previewStory.changeTextScrollSpeed(200);
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnSelectChoice();
-              }
+              self.advanceStoryPlayMode();
               return;
             }
             case 'ArrowUp': {
@@ -1389,11 +1390,16 @@ export var App = function(name, version) {
   };
 
   this.advanceStoryPlayMode = function(speed = 5) {
-    self.previewStory.changeTextScrollSpeed(speed);
+    if (!self.previewStory.finished) {
+      self.previewStory.changeTextScrollSpeed(speed)
+      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
+        self.previewStory.vnSelectChoice();
+      }
+    }
+    else self.togglePlayMode(false);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    if (!playModeOverwrite && self.previewStory.finished) return;
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
@@ -1422,7 +1428,7 @@ export var App = function(name, version) {
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       storyPreviewPlayButton.className = 'bbcode-button';
-      self.previewStory.finished = true;
+      self.previewStory.terminate();
       setTimeout(() => {
         if (self.editing().title() !== self.previewStory.node.title)
           self.openNodeByTitle(self.previewStory.node.title);
@@ -1582,21 +1588,24 @@ export var App = function(name, version) {
   };
 
   this.saveNode = function(closeEditor = true) {
-    if (self.editing() != null) {
+    const node = self.editing();
+    if (node) {
       const editorTitleElement = $('#editorTitle')[0];
+      self.previewStory.terminate();
 
       // Ensure the title is unique
       const title = self.getFutureEditedNodeTitle();
 
       // Update the title in the UI
       editorTitleElement.value = title;
-      self.editing().title(title);
+      node.title(title);
 
       // Remove leading and trailing spaces from the body links
-      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+      node.body(self.trimBodyLinks(node.body().trim()));
 
       self.makeNewNodesFromLinks();
-      self.propagateUpdateFromNode(self.editing());
+      self.propagateUpdateFromNode(node);
+      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
@@ -1617,7 +1626,6 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
-
     }
   };
 
@@ -1708,6 +1716,44 @@ export var App = function(name, version) {
       node.linkedFrom().forEach(parent => {
         if (!updated.includes(parent)) toUpdate.push(parent);
       });
+    }
+  };
+
+  this.updateTagsRepository = function() {
+    const findFirstFreeId = () => {
+      const usedIds = self.tags().map( tag => tag.id );
+      for (let id = 1; ;++id)
+        if (!usedIds.includes(id))
+          return id;
+    };
+
+    // Reset count
+    self.tags().forEach(tag => tag.count = 0);
+
+    // Recount tags and add new
+    self.nodes().forEach(node => {
+      Utils.uniqueSplit(node.tags(), ' ').forEach(tag => {
+        const found = self.tags().find(e => e.text == tag);
+        if (found) {
+          ++found.count;
+        }
+        else {
+          const id = findFirstFreeId();
+          self.tags.push({
+            id: id,
+            style: 'tag-style-' + id,
+            text: tag,
+            count: 1
+          });
+        }
+      });
+    });
+
+    // Remove unused tags
+    let i = app.tags().length;
+    while (i--) {
+      if(app.tags()[i].count === 0)
+        app.tags().splice(i, 1);
     }
   };
 

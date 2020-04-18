@@ -67,7 +67,7 @@ export var yarnRender = function() {
       attemptChoice = vnResult.options.length - 1;
     }
     this.vnSelectedChoice = attemptChoice;
-    vnChoices = document.createElement("DIV"); 
+    vnChoices = document.createElement("DIV");
     vnResult.options.forEach((choice, i) => {
       const btn = document.createElement("DIV");
       if (i == this.vnSelectedChoice) {
@@ -149,6 +149,8 @@ export var yarnRender = function() {
         // }
         /// emit debug signal
         if (nextNode.data && this.node.title !== nextNode.data.title) {
+          vnText = '';
+          vnTextScrollIdx = -1;
           this.node = self.jsonCopy(nextNode.data);
           this.visitedNodes.push(nextNode.data.title);
           this.emiter.emit('startedNode', this.node);
@@ -180,8 +182,11 @@ export var yarnRender = function() {
       return;
     }
     if (vnResult.constructor.name === 'TextResult') {
-      vnText += '<br>' + vnResult.text;
-      this.changeTextScrollSpeed(111);
+      vnText += '\n' + vnResult.text;
+      // this.changeTextScrollSpeed(111);
+    }
+    if (vnResult.constructor.name === 'OptionsResult') {
+      vnTextScrollIdx = -1;
     }
   };
 
@@ -236,10 +241,16 @@ export var yarnRender = function() {
   };
 
   this.terminate = () => {
-    // document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
-    VNdata = null;
-    vnResult = null;
-    finished = true;
+    try {
+      document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
+      document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
+      vnChoices = undefined;
+      
+      emiter.removeAllListeners();
+      this.finished = true;
+    } catch(e) {
+      console.warn(e);
+    }
   };
 
   this.initYarn = (
@@ -249,27 +260,43 @@ export var yarnRender = function() {
     resourcesPath,
     debugLabelId
   ) => {
+    const randomColour = ["#f5ff6f", "#44fe66", "#e00ec0", "#e93ecf", "#0ec0e0", "#3ecfe9", "#e4dbcb", "#978e7e", "#666", "#2f919a", "deeppink", "black", "#97E1E9", "#576574", "#6EA5E0", "#9EDE74", "#FFE374", "#F7A666", "#C47862"];
+    const randomAscii = ["__̴ı̴̴̡̡̡ ̡͌l̡̡̡ ̡͌l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡| ̲▫̲͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡, ̴̡ı̴̡̡ ̡͌l̡̡̡̡.___", "°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸", "(===||:::::::::::::::>",
+    "¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>", "=^..^=", "|==|iiii|>-----", " ¦̵̱ ̵̱ ̵̱ ̵̱ ̵̱(̢ ̡͇̅└͇̅┘͇̅ (▤8כ−◦", "(♥_♥)", "龴ↀ◡ↀ龴", "☁ ▅▒░☼‿☼░▒▅ ☁,",
+    "▓⚗_⚗▓", "<:3 )~~~", "(╯°□°）╯︵ ┻━┻", "●▬▬▬▬๑۩۩๑▬▬▬▬▬●", "(\/)(Ö,,,,Ö)(\/)", "/)^3^(\\", "( . Y . )",
+    "< )))) ><", "(ノಠ益ಠ)ノ彡", "d(^o^)b¸¸♬·¯·♩¸¸♪·¯·♫¸¸", "O=('-'Q)", "-`ღ´-", "ˁ(⦿ᴥ⦿)ˀ", "(╥﹏╥)", "✲´*。.❄¨¯`*✲。❄。*。¨¯`*✲",
+    "▂▃▅▇█▓▒░۩۞۩        ۩۞۩░▒▓█▇▅▃▂", "( •_•)O*¯`·.¸.·´¯`°Q(•_• )", "┻━┻︵  \(°□°)/ ︵ ┻━┻", "|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡ ̴̡ı̴̡̡ ̡͌l̡ ̴̡ı̴̴̡ ̡l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡|̲̲̲͡͡͡ ̲▫̲͡ ̲̲̲͡͡π̲̲͡͡ ̲̲͡▫̲̲͡͡ |",
+    "❤◦.¸¸.  ◦✿", "ʕʘ̅͜ʘ̅ʔ", "( ๏ Y ๏ )", "ʕ•̫͡•ʕ*̫͡*ʕ•͓͡•ʔ-̫͡-ʕ•̫͡•ʔ*̫͡*ʔ-̫͡-ʔ", "(っ◕‿◕)っ", "❚█══█❚", "─=≡Σ((( つ◕ل͜◕)つ", "^ↀᴥↀ^",
+    "༼ つ ͡◕ Ѿ ͡◕ ༽つ", "ᕦ(ò_óˇ)ᕤ",  "┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴", "[̲̅$̲̅(̲̅5)̲̅$̲̅]", "(ꈍ⌓ꈍ✿)", "(๑•́ ₃ •̀๑) ♡", "( • )( • )ԅ(≖⌣≖ԅ)", "（。々°）",
+    "⊂(´･◡･⊂ )∘˚˳°", "( ㅅ )", "(ﾉ☉ヮ⚆)ﾉ ⌒*:･ﾟ✧", "(－‸ლ)", "(‿|‿)", "(㇏(•̀ᵥᵥ•́)ノ)", "ʚ✟⃛ɞ",  "(′ꈍωꈍ‵)", "♚ ♛ ♜ ♝ ♞ ♟ ♔ ♕ ♖ ♗ ♘ ♙",
+    "(´ᴗ`)(´ᴗ`)", "♥(´∀｀)", "ฅ(˵●ﻌ●˵)ฅ"
+    ];
     debugLabelIdToAttachTo = debugLabelId;
     htmIDtoAttachYarnTo = htmlIdToAttachTo;
     this.yarnDataObject = yarnDataObject;
     this.startChapter = startChapter;
     this.resourcesPath = resourcesPath;
     this.finished = false;
+    document.getElementById(debugLabelIdToAttachTo).innerHTML =
+      "<br/><font color='red'>🚥Press/Hold Z or 📱Double-click/Tap to advance</font><br/>";
     emiter.on('startedNode', function(nodeData) {
-      document.getElementById(debugLabelIdToAttachTo).innerHTML = 
-        "<br/><font color='red'>Press/Hold Z or Double-click/Tap to advance</font><br/>";
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='CADETBLUE'>Title: " + nodeData.title + '</font>';
+        "<br/><br/><font color='#581845'>📜 --- Loaded next node ---</font>";
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='deeppink'>Tags: " + nodeData.tags + '</font>';
+        `<font color='${randomColour[Math.floor(Math.random() * randomColour.length)]}'>  ${randomAscii[Math.floor(Math.random() * randomAscii.length)]}</font>`;
+      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+        "<br/><font color='CADETBLUE'>&ensp;&ensp;&ensp;Title: " + nodeData.title + '</font>';
+      if (nodeData.tags.length > 0 && nodeData.tags[0].length > 0)
+        document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+          "<br/><font color='deeppink'>&ensp;&ensp;&ensp;Tags: " + nodeData.tags + '</font>';
     });
     emiter.on('choiceMade', function(choice) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='fuchsia'>Player chose: >" + choice + '</font>';
+        "<br/><font color='fuchsia'>🐙Player chose: >" + choice + '</font>';
     });
     emiter.on('commandCall', function(call) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
-        "<br/><font color='green'>Command call: " + call + '</font>';
+        `<br/><font color='green'>🐣Command call:</font> <font color='red'>&lt;&lt;${call}&gt;&gt;</font>`;
     });
     emiter.on('finished', function() {
       finished = true;
