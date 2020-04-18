@@ -237,7 +237,7 @@ export var data = {
 
         app.nodes.push(node);
       });
-    }  
+    }
     app.nodes.extend({ rateLimit: false });
 
     // Callback for embedding in other webapps
