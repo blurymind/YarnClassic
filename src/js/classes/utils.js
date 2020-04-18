@@ -122,7 +122,7 @@ export var Utils = {
   now:
     Date.now ||
     function() {
-    	return new Date().getTime();
+      return new Date().getTime();
     },
   langs: [
     ['Afrikaans', ['af-ZA']],
