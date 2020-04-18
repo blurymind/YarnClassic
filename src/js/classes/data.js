@@ -1,3 +1,4 @@
+/* eslint-disable jquery/no-ajax */
 const path = require('path');
 const saveAs = require('file-saver');
 import { Node } from './node';

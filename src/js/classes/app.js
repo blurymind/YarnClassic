@@ -1,3 +1,6 @@
+/* eslint-disable jquery/no-hide */
+/* eslint-disable jquery/no-ajax */
+/* eslint-disable jquery/no-show */
 import {
   enable_spellcheck,
   disable_spellcheck,
