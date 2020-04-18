@@ -67,7 +67,7 @@ export var Node = function(options = {}) {
     });
 
     /// Commands in preview mode
-    result = result.replace(/<</gi, "<font color='violet'>(run:");
+    result = result.replace(/<</gi, '<font color=\'violet\'>(run:');
     result = result.replace(/>>/gi, ')</font>');
 
     /// bbcode color tags in preview mode
@@ -275,12 +275,12 @@ export var Node = function(options = {}) {
       if (dragging) {
         const pageX =
           app.hasTouchScreen && e.changedTouches
-            ? e.changedTouches[0].pageX
-            : e.pageX;
+          	? e.changedTouches[0].pageX
+          	: e.pageX;
         const pageY =
           app.hasTouchScreen && e.changedTouches
-            ? e.changedTouches[0].pageY
-            : e.pageY;
+          	? e.changedTouches[0].pageY
+          	: e.pageY;
 
         var newX = pageX / self.getScale() - offset[0];
         var newY = pageY / self.getScale() - offset[1];
