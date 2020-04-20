@@ -233,8 +233,8 @@ export var data = {
           body: object.body,
           tags: object.tags,
           colorID: object.colorID,
-          x: object.position.x,
-          y: object.position.y,
+          x: parseInt(object.position.x),
+          y: parseInt(object.position.y),
         });
 
         app.nodes.push(node);
