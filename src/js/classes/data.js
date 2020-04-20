@@ -85,13 +85,13 @@ export var data = {
   getFileType: function(filename) {
     const lowerFileName = filename.toLowerCase();
 
-    if (lowerFileName.includes('.json')) return FILETYPE.JSON;
-    else if (lowerFileName.includes('.yarn.txt')) return FILETYPE.YARN;
-    else if (lowerFileName.includes('.yarn')) return FILETYPE.YARN;
-    else if (lowerFileName.includes('.xml')) return FILETYPE.XML;
-    else if (lowerFileName.includes('.txt')) return FILETYPE.TWEE;
-    else if (lowerFileName.includes('.tw2')) return FILETYPE.TWEE2;
-    else if (lowerFileName.includes('.twee')) return FILETYPE.TWEE2;
+    if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
+    else if (lowerFileName.endsWith('.yarn.txt')) return FILETYPE.YARN;
+    else if (lowerFileName.endsWith('.yarn')) return FILETYPE.YARN;
+    else if (lowerFileName.endsWith('.xml')) return FILETYPE.XML;
+    else if (lowerFileName.endsWith('.txt')) return FILETYPE.TWEE;
+    else if (lowerFileName.endsWith('.tw2')) return FILETYPE.TWEE2;
+    else if (lowerFileName.endsWith('.twee')) return FILETYPE.TWEE2;
 
     return FILETYPE.UNKNOWN;
   },
