@@ -67,7 +67,7 @@ export var Node = function(options = {}) {
     });
 
     /// Commands in preview mode
-    result = result.replace(/<</gi, "<font color='violet'>(run:");
+    result = result.replace(/<</gi, '<font color=\'violet\'>(run:');
     result = result.replace(/>>/gi, ')</font>');
 
     /// bbcode color tags in preview mode
