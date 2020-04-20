@@ -1,3 +1,4 @@
+/* eslint-disable jquery/no-ajax */
 // You also need to load in nspell.js and jquery.js
 
 // This is a custom made fork that uses nspell instead of typo.js due to major performance issues in the later.
