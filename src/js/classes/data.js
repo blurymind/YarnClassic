@@ -83,7 +83,7 @@ export var data = {
   },
 
   getFileType: function(filename) {
-    var lowerFileName = filename.toLowerCase();
+    const lowerFileName = filename.toLowerCase();
 
     if (lowerFileName.includes('.json')) return FILETYPE.JSON;
     else if (lowerFileName.includes('.yarn.txt')) return FILETYPE.YARN;
