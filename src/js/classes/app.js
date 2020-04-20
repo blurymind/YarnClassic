@@ -375,14 +375,14 @@ export var App = function(name, version) {
     $(document).on('keydown', function(e) {
       if ((e.metaKey || e.ctrlKey) && !self.editing()) {
         switch (e.keyCode) {
-          case 90: // ctrl+z
-            self.historyDirection('undo');
-            break;
-          case 89: // ctrl+y
-            self.historyDirection('redo');
-            break;
-          case 68: // ctrl+d
-            self.workspace.deselectAll();
+        case 90: // ctrl+z
+          self.historyDirection('undo');
+          break;
+        case 89: // ctrl+y
+          self.historyDirection('redo');
+          break;
+        case 68: // ctrl+d
+          self.workspace.deselectAll();
         }
       }
     });
@@ -391,36 +391,36 @@ export var App = function(name, version) {
       if (e.ctrlKey || e.metaKey) {
         if (e.shiftKey) {
           switch (e.keyCode) {
-            case 83: // ctrl+shift+s
-              data.trySave(FILETYPE.JSON);
-              self.fileKeyPressed = true;
-              break;
-            case 65: // ctrl+shift+a
-              data.tryAppend();
-              self.fileKeyPressed = true;
-              break;
+          case 83: // ctrl+shift+s
+            data.trySave(FILETYPE.JSON);
+            self.fileKeyPressed = true;
+            break;
+          case 65: // ctrl+shift+a
+            data.tryAppend();
+            self.fileKeyPressed = true;
+            break;
           }
         } else if (e.altKey) {
           switch (e.keyCode) {
-            case 83: //alt+s
-              data.trySave(FILETYPE.YARN);
-              self.fileKeyPressed = true;
-              break;
+          case 83: //alt+s
+            data.trySave(FILETYPE.YARN);
+            self.fileKeyPressed = true;
+            break;
           }
         } else {
           switch (e.keyCode) {
-            case 83: // ctrl+s
-              if (data.editingPath() != null) {
-                data.trySaveCurrent();
-              } else {
-                data.trySave(FILETYPE.JSON);
-              }
-              self.fileKeyPressed = true;
-              break;
-            case 79: // ctrl+o
-              data.tryOpenFile();
-              self.fileKeyPressed = true;
-              break;
+          case 83: // ctrl+s
+            if (data.editingPath() != null) {
+              data.trySaveCurrent();
+            } else {
+              data.trySave(FILETYPE.JSON);
+            }
+            self.fileKeyPressed = true;
+            break;
+          case 79: // ctrl+o
+            data.tryOpenFile();
+            self.fileKeyPressed = true;
+            break;
           }
         }
       }
@@ -446,10 +446,10 @@ export var App = function(name, version) {
         // If previewing the story, speed up scrolling when holding z
         if (!self.previewStory.finished)
           switch (e.key) {
-            case 'z': {
-              self.previewStory.changeTextScrollSpeed(20);
-              return;
-            }
+          case 'z': {
+            self.previewStory.changeTextScrollSpeed(20);
+            return;
+          }
           }
       } else {
         // ctrl + c NODES
@@ -515,22 +515,22 @@ export var App = function(name, version) {
         // Input event listeners for story preview
         if (!self.previewStory.finished)
           switch (e.key) {
-            case 'z': {
-              self.advanceStoryPlayMode();
-              return;
+          case 'z': {
+            self.advanceStoryPlayMode();
+            return;
+          }
+          case 'ArrowUp': {
+            if (self.previewStory.vnSelectedChoice != -1) {
+              self.previewStory.vnUpdateChoice(-1);
             }
-            case 'ArrowUp': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(-1);
-              }
-              return;
+            return;
+          }
+          case 'ArrowDown': {
+            if (self.previewStory.vnSelectedChoice != -1) {
+              self.previewStory.vnUpdateChoice(1);
             }
-            case 'ArrowDown': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(1);
-              }
-              return;
-            }
+            return;
+          }
           }
       }
 
@@ -1198,35 +1198,35 @@ export var App = function(name, version) {
         if (autoCompleteButton.checked) {
           setTimeout(() => {
             switch (self.getTagBeforeCursor()) {
-              case '[[':
-                self.insertTextAtCursor(' answer: | ]] ');
-                self.moveEditCursor(-4);
-                break;
-              case '<<':
-                self.insertTextAtCursor(' >> ');
-                self.moveEditCursor(-3);
-                break;
-              case '[colo':
-                self.insertTextAtCursor('r=#][/color] ');
-                self.moveEditCursor(-10);
-                self.insertColorCode();
-                break;
-              case '[b':
-                self.insertTextAtCursor('][/b] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[i':
-                self.insertTextAtCursor('][/i] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[img':
-                self.insertTextAtCursor('][/img] ');
-                self.moveEditCursor(-7);
-                break;
-              case '[u':
-                self.insertTextAtCursor('][/u] ');
-                self.moveEditCursor(-5);
-                break;
+            case '[[':
+              self.insertTextAtCursor(' answer: | ]] ');
+              self.moveEditCursor(-4);
+              break;
+            case '<<':
+              self.insertTextAtCursor(' >> ');
+              self.moveEditCursor(-3);
+              break;
+            case '[colo':
+              self.insertTextAtCursor('r=#][/color] ');
+              self.moveEditCursor(-10);
+              self.insertColorCode();
+              break;
+            case '[b':
+              self.insertTextAtCursor('][/b] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[i':
+              self.insertTextAtCursor('][/i] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[img':
+              self.insertTextAtCursor('][/img] ');
+              self.moveEditCursor(-7);
+              break;
+            case '[u':
+              self.insertTextAtCursor('][/u] ');
+              self.moveEditCursor(-5);
+              break;
             }
           }, 200);
           return;
@@ -1284,7 +1284,7 @@ export var App = function(name, version) {
     if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
     } else {
-      const title = self.nodeVisitHistory.pop()
+      const title = self.nodeVisitHistory.pop();
       self.propagateUpdateFromNode(self.editing());
       self.openNodeByTitle(title);
     }
@@ -1391,7 +1391,7 @@ export var App = function(name, version) {
 
   this.advanceStoryPlayMode = function(speed = 5) {
     if (!self.previewStory.finished) {
-      self.previewStory.changeTextScrollSpeed(speed)
+      self.previewStory.changeTextScrollSpeed(speed);
       if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
         self.previewStory.vnSelectChoice();
       }
@@ -1503,9 +1503,9 @@ export var App = function(name, version) {
     var tagBeforeCursor =
       textBeforeCursor.lastIndexOf('[') !== -1
         ? textBeforeCursor.substring(
-            textBeforeCursor.lastIndexOf('['),
-            textBeforeCursor.length
-          )
+          textBeforeCursor.lastIndexOf('['),
+          textBeforeCursor.length
+        )
         : '';
 
     if (
@@ -1559,11 +1559,11 @@ export var App = function(name, version) {
           if (node.title() !== self.editing().title()) {
             p.setAttribute(
               'onclick',
-              "app.insertTextAtCursor(' [[Answer:" +
+              'app.insertTextAtCursor(\' [[Answer:' +
                 node.title() +
                 '|' +
                 node.title() +
-                "]]')"
+                ']]\')'
             );
             rootMenu.appendChild(p);
           }

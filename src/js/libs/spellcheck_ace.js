@@ -1,13 +1,14 @@
+/* eslint-disable jquery/no-ajax */
 // You also need to load in nspell.js and jquery.js
 
 // This is a custom made fork that uses nspell instead of typo.js due to major performance issues in the later.
 // Please keep this file for now...
-var nspell = require("nspell");
+var nspell = require('nspell');
 // You should configure these classes.
-var editor = "editor"; // This should be the id of your editor element.
+var editor = 'editor'; // This should be the id of your editor element.
 
-var dicPath = "public/dictionaries/en/index.dic";
-var affPath = "public/dictionaries/en/index.aff";
+var dicPath = 'public/dictionaries/en/index.dic';
+var affPath = 'public/dictionaries/en/index.aff';
 // var dicPath =
 //   "https://raw.githubusercontent.com/elastic/hunspell/master/dicts/en_US/en_US.dic";
 // var affPath =
@@ -15,11 +16,11 @@ var affPath = "public/dictionaries/en/index.aff";
 
 // Make red underline for gutter and words.
 $(
-  "<style type='text/css'>.ace_marker-layer .misspelled { position: absolute; z-index: -2; border-bottom: 1px solid red; margin-bottom: -1px; }</style>"
-).appendTo("head");
+  '<style type=\'text/css\'>.ace_marker-layer .misspelled { position: absolute; z-index: -2; border-bottom: 1px solid red; margin-bottom: -1px; }</style>'
+).appendTo('head');
 $(
-  "<style type='text/css'>.misspelled { border-bottom: 1px solid red; margin-bottom: -1px; }</style>"
-).appendTo("head");
+  '<style type=\'text/css\'>.misspelled { border-bottom: 1px solid red; margin-bottom: -1px; }</style>'
+).appendTo('head');
 
 // Load the dictionary.
 // We have to load the dictionary files sequentially to ensure
@@ -46,7 +47,7 @@ function load_dictionary(dicLanguage) {
         $.get(affPath, function(data) {
           affData = data;
         }).done(function() {
-          console.log("Dictionary loaded from server");
+          console.log('Dictionary loaded from server');
           dictionary = new nspell(affData, dicData);
           contents_modified = true;
           spell_check();
@@ -57,7 +58,7 @@ function load_dictionary(dicLanguage) {
       $.get(affPath, function(data) {
         affData = data;
       }).done(function() {
-        console.log("Dictionary loaded locally");
+        console.log('Dictionary loaded locally');
         dictionary = new nspell(affData, dicData);
         contents_modified = true;
         spell_check();
@@ -111,7 +112,7 @@ function spell_check() {
   clear_spellcheck_markers();
   // Populate with markers and gutter
   try {
-    var Range = ace.require("ace/range").Range;
+    var Range = ace.require('ace/range').Range;
     var lines = session.getDocument().getAllLines();
     for (var i in lines) {
       // Check spelling of this line.
@@ -125,8 +126,8 @@ function spell_check() {
         var range = new Range(i, misspellings[j][0], i, misspellings[j][1]);
         markers_present[markers_present.length] = session.addMarker(
           range,
-          "misspelled",
-          "typo",
+          'misspelled',
+          'typo',
           true
         );
       }
@@ -144,7 +145,7 @@ function enable_spellcheck() {
   ace
     .edit(editor)
     .getSession()
-    .on("change", function(e) {
+    .on('change', function(e) {
       if (spellcheckEnabled) {
         contents_modified = true;
         spell_check();
@@ -172,7 +173,7 @@ function clear_spellcheck_markers() {
   // Clear the gutter
   var lines = session.getDocument().getAllLines();
   for (var i in lines) {
-    session.removeGutterDecoration(i, "misspelled");
+    session.removeGutterDecoration(i, 'misspelled');
   }
 }
 exports.clear_spellcheck_markers = clear_spellcheck_markers;
