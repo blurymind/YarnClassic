@@ -92,6 +92,7 @@ export var data = {
     else if (lowerFileName.includes('.txt')) return FILETYPE.TWEE;
     else if (lowerFileName.includes('.tw2')) return FILETYPE.TWEE2;
     else if (lowerFileName.includes('.twee')) return FILETYPE.TWEE2;
+
     return FILETYPE.UNKNOWN;
   },
 
