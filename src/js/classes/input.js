@@ -50,13 +50,13 @@ export const Input = function(app) {
           app.workspace.deselectAll();
 
         switch (e.button) {
-          case MouseButton.Left:
-            app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
-            break;
+        case MouseButton.Left:
+          app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
+          break;
 
-          case MouseButton.Middle:
-            app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
-            break;
+        case MouseButton.Middle:
+          app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
+          break;
         }
       }
     });
@@ -97,9 +97,10 @@ export const Input = function(app) {
 
       self.isDragging = false;
 
-      if (app.inWorkspace())
+      if (app.inWorkspace()) {
         app.workspace.onDragEnd();
         app.workspace.onMarqueeEnd();
+      }
     });
 
     $('.nodes').mousewheel(event => {
@@ -176,31 +177,31 @@ export const Input = function(app) {
 
       if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
         switch (e.keyCode) {
-          case Key.S: app.data.trySave(FILETYPE.JSON); break; // ctrl+shift+s
-          case Key.A: app.data.tryAppend(); break; // ctrl+shift+a
+        case Key.S: app.data.trySave(FILETYPE.JSON); break; // ctrl+shift+s
+        case Key.A: app.data.tryAppend(); break; // ctrl+shift+a
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
-          case Key.S: app.data.trySave(FILETYPE.YARN); break;  // ctrl+alt+s
+        case Key.S: app.data.trySave(FILETYPE.YARN); break;  // ctrl+alt+s
         }
       }
       else if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-          case Key.A: app.workspace.selectAll(); break; // ctrl+a
-          case Key.C: // ctrl+c
-            app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
-            break;
-          case Key.D: app.workspace.deselectAll(); break; // ctrl+d
-          case Key.O: app.data.tryOpenFile(); break; // ctrl+o
-          case Key.S: app.data.save(); break; // ctrl+s
-          case Key.V: app.pasteNodes(); break; // ctrl+s
-          case Key.X: // ctrl+x
-            app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
-            app.deleteSelectedNodes();
-            break;
-          case Key.Y: app.historyDirection('redo'); break; // ctrl+y
-          case Key.Z: app.historyDirection('undo'); break; // ctrl+z
+        case Key.A: app.workspace.selectAll(); break; // ctrl+a
+        case Key.C: // ctrl+c
+          app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
+          break;
+        case Key.D: app.workspace.deselectAll(); break; // ctrl+d
+        case Key.O: app.data.tryOpenFile(); break; // ctrl+o
+        case Key.S: app.data.save(); break; // ctrl+s
+        case Key.V: app.pasteNodes(); break; // ctrl+s
+        case Key.X: // ctrl+x
+          app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
+          app.deleteSelectedNodes();
+          break;
+        case Key.Y: app.historyDirection('redo'); break; // ctrl+y
+        case Key.Z: app.historyDirection('undo'); break; // ctrl+z
         }
       }
       else {
@@ -242,18 +243,18 @@ export const Input = function(app) {
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-          case Key.Escape: app.saveNode(); break;
-          case Key.C: self.clipboard = app.editor.getSelectedText(); break;
-          case Key.X:
-            document.execCommand('copy');
-            app.clipboard = app.editor.getSelectedText();
-            sapp.insertTextAtCursor('');
-            break;
+        case Key.Escape: app.saveNode(); break;
+        case Key.C: self.clipboard = app.editor.getSelectedText(); break;
+        case Key.X:
+          document.execCommand('copy');
+          app.clipboard = app.editor.getSelectedText();
+          sapp.insertTextAtCursor('');
+          break;
         }
       }
       else {
         switch (e.keyCode) {
-          case Key.Escape: app.saveNode(); break;
+        case Key.Escape: app.saveNode(); break;
         }
       }
     });
@@ -280,21 +281,21 @@ export const Input = function(app) {
         return;
 
       switch (e.keyCode) {
-        case Key.Z:
-          app.previewStory.changeTextScrollSpeed(200);
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnSelectChoice();
-          break;
+      case Key.Z:
+        app.previewStory.changeTextScrollSpeed(200);
+        if (app.previewStory.vnSelectedChoice != -1)
+          app.previewStory.vnSelectChoice();
+        break;
 
-        case Key.Up:
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnUpdateChoice(-1);
-          break;
+      case Key.Up:
+        if (app.previewStory.vnSelectedChoice != -1)
+          app.previewStory.vnUpdateChoice(-1);
+        break;
 
-        case Key.Down:
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnUpdateChoice(1);
-          break;
+      case Key.Down:
+        if (app.previewStory.vnSelectedChoice != -1)
+          app.previewStory.vnUpdateChoice(1);
+        break;
       }
     });
   };
@@ -327,7 +328,7 @@ export const Input = function(app) {
         });
       },
     };
-  }
+  };
 
   // init
   //

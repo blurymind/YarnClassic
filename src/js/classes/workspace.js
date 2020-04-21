@@ -31,7 +31,7 @@ export const Workspace = function(app) {
   this.onPanLeft = function() {
     app.transformOrigin[0] += self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
-  }
+  };
 
   // onPanRight
   //
@@ -39,7 +39,7 @@ export const Workspace = function(app) {
   this.onPanRight = function() {
     app.transformOrigin[0] -= self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
-  }
+  };
 
   // onPanUp
   //
@@ -47,7 +47,7 @@ export const Workspace = function(app) {
   this.onPanUp = function() {
     app.transformOrigin[1] += self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
-  }
+  };
 
   // onPanDown
   //
@@ -55,7 +55,7 @@ export const Workspace = function(app) {
   this.onPanDown = function() {
     app.transformOrigin[1] -= self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
-  }
+  };
 
   // getPanAmount
   //
@@ -65,7 +65,7 @@ export const Workspace = function(app) {
     return app.input.isShiftDown ?
       scale * PAN_SMALL_STEP :
       scale * PAN_BIG_STEP;
-  }
+  };
 
   // onZoom
   //
@@ -116,7 +116,7 @@ export const Workspace = function(app) {
   //
   //
   this.onDragEnd = function() {
-  }
+  };
 
 
   // onMarqueeStart
@@ -326,7 +326,7 @@ export const Workspace = function(app) {
           const normal = {
             x: (toX - fromX) / distance,
             y: (toY - fromY) / distance,
-          }
+          };
 
           const dist = (
             110 + (
@@ -344,7 +344,7 @@ export const Workspace = function(app) {
           const to = {
             x: toX - normal.x * dist,
             y: toY - normal.y * dist,
-          }
+          };
 
           linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
           arrowPoints.push({
@@ -460,9 +460,9 @@ export const Workspace = function(app) {
   // Moves the viewport to focus the specified node
   this.warpToNode = function(node) {
     node && self.warpToXY(node.x(), node.y());
-  }
+  };
 
-  // warpToNode
+  // warpToXY
   //
   // Moves the viewport to focus the x,y position
   this.warpToXY = function(x, y) {
@@ -488,17 +488,17 @@ export const Workspace = function(app) {
     const SPACING = 210;
 
     const selectedNodes = app
-      .nodes()
-      .filter((el) => {
-        return el.selected;
-      })
-      .sort((a, b) => {
-        if (a.y() > b.y()) return 1;
-        if (a.y() < b.y()) return -1;
-        return 0;
-      }),
+        .nodes()
+        .filter((el) => {
+          return el.selected;
+        })
+        .sort((a, b) => {
+          if (a.y() > b.y()) return 1;
+          if (a.y() < b.y()) return -1;
+          return 0;
+        }),
 
-    referenceNode = selectedNodes.shift();
+      referenceNode = selectedNodes.shift();
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');
@@ -515,20 +515,20 @@ export const Workspace = function(app) {
   //
   // Align selected nodes relative to a node with the lowest x-value
   this.alignX = function() {
-   const SPACING = 210;
+    const SPACING = 210;
 
     const selectedNodes = app
-      .nodes()
-      .filter((el) => {
-        return el.selected;
-      })
-      .sort((a, b) => {
-        if (a.x() > b.x()) return 1;
-        if (a.x() < b.x()) return -1;
-        return 0;
-      }),
+        .nodes()
+        .filter((el) => {
+          return el.selected;
+        })
+        .sort((a, b) => {
+          if (a.x() > b.x()) return 1;
+          if (a.x() < b.x()) return -1;
+          return 0;
+        }),
 
-    referenceNode = selectedNodes.shift();
+      referenceNode = selectedNodes.shift();
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');

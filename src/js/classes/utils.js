@@ -60,6 +60,10 @@ export var Utils = {
     });
   },
 
+  uniqueSplit: function(str, separator = ' ') {
+    return [...(new Set(str.split(separator).filter(item => item)))];
+  },
+
   getHighestZ: function(container) {
     let highestZ = Number.NEGATIVE_INFINITY;
     $(container).children().each(function() {

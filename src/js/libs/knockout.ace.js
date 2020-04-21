@@ -16,21 +16,21 @@
 
       // Ace attaches to the element by DOM id, so we need to make one for the element if it doesn't have one already.
       if (!element.id) {
-        element.id = "knockout-ace-" + init_id;
+        element.id = 'knockout-ace-' + init_id;
         init_id = init_id + 1;
       }
 
       var editor = ace.edit(element.id);
 
-      if (options.theme) editor.setTheme("ace/theme/" + options.theme);
-      if (options.mode) editor.getSession().setMode("ace/mode/" + options.mode);
+      if (options.theme) editor.setTheme('ace/theme/' + options.theme);
+      if (options.mode) editor.getSession().setMode('ace/mode/' + options.mode);
 
       editor.setValue(value);
       editor.gotoLine(0);
       editor.setShowPrintMargin(false);
       editor.getSession().setUseWrapMode(true);
 
-      editor.getSession().on("change", function(delta) {
+      editor.getSession().on('change', function(delta) {
         if (ko.isWriteableObservable(valueAccessor())) {
           valueAccessor()(editor.getValue());
         }
@@ -59,7 +59,7 @@
       //handle programmatic updates to the observable
       // also makes sure it doesn't update it if it's the same.
       // otherwise, it will reload the instance, causing the cursor to jump.
-      if (id !== undefined && id !== "" && instances_by_id.hasOwnProperty(id)) {
+      if (id !== undefined && id !== '' && instances_by_id.hasOwnProperty(id)) {
         var editor = instances_by_id[id];
         var content = editor.getValue();
         if (content !== value) {

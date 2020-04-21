@@ -1,3 +1,6 @@
+/* eslint-disable jquery/no-hide */
+/* eslint-disable jquery/no-ajax */
+/* eslint-disable jquery/no-show */
 import {
   enable_spellcheck,
   disable_spellcheck,
@@ -39,6 +42,7 @@ export var App = function(name, version) {
   this.editing = ko.observable(null);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
+  this.tags = ko.observableArray([]);
   this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -99,6 +103,13 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
+    window.addEventListener('yarnLoadedData', e => {
+      $('.arrows')
+        .css({ opacity: 0 })
+        .transition({ opacity: 1 }, 500);
+
+      self.updateNodeLinks();
+    });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (
@@ -735,35 +746,35 @@ export var App = function(name, version) {
         if (autoCompleteButton.checked) {
           setTimeout(() => {
             switch (self.getTagBeforeCursor()) {
-              case '[[':
-                self.insertTextAtCursor(' answer: | ]] ');
-                self.moveEditCursor(-4);
-                break;
-              case '<<':
-                self.insertTextAtCursor(' >> ');
-                self.moveEditCursor(-3);
-                break;
-              case '[colo':
-                self.insertTextAtCursor('r=#][/color] ');
-                self.moveEditCursor(-10);
-                self.insertColorCode();
-                break;
-              case '[b':
-                self.insertTextAtCursor('][/b] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[i':
-                self.insertTextAtCursor('][/i] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[img':
-                self.insertTextAtCursor('][/img] ');
-                self.moveEditCursor(-7);
-                break;
-              case '[u':
-                self.insertTextAtCursor('][/u] ');
-                self.moveEditCursor(-5);
-                break;
+            case '[[':
+              self.insertTextAtCursor(' answer: | ]] ');
+              self.moveEditCursor(-4);
+              break;
+            case '<<':
+              self.insertTextAtCursor(' >> ');
+              self.moveEditCursor(-3);
+              break;
+            case '[colo':
+              self.insertTextAtCursor('r=#][/color] ');
+              self.moveEditCursor(-10);
+              self.insertColorCode();
+              break;
+            case '[b':
+              self.insertTextAtCursor('][/b] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[i':
+              self.insertTextAtCursor('][/i] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[img':
+              self.insertTextAtCursor('][/img] ');
+              self.moveEditCursor(-7);
+              break;
+            case '[u':
+              self.insertTextAtCursor('][/u] ');
+              self.moveEditCursor(-5);
+              break;
             }
           }, 200);
           return;
@@ -821,7 +832,7 @@ export var App = function(name, version) {
     if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
     } else {
-      const title = self.nodeVisitHistory.pop()
+      const title = self.nodeVisitHistory.pop();
       self.propagateUpdateFromNode(self.editing());
       self.openNodeByTitle(title);
     }
@@ -927,12 +938,16 @@ export var App = function(name, version) {
   };
 
   this.advanceStoryPlayMode = function(speed = 5) {
-    if (!self.previewStory.finished)
+    if (!self.previewStory.finished) {
       self.previewStory.changeTextScrollSpeed(speed);
+      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
+        self.previewStory.vnSelectChoice();
+      }
+    }
+    else self.togglePlayMode(false);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    if (!playModeOverwrite && self.previewStory.finished) return;
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
@@ -1032,9 +1047,9 @@ export var App = function(name, version) {
     var tagBeforeCursor =
       textBeforeCursor.lastIndexOf('[') !== -1
         ? textBeforeCursor.substring(
-            textBeforeCursor.lastIndexOf('['),
-            textBeforeCursor.length
-          )
+          textBeforeCursor.lastIndexOf('['),
+          textBeforeCursor.length
+        )
         : '';
 
     if (
@@ -1089,11 +1104,11 @@ export var App = function(name, version) {
           if (node.title() !== self.editing().title()) {
             p.setAttribute(
               'onclick',
-              "app.insertTextAtCursor(' [[Answer:" +
+              'app.insertTextAtCursor(\' [[Answer:' +
                 node.title() +
                 '|' +
                 node.title() +
-                "]]')"
+                ']]\')'
             );
             rootMenu.appendChild(p);
           }
@@ -1118,7 +1133,8 @@ export var App = function(name, version) {
   };
 
   this.saveNode = function(closeEditor = true) {
-    if (self.editing() != null) {
+    const node = self.editing();
+    if (node) {
       const editorTitleElement = $('#editorTitle')[0];
       self.previewStory.terminate();
 
@@ -1127,13 +1143,14 @@ export var App = function(name, version) {
 
       // Update the title in the UI
       editorTitleElement.value = title;
-      self.editing().title(title);
+      node.title(title);
 
       // Remove leading and trailing spaces from the body links
-      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+      node.body(self.trimBodyLinks(node.body().trim()));
 
       self.makeNewNodesFromLinks();
-      self.propagateUpdateFromNode(self.editing());
+      self.propagateUpdateFromNode(node);
+      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
@@ -1154,7 +1171,6 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
-
     }
   };
 
@@ -1245,6 +1261,44 @@ export var App = function(name, version) {
       node.linkedFrom().forEach(parent => {
         if (!updated.includes(parent)) toUpdate.push(parent);
       });
+    }
+  };
+
+  this.updateTagsRepository = function() {
+    const findFirstFreeId = () => {
+      const usedIds = self.tags().map( tag => tag.id );
+      for (let id = 1; ;++id)
+        if (!usedIds.includes(id))
+          return id;
+    };
+
+    // Reset count
+    self.tags().forEach(tag => tag.count = 0);
+
+    // Recount tags and add new
+    self.nodes().forEach(node => {
+      Utils.uniqueSplit(node.tags(), ' ').forEach(tag => {
+        const found = self.tags().find(e => e.text == tag);
+        if (found) {
+          ++found.count;
+        }
+        else {
+          const id = findFirstFreeId();
+          self.tags.push({
+            id: id,
+            style: 'tag-style-' + id,
+            text: tag,
+            count: 1
+          });
+        }
+      });
+    });
+
+    // Remove unused tags
+    let i = app.tags().length;
+    while (i--) {
+      if(app.tags()[i].count === 0)
+        app.tags().splice(i, 1);
     }
   };
 
