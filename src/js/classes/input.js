@@ -188,14 +188,12 @@ export const Input = function(app) {
       }
       else if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.A: app.workspace.selectAll(); break; // ctrl+a
         case Key.C: // ctrl+c
           app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
           break;
         case Key.D: app.workspace.deselectAll(); break; // ctrl+d
         case Key.O: app.data.tryOpenFile(); break; // ctrl+o
         case Key.S: app.data.save(); break; // ctrl+s
-        case Key.V: app.pasteNodes(); break; // ctrl+s
         case Key.X: // ctrl+x
           app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
           app.deleteSelectedNodes();
@@ -227,12 +225,20 @@ export const Input = function(app) {
       if (!app.inWorkspace())
         return;
 
-      if (e.keyCode === Key.Enter || e.key === 'Enter') {
-        const activeNode = app.nodes()[app.focusedNodeIdx];
-        if (activeNode)
-          app.editNode(activeNode);
-        else
-          app.editNode(app.nodes()[0]);
+      if (e.metaKey || e.ctrlKey) {
+        switch (e.keyCode) {
+        case Key.A: app.workspace.selectAll(); break; // ctrl+a
+        case Key.V: app.pasteNodes(); break; // ctrl+v
+        }
+      }
+      else {
+        if (e.keyCode === Key.Enter || e.key === 'Enter') {
+          const activeNode = app.nodes()[app.focusedNodeIdx];
+          if (activeNode)
+            app.editNode(activeNode);
+          else
+            app.editNode(app.nodes()[0]);
+        }
       }
     });
 
