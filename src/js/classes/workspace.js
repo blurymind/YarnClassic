@@ -228,7 +228,7 @@ export const Workspace = function(app) {
     node && self.warpToXY(node.x(), node.y());
   };
 
-  // warpToNode
+  // warpToXY
   //
   // Moves the viewport to focus the x,y position
   this.warpToXY = function(x, y) {

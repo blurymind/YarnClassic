@@ -92,6 +92,13 @@ export var App = function(name, version) {
     window.addEventListener('touchstart', function() {
       self.hasTouchScreen = true;
     });
+    window.addEventListener('yarnLoadedData', e => {
+      $('.arrows')
+        .css({ opacity: 0 })
+        .transition({ opacity: 1 }, 500);
+
+      self.updateNodeLinks();
+    });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (

@@ -45,7 +45,6 @@ export var data = {
       var type = data.getFileType(filename);
       if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
       else {
-        // console.log("reading-", type, filename, reader);
         data.editingPath(file.path);
         data.editingType(type);
         data.loadData(reader.result, type, clearNodes);
@@ -84,39 +83,37 @@ export var data = {
   },
 
   getFileType: function(filename) {
-    var clone = filename;
+    const lowerFileName = filename.toLowerCase();
 
-    if (filename.toLowerCase().indexOf('.json') > -1) return FILETYPE.JSON;
-    else if (filename.toLowerCase().indexOf('.yarn.txt') > -1)
-      return FILETYPE.YARN;
-    else if (filename.toLowerCase().indexOf('.yarn') > -1) return FILETYPE.YARN;
-    else if (filename.toLowerCase().indexOf('.xml') > -1) return FILETYPE.XML;
-    else if (filename.toLowerCase().indexOf('.txt') > -1) return FILETYPE.TWEE;
-    else if (filename.toLowerCase().indexOf('.tw2') > -1) return FILETYPE.TWEE2;
-    else if (filename.toLowerCase().indexOf('.twee') > -1)
-      return FILETYPE.TWEE2;
+    if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
+    else if (lowerFileName.endsWith('.yarn.txt')) return FILETYPE.YARN;
+    else if (lowerFileName.endsWith('.yarn')) return FILETYPE.YARN;
+    else if (lowerFileName.endsWith('.xml')) return FILETYPE.XML;
+    else if (lowerFileName.endsWith('.txt')) return FILETYPE.TWEE;
+    else if (lowerFileName.endsWith('.tw2')) return FILETYPE.TWEE2;
+    else if (lowerFileName.endsWith('.twee')) return FILETYPE.TWEE2;
+
     return FILETYPE.UNKNOWN;
   },
 
   loadData: function(content, type, clearNodes) {
-    // clear all content
-    if (clearNodes) app.nodes.removeAll();
+    const objects = [];
 
-    var objects = [];
-    var i = 0;
     if (type == FILETYPE.JSON) {
       content = JSON.parse(content);
       if (!content) {
         return;
       }
-      for (i = 0; i < content.length; i++) objects.push(content[i]);
+      for (let i = 0; i < content.length; i++) {
+        objects.push(content[i]);
+      }
     } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
       var index = 0;
       var readingBody = false;
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() == '===') {
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].trim() === '===') {
           readingBody = false;
           if (obj != null) {
             objects.push(obj);
@@ -225,37 +222,25 @@ export var data = {
         for (i = 0; i < content.length; i++) objects.push(content[i]);
     }
 
-    var avgX = 0,
-      avgY = 0;
-    var numAvg = 0;
-    for (var i = 0; i < objects.length; i++) {
-      var node = new Node();
-      app.nodes.push(node);
+    app.nodes.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 } });
+    {
+      if (clearNodes)
+        app.nodes.removeAll();
 
-      var object = objects[i];
-      if (object.title != undefined) node.title(object.title);
-      if (object.body != undefined) node.body(object.body);
-      if (object.tags != undefined) node.tags(object.tags);
-      if (object.position != undefined && object.position.x != undefined) {
-        node.x(parseInt(object.position.x));
-        avgX += parseInt(object.position.x);
-        numAvg++;
-      }
-      if (object.position != undefined && object.position.y != undefined) {
-        node.y(parseInt(object.position.y));
-        avgY += parseInt(object.position.y);
-      }
-      if (object.colorID != undefined) node.colorID(object.colorID);
+      objects.forEach( (object, i) => {
+        let node = new Node({
+          title: object.title,
+          body: object.body,
+          tags: object.tags,
+          colorID: object.colorID,
+          x: parseInt(object.position.x),
+          y: parseInt(object.position.y),
+        });
+
+        app.nodes.push(node);
+      });
     }
-
-    if (numAvg > 0) {
-      app.workspace.warpToXY(avgX / numAvg, avgY / numAvg);
-    }
-
-    $('.arrows')
-      .css({ opacity: 0 })
-      .transition({ opacity: 1 }, 500);
-    app.updateNodeLinks();
+    app.nodes.extend({ rateLimit: false });
 
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnLoadedData');
