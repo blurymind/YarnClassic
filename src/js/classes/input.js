@@ -142,9 +142,8 @@ export const Input = function(app) {
 
     // Workspace/Editor keyboard shortcuts
     $(document).on('keyup', function(e) {
-      // Spacebar cycles between nodes
       if (e.keyCode === Key.Space) {
-        if (app.inEditor() && !e.altKey)
+        if ((app.inWorkspace() && e.altKey) || (app.inEditor() && ! e.altKey))
           return;
 
         app.cachedScale = 1;
@@ -158,15 +157,18 @@ export const Input = function(app) {
         if (app.focusedNodeIdx < 0 || app.focusedNodeIdx >= nodes.length)
           app.focusedNodeIdx = 0 ;
 
-        if (isNodeSelected) {
-          app.workspace.warpToSelectedNodeByIdx(app.focusedNodeIdx);
-        } else {
-          app.workspace.warpToNodeByIdx(app.focusedNodeIdx);
+        if (app.inWorkspace()) {
+          // Spacebar cycles between all or selected nodes
+          if (isNodeSelected) {
+            app.workspace.warpToSelectedNodeByIdx(app.focusedNodeIdx);
+          } else {
+            app.workspace.warpToNodeByIdx(app.focusedNodeIdx);
+          }
         }
-
-        // alt+Spacebar cycles between nodes and edits the focused node
-        if (app.inEditor())
+        else if (app.inEditor()) {
+          // alt+Spacebar cycles between nodes and edits the focused node
           app.editNode(app.nodes()[app.focusedNodeIdx]);
+        }
       }
     });
 
