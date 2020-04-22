@@ -7,8 +7,7 @@ Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB
 # 🧶 Live Web APP (Use it in the browser)
 <a href="https://yarnspinnertool.github.io/YarnEditor/">https://yarnspinnertool.github.io/YarnEditor/</a>
 <br/>
-<a href="https://yarnspinnertool.github.io/YarnEditor/
-" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png"
+<a href="https://yarnspinnertool.github.io/YarnEditor/" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png"
 alt="Yarn web app"  height="480" border="10" /></a>
 
 # 📲 Install the Web App on your mobile device
@@ -17,8 +16,7 @@ alt="Yarn web app"  height="480" border="10" /></a>
 2. Open the web browser's menu and select "Add to home screen"
 3. When you run Yarn from the home screen, it will work in full screen mode, even when you are offline!
 <br/>
-<a href="https://yarnspinnertool.github.io/YarnEditor/
-" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnMobile.jpeg"
+<a href="https://yarnspinnertool.github.io/YarnEditor/" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnMobile.jpeg"
 alt="Yarn web app"  height="480" border="10" /></a>
 
 # 🚧 Roadmap
