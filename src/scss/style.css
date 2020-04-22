@@ -106,7 +106,7 @@ a:hover {
   text-transform: uppercase;
   opacity: 0.4;
   line-height: 1.2em;
-  z-index: -10;
+  /* z-index: -10; */
 }
 
 .app-info span {
