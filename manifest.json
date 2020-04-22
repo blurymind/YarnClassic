@@ -3,7 +3,7 @@
     {
       "src": "icon_32x32.ico",
       "sizes": "32x32",
-      "type": "image/x-icon"
+      "type": "image/vnd.microsoft.icon"
     },
     {
       "src": "icon_128x128.png",
