@@ -20,7 +20,7 @@ export const Workspace = function(app) {
 
   this.scale = 1;
   this.offset = { x: 0, y: 0 };
-  this.transformOrigin = [0, 0];
+  this.transform = { x:0, y:0 };
 
   this.isMarqueeEnabled = false;
   this.marqueeSelection = [];
@@ -30,6 +30,26 @@ export const Workspace = function(app) {
   this.zoomSpeed = 0.005;
   this.zoomLimitMin = 0.05;
   this.zoomLimitMax = 1;
+
+  // setTranslation
+  //
+  // Sets the translation on the transform matrix
+  this.setTranslation = function(x, y, time=0) {
+    self.transform.x = x;
+    self.transform.y = y;
+    self.translate(time);
+  };
+
+  // shiftTranslation
+  //
+  // Applies an offset to the translation on the transform matrix
+  this.shiftTranslation = function(x, y, time=0) {
+    self.setTranslation(
+      self.transform.x + x,
+      self.transform.y + y,
+      time
+    );
+  };
 
   // translate
   //
@@ -46,9 +66,9 @@ export const Workspace = function(app) {
           ',0,0,' +
           self.scale +
           ',' +
-          self.transformOrigin[0] +
+          self.transform.x +
           ',' +
-          self.transformOrigin[1] +
+          self.transform.y +
           ')',
       },
       speed || 0,
@@ -67,8 +87,8 @@ export const Workspace = function(app) {
   // Converts "page" coordinates to "workspace" coordinates
   this.toWorkspaceCoordinates = (x, y) => {
     return {
-      x: (x - app.workspace.transformOrigin[0]) / self.scale,
-      y: (y - app.workspace.transformOrigin[1]) / self.scale
+      x: (x - app.workspace.transform.x) / self.scale,
+      y: (y - app.workspace.transform.y) / self.scale
     };
   };
 
@@ -76,32 +96,28 @@ export const Workspace = function(app) {
   //
   // Moves all nodes to the right.
   this.onPanLeft = function() {
-    self.transformOrigin[0] += self.getPanAmount();
-    self.translate(PAN_TRANSITION_TIME);
+    self.shiftTranslation(self.getPanAmount(), 0, PAN_TRANSITION_TIME);
   };
 
   // onPanRight
   //
   // Moves all nodes to the left.
   this.onPanRight = function() {
-    self.transformOrigin[0] -= self.getPanAmount();
-    self.translate(PAN_TRANSITION_TIME);
+    self.shiftTranslation(-self.getPanAmount(), 0, PAN_TRANSITION_TIME);
   };
 
   // onPanUp
   //
   // Moves all nodes down.
   this.onPanUp = function() {
-    self.transformOrigin[1] += self.getPanAmount();
-    self.translate(PAN_TRANSITION_TIME);
+    self.shiftTranslation(0, self.getPanAmount(), PAN_TRANSITION_TIME);
   };
 
   // onPanDown
   //
   // Moves all nodes up.
   this.onPanDown = function() {
-    self.transformOrigin[1] -= self.getPanAmount();
-    self.translate(PAN_TRANSITION_TIME);
+    self.shiftTranslation(0, -self.getPanAmount(), PAN_TRANSITION_TIME);
   };
 
   // getPanAmount
@@ -134,17 +150,15 @@ export const Workspace = function(app) {
       self.zoomLimitMax
     );
 
-    const mouseX = x - self.transformOrigin[0];
-    const mouseY = y - self.transformOrigin[1];
+    const mouseX = x - self.transform.x;
+    const mouseY = y - self.transform.y;
     const newX = mouseX * (self.scale / previousScale);
     const newY = mouseY * (self.scale / previousScale);
+
     const deltaX = mouseX - newX;
     const deltaY = mouseY - newY;
 
-    self.transformOrigin[0] += deltaX;
-    self.transformOrigin[1] += deltaY;
-
-    self.translate();
+    self.shiftTranslation(deltaX, deltaY);
   };
 
   // onDragStart
@@ -289,15 +303,11 @@ export const Workspace = function(app) {
   //
   // Moves all nodes by a relative offset.
   this.shiftNodes = function(offset) {
-    const deltaX = offset.x - self.offset.x;
-    const deltaY = offset.y - self.offset.y;
+    const delta = { x: offset.x - self.offset.x, y: offset.y - self.offset.y };
 
-    self.transformOrigin[0] += deltaX;
-    self.transformOrigin[1] += deltaY;
+    self.shiftTranslation (delta.x, delta.y);
 
     self.offset = offset;
-
-    self.translate();
   };
 
   // startUpdatingArrows
@@ -527,10 +537,11 @@ export const Workspace = function(app) {
     const nodeWidthShift = (nodeWidth * self.scale) / 2;
     const nodeHeightShift = (nodeHeight * self.scale) / 2;
 
-    self.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
-    self.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
-
-    self.translate(100);
+    self.setTranslation(
+      nodeXScaled + winXCenter - nodeWidthShift,
+      nodeYScaled + winYCenter - nodeHeightShift,
+      100
+    );
   };
 
   // alignY
