@@ -279,40 +279,64 @@
 
 			<!-- ko if:app.settings() === true -->
 			<div class="settings-dialog">
-				<div class="form">
-					Settings
+				<div class="settings-form">
+					<p>Settings</p>
 					<hr/> <!-- ------------------------------------------------------ -->
-          <!-- Language -->
-					<p>
-						<label for="language">
-							Dictionary language:
-							<select>
-								<option value="es">Español</option>
-								<option value="en">English</option>
-							</select>
-						</label>
-					</p>
+					<div class="settings-row">
+						<div class="settings-column">
+							<!-- Language -->
+							<div class="settings-item">
+								<label class="settings-label" for="language">Spell check language</label>
+								<select id="language" class="settings-value">
+									<option value="es">Español</option>
+									<option value="en">English</option>
+								</select>
+							</div>
 
-					<!-- Theme -->
-					<p>
-						<label for="theme">
-							Theme:
-							<select>
-								<option value="a">Yarn Editor Classic</option>
-								<option value="b">Twine-like</option>
-								<option value="c">Modern</option>
-							</select>
-						</label>
-					</p>
+							<!-- Theme -->
+							<div class="settings-item">
+								<label class="settings-label" for="theme">Theme</label>
+								<select id="theme" class="settings-value">
+									<option value="classic">Classic</option>
+									<option value="blueprint">Blueprint</option>
+									<option value="dracula">Dracula</option>
+								</select>
+							</div>
 
-					<!-- Throttle threshold -->
-					<p>
-						<label for="throttle-threshold">
-							Redraw throttle threshold (ms):<input type="number" size="5" min="16" max="250" value="50">
-						</label>
-					</p>
-				</div>
-			</div>
+							<!-- Throttle threshold -->
+							<div class="settings-item">
+								<label class="settings-label" for="throttle-threshold">Redraw throttle (ms)</label>
+								<div class="slidecontainer settings-value">
+									<input type="range" class="slider" size="5" min="16" max="250" value="50" class="settings-value">
+								</div>
+							</div> <!-- settgins-item -->
+
+						</div> <!-- settgins-column -->
+						<div class="settings-column">
+							<div class="settings-item">
+								<label class="settings-label" for="spellcheck">Spell check</label>
+								<input id="spellcheck" type="checkbox" checked="true" class="settings-value">
+							</div>
+							<div class="settings-item">
+								<label class="settings-label" for="transcription">Transcription</label>
+								<input id="transcription" type="checkbox" checked="true" class="settings-value">
+							</div>
+							<div class="settings-item">
+								<label class="settings-label" for="autocompletion">Autocompletion</label>
+								<input id="autocompletion" type="checkbox" checked="true" class="settings-value">
+							</div>
+							<div class="settings-item">
+								<label class="settings-label" for="autocreation">Auto create new nodes</label>
+								<input id="autocreation" type="checkbox" checked="true" class="settings-value">
+							</div>
+							<div class="settings-item">
+								<label class="settings-label" for="autosave">Auto save</label>
+								<input id="autosave" type="checkbox" checked="true" class="settings-value">
+							</div>
+						</div> <!-- settgins-column -->
+					</div> <!-- settgins-row -->
+				</div> <!-- settgins-form -->
+			</div> <!-- settgins-dialog -->
 			<!-- /ko -->
 		</div>
 
