@@ -266,7 +266,7 @@ export let Node = function(options = {}) {
   };
 
   this.drag = function() {
-    const offset = [0, 0]; // Where inside the node did the mouse click
+    const offset = { x:0, y:0 }; // Where inside the node did the mouse click
     let dragging = false;
     let groupDragging = false;
 
@@ -283,8 +283,8 @@ export let Node = function(options = {}) {
 
         let {x, y} = app.workspace.toWorkspaceCoordinates(pageX, pageY);
 
-        x -= offset[0];
-        y -= offset[1];
+        x -= offset.x;
+        y -= offset.y;
 
         let movedX = x - self.x();
         let movedY = y - self.y();
@@ -323,8 +323,8 @@ export let Node = function(options = {}) {
 
         const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
 
-        offset[0] = x - self.x();
-        offset[1] = y - self.y();
+        offset.x = x - self.x();
+        offset.y = y - self.y();
       }
     });
 
