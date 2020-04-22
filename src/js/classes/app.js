@@ -35,7 +35,6 @@ export var App = function(name, version) {
   this.input = new Input(self);
   this.previewStory = new yarnRender();
 
-  this.instance = this;
   this.data = data;
   this.name = ko.observable(name);
   this.version = ko.observable(version);
@@ -48,7 +47,6 @@ export var App = function(name, version) {
   this.nodeFuture = [];
   this.editingHistory = [];
   this.editingSaveHistoryTimeout = null;
-  this.dirty = false;
   this.focusedNodeIdx = -1;
   this.zoomSpeed = 0.005;
   this.zoomLimitMin = 0.05;
