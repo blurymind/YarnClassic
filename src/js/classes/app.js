@@ -678,6 +678,13 @@ export var App = function(name, version) {
       $('#emojiPicker-container').show();
     };
 
+    this.updateTheme = function() {
+      const selectedTheme = document.getElementById('theme');
+      const theme = document.getElementById('theme-stylesheet');
+      const themePath = './scss/themes/' + selectedTheme.value + '.css';
+      theme.href = themePath;
+    };
+
     this.updateCountry = function() {
       var select_language = document.getElementById('select_language');
       self.selectedLanguageIndex = select_language.selectedIndex;
