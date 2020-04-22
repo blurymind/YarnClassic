@@ -12,7 +12,6 @@ const BrowserWindow = electron.BrowserWindow;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let yarnRunnerWindow;
 const yarnVersion = app.getVersion();
 function createWindow() {
   // Create the browser window.
@@ -43,9 +42,7 @@ function createWindow() {
     mainWindow.webContents.send("appIsClosing", event);
 
     event.preventDefault();
-    if (yarnRunnerWindow) {
-      yarnRunnerWindow.destroy();
-    }
+
     mainWindow.destroy();
     mainWindow = null;
   });
@@ -88,42 +85,6 @@ function createWindow() {
     // in case you wannt to export yarn object to another embedded app
     otherApp.webContents.send("yarnSavedStory", content);
     mainWindow.close();
-  });
-
-  ipcMain.on(
-    "testYarnStoryFrom",
-    (event, content, startTestNode, resourcesPath) => {
-      createYarnTesterWindow(content, startTestNode, resourcesPath);
-    }
-  );
-}
-
-function createYarnTesterWindow(content, startTestNode, resourcesPath) {
-  // console.log("START RUN::"+startTestNode);
-  if (yarnRunnerWindow) {
-    yarnRunnerWindow.destroy();
-  }
-  yarnRunnerWindow = new BrowserWindow({
-    defaultWidth: 1400,
-    defaultHeight: 200,
-    maximize: false,
-    show: false,
-    autoHideMenuBar: true
-  });
-
-  yarnRunnerWindow.loadURL(`file://${__dirname}/app/renderer.html`);
-  if (isDev) {
-    yarnRunnerWindow.webContents.openDevTools();
-  }
-
-  yarnRunnerWindow.webContents.on("dom-ready", () => {
-    yarnRunnerWindow.webContents.send(
-      "loadYarnDataOnRunner",
-      content,
-      startTestNode,
-      resourcesPath
-    );
-    yarnRunnerWindow.show();
   });
 }
 
