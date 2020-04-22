@@ -144,9 +144,8 @@ const config = {
       },
     }),
     new OfflinePlugin({
-      responseStrategy: 'network-first',
+      // responseStrategy: 'network-first',
       autoUpdate: true,
-      // disableInstall: true,
       externals: [
         'https://www.dropbox.com/static/api/2/dropins.js',
         'https://www.dropbox.com/static/images/widgets/dbx-saver-status.png',
