@@ -110,6 +110,11 @@ export var App = function(name, version) {
 
     if (osName == 'Windows') self.zoomSpeed = 0.1;
 
+    // PWA install promotion banner on start
+    window.addEventListener('beforeinstallprompt', function(event) {
+      event.prompt();
+    });
+
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
 

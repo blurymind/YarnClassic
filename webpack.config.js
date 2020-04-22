@@ -112,6 +112,7 @@ const config = {
     new CssUrlRelativePlugin(),
     new WebpackPwaManifest({
       filename: 'manifest.json',
+      start_url: 'index.html',
       inject: true,
       fingerprints: false,
       dir: 'auto',
@@ -125,11 +126,11 @@ const config = {
       icons: [
         {
           src: path.resolve('src/public/icon.png'),
-          sizes: [96, 128], // multiple sizes
+          sizes: [96, 128, 192], // multiple sizes, 192 needed by pwa
         },
         {
           src: path.resolve('src/public/icon.ico'),
-          sizes: [32], // you can also use the specifications pattern
+          sizes: [32, 192], // you can also use the specifications pattern
         },
       ],
     }),
@@ -143,7 +144,9 @@ const config = {
       },
     }),
     new OfflinePlugin({
-      // responseStrategy: 'network-first',
+      responseStrategy: 'network-first',
+      autoUpdate: true,
+      // disableInstall: true,
       externals: [
         'https://www.dropbox.com/static/api/2/dropins.js',
         'https://www.dropbox.com/static/images/widgets/dbx-saver-status.png',
