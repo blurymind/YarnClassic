@@ -115,20 +115,18 @@ export const Input = function(app) {
     });
 
     $(document).contextmenu(e => {
-      const isAllowedEl =
+      if (!app.inWorkspace())
+        return;
+
+      const canSpawn =
         $(e.target).hasClass('nodes') || $(e.target).parents('.nodes').length;
 
-      if (e.button == MouseButton.Right && isAllowedEl) {
-        let x = (app.transformOrigin[0] * -1) / app.cachedScale;
-        let y = (app.transformOrigin[1] * -1) / app.cachedScale;
-
-        x += e.pageX / app.cachedScale;
-        y += e.pageY / app.cachedScale;
-
+      if (e.button === MouseButton.Right && canSpawn) {
+        const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
         app.newNodeAt(x, y);
       }
 
-      return !isAllowedEl;
+      return !canSpawn;
     });
   };
 
@@ -146,7 +144,7 @@ export const Input = function(app) {
         if ((app.inWorkspace() && e.altKey) || (app.inEditor() && ! e.altKey))
           return;
 
-        app.cachedScale = 1;
+        app.workspace.scale = 1;
 
         const selectedNodes = app.workspace.getSelectedNodes();
         const isNodeSelected = selectedNodes.length > 0;

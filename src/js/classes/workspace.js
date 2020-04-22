@@ -18,12 +18,59 @@ export const Workspace = function(app) {
 
   this.selectedNodes = [];
 
+  this.scale = 1;
   this.offset = { x: 0, y: 0 };
+  this.transformOrigin = [0, 0];
 
   this.isMarqueeEnabled = false;
   this.marqueeSelection = [];
   this.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
   this.marqueeOffset = [0, 0];
+
+  this.zoomSpeed = 0.005;
+  this.zoomLimitMin = 0.05;
+  this.zoomLimitMax = 1;
+
+  // translate
+  //
+  // Applies translation and scale to the workspace
+  this.translate = function(speed) {
+    if (speed)
+      self.startUpdatingArrows();
+
+    $('.nodes-holder').transition(
+      {
+        transform:
+          'matrix(' +
+          self.scale +
+          ',0,0,' +
+          self.scale +
+          ',' +
+          self.transformOrigin[0] +
+          ',' +
+          self.transformOrigin[1] +
+          ')',
+      },
+      speed || 0,
+      'easeInQuad',
+      function() {
+        if (speed) {
+          self.stopUpdatingArrows();
+        }
+        self.updateArrows();
+      }
+    );
+  };
+
+  // toWorkspaceCoordinates
+  //
+  // Converts "page" coordinates to "workspace" coordinates
+  this.toWorkspaceCoordinates = (x, y) => {
+    return {
+      x: (x - app.workspace.transformOrigin[0]) / self.scale,
+      y: (y - app.workspace.transformOrigin[1]) / self.scale
+    };
+  };
 
   // onPanLeft
   //
@@ -31,8 +78,8 @@ export const Workspace = function(app) {
   // TODO: in the future this should move the viewport to the left, maybe
   // moving the ".nodes-holder"
   this.onPanLeft = function() {
-    app.transformOrigin[0] += self.getPanAmount();
-    app.translate(PAN_TRANSITION_TIME);
+    self.transformOrigin[0] += self.getPanAmount();
+    self.translate(PAN_TRANSITION_TIME);
   };
 
   // onPanRight
@@ -41,8 +88,8 @@ export const Workspace = function(app) {
   // TODO: in the future this should move the viewport to the right, maybe
   // moving the ".nodes-holder"
   this.onPanRight = function() {
-    app.transformOrigin[0] -= self.getPanAmount();
-    app.translate(PAN_TRANSITION_TIME);
+    self.transformOrigin[0] -= self.getPanAmount();
+    self.translate(PAN_TRANSITION_TIME);
   };
 
   // onPanUp
@@ -51,8 +98,8 @@ export const Workspace = function(app) {
   // TODO: in the future this should move the viewport up, maybe
   // moving the ".nodes-holder"
   this.onPanUp = function() {
-    app.transformOrigin[1] += self.getPanAmount();
-    app.translate(PAN_TRANSITION_TIME);
+    self.transformOrigin[1] += self.getPanAmount();
+    self.translate(PAN_TRANSITION_TIME);
   };
 
   // onPanDown
@@ -61,44 +108,51 @@ export const Workspace = function(app) {
   // TODO: in the future this should move the viewport down, maybe
   // moving the ".nodes-holder"
   this.onPanDown = function() {
-    app.transformOrigin[1] -= self.getPanAmount();
-    app.translate(PAN_TRANSITION_TIME);
+    self.transformOrigin[1] -= self.getPanAmount();
+    self.translate(PAN_TRANSITION_TIME);
   };
 
   // getPanAmount
   //
   // Get the amount of panning depending on the kind of panning, big or small
   this.getPanAmount = function() {
-    const scale = app.cachedScale || 1;
     return app.input.isShiftDown ?
-      scale * PAN_SMALL_STEP :
-      scale * PAN_BIG_STEP;
+      self.scale * PAN_SMALL_STEP :
+      self.scale * PAN_BIG_STEP;
+  };
+
+  // setZoom
+  //
+  // Sets the zoom to the specified value
+  this.setZoom = function(value) {
+    self.scale = value / 4;
+    self.translate(200);
   };
 
   // onZoom
   //
-  // Zooms in/out applying zoom limits
+  // Zooms in/out interactively applying zoom limits
   this.onZoom = function(x, y, delta) {
-    const previousScale = app.cachedScale;
-    const scaleChange = delta * app.zoomSpeed * app.cachedScale;
+    const previousScale = self.scale;
+    const scaleChange = delta * self.zoomSpeed * self.scale;
 
-    app.cachedScale = Utils.clamp(
-      app.cachedScale + scaleChange,
-      app.zoomLimitMin,
-      app.zoomLimitMax
+    self.scale = Utils.clamp(
+      self.scale + scaleChange,
+      self.zoomLimitMin,
+      self.zoomLimitMax
     );
 
-    const mouseX = x - app.transformOrigin[0];
-    const mouseY = y - app.transformOrigin[1];
-    const newX = mouseX * (app.cachedScale / previousScale);
-    const newY = mouseY * (app.cachedScale / previousScale);
+    const mouseX = x - self.transformOrigin[0];
+    const mouseY = y - self.transformOrigin[1];
+    const newX = mouseX * (self.scale / previousScale);
+    const newY = mouseY * (self.scale / previousScale);
     const deltaX = mouseX - newX;
     const deltaY = mouseY - newY;
 
-    app.transformOrigin[0] += deltaX;
-    app.transformOrigin[1] += deltaY;
+    self.transformOrigin[0] += deltaX;
+    self.transformOrigin[1] += deltaY;
 
-    app.translate();
+    self.translate();
   };
 
   // onDragStart
@@ -112,12 +166,12 @@ export const Workspace = function(app) {
   // onDrag
   //
   // Handles the drag event depending on the state
-  this.onDragUpdate = function(position) {
+  this.onDragUpdate = function(offset) {
     if (self.isMarqueeEnabled) {
       app.workspace.onMarqueeEnd();
     }
 
-    app.workspace.shiftNodes(position);
+    app.workspace.shiftNodes(offset);
   };
 
   // onDragEnd
@@ -196,17 +250,16 @@ export const Workspace = function(app) {
   // selected nodes and deselecting onces which have been selected
   // by the marquee.
   this.selectNodesInsideMarquee = function () {
-    const scale = app.cachedScale;
     app.nodes().forEach(node => {
       const index = self.marqueeSelection.indexOf(node);
       const inMarqueeSelection = index >= 0;
 
       const holder = $('.nodes-holder').offset();
       const marqueeOverNode =
-        (self.marqueeRect.x2 - holder.left) / scale > node.x() &&
-        (self.marqueeRect.x1 - holder.left) / scale < node.x() + node.tempWidth &&
-        (self.marqueeRect.y2 - holder.top)  / scale > node.y() &&
-        (self.marqueeRect.y1 - holder.top)  / scale < node.y() + node.tempHeight;
+        (self.marqueeRect.x2 - holder.left) / self.scale > node.x() &&
+        (self.marqueeRect.x1 - holder.left) / self.scale < node.x() + node.tempWidth &&
+        (self.marqueeRect.y2 - holder.top)  / self.scale > node.y() &&
+        (self.marqueeRect.y1 - holder.top)  / self.scale < node.y() + node.tempHeight;
 
       if (marqueeOverNode) {
         if (!inMarqueeSelection) {
@@ -244,14 +297,14 @@ export const Workspace = function(app) {
   //
   // Moves all nodes by a relative offset.
   // TODO: move the nodes' holder instead of moving all nodes
-  this.shiftNodes = function(position) {
+  this.shiftNodes = function(offset) {
     app.nodes().forEach( node => {
-      node.x(node.x() + (position.x - self.offset.x) / app.cachedScale);
-      node.y(node.y() + (position.y - self.offset.y) / app.cachedScale);
+      node.x(node.x() + (offset.x - self.offset.x) / self.scale);
+      node.y(node.y() + (offset.y - self.offset.y) / self.scale);
     });
 
-    self.offset.x = position.x;
-    self.offset.y = position.y;
+    self.offset.x = offset.x;
+    self.offset.y = offset.y;
 
     self.updateArrows();
   };
@@ -298,7 +351,7 @@ export const Workspace = function(app) {
 
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
-    const scale = app.cachedScale;
+    const scale = self.scale;
     const lineWidth = 3 * scale;
     const arrowWidth = 8 * scale;
     const arrowHeight = 6 * scale;
@@ -476,17 +529,17 @@ export const Workspace = function(app) {
   this.warpToXY = function(x, y) {
     const nodeWidth = 100;
     const nodeHeight = 100;
-    const nodeXScaled = -(x * app.cachedScale);
-    const nodeYScaled = -(y * app.cachedScale);
+    const nodeXScaled = -(x * self.scale);
+    const nodeYScaled = -(y * self.scale);
     const winXCenter = $(window).width() / 2;
     const winYCenter = $(window).height() / 2;
-    const nodeWidthShift = (nodeWidth * app.cachedScale) / 2;
-    const nodeHeightShift = (nodeHeight * app.cachedScale) / 2;
+    const nodeWidthShift = (nodeWidth * self.scale) / 2;
+    const nodeHeightShift = (nodeHeight * self.scale) / 2;
 
-    app.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
-    app.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
+    self.transformOrigin[0] = nodeXScaled + winXCenter - nodeWidthShift;
+    self.transformOrigin[1] = nodeYScaled + winYCenter - nodeHeightShift;
 
-    app.translate(100);
+    self.translate(100);
   };
 
   // alignY

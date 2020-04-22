@@ -1,14 +1,14 @@
 import { data } from './data';
 import { Utils } from './utils';
 
-var globalNodeIndex = 0;
+let globalNodeIndex = 0;
 const NodeExpandWidth = 300;
 const NodeExpandHeight = 150;
 const ClipNodeTextLength = 1024;
 const bbcode = require('bbcode');
 
-export var Node = function(options = {}) {
-  var self = this;
+export let Node = function(options = {}) {
+  let self = this;
 
   this.titleStyles = [
     'title-style-1',
@@ -53,8 +53,8 @@ export var Node = function(options = {}) {
   }, this);
 
   this.textToHtml = function(text, showRowNumbers = false) {
-    var rowCounter = 1;
-    var result = showRowNumbers
+    let rowCounter = 1;
+    let result = showRowNumbers
       ? '<font color="pink">' + rowCounter + '.   </font>' + text
       : text;
 
@@ -108,7 +108,7 @@ export var Node = function(options = {}) {
 
     /// do this last, as we need the newline characters in previous regex tests
     result = result.replace(/[\n\r]/g, function(row) {
-      var rowAppend = '<br/>';
+      let rowAppend = '<br/>';
       rowCounter += 1;
       if (showRowNumbers) {
         rowAppend += '<font color="pink">' + rowCounter + '.   </font>';
@@ -124,7 +124,7 @@ export var Node = function(options = {}) {
     if (app.editing()) {
       return;
     }
-    var result = app.getHighlightedText(this.body());
+    let result = app.getHighlightedText(this.body());
     result = self.textToHtml(result);
     result = result.substr(0, ClipNodeTextLength);
     return result;
@@ -146,7 +146,7 @@ export var Node = function(options = {}) {
       self.x(self.createX);
       self.y(self.createY);
     } else {
-      var parent = $(self.element).parent();
+      let parent = $(self.element).parent();
       self.x(-parent.offset().left + $(window).width() / 2 - 100);
       self.y(-parent.offset().top + $(window).height() / 2 - 100);
     }
@@ -266,9 +266,9 @@ export var Node = function(options = {}) {
   };
 
   this.drag = function() {
-    var dragging = false;
-    var groupDragging = false;
-    var offset = [0, 0];
+    const offset = [0, 0]; // Where inside the node did the mouse click
+    let dragging = false;
+    let groupDragging = false;
 
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
@@ -281,16 +281,19 @@ export var Node = function(options = {}) {
             ? e.changedTouches[0].pageY
             : e.pageY;
 
-        var newX = pageX / self.getScale() - offset[0];
-        var newY = pageY / self.getScale() - offset[1];
-        var movedX = newX - self.x();
-        var movedY = newY - self.y();
+        let {x, y} = app.workspace.toWorkspaceCoordinates(pageX, pageY);
 
-        self.x(newX);
-        self.y(newY);
+        x -= offset[0];
+        y -= offset[1];
+
+        let movedX = x - self.x();
+        let movedY = y - self.y();
+
+        self.x(x);
+        self.y(y);
 
         if (groupDragging) {
-          var nodes = [];
+          let nodes = [];
           if (self.selected) {
             nodes = app.workspace.getSelectedNodes();
             nodes.splice(nodes.indexOf(self), 1);
@@ -299,7 +302,7 @@ export var Node = function(options = {}) {
           }
 
           if (nodes.length > 0) {
-            for (var i in nodes) {
+            for (let i in nodes) {
               nodes[i].x(nodes[i].x() + movedX);
               nodes[i].y(nodes[i].y() + movedY);
             }
@@ -311,17 +314,17 @@ export var Node = function(options = {}) {
     });
 
     $(self.element).on('pointerdown', function(e) {
-      if (!dragging && self.active()) {
-        var parent = $(self.element).parent();
-
+      if (!dragging && self.active() && e.button ===0) {
         dragging = true;
 
         if (app.input.isShiftDown || self.selected) {
           groupDragging = true;
         }
 
-        offset[0] = e.pageX / self.getScale() - self.x();
-        offset[1] = e.pageY / self.getScale() - self.y();
+        const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
+
+        offset[0] = x - self.x();
+        offset[1] = y - self.y();
       }
     });
 
@@ -352,8 +355,8 @@ export var Node = function(options = {}) {
   this.isConnectedTo = function(otherNode, checkBack) {
     if (checkBack && otherNode.isConnectedTo(self, false)) return true;
 
-    var linkedNodes = self.linkedTo();
-    for (var i in linkedNodes) {
+    let linkedNodes = self.linkedTo();
+    for (let i in linkedNodes) {
       if (linkedNodes[i] == otherNode) return true;
       if (linkedNodes[i].isConnectedTo(otherNode, false)) return true;
       if (otherNode.isConnectedTo(linkedNodes[i], false)) return true;
@@ -363,11 +366,11 @@ export var Node = function(options = {}) {
   };
 
   this.getLinksInNode = function(node) {
-    var links = (node || self).body().match(/\[\[(.*?)\]\]/g);
+    let links = (node || self).body().match(/\[\[(.*?)\]\]/g);
 
     if (links != undefined) {
-      var exists = {};
-      for (var i = links.length - 1; i >= 0; i--) {
+      let exists = {};
+      for (let i = links.length - 1; i >= 0; i--) {
         links[i] = links[i].substr(2, links[i].length - 4).trim(); //.toLowerCase();
 
         if (links[i].indexOf('|') >= 0) {
@@ -400,10 +403,10 @@ export var Node = function(options = {}) {
     self.linkedFrom.removeAll();
 
     app.nodes().forEach(parent => {
-      var parentLinks = self.getLinksInNode(parent);
+      let parentLinks = self.getLinksInNode(parent);
       if (parentLinks && parentLinks.includes(self.oldTitle)) {
-        var re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
-        var newBody = parent.body().replace(re, '|' + self.title() + ']]');
+        let re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
+        let newBody = parent.body().replace(re, '|' + self.title() + ']]');
         parent.body(newBody);
         self.linkedFrom.push(parent);
       }
@@ -415,27 +418,19 @@ export var Node = function(options = {}) {
   this.updateLinksToChildren = function() {
     self.linkedTo.removeAll();
 
-    var links = self.getLinksInNode();
+    let links = self.getLinksInNode();
 
     if (!links) {
       return;
     }
 
-    for (var index in app.nodes()) {
-      var other = app.nodes()[index];
-      for (var i = 0; i < links.length; i++) {
+    for (let index in app.nodes()) {
+      let other = app.nodes()[index];
+      for (let i = 0; i < links.length; i++) {
         if (other != self && other.title().trim() === links[i].trim()) {
           self.linkedTo.push(other);
         }
       }
-    }
-  };
-
-  this.getScale = function() {
-    if (app && typeof app.cachedScale === 'number') {
-      return app.cachedScale;
-    } else {
-      return 1;
     }
   };
 };
