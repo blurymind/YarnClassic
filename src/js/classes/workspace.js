@@ -27,7 +27,9 @@ export const Workspace = function(app) {
 
   // onPanLeft
   //
-  //
+  // Moves all nodes to the right.
+  // TODO: in the future this should move the viewport to the left, maybe
+  // moving the ".nodes-holder"
   this.onPanLeft = function() {
     app.transformOrigin[0] += self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
@@ -35,7 +37,9 @@ export const Workspace = function(app) {
 
   // onPanRight
   //
-  //
+  // Moves all nodes to the left.
+  // TODO: in the future this should move the viewport to the right, maybe
+  // moving the ".nodes-holder"
   this.onPanRight = function() {
     app.transformOrigin[0] -= self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
@@ -43,7 +47,9 @@ export const Workspace = function(app) {
 
   // onPanUp
   //
-  //
+  // Moves all nodes down.
+  // TODO: in the future this should move the viewport up, maybe
+  // moving the ".nodes-holder"
   this.onPanUp = function() {
     app.transformOrigin[1] += self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
@@ -51,7 +57,9 @@ export const Workspace = function(app) {
 
   // onPanDown
   //
-  //
+  // Moves all nodes up.
+  // TODO: in the future this should move the viewport down, maybe
+  // moving the ".nodes-holder"
   this.onPanDown = function() {
     app.transformOrigin[1] -= self.getPanAmount();
     app.translate(PAN_TRANSITION_TIME);
@@ -59,9 +67,9 @@ export const Workspace = function(app) {
 
   // getPanAmount
   //
-  //
+  // Get the amount of panning depending on the kind of panning, big or small
   this.getPanAmount = function() {
-    const scale = self.cachedScale || 1;
+    const scale = app.cachedScale || 1;
     return app.input.isShiftDown ?
       scale * PAN_SMALL_STEP :
       scale * PAN_BIG_STEP;
@@ -69,7 +77,7 @@ export const Workspace = function(app) {
 
   // onZoom
   //
-  //
+  // Zooms in/out applying zoom limits
   this.onZoom = function(x, y, delta) {
     const previousScale = app.cachedScale;
     const scaleChange = delta * app.zoomSpeed * app.cachedScale;
@@ -95,7 +103,7 @@ export const Workspace = function(app) {
 
   // onDragStart
   //
-  //
+  // Trigger when the mouse starts dragging over the workspace
   this.onDragStart = function(offset) {
     self.offset.x = offset.x;
     self.offset.y = offset.y;
@@ -114,7 +122,7 @@ export const Workspace = function(app) {
 
   // onDragEnd
   //
-  //
+  // Trigger when the mouse ends dragging over the workspace
   this.onDragEnd = function() {
   };
 
@@ -149,7 +157,7 @@ export const Workspace = function(app) {
 
   // updateMarqueeRect
   //
-  //
+  // Updates the with and height of the selection marquee
   this.updateMarqueeRect = function(position) {
     if (position.x > self.offset.x && position.y < self.offset.y) {
       self.marqueeRect.x1 = self.offset.x;
@@ -216,7 +224,7 @@ export const Workspace = function(app) {
 
   // onMarqueeEnd
   //
-  //
+  // Triggered when the mouse stops dragging over the workspace
   this.onMarqueeEnd = function() {
     if (!self.isMarqueeEnabled)
       return;
