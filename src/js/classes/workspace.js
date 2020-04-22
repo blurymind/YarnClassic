@@ -75,8 +75,6 @@ export const Workspace = function(app) {
   // onPanLeft
   //
   // Moves all nodes to the right.
-  // TODO: in the future this should move the viewport to the left, maybe
-  // moving the ".nodes-holder"
   this.onPanLeft = function() {
     self.transformOrigin[0] += self.getPanAmount();
     self.translate(PAN_TRANSITION_TIME);
@@ -85,8 +83,6 @@ export const Workspace = function(app) {
   // onPanRight
   //
   // Moves all nodes to the left.
-  // TODO: in the future this should move the viewport to the right, maybe
-  // moving the ".nodes-holder"
   this.onPanRight = function() {
     self.transformOrigin[0] -= self.getPanAmount();
     self.translate(PAN_TRANSITION_TIME);
@@ -95,8 +91,6 @@ export const Workspace = function(app) {
   // onPanUp
   //
   // Moves all nodes down.
-  // TODO: in the future this should move the viewport up, maybe
-  // moving the ".nodes-holder"
   this.onPanUp = function() {
     self.transformOrigin[1] += self.getPanAmount();
     self.translate(PAN_TRANSITION_TIME);
@@ -105,8 +99,6 @@ export const Workspace = function(app) {
   // onPanDown
   //
   // Moves all nodes up.
-  // TODO: in the future this should move the viewport down, maybe
-  // moving the ".nodes-holder"
   this.onPanDown = function() {
     self.transformOrigin[1] -= self.getPanAmount();
     self.translate(PAN_TRANSITION_TIME);
@@ -296,17 +288,16 @@ export const Workspace = function(app) {
   // shiftNodes
   //
   // Moves all nodes by a relative offset.
-  // TODO: move the nodes' holder instead of moving all nodes
   this.shiftNodes = function(offset) {
-    app.nodes().forEach( node => {
-      node.x(node.x() + (offset.x - self.offset.x) / self.scale);
-      node.y(node.y() + (offset.y - self.offset.y) / self.scale);
-    });
+    const deltaX = offset.x - self.offset.x;
+    const deltaY = offset.y - self.offset.y;
 
-    self.offset.x = offset.x;
-    self.offset.y = offset.y;
+    self.transformOrigin[0] += deltaX;
+    self.transformOrigin[1] += deltaY;
 
-    self.updateArrows();
+    self.offset = offset;
+
+    self.translate();
   };
 
   // startUpdatingArrows
@@ -345,9 +336,9 @@ export const Workspace = function(app) {
     }
 
     self.isDrawingArrows = true;
-    self.nextArrowsUpdate = (now + UPDATE_ARROWS_THROTTLE_MS);
     window.clearInterval(self.deferredArrowsDrawInterval);
     self.deferredArrowsDrawInterval = undefined;
+    self.nextArrowsUpdate = (now + UPDATE_ARROWS_THROTTLE_MS);
 
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();
