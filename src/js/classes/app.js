@@ -1,3 +1,6 @@
+/* eslint-disable jquery/no-hide */
+/* eslint-disable jquery/no-ajax */
+/* eslint-disable jquery/no-show */
 import {
   enable_spellcheck,
   disable_spellcheck,
@@ -35,6 +38,7 @@ export var App = function(name, version) {
   this.settings = ko.observable(false);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
+  this.tags = ko.observableArray([]);
   this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -88,6 +92,13 @@ export var App = function(name, version) {
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
     window.addEventListener('touchstart', function() {
       self.hasTouchScreen = true;
+    });
+    window.addEventListener('yarnLoadedData', e => {
+      $('.arrows')
+        .css({ opacity: 0 })
+        .transition({ opacity: 1 }, 500);
+
+      self.updateNodeLinks();
     });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -365,14 +376,14 @@ export var App = function(name, version) {
     $(document).on('keydown', function(e) {
       if ((e.metaKey || e.ctrlKey) && !self.editing()) {
         switch (e.keyCode) {
-          case 90: // ctrl+z
-            self.historyDirection('undo');
-            break;
-          case 89: // ctrl+y
-            self.historyDirection('redo');
-            break;
-          case 68: // ctrl+d
-            self.workspace.deselectAll();
+        case 90: // ctrl+z
+          self.historyDirection('undo');
+          break;
+        case 89: // ctrl+y
+          self.historyDirection('redo');
+          break;
+        case 68: // ctrl+d
+          self.workspace.deselectAll();
         }
       }
     });
@@ -381,36 +392,36 @@ export var App = function(name, version) {
       if (e.ctrlKey || e.metaKey) {
         if (e.shiftKey) {
           switch (e.keyCode) {
-            case 83: // ctrl+shift+s
-              data.trySave(FILETYPE.JSON);
-              self.fileKeyPressed = true;
-              break;
-            case 65: // ctrl+shift+a
-              data.tryAppend();
-              self.fileKeyPressed = true;
-              break;
+          case 83: // ctrl+shift+s
+            data.trySave(FILETYPE.JSON);
+            self.fileKeyPressed = true;
+            break;
+          case 65: // ctrl+shift+a
+            data.tryAppend();
+            self.fileKeyPressed = true;
+            break;
           }
         } else if (e.altKey) {
           switch (e.keyCode) {
-            case 83: //alt+s
-              data.trySave(FILETYPE.YARN);
-              self.fileKeyPressed = true;
-              break;
+          case 83: //alt+s
+            data.trySave(FILETYPE.YARN);
+            self.fileKeyPressed = true;
+            break;
           }
         } else {
           switch (e.keyCode) {
-            case 83: // ctrl+s
-              if (data.editingPath() != null) {
-                data.trySaveCurrent();
-              } else {
-                data.trySave(FILETYPE.JSON);
-              }
-              self.fileKeyPressed = true;
-              break;
-            case 79: // ctrl+o
-              data.tryOpenFile();
-              self.fileKeyPressed = true;
-              break;
+          case 83: // ctrl+s
+            if (data.editingPath() != null) {
+              data.trySaveCurrent();
+            } else {
+              data.trySave(FILETYPE.JSON);
+            }
+            self.fileKeyPressed = true;
+            break;
+          case 79: // ctrl+o
+            data.tryOpenFile();
+            self.fileKeyPressed = true;
+            break;
           }
         }
       }
@@ -436,10 +447,10 @@ export var App = function(name, version) {
         // If previewing the story, speed up scrolling when holding z
         if (!self.previewStory.finished)
           switch (e.key) {
-            case 'z': {
-              self.previewStory.changeTextScrollSpeed(20);
-              return;
-            }
+          case 'z': {
+            self.previewStory.changeTextScrollSpeed(20);
+            return;
+          }
           }
       }
       else if (self.settings() === true) {
@@ -511,25 +522,22 @@ export var App = function(name, version) {
         // Input event listeners for story preview
         if (!self.previewStory.finished)
           switch (e.key) {
-            case 'z': {
-              self.previewStory.changeTextScrollSpeed(200);
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnSelectChoice();
-              }
-              return;
+          case 'z': {
+            self.advanceStoryPlayMode();
+            return;
+          }
+          case 'ArrowUp': {
+            if (self.previewStory.vnSelectedChoice != -1) {
+              self.previewStory.vnUpdateChoice(-1);
             }
-            case 'ArrowUp': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(-1);
-              }
-              return;
+            return;
+          }
+          case 'ArrowDown': {
+            if (self.previewStory.vnSelectedChoice != -1) {
+              self.previewStory.vnUpdateChoice(1);
             }
-            case 'ArrowDown': {
-              if (self.previewStory.vnSelectedChoice != -1) {
-                self.previewStory.vnUpdateChoice(1);
-              }
-              return;
-            }
+            return;
+          }
           }
       }
 
@@ -1116,7 +1124,7 @@ export var App = function(name, version) {
     $('.settings-dialog .form')
       .css({ y: '-100' })
       .transition({ y: '0' }, 250);
-  }
+  };
 
   this.closeSettingsDialog = function() {
     self.settings(true);
@@ -1128,7 +1136,7 @@ export var App = function(name, version) {
       .transition({ y: '-100' }, 250, e => {
         self.settings(false);
       });
-  }
+  };
 
   this.editNode = function(node) {
     if (!node.active()) {
@@ -1220,35 +1228,35 @@ export var App = function(name, version) {
         if (autoCompleteButton.checked) {
           setTimeout(() => {
             switch (self.getTagBeforeCursor()) {
-              case '[[':
-                self.insertTextAtCursor(' answer: | ]] ');
-                self.moveEditCursor(-4);
-                break;
-              case '<<':
-                self.insertTextAtCursor(' >> ');
-                self.moveEditCursor(-3);
-                break;
-              case '[colo':
-                self.insertTextAtCursor('r=#][/color] ');
-                self.moveEditCursor(-10);
-                self.insertColorCode();
-                break;
-              case '[b':
-                self.insertTextAtCursor('][/b] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[i':
-                self.insertTextAtCursor('][/i] ');
-                self.moveEditCursor(-5);
-                break;
-              case '[img':
-                self.insertTextAtCursor('][/img] ');
-                self.moveEditCursor(-7);
-                break;
-              case '[u':
-                self.insertTextAtCursor('][/u] ');
-                self.moveEditCursor(-5);
-                break;
+            case '[[':
+              self.insertTextAtCursor(' answer: | ]] ');
+              self.moveEditCursor(-4);
+              break;
+            case '<<':
+              self.insertTextAtCursor(' >> ');
+              self.moveEditCursor(-3);
+              break;
+            case '[colo':
+              self.insertTextAtCursor('r=#][/color] ');
+              self.moveEditCursor(-10);
+              self.insertColorCode();
+              break;
+            case '[b':
+              self.insertTextAtCursor('][/b] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[i':
+              self.insertTextAtCursor('][/i] ');
+              self.moveEditCursor(-5);
+              break;
+            case '[img':
+              self.insertTextAtCursor('][/img] ');
+              self.moveEditCursor(-7);
+              break;
+            case '[u':
+              self.insertTextAtCursor('][/u] ');
+              self.moveEditCursor(-5);
+              break;
             }
           }, 200);
           return;
@@ -1306,7 +1314,7 @@ export var App = function(name, version) {
     if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
     } else {
-      const title = self.nodeVisitHistory.pop()
+      const title = self.nodeVisitHistory.pop();
       self.propagateUpdateFromNode(self.editing());
       self.openNodeByTitle(title);
     }
@@ -1412,11 +1420,16 @@ export var App = function(name, version) {
   };
 
   this.advanceStoryPlayMode = function(speed = 5) {
-    self.previewStory.changeTextScrollSpeed(speed);
+    if (!self.previewStory.finished) {
+      self.previewStory.changeTextScrollSpeed(speed);
+      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
+        self.previewStory.vnSelectChoice();
+      }
+    }
+    else self.togglePlayMode(false);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    if (!playModeOverwrite && self.previewStory.finished) return;
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
@@ -1445,7 +1458,7 @@ export var App = function(name, version) {
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       storyPreviewPlayButton.className = 'bbcode-button';
-      self.previewStory.finished = true;
+      self.previewStory.terminate();
       setTimeout(() => {
         if (self.editing().title() !== self.previewStory.node.title)
           self.openNodeByTitle(self.previewStory.node.title);
@@ -1520,9 +1533,9 @@ export var App = function(name, version) {
     var tagBeforeCursor =
       textBeforeCursor.lastIndexOf('[') !== -1
         ? textBeforeCursor.substring(
-            textBeforeCursor.lastIndexOf('['),
-            textBeforeCursor.length
-          )
+          textBeforeCursor.lastIndexOf('['),
+          textBeforeCursor.length
+        )
         : '';
 
     if (
@@ -1576,11 +1589,11 @@ export var App = function(name, version) {
           if (node.title() !== self.editing().title()) {
             p.setAttribute(
               'onclick',
-              "app.insertTextAtCursor(' [[Answer:" +
+              'app.insertTextAtCursor(\' [[Answer:' +
                 node.title() +
                 '|' +
                 node.title() +
-                "]]')"
+                ']]\')'
             );
             rootMenu.appendChild(p);
           }
@@ -1605,21 +1618,24 @@ export var App = function(name, version) {
   };
 
   this.saveNode = function(closeEditor = true) {
-    if (self.editing() != null) {
+    const node = self.editing();
+    if (node) {
       const editorTitleElement = $('#editorTitle')[0];
+      self.previewStory.terminate();
 
       // Ensure the title is unique
       const title = self.getFutureEditedNodeTitle();
 
       // Update the title in the UI
       editorTitleElement.value = title;
-      self.editing().title(title);
+      node.title(title);
 
       // Remove leading and trailing spaces from the body links
-      self.editing().body(self.trimBodyLinks(self.editing().body().trim()));
+      node.body(self.trimBodyLinks(node.body().trim()));
 
       self.makeNewNodesFromLinks();
-      self.propagateUpdateFromNode(self.editing());
+      self.propagateUpdateFromNode(node);
+      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
@@ -1640,7 +1656,6 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
-
     }
   };
 
@@ -1731,6 +1746,44 @@ export var App = function(name, version) {
       node.linkedFrom().forEach(parent => {
         if (!updated.includes(parent)) toUpdate.push(parent);
       });
+    }
+  };
+
+  this.updateTagsRepository = function() {
+    const findFirstFreeId = () => {
+      const usedIds = self.tags().map( tag => tag.id );
+      for (let id = 1; ;++id)
+        if (!usedIds.includes(id))
+          return id;
+    };
+
+    // Reset count
+    self.tags().forEach(tag => tag.count = 0);
+
+    // Recount tags and add new
+    self.nodes().forEach(node => {
+      Utils.uniqueSplit(node.tags(), ' ').forEach(tag => {
+        const found = self.tags().find(e => e.text == tag);
+        if (found) {
+          ++found.count;
+        }
+        else {
+          const id = findFirstFreeId();
+          self.tags.push({
+            id: id,
+            style: 'tag-style-' + id,
+            text: tag,
+            count: 1
+          });
+        }
+      });
+    });
+
+    // Remove unused tags
+    let i = app.tags().length;
+    while (i--) {
+      if(app.tags()[i].count === 0)
+        app.tags().splice(i, 1);
     }
   };
 

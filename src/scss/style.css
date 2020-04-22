@@ -437,7 +437,8 @@ a:hover {
 }
 
 .title-style-1 {
-  background-color: #eee;
+  background-color: #EBEBEB;
+  color: black;
 }
 .title-style-2 {
   background-color: #6EA5E0;
@@ -502,7 +503,7 @@ a:hover {
   padding: 2px 4px 2px 4px;
   bottom: 0px;
   border-top: 1px solid #ddd;
-  background: #f2f0eb;
+  background: #EBEBEB;
   overflow: hidden;
 }
 
@@ -510,9 +511,9 @@ a:hover {
   padding: 4px 8px 4px 8px;
   margin: 4px 4px 0px 0px;
   font-size: 0.8em;
-  background: #e4dbcb;
-  color: #978e7e;
   border-radius: 4px;
+  background-color: #E0D6C5;
+  color: #8D8374;
 }
 
 .node .edit,
@@ -755,6 +756,7 @@ a:hover {
   border: 3px solid #73ad21;
   background: rgba(1, 1, 1, 0.5);
   font: x-large arial, calibri;
+  white-space: break-spaces;
 }
 
 /* --- EDITOR HIGHLIGHTING --- */

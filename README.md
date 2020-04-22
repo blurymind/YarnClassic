@@ -16,6 +16,10 @@ alt="Yarn web app"  height="480" border="10" /></a>
 <br/> with your smartphone or tablet
 2. Open the web browser's menu and select "Add to home screen"
 3. When you run Yarn from the home screen, it will work in full screen mode!
+<br/>
+<a href="https://yarnspinnertool.github.io/YarnEditor/
+" target="_blank"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnMobile.jpeg"
+alt="Yarn web app"  height="480" border="10" /></a>
 
 # 🚧 Roadmap
 You can see planned features, vote for features or see how you can contribute at the roadmap here:
