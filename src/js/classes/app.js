@@ -1528,15 +1528,6 @@ export var App = function(name, version) {
     return tagBeforeCursor;
   };
 
-  this.testRunFrom = function(startTestNode) {
-    ipc.send(
-      'testYarnStoryFrom',
-      JSON.parse(data.getSaveData(FILETYPE.JSON)),
-      startTestNode,
-      data.editingFileFolder()
-    );
-  };
-
   this.openNodeListMenu = function(action) {
     var helperLinkSearch = document.getElementById(action + 'HelperMenuFilter')
       .value;
