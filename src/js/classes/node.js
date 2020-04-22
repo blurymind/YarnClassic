@@ -273,11 +273,11 @@ export var Node = function(options = {}) {
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
         const pageX =
-          app.hasTouchScreen && e.changedTouches
+          app.input.isScreenTouched && e.changedTouches
             ? e.changedTouches[0].pageX
             : e.pageX;
         const pageY =
-          app.hasTouchScreen && e.changedTouches
+          app.input.isScreenTouched && e.changedTouches
             ? e.changedTouches[0].pageY
             : e.pageY;
 
