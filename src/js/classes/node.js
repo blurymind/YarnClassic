@@ -2,13 +2,11 @@ import { data } from './data';
 import { Utils } from './utils';
 
 let globalNodeIndex = 0;
-const NodeExpandWidth = 300;
-const NodeExpandHeight = 150;
 const ClipNodeTextLength = 1024;
 const bbcode = require('bbcode');
 
 export let Node = function(options = {}) {
-  let self = this;
+  const self = this;
 
   this.titleStyles = [
     'title-style-1',
@@ -27,8 +25,6 @@ export let Node = function(options = {}) {
   this.title = ko.observable(options.title || app.getUniqueTitle());
   this.tags = ko.observable(options.tags || '');
   this.body = ko.observable(options.body || 'Empty Text');
-  //this.x = ko.observable(128);
-  //this.y = ko.observable(128);
   this.active = ko.observable(options.active || true);
   this.tempWidth = null;
   this.tempHeight = null;
