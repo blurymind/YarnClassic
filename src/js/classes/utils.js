@@ -37,6 +37,7 @@ export var Utils = {
       },
     };
   },
+
   addDoubleTapDetector: function(element, callback) {
     element.lastTap = 0;
     element.tapTimeout = 0;
@@ -72,6 +73,10 @@ export var Utils = {
       }
     });
     return highestZ;
+  },
+
+  clamp: function(value, min, max) {
+    return Math.max(Math.min(value, max), min);
   },
 
   stripHtml: function(html) {
@@ -115,7 +120,6 @@ export var Utils = {
         }
       }
     }
-    console.log(nodes);
 
     return nodes;
   },
