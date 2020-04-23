@@ -192,16 +192,6 @@ a:hover {
   padding: 7px;
 }
 
-.dropbox-dropin-btn {
-  border: unset !important;
-  border-radius: unset !important;
-  border-bottom-color: unset !important;
-  height: 100% !important;
-  font-family: unset !important;
-  font-weight: unset !important;
-  line-height: 2 !important;
-}
-
 .app-menu .dropdown .item:hover {
   background: #eee;
   color: #000;

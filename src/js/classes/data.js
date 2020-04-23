@@ -382,48 +382,6 @@ export var data = {
     data.openFileDialog($('#open-file'), data.openFile);
   },
 
-  tryLoadFromDropbox: function(dropboxObject) {
-    console.log('fetched from db', dropboxObject);
-    $.get(dropboxObject.link, function(textData) {
-      var type = data.getFileType(dropboxObject.name);
-      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
-      else {
-        data.editingPath(dropboxObject.link);
-        data.editingType(type);
-        data.editingName(dropboxObject.name.replace(/\.[^/.]+$/, ''));
-        data.loadData(textData, type, true);
-      }
-    });
-  },
-
-  trySaveDropbox: function() {
-    const editingType = data.editingType();
-    if (data.editingName() === 'NewFile') {
-      var fileNameAsk = prompt('Please enter your name:', 'NewFile');
-      if (fileNameAsk !== null || fileNameAsk !== '') {
-        data.editingName(fileNameAsk);
-      }
-    }
-    const editingName =
-      data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
-    const yarnData = data.getSaveData(editingType);
-    // console.log(editingType, yarnData, editingName);
-    const yarnTextFileUrl = Utils.makeTextFile(yarnData);
-    var options = {
-      files: [
-        {
-          url: yarnTextFileUrl,
-          filename: editingName,
-        },
-      ],
-      success: function() {
-        alert('Success! Files saved to your Dropbox.');
-        data.editingName(editingName.replace(/\.[^/.]+$/, ''));
-      },
-    };
-    Dropbox.save(yarnTextFileUrl, editingName, options);
-  },
-
   tryShareFilePwa: function (format) {
     const editingType = data.editingType();
     if (data.editingName() === 'NewFile') {
