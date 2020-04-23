@@ -309,7 +309,7 @@ export let Node = function(options = {}) {
           }
         }
 
-        // app.workspace.updateArrows();
+        app.workspace.updateArrows();
       }
     });
 

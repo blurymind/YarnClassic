@@ -634,12 +634,10 @@ export var App = function(name, version) {
   };
 
   this.newNodeAt = function(x, y) {
-    var node = new Node();
+    var node = new Node({ x, y });
 
     self.nodes.push(node);
 
-    node.x(x - 100);
-    node.y(y - 100);
     self.updateNodeLinks();
     self.recordNodeAction('created', node);
 
