@@ -1174,7 +1174,6 @@ export var App = function(name, version) {
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(node);
-      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
