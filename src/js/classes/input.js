@@ -96,7 +96,7 @@ export const Input = function(app) {
       self.isDragging = false;
 
       if (e.button === MouseButton.Middle)
-      self.isMiddleButtonDown = false;
+        self.isMiddleButtonDown = false;
 
       if (app.inWorkspace()) {
         app.workspace.onDragEnd();
