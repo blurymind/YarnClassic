@@ -424,6 +424,40 @@ export var data = {
     Dropbox.save(yarnTextFileUrl, editingName, options);
   },
 
+  tryShareFilePwa: function (format) {
+    const editingType = data.editingType();
+    if (data.editingName() === 'NewFile') {
+      var fileNameAsk = prompt('Please enter your name:', 'NewFile');
+      if (fileNameAsk !== null || fileNameAsk !== '') {
+        data.editingName(fileNameAsk);
+      }
+    }
+    const editingName =
+      data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
+    const yarnData = data.getSaveData(editingType);
+
+    const parts = [
+      new Blob([yarnData], {type: 'text/plain'}),
+    ];
+    const file = new File(parts, editingName, {});
+    
+    console.log(file);
+    
+    if (navigator.canShare && navigator.canShare({
+      files: [file]
+    })) {
+      navigator.share({
+        title: editingName,
+        text: yarnData,
+        file: [file],
+      })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing', error));
+    } else {
+      alert('Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...');
+    }
+  },
+
   tryOpenFolder: function() {
     data.openFileDialog($('#open-folder'), data.openFolder);
   },
