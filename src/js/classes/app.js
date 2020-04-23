@@ -116,6 +116,40 @@ export var App = function(name, version) {
     if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
     if (osName === 'mobile') self.workspace.zoom(3);
 
+    // PWA install promotion banner on start
+    // window.addEventListener('beforeinstallprompt', function(event) {
+    //   event.prompt();
+    // });
+    let deferredPrompt;
+    const addBtn = $('#addPwa')[0];
+    addBtn.style.display = 'none';
+    // addBtn.addEventListener('click', (e) => {console.log(e)});
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Update UI to notify the user they can add to home screen
+      addBtn.style.display = 'block';
+
+      addBtn.addEventListener('click', (e) => {
+        // hide our user interface that shows our A2HS button
+        addBtn.style.display = 'none';
+        // Show the prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+            addBtn.style.display = 'none';
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
     if (!self.isElectron) {
       // Add dropbox chooser
       Utils.createDropboxChooser(
@@ -1411,159 +1445,6 @@ export var App = function(name, version) {
         lineNumbers += i + 1 + '<br />';
     }
     $('.editor-container .lines').html(lineNumbers);
-  };
-
-  this.updateHighlights = function(e) {
-    if (e.keyCode == 17 || (e.keyCode >= 37 && e.keyCode <= 40)) return;
-
-    // get the text
-    var editor = $('.editor');
-    var text = editor[0].innerText;
-    var startOffset, endOffset;
-
-    // ctrl + z
-    if ((e.metaKey || e.ctrlKey) && e.keyCode == 90) {
-      if (self.editingHistory.length > 0) {
-        var last = self.editingHistory.pop();
-        text = last.text;
-        startOffset = last.start;
-        endOffset = last.end;
-      } else {
-        return;
-      }
-    } else {
-      // get the current start offset
-      var range = window.getSelection().getRangeAt(0);
-      var preCaretStartRange = range.cloneRange();
-      preCaretStartRange.selectNodeContents(editor[0]);
-      preCaretStartRange.setEnd(range.startContainer, range.startOffset);
-      startOffset = preCaretStartRange.toString().length;
-
-      // get the current end offset
-      var preCaretEndRange = range.cloneRange();
-      preCaretEndRange.selectNodeContents(editor[0]);
-      preCaretEndRange.setEnd(range.endContainer, range.endOffset);
-      endOffset = preCaretEndRange.toString().length;
-
-      // ctrl + c
-      if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-        if (self.gui != undefined) {
-          var clipboard = self.gui.Clipboard.get();
-          clipboard.set(
-            text.substr(startOffset, endOffset - startOffset),
-            'text'
-          );
-        }
-      } else {
-        // ctrl + v
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
-          var clipboard = self.gui.Clipboard.get();
-          text =
-            text.substr(0, startOffset) +
-            clipboard.get('text') +
-            text.substr(endOffset);
-          startOffset = endOffset = startOffset + clipboard.get('text').length;
-        }
-        // ctrl + x
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          if (self.gui != undefined) {
-            var clipboard = self.gui.Clipboard.get();
-            clipboard.set(
-              text.substr(startOffset, endOffset - startOffset),
-              'text'
-            );
-            text = text.substr(0, startOffset) + text.substr(endOffset);
-            endOffset = startOffset;
-          }
-        }
-        // increment if we just hit enter
-        else if (e.keyCode == 13) {
-          startOffset++;
-          endOffset++;
-          if (startOffset > text.length) startOffset = text.length;
-          if (endOffset > text.length) endOffset = text.length;
-        }
-        // take into account tab character
-        else if (e.keyCode == 9) {
-          text = text.substr(0, startOffset) + '\t' + text.substr(endOffset);
-          startOffset++;
-          endOffset = startOffset;
-          e.preventDefault();
-        }
-
-        // save history (in chunks)
-        if (
-          self.editingHistory.length == 0 ||
-          text != self.editingHistory[self.editingHistory.length - 1].text
-        ) {
-          if (self.editingSaveHistoryTimeout == null)
-            self.editingHistory.push({
-              text: text,
-              start: startOffset,
-              end: endOffset,
-            });
-          clearTimeout(self.editingSaveHistoryTimeout);
-          self.editingSaveHistoryTimeout = setTimeout(function() {
-            self.editingSaveHistoryTimeout = null;
-          }, 500);
-        }
-      }
-    }
-
-    // update text
-    //editor[0].innerHTML = self.getHighlightedText(text);
-
-    self.updateLineNumbers(text);
-
-    // reset offsets
-    if (document.createRange && window.getSelection) {
-      function getTextNodesIn(node) {
-        var textNodes = [];
-        if (node.nodeType == 3) textNodes.push(node);
-        else {
-          var children = node.childNodes;
-          for (var i = 0, len = children.length; i < len; ++i)
-            textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
-        }
-        return textNodes;
-      }
-
-      var range = document.createRange();
-      range.selectNodeContents(editor[0]);
-      var textNodes = getTextNodesIn(editor[0]);
-      var charCount = 0,
-        endCharCount;
-      var foundStart = false;
-      var foundEnd = false;
-
-      for (var i = 0, textNode; (textNode = textNodes[i++]); ) {
-        endCharCount = charCount + textNode.length;
-        if (
-          !foundStart &&
-          startOffset >= charCount &&
-          (startOffset <= endCharCount ||
-            (startOffset == endCharCount && i < textNodes.length))
-        ) {
-          range.setStart(textNode, startOffset - charCount);
-          foundStart = true;
-        }
-        if (
-          !foundEnd &&
-          endOffset >= charCount &&
-          (endOffset <= endCharCount ||
-            (endOffset == endCharCount && i < textNodes.length))
-        ) {
-          range.setEnd(textNode, endOffset - charCount);
-          foundEnd = true;
-        }
-        if (foundStart && foundEnd) break;
-        charCount = endCharCount;
-      }
-
-      var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
   };
 
   this.moveNodes = function(offX, offY) {

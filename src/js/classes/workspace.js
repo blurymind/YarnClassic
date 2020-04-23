@@ -200,8 +200,6 @@ export const Workspace = function(app) {
     self.marqueeOffset[0] = 0;
     self.marqueeOffset[1] = 0;
     self.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-
-    $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
   };
 
   // onMarqueeUpdate
@@ -242,6 +240,7 @@ export const Workspace = function(app) {
     }
 
     $('#marquee').css({
+      display: 'block',
       x: self.marqueeRect.x1,
       y: self.marqueeRect.y1,
       width: Math.abs(self.marqueeRect.x1 - self.marqueeRect.x2),
@@ -295,8 +294,7 @@ export const Workspace = function(app) {
     self.isMarqueeEnabled = false;
     self.marqueeSelection = [];
     self.marqueeRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-
-    $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
+    $('#marquee').css({ display: 'none', x: 0, y: 0, width: 0, height: 0 });
   };
 
   // shiftNodes
