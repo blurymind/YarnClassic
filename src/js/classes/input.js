@@ -91,11 +91,12 @@ export const Input = function(app) {
       }
     });
 
-    $(document).on('pointerup', e => {
-      if (e.button === MouseButton.Middle)
-        self.isMiddleButtonDown = false;
-
+    $(document).on('pointerup touchend', e => {
+      self.isScreenTouched = false;
       self.isDragging = false;
+
+      if (e.button === MouseButton.Middle)
+      self.isMiddleButtonDown = false;
 
       if (app.inWorkspace()) {
         app.workspace.onDragEnd();
