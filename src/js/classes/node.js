@@ -226,7 +226,7 @@ export var Node = function(options = {}) {
     setTimeout(self.resetDoubleClick, 500);
     self.canDoubleClick = false;
 
-    if (app.shifted) app.matchConnectedColorID(self);
+    if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
   };
@@ -237,7 +237,7 @@ export var Node = function(options = {}) {
     setTimeout(self.resetDoubleClick, 500);
     self.canDoubleClick = false;
 
-    if (app.shifted) app.matchConnectedColorID(self);
+    if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
   };
@@ -269,16 +269,15 @@ export var Node = function(options = {}) {
     var dragging = false;
     var groupDragging = false;
     var offset = [0, 0];
-    var moved = false;
 
     $(document.body).on('mousemove touchmove', function(e) {
       if (dragging) {
         const pageX =
-          app.hasTouchScreen && e.changedTouches
+          app.input.isScreenTouched && e.changedTouches
             ? e.changedTouches[0].pageX
             : e.pageX;
         const pageY =
-          app.hasTouchScreen && e.changedTouches
+          app.input.isScreenTouched && e.changedTouches
             ? e.changedTouches[0].pageY
             : e.pageY;
 
@@ -287,7 +286,6 @@ export var Node = function(options = {}) {
         var movedX = newX - self.x();
         var movedY = newY - self.y();
 
-        moved = true;
         self.x(newX);
         self.y(newY);
 
@@ -318,7 +316,7 @@ export var Node = function(options = {}) {
 
         dragging = true;
 
-        if (app.shifted || self.selected) {
+        if (app.input.isShiftDown || self.selected) {
           groupDragging = true;
         }
 
@@ -332,10 +330,6 @@ export var Node = function(options = {}) {
     });
 
     $(self.element).on('pointerup touchend', function(e) {
-      if (!moved)
-        app.mouseUpOnNodeNotMoved();
-
-      moved = false;
       dragging = false;
       groupDragging = false;
     });
