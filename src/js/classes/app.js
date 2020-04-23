@@ -112,9 +112,7 @@ export var App = function(name, version) {
       osName = 'mobile';
     }
 
-    // Platform specific settings
     if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
-    if (osName === 'mobile') self.workspace.zoom(3);
 
     // PWA install promotion banner on start
     // window.addEventListener('beforeinstallprompt', function(event) {
@@ -175,6 +173,8 @@ export var App = function(name, version) {
       if (e.keyCode == 27) self.clearSearch();
       else self.searchWarp();
     });
+
+    if (osName === 'mobile') self.workspace.zoom(3);
 
     $(window).on('resize', self.workspace.updateArrows);
 
