@@ -432,6 +432,13 @@ export var data = {
     data.openFileDialog($('#open-file'), data.appendFile);
   },
 
+  save: function() {
+    if (self.editingPath())
+      self.trySaveCurrent();
+    else
+      self.trySave(FILETYPE.JSON);
+  },
+
   trySave: function(type) {
     data.editingType(type);
     data.saveFileDialog($('#save-file'), type, data.getSaveData(type));
@@ -442,6 +449,7 @@ export var data = {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
   },
+
   doesFileExist: function(filePath) {
     //todo remove fs from everywhere, use cache to load images instead
     return false;
