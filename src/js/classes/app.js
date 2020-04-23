@@ -174,7 +174,7 @@ export var App = function(name, version) {
       else self.searchWarp();
     });
 
-    if (osName === 'mobile') self.workspace.zoom(3);
+    if (osName === 'mobile') self.workspace.setZoom(3);
 
     $(window).on('resize', self.workspace.updateArrows);
 
