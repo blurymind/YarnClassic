@@ -43,6 +43,7 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
+  this.mustUpdateTags = true;
   this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -692,6 +693,8 @@ export var App = function(name, version) {
 
     self.editing(node);
 
+    self.mustUpdateTags = true;
+
     $('.node-editor')
       .css({ opacity: 0 })
       .transition({ opacity: 1 }, 250);
@@ -1000,8 +1003,12 @@ export var App = function(name, version) {
       storyPreviewPlayButton.className = 'bbcode-button';
       self.previewStory.terminate();
       setTimeout(() => {
-        if (self.editing().title() !== self.previewStory.node.title)
+        if (
+          self.editing() &&
+          self.editing().title() !== self.previewStory.node.title
+        ) {
           self.openNodeByTitle(self.previewStory.node.title);
+        }
         self.editor.focus();
       }, 1000);
     }
@@ -1276,6 +1283,11 @@ export var App = function(name, version) {
   };
 
   this.updateTagsRepository = function() {
+    if (!self.mustUpdateTags)
+      return;
+
+    self.mustUpdateTags = false;
+
     const findFirstFreeId = () => {
       const usedIds = self.tags().map( tag => tag.id );
       for (let id = 1; ;++id)
