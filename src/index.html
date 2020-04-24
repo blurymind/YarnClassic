@@ -33,24 +33,26 @@
 				</span>
 			</div>
 
-			<!-- zoom controls -->
+			<!-- align controls -->
 			<div class="app-sort hide-when-narrow">
-				<span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
+        <span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
 				<span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
 				<span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
 				<span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
 			</div>
 
+      <!-- undo/redo controls -->
 			<div class="app-undo-redo">
-				<span data-bind="click: function() { app.historyDirection('undo'); }"></span>
+        <span data-bind="click: function() { app.historyDirection('undo'); }"></span>
 				<span data-bind="click: function() { app.historyDirection('redo'); }"></span>
 			</div>
 
+      <!-- zoom controls -->
 			<div class="app-zoom">
-					<span data-bind="click: function() { app.zoom(4); }" title="Zoom 1:1"></span>
-					<span data-bind="click: function() { app.zoom(3); }" title="Zoom 2:1"></span>
-					<span data-bind="click: function() { app.zoom(2); }" title="Zoom 3:1"></span>
-					<span data-bind="click: function() { app.zoom(1); }" title="Zoom 4:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(3); }" title="Zoom 2:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"></span>
 				</div>
 
 			<!-- navigation / menu -->

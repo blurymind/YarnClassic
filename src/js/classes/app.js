@@ -35,7 +35,6 @@ export var App = function(name, version) {
   this.input = new Input(self);
   this.previewStory = new yarnRender();
 
-  this.instance = this;
   this.data = data;
   this.name = ko.observable(name);
   this.version = ko.observable(version);
@@ -44,17 +43,11 @@ export var App = function(name, version) {
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
   this.mustUpdateTags = true;
-  this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
   this.editingHistory = [];
   this.editingSaveHistoryTimeout = null;
-  this.dirty = false;
   this.focusedNodeIdx = -1;
-  this.zoomSpeed = 0.005;
-  this.zoomLimitMin = 0.05;
-  this.zoomLimitMax = 1;
-  this.transformOrigin = [0, 0];
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
@@ -120,7 +113,7 @@ export var App = function(name, version) {
       osName = 'mobile';
     }
 
-    if (osName == 'Windows') self.zoomSpeed = 0.1;
+    if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
 
     // PWA install promotion banner on start
     // window.addEventListener('beforeinstallprompt', function(event) {
@@ -160,23 +153,17 @@ export var App = function(name, version) {
     self.newNode().title('Start');
 
     // search field enter
+    $('.search-title input').click(self.updateSearch);
+    $('.search-body input').click(self.updateSearch);
+    $('.search-tags input').click(self.updateSearch);
+    self.$searchField.on('input', self.updateSearch);
     self.$searchField.on('keyup', function(e) {
       // escape
       if (e.keyCode == 27) self.clearSearch();
       else self.searchWarp();
     });
 
-    // Load json app settings from home folder
-    // data.tryLoadConfigFile()
-
-    // set default zoom level for mobile users
-    if (osName === 'mobile') self.zoom(3);
-
-    // search field
-    self.$searchField.on('input', self.updateSearch);
-    $('.search-title input').click(self.updateSearch);
-    $('.search-body input').click(self.updateSearch);
-    $('.search-tags input').click(self.updateSearch);
+    if (osName === 'mobile') self.workspace.setZoom(3);
 
     $(window).on('resize', self.workspace.updateArrows);
 
@@ -636,12 +623,10 @@ export var App = function(name, version) {
   };
 
   this.newNodeAt = function(x, y) {
-    var node = new Node();
+    var node = new Node({ x: x - 100, y: y - 100});
 
     self.nodes.push(node);
 
-    node.x(x - 100);
-    node.y(y - 100);
     self.updateNodeLinks();
     self.recordNodeAction('created', node);
 
@@ -1457,39 +1442,6 @@ export var App = function(name, version) {
         lineNumbers += i + 1 + '<br />';
     }
     $('.editor-container .lines').html(lineNumbers);
-  };
-
-  this.zoom = function(zoomLevel) {
-    self.cachedScale = zoomLevel / 4;
-    self.translate(200);
-  };
-
-  this.translate = function(speed) {
-    if (speed)
-      self.workspace.startUpdatingArrows();
-
-    $('.nodes-holder').transition(
-      {
-        transform:
-          'matrix(' +
-          self.cachedScale +
-          ',0,0,' +
-          self.cachedScale +
-          ',' +
-          self.transformOrigin[0] +
-          ',' +
-          self.transformOrigin[1] +
-          ')',
-      },
-      speed || 0,
-      'easeInQuad',
-      function() {
-        if (speed) {
-          self.workspace.stopUpdatingArrows();
-        }
-        self.workspace.updateArrows();
-      }
-    );
   };
 
   this.moveNodes = function(offX, offY) {
