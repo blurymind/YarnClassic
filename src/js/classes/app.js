@@ -622,7 +622,7 @@ export var App = function(name, version) {
   };
 
   this.newNodeAt = function(x, y) {
-    var node = new Node({ x, y });
+    var node = new Node({ x: x - 100, y: y - 100});
 
     self.nodes.push(node);
 
