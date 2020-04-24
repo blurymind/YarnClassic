@@ -40,6 +40,7 @@ export let Node = function(options = {}) {
   //
   // Returns an array of tags objects with id, style and count
   this.clippedTags = ko.computed(function() {
+    app.updateTagsRepository();
     return Utils
       .uniqueSplit(self.tags(), ' ')
       .map (
