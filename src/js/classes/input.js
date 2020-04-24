@@ -8,8 +8,8 @@ export const Input = function(app) {
   });
 
   const Key = Object.freeze({
+    'Enter': 13,
     'Escape': 27,
-    'Enter': 31,
     'Space': 32,
     'Left': 37,
     'Up': 38,
@@ -250,12 +250,11 @@ export const Input = function(app) {
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.Escape: app.saveNode(); break;
         case Key.C: self.clipboard = app.editor.getSelectedText(); break;
         case Key.X:
           document.execCommand('copy');
           app.clipboard = app.editor.getSelectedText();
-          sapp.insertTextAtCursor('');
+          app.insertTextAtCursor('');
           break;
         }
       }
@@ -271,8 +270,12 @@ export const Input = function(app) {
       if (!app.inEditor())
         return;
 
-      if (e.ctrlKey && e.altKey)
-        app.saveNode(); //ctrl+alt+enter closes/saves an open node
+      if ((e.metaKey || e.ctrlKey) && e.altKey) {
+        switch (e.keyCode) {
+        case Key.Enter:
+          app.saveNode(); break; //ctrl+alt+enter closes/saves an open node
+        }
+      }
     });
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
