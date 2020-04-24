@@ -43,7 +43,6 @@ export var App = function(name, version) {
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
   this.mustUpdateTags = true;
-  this.cachedScale = 1;
   this.nodeHistory = [];
   this.nodeFuture = [];
   this.editingHistory = [];
