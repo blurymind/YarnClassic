@@ -398,9 +398,7 @@ export var data = {
       new Blob([yarnData], {type: 'text/plain'}),
     ];
     const file = new File(parts, editingName, {});
-    
-    console.log(file);
-    
+        
     if (navigator.canShare && navigator.canShare({
       files: [file]
     })) {
