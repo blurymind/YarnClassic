@@ -37,6 +37,7 @@ export var Utils = {
       },
     };
   },
+
   addDoubleTapDetector: function(element, callback) {
     element.lastTap = 0;
     element.tapTimeout = 0;
@@ -72,6 +73,10 @@ export var Utils = {
       }
     });
     return highestZ;
+  },
+
+  clamp: function(value, min, max) {
+    return Math.max(Math.min(value, max), min);
   },
 
   stripHtml: function(html) {
@@ -115,7 +120,6 @@ export var Utils = {
         }
       }
     }
-    console.log(nodes);
 
     return nodes;
   },
@@ -195,37 +199,4 @@ export var Utils = {
     ['日本語', ['ja-JP']],
     ['Lingua latīna', ['la']],
   ],
-  createDropboxChooser: function(dropboxButton, onSuccess) {
-    if (!dropboxButton) return;
-    var options = {
-      success: function(files) {
-        files.forEach(function(file) {
-          onSuccess(file);
-        });
-      },
-      cancel: function() {
-        //optional
-      },
-      linkType: 'direct', // "preview" or "direct"
-      multiselect: false, // true or false
-    };
-
-    var button = Dropbox.createChooseButton(options);
-    dropboxButton.appendChild(button);
-  },
-  makeTextFile: function(text) {
-    // Blobs dont work for dropbox..
-    // var data = new Blob([text], { type: 'text/plain' });
-    // If we are replacing a previously generated file we need to
-    // manually revoke the object URL to avoid memory leaks.
-    // if (appTextfile !== null) {
-    //   window.URL.revokeObjectURL(textFile);
-    // }
-    // var appTextfile = window.URL.createObjectURL(data);
-
-    var appTextfile =
-      'data:text/plain;charset=utf-11,' + encodeURIComponent(text);
-    // returns the url of the created text file
-    return appTextfile;
-  },
 };

@@ -106,7 +106,7 @@ a:hover {
   text-transform: uppercase;
   opacity: 0.4;
   line-height: 1.2em;
-  z-index: -10;
+  /* z-index: -10; */
 }
 
 .app-info span {
@@ -192,16 +192,6 @@ a:hover {
   padding: 7px;
 }
 
-.dropbox-dropin-btn {
-  border: unset !important;
-  border-radius: unset !important;
-  border-bottom-color: unset !important;
-  height: 100% !important;
-  font-family: unset !important;
-  font-weight: unset !important;
-  line-height: 2 !important;
-}
-
 .app-menu .dropdown .item:hover {
   background: #eee;
   color: #000;
@@ -221,7 +211,7 @@ a:hover {
 }
 
 .app-menu .menu:hover .dropdown {
-  max-height: 400px;
+  max-height: 450px;
 }
 
 .app-menu .menu:hover .title {

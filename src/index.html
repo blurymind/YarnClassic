@@ -5,7 +5,6 @@
 		<link rel="manifest" href="./manifest.json" >
 
 		<title>Yarn</title>
-	<!-- <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="8gmp2fm55zkop6h"></script> -->
 	</head>
 	<body>
 		<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/dracula.css" >
@@ -35,24 +34,26 @@
 				</span>
 			</div>
 
-			<!-- zoom controls -->
+			<!-- align controls -->
 			<div class="app-sort hide-when-narrow">
-				<span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
+        <span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
 				<span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
 				<span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
 				<span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
 			</div>
 
+      <!-- undo/redo controls -->
 			<div class="app-undo-redo">
-				<span data-bind="click: function() { app.historyDirection('undo'); }"></span>
+        <span data-bind="click: function() { app.historyDirection('undo'); }"></span>
 				<span data-bind="click: function() { app.historyDirection('redo'); }"></span>
 			</div>
 
+      <!-- zoom controls -->
 			<div class="app-zoom">
-					<span data-bind="click: function() { app.zoom(4); }" title="Zoom 1:1"></span>
-					<span data-bind="click: function() { app.zoom(3); }" title="Zoom 2:1"></span>
-					<span data-bind="click: function() { app.zoom(2); }" title="Zoom 3:1"></span>
-					<span data-bind="click: function() { app.zoom(1); }" title="Zoom 4:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(3); }" title="Zoom 2:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"></span>
+					<span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"></span>
 				</div>
 
 			<!-- navigation / menu -->
@@ -78,13 +79,6 @@
 						<!-- ko if:data.editingPath() != null -->
 						<span class="item" data-bind="click: app.data.trySaveCurrent">Save</span>
 						<!-- /ko -->
-						<span id="dropboxIO">
-						<!-- <div id="dropbox-container" class="item"></div> -->
-						<!-- <span class="item" data-bind="click: function() { app.data.trySaveDropbox();}">
-							<img width="12px" src="./public/images/dropbox.ico" alt="Dropbox Icon" />
-							&nbsp;
-							Save to dropbox
-						</span> -->
 						</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('json');}">
 							<img width="12px" src="./public/icon.ico" alt="Yarn Icon" />
@@ -107,6 +101,11 @@
 							Save As Twee2
 						</span>
 						<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">Save As Xml</span>
+						<span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
+							<img width="12px" src="./public/icon.ico" alt="Yarn Icon" />
+							&nbsp;
+							Send file
+						</span>
 					</div>
 				</div>
 			</div>
@@ -273,6 +272,7 @@
 			<div class="app-info">
 				<span class="app-title" data-bind="text:app.name"></span>
 				<span class="app-version" data-bind="text:app.version"></span>
+				<span class="title" id="addPwa">Add to Homescreen</span>
 			</div>
 
 			<!-- marquee -->

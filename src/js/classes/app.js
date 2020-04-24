@@ -9,6 +9,7 @@ import {
 } from '../libs/spellcheck_ace.js';
 import { Node } from './node';
 import { Workspace } from './workspace';
+import { Input } from './input';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
@@ -17,6 +18,9 @@ import { Utils, FILETYPE } from './utils';
 //
 // Create Settings class: manages user settings using window.localStorage
 // Create UI class: manages menus, buttons, search, settings dialog...
+// Create Platform class: provides platform specific info and abstractions
+// Create History class: handles command history navigation (undo/redo)
+// Create Editor class: handles editor setup and events
 // Create:
 //   RichTextFormater interface
 //   RichTextFormaterBbcode implementation
@@ -28,9 +32,9 @@ export var App = function(name, version) {
 
   // Ideally this dependencies should be injected by index.js
   this.workspace = new Workspace(self);
+  this.input = new Input(self);
   this.previewStory = new yarnRender();
 
-  this.instance = this;
   this.data = data;
   this.name = ko.observable(name);
   this.version = ko.observable(version);
@@ -39,29 +43,20 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
-  this.cachedScale = 1;
+  this.mustUpdateTags = true;
   this.nodeHistory = [];
   this.nodeFuture = [];
   this.editingHistory = [];
   this.editingSaveHistoryTimeout = null;
-  this.dirty = false;
   this.focusedNodeIdx = -1;
-  this.zoomSpeed = 0.005;
-  this.zoomLimitMin = 0.05;
-  this.zoomLimitMax = 1;
-  this.transformOrigin = [0, 0];
-  this.shifted = false;
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
-  this.mouseX = 0;
-  this.mouseY = 0;
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
   this.selectedLanguageIndex = 6;
   this.language = null;
-  this.hasTouchScreen = false;
 
   this.configFilePath = null;
   this.config = {
@@ -82,6 +77,19 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
 
+  // inEditor
+  //
+  // Indicates if we are in the editor view
+  this.inEditor = () => self.editing();
+
+  // inWorkspace
+  //
+  // Indicates if we are in the workspace view
+  this.inWorkspace = () => !self.editing();
+
+  // run
+  //
+  // Initializes the application
   this.run = function() {
     var osName = 'Unknown OS';
     if (navigator.platform.indexOf('Win') != -1) osName = 'Windows';
@@ -90,9 +98,6 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
-    window.addEventListener('touchstart', function() {
-      self.hasTouchScreen = true;
-    });
     window.addEventListener('yarnLoadedData', e => {
       $('.arrows')
         .css({ opacity: 0 })
@@ -109,7 +114,39 @@ export var App = function(name, version) {
       osName = 'mobile';
     }
 
-    if (osName == 'Windows') self.zoomSpeed = 0.1;
+    if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
+
+    // PWA install promotion banner on start
+    // window.addEventListener('beforeinstallprompt', function(event) {
+    //   event.prompt();
+    // });
+    let deferredPrompt;
+    const addBtn = $('#addPwa')[0];
+    addBtn.style.display = 'none';
+    // addBtn.addEventListener('click', (e) => {console.log(e)});
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      deferredPrompt = e;
+      // Update UI to notify the user they can add to home screen
+      addBtn.style.display = 'block';
+
+      addBtn.addEventListener('click', (e) => {
+        // hide our user interface that shows our A2HS button
+        addBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+            addBtn.style.display = 'none';
+          } else {
+            console.log('User dismissed the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
 
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
@@ -117,491 +154,19 @@ export var App = function(name, version) {
     self.newNode().title('Start');
 
     // search field enter
+    $('.search-title input').click(self.updateSearch);
+    $('.search-body input').click(self.updateSearch);
+    $('.search-tags input').click(self.updateSearch);
+    self.$searchField.on('input', self.updateSearch);
     self.$searchField.on('keyup', function(e) {
       // escape
       if (e.keyCode == 27) self.clearSearch();
       else self.searchWarp();
     });
 
-    // Load json app settings from home folder
-    // data.tryLoadConfigFile()
-
-    // set default zoom level for mobile users
-    if (osName === 'mobile') self.zoom(3);
-
-    if (!self.isElectron) {
-      // Add dropbox chooser
-      Utils.createDropboxChooser(
-        document.getElementById('dropbox-container'),
-        file => data.tryLoadFromDropbox(file)
-      );
-    } else {
-      document.getElementById('dropboxIO').style.display = 'none';
-    }
-
-    // prevent click bubbling
-    ko.bindingHandlers.preventBubble = {
-      init: function(element, valueAccessor) {
-        var eventName = ko.utils.unwrapObservable(valueAccessor());
-        ko.utils.registerEventHandler(element, eventName, function(event) {
-          event.cancelBubble = true;
-          if (event.stopPropagation) event.stopPropagation();
-        });
-      },
-    };
-    ko.bindingHandlers.mousedown = {
-      init: function(
-        element,
-        valueAccessor,
-        allBindings,
-        viewModel,
-        bindingContext
-      ) {
-        var value = ko.unwrap(valueAccessor());
-        $(element).mousedown(function() {
-          value();
-        });
-      },
-    };
-
-    // drag node holder around
-    (function() {
-      var dragging = false;
-      var offset = { x: 0, y: 0 };
-      var MarqueeOn = false;
-      var MarqueeSelection = [];
-      var MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-      var MarqueeOffset = [0, 0];
-      var midClickHeld = false;
-
-      $('.nodes').on('pointerdown', function(e) {
-        if (e.button == 1) {
-          midClickHeld = true;
-        }
-        $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-        dragging = true;
-        offset.x = e.pageX;
-        offset.y = e.pageY;
-        MarqueeSelection = [];
-        MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-
-        var scale = self.cachedScale;
-
-        MarqueeOffset[0] = 0;
-        MarqueeOffset[1] = 0;
-
-        if (!e.altKey && !e.shiftKey) {
-          self.workspace.deselectAll();
-        }
-      });
-
-      $('.nodes').on('mousemove touchmove', function(e) {
-        if (dragging) {
-          const pageX =
-            self.hasTouchScreen && e.changedTouches
-              ? e.changedTouches[0].pageX
-              : e.pageX;
-          const pageY =
-            self.hasTouchScreen && e.changedTouches
-              ? e.changedTouches[0].pageY
-              : e.pageY;
-
-          if (e.altKey || midClickHeld || self.hasTouchScreen) {
-            //prevents jumping straight back to standard dragging
-            if (MarqueeOn) {
-              MarqueeSelection = [];
-              MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-              $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-            } else {
-              var nodes = self.nodes();
-              for (var i in nodes) {
-                nodes[i].x(
-                  nodes[i].x() + (pageX - offset.x) / self.cachedScale
-                );
-                nodes[i].y(
-                  nodes[i].y() + (pageY - offset.y) / self.cachedScale
-                );
-              }
-              offset.x = pageX;
-              offset.y = pageY;
-
-              self.workspace.updateArrows();
-            }
-          } else {
-            MarqueeOn = true;
-
-            var scale = self.cachedScale;
-
-            if (pageX > offset.x && pageY < offset.y) {
-              MarqRect.x1 = offset.x;
-              MarqRect.y1 = pageY;
-              MarqRect.x2 = pageX;
-              MarqRect.y2 = offset.y;
-            } else if (pageX > offset.x && pageY > offset.y) {
-              MarqRect.x1 = offset.x;
-              MarqRect.y1 = offset.y;
-              MarqRect.x2 = pageX;
-              MarqRect.y2 = pageY;
-            } else if (pageX < offset.x && pageY < offset.y) {
-              MarqRect.x1 = pageX;
-              MarqRect.y1 = pageY;
-              MarqRect.x2 = offset.x;
-              MarqRect.y2 = offset.y;
-            } else {
-              MarqRect.x1 = pageX;
-              MarqRect.y1 = offset.y;
-              MarqRect.x2 = offset.x;
-              MarqRect.y2 = pageY;
-            }
-
-            $('#marquee').css({
-              x: MarqRect.x1,
-              y: MarqRect.y1,
-              width: Math.abs(MarqRect.x1 - MarqRect.x2),
-              height: Math.abs(MarqRect.y1 - MarqRect.y2),
-            });
-
-            //Select nodes which are within the marquee
-            // MarqueeSelection is used to prevent it from deselecting already
-            // selected nodes and deselecting onces which have been selected
-            // by the marquee
-            var nodes = self.nodes();
-            for (var i in nodes) {
-              var index = MarqueeSelection.indexOf(nodes[i]);
-              var inMarqueeSelection = index >= 0;
-
-              //test the Marque scaled to the nodes x,y values
-              var holder = $('.nodes-holder').offset();
-              var marqueeOverNode =
-                (MarqRect.x2 - holder.left) / scale > nodes[i].x() &&
-                (MarqRect.x1 - holder.left) / scale <
-                  nodes[i].x() + nodes[i].tempWidth &&
-                (MarqRect.y2 - holder.top) / scale > nodes[i].y() &&
-                (MarqRect.y1 - holder.top) / scale <
-                  nodes[i].y() + nodes[i].tempHeight;
-
-              if (marqueeOverNode) {
-                if (!inMarqueeSelection) {
-                  self.workspace.addNodesToSelection(nodes[i]);
-                  MarqueeSelection.push(nodes[i]);
-                }
-              } else {
-                if (inMarqueeSelection) {
-                  self.workspace.removeNodesFromSelection(nodes[i]);
-                  MarqueeSelection.splice(index, 1);
-                }
-              }
-            }
-          }
-        }
-      });
-
-      $('.nodes').on('pointerup', function(e) {
-        if (e.button == 1) {
-          midClickHeld = false;
-        }
-        dragging = false;
-
-        if (MarqueeOn && MarqueeSelection.length == 0) {
-          self.workspace.deselectAll();
-        }
-
-        MarqueeSelection = [];
-        MarqRect = { x1: 0, y1: 0, x2: 0, y2: 0 };
-        $('#marquee').css({ x: 0, y: 0, width: 0, height: 0 });
-        MarqueeOn = false;
-      });
-    })();
-
-    // search field
-    self.$searchField.on('input', self.updateSearch);
-    $('.search-title input').click(self.updateSearch);
-    $('.search-body input').click(self.updateSearch);
-    $('.search-tags input').click(self.updateSearch);
-
-    // using the event helper
-    $('.nodes').mousewheel(function(event) {
-      // https://github.com/InfiniteAmmoInc/Yarn/issues/40
-      if (event.altKey) {
-        return;
-      } else {
-        event.preventDefault();
-      }
-
-      var lastZoom = self.cachedScale,
-        scaleChange = event.deltaY * self.zoomSpeed * self.cachedScale;
-
-      if (self.cachedScale + scaleChange > self.zoomLimitMax) {
-        self.cachedScale = self.zoomLimitMax;
-      } else if (self.cachedScale + scaleChange < self.zoomLimitMin) {
-        self.cachedScale = self.zoomLimitMin;
-      } else {
-        self.cachedScale += scaleChange;
-      }
-
-      var mouseX = event.pageX - self.transformOrigin[0],
-        mouseY = event.pageY - self.transformOrigin[1],
-        newX = mouseX * (self.cachedScale / lastZoom),
-        newY = mouseY * (self.cachedScale / lastZoom),
-        deltaX = mouseX - newX,
-        deltaY = mouseY - newY;
-
-      self.transformOrigin[0] += deltaX;
-      self.transformOrigin[1] += deltaY;
-
-      self.translate();
-    });
-
-    $(document).on('keyup keydown', function(e) {
-      self.shifted = e.shiftKey;
-    });
-
-    $(document).contextmenu(function(e) {
-      var isAllowedEl =
-        $(e.target).hasClass('nodes') || $(e.target).parents('.nodes').length;
-
-      if (e.button == 2 && isAllowedEl) {
-        var x = (self.transformOrigin[0] * -1) / self.cachedScale,
-          y = (self.transformOrigin[1] * -1) / self.cachedScale;
-
-        x += e.pageX / self.cachedScale;
-        y += e.pageY / self.cachedScale;
-
-        self.newNodeAt(x, y);
-      }
-
-      return !isAllowedEl;
-    });
-
-    $(document).on('keydown', function(e) {
-      if ((e.metaKey || e.ctrlKey) && !self.editing()) {
-        switch (e.keyCode) {
-        case 90: // ctrl+z
-          self.historyDirection('undo');
-          break;
-        case 89: // ctrl+y
-          self.historyDirection('redo');
-          break;
-        case 68: // ctrl+d
-          self.workspace.deselectAll();
-        }
-      }
-    });
-
-    $(document).on('keydown', function(e) {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.shiftKey) {
-          switch (e.keyCode) {
-          case 83: // ctrl+shift+s
-            data.trySave(FILETYPE.JSON);
-            self.fileKeyPressed = true;
-            break;
-          case 65: // ctrl+shift+a
-            data.tryAppend();
-            self.fileKeyPressed = true;
-            break;
-          }
-        } else if (e.altKey) {
-          switch (e.keyCode) {
-          case 83: //alt+s
-            data.trySave(FILETYPE.YARN);
-            self.fileKeyPressed = true;
-            break;
-          }
-        } else {
-          switch (e.keyCode) {
-          case 83: // ctrl+s
-            if (data.editingPath() != null) {
-              data.trySaveCurrent();
-            } else {
-              data.trySave(FILETYPE.JSON);
-            }
-            self.fileKeyPressed = true;
-            break;
-          case 79: // ctrl+o
-            data.tryOpenFile();
-            self.fileKeyPressed = true;
-            break;
-          }
-        }
-      }
-    });
-
-    $(document).on('keydown', function(e) {
-      // clipboard manual saving to get around browser security bs
-      if (self.editing()) {
-        // ctrl + c
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-          self.clipboard = self.editor.getSelectedText();
-        }
-        // ctrl + x
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          document.execCommand('copy');
-          self.clipboard = self.editor.getSelectedText();
-          self.insertTextAtCursor('');
-        } // escape
-        else if (e.keyCode == 27) {
-          self.saveNode();
-        }
-
-        // If previewing the story, speed up scrolling when holding z
-        if (!self.previewStory.finished)
-          switch (e.key) {
-          case 'z': {
-            self.previewStory.changeTextScrollSpeed(20);
-            return;
-          }
-          }
-      }
-      else if (self.settings() === true) {
-        if (e.keyCode == 27) {
-          self.closeSettingsDialog();
-        }
-      }
-      else {
-        // ctrl + c NODES
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
-        }
-        // ctrl + x NODES
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          self.nodeClipboard = app.cloneNodeArray(self.workspace.getSelectedNodes());
-          self.deleteSelectedNodes();
-        }
-      }
-    });
-    $(document).on('keydown', function(e) {
-      if (
-        self.editing() ||
-        self.$searchField.is(':focus') ||
-        e.ctrlKey ||
-        e.metaKey
-      )
-        return;
-      var scale = self.cachedScale || 1,
-        movement = scale * 500;
-
-      if (e.shiftKey) {
-        movement = scale * 100;
-      }
-
-      if (e.keyCode === 65 || e.keyCode === 37) {
-        // a or left arrow
-        self.transformOrigin[0] += movement;
-      } else if (e.keyCode === 68 || e.keyCode === 39) {
-        // d or right arrow
-        self.transformOrigin[0] -= movement;
-      } else if (e.keyCode === 87 || e.keyCode === 38) {
-        // w or up arrow
-        self.transformOrigin[1] += movement;
-      } else if (e.keyCode === 83 || e.keyCode === 40) {
-        // w or down arrow
-        self.transformOrigin[1] -= movement;
-      }
-
-      self.translate(100);
-    });
-
-    $(document).on('keyup', function(e) {
-      // console.log(e.keyCode);
-      if (!self.editing()) {
-        // ctrl + a
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 65) {
-          self.workspace.selectAll();
-        }
-        // ctrl + v NODES
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
-          self.pasteNodes();
-        }
-        // console.log(e.keyCode+"-"+e.key)
-        if (e.keyCode === 46 || e.key === 'Delete') {
-          // Delete selected
-          self.deleteSelectedNodes();
-        }
-      } else {
-        // Input event listeners for story preview
-        if (!self.previewStory.finished)
-          switch (e.key) {
-          case 'z': {
-            self.advanceStoryPlayMode();
-            return;
-          }
-          case 'ArrowUp': {
-            if (self.previewStory.vnSelectedChoice != -1) {
-              self.previewStory.vnUpdateChoice(-1);
-            }
-            return;
-          }
-          case 'ArrowDown': {
-            if (self.previewStory.vnSelectedChoice != -1) {
-              self.previewStory.vnUpdateChoice(1);
-            }
-            return;
-          }
-          }
-      }
-
-      if (e.keyCode === 31 || e.key === 'Enter') {
-        // Open active node, if already active, close it
-        if (self.editing() === null) {
-          var activeNode = self.nodes()[self.focusedNodeIdx];
-          if (activeNode !== undefined) {
-            self.editNode(activeNode);
-          } else {
-            self.editNode(self.nodes()[0]);
-          }
-        } else if (e.ctrlKey && e.altKey) {
-          //ctrl+alt+ enter closes/saves an open node
-          self.saveNode();
-        }
-      }
-
-      // Spacebar toggle between nodes
-      if (e.keyCode === 32) {
-        if (self.editing() !== null && !e.altKey) {
-          return; // alt+spacebar to toggle between open nodes
-        }
-        var selectedNodes = self.workspace.getSelectedNodes();
-        var nodes = selectedNodes.length > 0 ? selectedNodes : self.nodes();
-        var isNodeSelected = selectedNodes.length > 0;
-        if (
-          self.focusedNodeIdx > -1 &&
-          nodes.length > self.focusedNodeIdx &&
-          (self.transformOrigin[0] !=
-            -nodes[self.focusedNodeIdx].x() +
-              $(window).width() / 2 -
-              $(nodes[self.focusedNodeIdx].element).width() / 2 ||
-            self.transformOrigin[1] !=
-              -nodes[self.focusedNodeIdx].y() +
-                $(window).height() / 2 -
-                $(nodes[self.focusedNodeIdx].element).height() / 2)
-        ) {
-          self.focusedNodeIdx = -1;
-        }
-
-        if (++self.focusedNodeIdx >= nodes.length) {
-          self.focusedNodeIdx = 0;
-        }
-        self.cachedScale = 1;
-        if (isNodeSelected) {
-          self.workspace.warpToSelectedNodeByIdx(self.focusedNodeIdx);
-        } else {
-          self.workspace.warpToNodeByIdx(self.focusedNodeIdx);
-        }
-
-        if (self.editing() !== null) {
-          self.editNode(self.nodes()[self.focusedNodeIdx]);
-        }
-      }
-    });
+    if (osName === 'mobile') self.workspace.setZoom(3);
 
     $(window).on('resize', self.workspace.updateArrows);
-
-    $(document).on('keyup keydown pointerdown pointerup', function(e) {
-      if (self.editing() != null) {
-        self.updateEditorStats();
-      }
-    });
 
     this.guessPopUpHelper = function() {
       if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
@@ -672,8 +237,8 @@ export var App = function(name, version) {
       this.emPicker.toggle();
       self.togglePreviewMode(true);
       $('#emojiPicker-container').css({
-        top: self.mouseY - 125,
-        left: self.mouseX - 200,
+        left: self.input.mouse.x - 200,
+        top: self.input.mouse.y - 125
       });
       $('#emojiPicker-container').show();
     };
@@ -801,11 +366,6 @@ export var App = function(name, version) {
         .catch(error => console.warn(error.message));
     };
 
-    $(document).on('pointermove', function(e) {
-      self.mouseX = e.pageX;
-      self.mouseY = e.pageY;
-    });
-
     this.insertColorCode = function() {
       if ($('#colorPicker-container').is(':visible')) {
         return;
@@ -814,8 +374,8 @@ export var App = function(name, version) {
       $('#colorPicker').spectrum('set', self.editor.getSelectedText());
       $('#colorPicker').spectrum('toggle');
       $('#colorPicker-container').css({
-        top: self.mouseY - 50,
-        left: self.mouseX - 70,
+        left: self.input.mouse.x - 70,
+        top: self.input.mouse.y - 50
       });
       $('#colorPicker-container').show();
       $('#colorPicker').on('dragstop.spectrum', function(e, color) {
@@ -854,10 +414,6 @@ export var App = function(name, version) {
         self.guessPopUpHelper();
       }
     });
-
-    // apple command key
-    //$(window).on('keydown', function(e) { if (e.keyCode == 91 || e.keyCode == 93) { self.appleCmdKey = true; } });
-    //$(window).on('keyup', function(e) { if (e.keyCode == 91 || e.keyCode == 93) { self.appleCmdKey = false; } });
 
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
@@ -898,10 +454,6 @@ export var App = function(name, version) {
       }
     }
     return connectedNodes;
-  };
-
-  this.mouseUpOnNodeNotMoved = function() {
-    self.workspace.deselectAll();
   };
 
   this.matchConnectedColorID = function(fromNode) {
@@ -1079,12 +631,10 @@ export var App = function(name, version) {
   };
 
   this.newNodeAt = function(x, y) {
-    var node = new Node();
+    var node = new Node({ x: x - 100, y: y - 100});
 
     self.nodes.push(node);
 
-    node.x(x - 100);
-    node.y(y - 100);
     self.updateNodeLinks();
     self.recordNodeAction('created', node);
 
@@ -1158,6 +708,8 @@ export var App = function(name, version) {
     node.oldTitle = node.title(); // To check later if "title" changed
 
     self.editing(node);
+
+    self.mustUpdateTags = true;
 
     $('.node-editor')
       .css({ opacity: 0 })
@@ -1467,8 +1019,12 @@ export var App = function(name, version) {
       storyPreviewPlayButton.className = 'bbcode-button';
       self.previewStory.terminate();
       setTimeout(() => {
-        if (self.editing().title() !== self.previewStory.node.title)
+        if (
+          self.editing() &&
+          self.editing().title() !== self.previewStory.node.title
+        ) {
           self.openNodeByTitle(self.previewStory.node.title);
+        }
         self.editor.focus();
       }, 1000);
     }
@@ -1501,10 +1057,6 @@ export var App = function(name, version) {
         $('#emojiPicker-container').hide();
       }
     }
-  };
-
-  this.trim = function(x) {
-    return x.replace(/^\s+|\s+$/gm, '');
   };
 
   this.appendText = function(textToAppend) {
@@ -1633,7 +1185,6 @@ export var App = function(name, version) {
 
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(node);
-      self.updateTagsRepository();
       self.workspace.updateArrows();
 
       // Save user settings
@@ -1748,6 +1299,11 @@ export var App = function(name, version) {
   };
 
   this.updateTagsRepository = function() {
+    if (!self.mustUpdateTags)
+      return;
+
+    self.mustUpdateTags = false;
+
     const findFirstFreeId = () => {
       const usedIds = self.tags().map( tag => tag.id );
       for (let id = 1; ;++id)
@@ -1917,192 +1473,6 @@ export var App = function(name, version) {
         lineNumbers += i + 1 + '<br />';
     }
     $('.editor-container .lines').html(lineNumbers);
-  };
-
-  this.updateHighlights = function(e) {
-    if (e.keyCode == 17 || (e.keyCode >= 37 && e.keyCode <= 40)) return;
-
-    // get the text
-    var editor = $('.editor');
-    var text = editor[0].innerText;
-    var startOffset, endOffset;
-
-    // ctrl + z
-    if ((e.metaKey || e.ctrlKey) && e.keyCode == 90) {
-      if (self.editingHistory.length > 0) {
-        var last = self.editingHistory.pop();
-        text = last.text;
-        startOffset = last.start;
-        endOffset = last.end;
-      } else {
-        return;
-      }
-    } else {
-      // get the current start offset
-      var range = window.getSelection().getRangeAt(0);
-      var preCaretStartRange = range.cloneRange();
-      preCaretStartRange.selectNodeContents(editor[0]);
-      preCaretStartRange.setEnd(range.startContainer, range.startOffset);
-      startOffset = preCaretStartRange.toString().length;
-
-      // get the current end offset
-      var preCaretEndRange = range.cloneRange();
-      preCaretEndRange.selectNodeContents(editor[0]);
-      preCaretEndRange.setEnd(range.endContainer, range.endOffset);
-      endOffset = preCaretEndRange.toString().length;
-
-      // ctrl + c
-      if ((e.metaKey || e.ctrlKey) && e.keyCode == 67) {
-        if (self.gui != undefined) {
-          var clipboard = self.gui.Clipboard.get();
-          clipboard.set(
-            text.substr(startOffset, endOffset - startOffset),
-            'text'
-          );
-        }
-      } else {
-        // ctrl + v
-        if ((e.metaKey || e.ctrlKey) && e.keyCode == 86) {
-          var clipboard = self.gui.Clipboard.get();
-          text =
-            text.substr(0, startOffset) +
-            clipboard.get('text') +
-            text.substr(endOffset);
-          startOffset = endOffset = startOffset + clipboard.get('text').length;
-        }
-        // ctrl + x
-        else if ((e.metaKey || e.ctrlKey) && e.keyCode == 88) {
-          if (self.gui != undefined) {
-            var clipboard = self.gui.Clipboard.get();
-            clipboard.set(
-              text.substr(startOffset, endOffset - startOffset),
-              'text'
-            );
-            text = text.substr(0, startOffset) + text.substr(endOffset);
-            endOffset = startOffset;
-          }
-        }
-        // increment if we just hit enter
-        else if (e.keyCode == 13) {
-          startOffset++;
-          endOffset++;
-          if (startOffset > text.length) startOffset = text.length;
-          if (endOffset > text.length) endOffset = text.length;
-        }
-        // take into account tab character
-        else if (e.keyCode == 9) {
-          text = text.substr(0, startOffset) + '\t' + text.substr(endOffset);
-          startOffset++;
-          endOffset = startOffset;
-          e.preventDefault();
-        }
-
-        // save history (in chunks)
-        if (
-          self.editingHistory.length == 0 ||
-          text != self.editingHistory[self.editingHistory.length - 1].text
-        ) {
-          if (self.editingSaveHistoryTimeout == null)
-            self.editingHistory.push({
-              text: text,
-              start: startOffset,
-              end: endOffset,
-            });
-          clearTimeout(self.editingSaveHistoryTimeout);
-          self.editingSaveHistoryTimeout = setTimeout(function() {
-            self.editingSaveHistoryTimeout = null;
-          }, 500);
-        }
-      }
-    }
-
-    // update text
-    //editor[0].innerHTML = self.getHighlightedText(text);
-
-    self.updateLineNumbers(text);
-
-    // reset offsets
-    if (document.createRange && window.getSelection) {
-      function getTextNodesIn(node) {
-        var textNodes = [];
-        if (node.nodeType == 3) textNodes.push(node);
-        else {
-          var children = node.childNodes;
-          for (var i = 0, len = children.length; i < len; ++i)
-            textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
-        }
-        return textNodes;
-      }
-
-      var range = document.createRange();
-      range.selectNodeContents(editor[0]);
-      var textNodes = getTextNodesIn(editor[0]);
-      var charCount = 0,
-        endCharCount;
-      var foundStart = false;
-      var foundEnd = false;
-
-      for (var i = 0, textNode; (textNode = textNodes[i++]); ) {
-        endCharCount = charCount + textNode.length;
-        if (
-          !foundStart &&
-          startOffset >= charCount &&
-          (startOffset <= endCharCount ||
-            (startOffset == endCharCount && i < textNodes.length))
-        ) {
-          range.setStart(textNode, startOffset - charCount);
-          foundStart = true;
-        }
-        if (
-          !foundEnd &&
-          endOffset >= charCount &&
-          (endOffset <= endCharCount ||
-            (endOffset == endCharCount && i < textNodes.length))
-        ) {
-          range.setEnd(textNode, endOffset - charCount);
-          foundEnd = true;
-        }
-        if (foundStart && foundEnd) break;
-        charCount = endCharCount;
-      }
-
-      var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  };
-
-  this.zoom = function(zoomLevel) {
-    self.cachedScale = zoomLevel / 4;
-    self.translate(200);
-  };
-
-  this.translate = function(speed) {
-    if (speed)
-      self.workspace.startUpdatingArrows();
-
-    $('.nodes-holder').transition(
-      {
-        transform:
-          'matrix(' +
-          self.cachedScale +
-          ',0,0,' +
-          self.cachedScale +
-          ',' +
-          self.transformOrigin[0] +
-          ',' +
-          self.transformOrigin[1] +
-          ')',
-      },
-      speed || 0,
-      'easeInQuad',
-      function() {
-        if (speed) {
-          self.workspace.stopUpdatingArrows();
-        }
-        self.workspace.updateArrows();
-      }
-    );
   };
 
   this.moveNodes = function(offX, offY) {

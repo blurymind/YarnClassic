@@ -382,21 +382,7 @@ export var data = {
     data.openFileDialog($('#open-file'), data.openFile);
   },
 
-  tryLoadFromDropbox: function(dropboxObject) {
-    console.log('fetched from db', dropboxObject);
-    $.get(dropboxObject.link, function(textData) {
-      var type = data.getFileType(dropboxObject.name);
-      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
-      else {
-        data.editingPath(dropboxObject.link);
-        data.editingType(type);
-        data.editingName(dropboxObject.name.replace(/\.[^/.]+$/, ''));
-        data.loadData(textData, type, true);
-      }
-    });
-  },
-
-  trySaveDropbox: function() {
+  tryShareFilePwa: function (format) {
     const editingType = data.editingType();
     if (data.editingName() === 'NewFile') {
       var fileNameAsk = prompt('Please enter your name:', 'NewFile');
@@ -407,21 +393,25 @@ export var data = {
     const editingName =
       data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
     const yarnData = data.getSaveData(editingType);
-    // console.log(editingType, yarnData, editingName);
-    const yarnTextFileUrl = Utils.makeTextFile(yarnData);
-    var options = {
-      files: [
-        {
-          url: yarnTextFileUrl,
-          filename: editingName,
-        },
-      ],
-      success: function() {
-        alert('Success! Files saved to your Dropbox.');
-        data.editingName(editingName.replace(/\.[^/.]+$/, ''));
-      },
-    };
-    Dropbox.save(yarnTextFileUrl, editingName, options);
+
+    const parts = [
+      new Blob([yarnData], {type: 'text/plain'}),
+    ];
+    const file = new File(parts, editingName, {});
+        
+    if (navigator.canShare && navigator.canShare({
+      files: [file]
+    })) {
+      navigator.share({
+        title: editingName,
+        text: yarnData,
+        file: [file],
+      })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing', error));
+    } else {
+      alert('Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...');
+    }
   },
 
   tryOpenFolder: function() {
@@ -430,6 +420,13 @@ export var data = {
 
   tryAppend: function() {
     data.openFileDialog($('#open-file'), data.appendFile);
+  },
+
+  save: function() {
+    if (self.editingPath())
+      self.trySaveCurrent();
+    else
+      self.trySave(FILETYPE.JSON);
   },
 
   trySave: function(type) {
@@ -442,6 +439,7 @@ export var data = {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
   },
+
   doesFileExist: function(filePath) {
     //todo remove fs from everywhere, use cache to load images instead
     return false;
