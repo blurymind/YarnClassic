@@ -298,7 +298,7 @@
 								<label class="settings-label" for="theme">Theme</label>
 
 								<select id="theme" class="settings-value" data-bind="
-									options: availableThemes,
+									options: app.ui.availableThemes,
 									optionsText: 'name',
 									optionsValue: 'id',
 									value: app.settings.theme,
@@ -309,17 +309,22 @@
 							<!-- Markup -->
 							<div class="settings-item">
 								<label class="settings-label" for="markup">Markup</label>
-								<select id="markup" class="settings-value">
+								<select id="markup" class="settings-value" disabled>
 									<option value="classic">BBcode</option>
 									<option value="blueprint">XML</option>
 								</select>
 							</div>
 
-							<!-- Throttle threshold -->
+							<!-- Throttle delay -->
 							<div class="settings-item">
-								<label class="settings-label" for="throttle-threshold">Redraw throttle</label>
+								<label class="settings-label" for="throttle-threshold">Redraw delay</label>
 								<div class="slidecontainer settings-value">
-									<input type="range" class="slider" size="5" min="16" max="250" value="50" class="settings-value">
+									<input
+										type="range"
+										class="slider settings-value"
+										min="16"
+										max="250"
+										data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
 								</div>
 							</div> <!-- settgins-item -->
 
