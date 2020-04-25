@@ -39,8 +39,8 @@
     border: none;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
 }
 .node.selected {
@@ -66,10 +66,12 @@
     border-top-right-radius: 12px;
 }
 .node .tags {
-    width: 100%;
-    border: 0;
     padding: 0;
     margin: 0;
+    width: 100%;
+    border: 0;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
     background: inherit;
 }
 .node .tags:empty {
