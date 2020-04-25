@@ -278,6 +278,17 @@ export const Input = function(app) {
       }
     });
 
+    // Settings dialog shortcuts
+    $(document).on('keydown', function(e) {
+      if (!app.inSettingsDialog())
+        return;
+
+      switch (e.keyCode) {
+      case Key.Escape: app.ui.closeSettingsDialog(); break;
+      }
+    });
+
+
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (!app.inEditor())
         return;

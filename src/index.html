@@ -197,10 +197,6 @@
 							<label for="toglNightMode" title="Night Mode"> &#9728 </label>
 						</span>
 						|
-						<span>
-							<select class="styled-dropdown" id="select_language" onchange="app.updateCountry()">
-							</select>
-							</span>
 							<span class="styled-checkbox">
 								<input class="styled-checkbox" type="checkbox" id="toglSpellCheck" onclick="app.toggleSpellCheck()"></input>
 								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
@@ -278,8 +274,8 @@
 			<!-- marquee -->
 			<div id="marquee"></div>
 
-			<!-- ko if:app.settings() === true -->
-			<div class="settings-dialog">
+			<!-- ko if:app.ui.settingsDialogVisible() === true -->
+			<div id="settings-dialog" class="settings-dialog">
 				<div class="settings-form">
 					<p>Settings</p>
 					<hr/> <!-- ------------------------------------------------------ -->
@@ -287,20 +283,26 @@
 						<div class="settings-column">
 							<!-- Language -->
 							<div class="settings-item">
-								<label class="settings-label" for="language">Spell check language</label>
-								<select id="language" class="settings-value">
-									<option value="es">Español</option>
-									<option value="en">English</option>
+								<label class="settings-label" for="language">Story language</label>
+								<select id="language" class="settings-value" data-bind="
+									options: app.ui.availableLanguages,
+									optionsText: 'name',
+									optionsValue: 'id',
+									value: app.settings.language,
+									event: { change: app.setLanguage }">
 								</select>
 							</div>
 
 							<!-- Theme -->
 							<div class="settings-item">
 								<label class="settings-label" for="theme">Theme</label>
-								<select id="theme" class="settings-value" onchange="app.updateTheme()">
-									<option value="classic">Classic</option>
-									<option value="blueprint">Blueprint</option>
-									<option value="dracula">Dracula</option>
+
+								<select id="theme" class="settings-value" data-bind="
+									options: availableThemes,
+									optionsText: 'name',
+									optionsValue: 'id',
+									value: app.settings.theme,
+									event: { change: app.setTheme }">
 								</select>
 							</div>
 

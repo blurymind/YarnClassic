@@ -39,8 +39,8 @@
     border: none;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
 }
 .node.selected {
@@ -83,9 +83,9 @@
     color: #8D8374;
 }
 .tag-style-1 {
-    border: 1px solid #E0D6C5 !important;
-    background-color: #E0D6C5 !important;
-    color: #8D8374 !important;
+    border: 1px solid red;
+    background-color: red !important;
+    color: yellow !important;
 }
 .tag-style-2 {
     border: 1px solid #6EA5E0 !important;

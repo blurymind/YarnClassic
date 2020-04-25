@@ -7,17 +7,18 @@ import {
   suggest_word_for_misspelled,
   load_dictionary,
 } from '../libs/spellcheck_ace.js';
+
 import { Node } from './node';
 import { Workspace } from './workspace';
 import { Input } from './input';
+import { Settings } from './settings';
+import { UI } from './ui';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
 // TODO: refactoring proposals
 //
-// Create Settings class: manages user settings using window.localStorage
-// Create UI class: manages menus, buttons, search, settings dialog...
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
@@ -30,16 +31,29 @@ import { Utils, FILETYPE } from './utils';
 export var App = function(name, version) {
   const self = this;
 
+  this.setTheme = function(name, e) {
+    let themeName = e ? e.target.value : name;
+    const theme = document.getElementById('theme-stylesheet');
+    theme.href = `./scss/themes/${themeName}.css`;
+  };
+
+  this.setLanguage = function(language, e) {
+    const languageId = e ? e.target.value : language;
+    self.settings.language = languageId;
+    spoken.recognition.lang = languageId;
+  };
+
   // Ideally this dependencies should be injected by index.js
   this.workspace = new Workspace(self);
   this.input = new Input(self);
+  this.settings = new Settings(self);
+  this.ui = new UI(self);
   this.previewStory = new yarnRender();
 
   this.data = data;
   this.name = ko.observable(name);
   this.version = ko.observable(version);
   this.editing = ko.observable(null);
-  this.settings = ko.observable(false);
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
@@ -55,8 +69,6 @@ export var App = function(name, version) {
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
-  this.selectedLanguageIndex = 6;
-  this.language = null;
 
   this.configFilePath = null;
   this.config = {
@@ -85,7 +97,13 @@ export var App = function(name, version) {
   // inWorkspace
   //
   // Indicates if we are in the workspace view
-  this.inWorkspace = () => !self.editing();
+  this.inWorkspace = () =>
+    !self.editing() && !self.ui.settingsDialogVisible();
+
+  // inSettingsDialog
+  //
+  // Indicates if we are in the settings dialog
+  this.inSettingsDialog = () => self.ui.settingsDialogVisible();
 
   // run
   //
@@ -152,6 +170,8 @@ export var App = function(name, version) {
     ko.applyBindings(self, $('#app')[0]);
 
     self.newNode().title('Start');
+
+    self.settings.apply();
 
     // search field enter
     $('.search-title input').click(self.updateSearch);
@@ -243,22 +263,6 @@ export var App = function(name, version) {
       $('#emojiPicker-container').show();
     };
 
-    this.updateTheme = function() {
-      const selectedTheme = document.getElementById('theme');
-      const theme = document.getElementById('theme-stylesheet');
-      const themePath = './scss/themes/' + selectedTheme.value + '.css';
-      theme.href = themePath;
-    };
-
-    this.updateCountry = function() {
-      var select_language = document.getElementById('select_language');
-      self.selectedLanguageIndex = select_language.selectedIndex;
-
-      self.language = Utils.langs[select_language.selectedIndex][1][0];
-      spoken.recognition.lang = self.language;
-      load_dictionary(self.language.split('-')[0]);
-    };
-
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();
       const say = selectedText
@@ -266,7 +270,7 @@ export var App = function(name, version) {
         : self.editor.getSession().getValue();
 
       spoken.voices().then(countries => {
-        const lookUp = self.language.split('-')[0];
+        const lookUp = self.settings.language.split('-')[0];
         const voices = countries.filter(v => !v.lang.indexOf(lookUp));
 
         if (voices.length) {
@@ -672,35 +676,14 @@ export var App = function(name, version) {
     });
   };
 
-  this.openSettingsDialog = function() {
-    self.settings(true);
-
-    $('.settings-dialog')
-      .css({ opacity: 0 })
-      .transition({ opacity: 1 }, 250);
-    $('.settings-dialog .form')
-      .css({ y: '-100' })
-      .transition({ y: '0' }, 250);
-  };
-
-  this.closeSettingsDialog = function() {
-    self.settings(true);
-    $('.settings-dialog')
-      .css({ opacity: 1 })
-      .transition({ opacity: 0 }, 250);
-    $('.settings-dialog .form')
-      .css({ y: '0' })
-      .transition({ y: '-100' }, 250, e => {
-        self.settings(false);
-      });
-  };
-
   this.editNode = function(node) {
     if (!node.active()) {
       return;
     }
 
-    // Make sure we save the currently node being edited before editing a new
+    load_dictionary(self.settings.language.split('-')[0]);
+
+    // Make sure we save the node being currently edited before editing a new
     // one using the context menu
     if (self.editing() && self.editing() !== node)
       self.saveNode(false);
@@ -832,20 +815,6 @@ export var App = function(name, version) {
         self.togglePreviewMode(false);
       }
     );
-
-    /// init language selector
-    var select_language = document.getElementById('select_language');
-    for (var i = 0; i < Utils.langs.length; i++) {
-      var option = document.createElement('option');
-      option.text = Utils.langs[i][0];
-      select_language.add(option);
-    }
-
-    select_language.selectedIndex = self.selectedLanguageIndex;
-    if (!self.language) {
-      self.language = 'en-US';
-      self.updateCountry();
-    }
 
     self.toggleSpellCheck();
     self.updateEditorStats();
