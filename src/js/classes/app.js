@@ -71,7 +71,6 @@ export var App = function(name, version) {
   this.speachInstance = null;
 
   this.config = {
-    nightModeEnabled: false,
     showCounter: false,
     overwrites: {
       makeNewNodesFromLinks: true,
@@ -320,11 +319,10 @@ export var App = function(name, version) {
       });
     };
 
-    this.toglTranscribing = function() {
+    this.toggleTranscribing = function() {
       const available = spoken.listen.available();
-      var transcribeButton = document.getElementById('toglTranscribing');
       var speakBubble = document.getElementById('speakTextBtnBubble');
-      if (transcribeButton.checked && available) {
+      if (available && self.settings.transcribeEnabled()) {
         spoken.listen.on.partial(ts => {
           if (self.editing()) {
             speakBubble.style.visibility = 'visible';
@@ -336,7 +334,6 @@ export var App = function(name, version) {
         self.startCapture();
       } else {
         speakBubble.style.visibility = 'hidden';
-        transcribeButton.checked = false;
         spoken.recognition.continuous = false;
         spoken.listen.stop();
       }
@@ -699,8 +696,6 @@ export var App = function(name, version) {
     self.editor.navigateFileEnd();
 
     // TODO: get rid of this
-    var nightModeButton = document.getElementById('toglNightMode');
-    nightModeButton.checked = self.config.nightModeEnabled;
     var showCounterButton = document.getElementById('toglShowCounter');
     showCounterButton.checked = self.config.showCounter;
 
@@ -796,7 +791,7 @@ export var App = function(name, version) {
       }
     );
 
-    self.toglTranscribing();
+    self.toggleTranscribing();
     self.toggleNightMode();
     self.toggleShowCounter();
     self.toggleWordCompletion();
@@ -891,14 +886,10 @@ export var App = function(name, version) {
   };
 
   this.toggleNightMode = function() {
-    var nightModeButton = document.getElementById('toglNightMode');
-    self.config.nightModeEnabled = nightModeButton.checked;
-    var cssOverwrite = {};
-    if (self.config.nightModeEnabled) {
-      cssOverwrite = { filter: 'invert(100%)' };
-    } else {
-      cssOverwrite = { filter: 'invert(0%)' };
-    }
+    const cssOverwrite = self.settings.nightModeEnabled() ?
+      { filter: 'invert(100%)' } :
+      { filter: 'invert(0%)' };
+
     $('#app').css(cssOverwrite);
     $('#app-bg').css(cssOverwrite);
     $('.tooltip').css(cssOverwrite);

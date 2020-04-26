@@ -15,6 +15,7 @@ export const Settings = function(app) {
   this.apply = function () {
     app.setTheme(self.theme());
     app.setLanguage(self.language());
+    app.toggleNightMode();
     app.workspace.setThrottle(self.redrawThrottle());
   };
 
@@ -52,4 +53,9 @@ export const Settings = function(app) {
   this.completeWordsEnabled = ko
     .observable(storage.getItem('completeWordsEnabled')==='true')
     .extend({ persist:'completeWordsEnabled' });
+
+  // Night mode
+  this.nightModeEnabled = ko
+    .observable(storage.getItem('nightModeEnabled')==='true')
+    .extend({ persist:'nightModeEnabled' });
 };

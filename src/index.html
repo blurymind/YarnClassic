@@ -197,7 +197,12 @@
 						</span>
 						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
 						<span class="styled-checkbox">
-							<input class="styled-checkbox" type="checkbox" id="toglNightMode" onclick="app.toggleNightMode()"></input>
+							<input
+								id="toglNightMode"
+								class="styled-checkbox"
+								type="checkbox"
+								data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode}">
+							</input>
 							<label for="toglNightMode" title="Night Mode"> &#9728 </label>
 						</span>
 						|
@@ -218,7 +223,7 @@
 								type="checkbox"
 								id="toglTranscribing"
 								data-bind="checked: app.settings.transcribeEnabled"
-								onclick="app.toglTranscribing()"
+								onclick="app.toggleTranscribing()"
 							></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
