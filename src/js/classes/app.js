@@ -39,8 +39,8 @@ export var App = function(name, version) {
 
   this.setLanguage = function(language, e) {
     const languageId = e ? e.target.value : language;
-    self.settings.language = languageId;
     spoken.recognition.lang = languageId;
+    // TODO: load dictionary here
   };
 
   // Ideally this dependencies should be injected by index.js
@@ -269,7 +269,7 @@ export var App = function(name, version) {
         : self.editor.getSession().getValue();
 
       spoken.voices().then(countries => {
-        const lookUp = self.settings.language.split('-')[0];
+        const lookUp = self.settings.language().split('-')[0];
         const voices = countries.filter(v => !v.lang.indexOf(lookUp));
 
         if (voices.length) {
@@ -680,7 +680,7 @@ export var App = function(name, version) {
       return;
     }
 
-    load_dictionary(self.settings.language.split('-')[0]);
+    load_dictionary(self.settings.language().split('-')[0]);
 
     // Make sure we save the node being currently edited before editing a new
     // one using the context menu

@@ -1,41 +1,40 @@
+export const Settings = function(app) {
+  const self = this;
+  const storage = window.localStorage;
 
-export class Settings {
-  constructor (app) {
-    this.app = app;
-    this.storage = window.localStorage;
-    const storage = window.localStorage;
-
-    ko.extenders.persist = function (target, option) {
-      target.subscribe(function (newValue) {
-        storage.setItem(option, newValue);
-      });
-      return target;
-    };
-
-    // Spellcheck enabled
-    this.spellcheckEnabled = ko
-      .observable(storage.getItem('spellcheckEnabled')==='true')
-      .extend({ persist:'spellcheckEnabled' });
-  }
+  ko.extenders.persist = function (target, option) {
+    target.subscribe(function (newValue) {
+      storage.setItem(option, newValue);
+    });
+    return target;
+  };
 
   // apply
   //
   // Applies the current settings
-  apply() {
-    this.app.setTheme(this.theme);
-    this.app.setLanguage(this.language);
-    this.app.workspace.setThrottle(this.redrawThrottle);
-  }
+  this.apply = function () {
+    app.setTheme(self.theme());
+    app.setLanguage(self.language());
+    app.workspace.setThrottle(self.redrawThrottle());
+  };
 
   // Theme
-  get theme () { return this.storage.getItem('theme') || 'classic'; };
-  set theme (value) { this.storage.setItem('theme', value); }
+  this.theme = ko
+    .observable(storage.getItem('theme') || 'classic')
+    .extend({ persist:'theme' });
 
   // Language
-  get language () { return this.storage.getItem('language') || 'en-GB'; };
-  set language (value) { this.storage.setItem('language', value); }
+  this.language = ko
+    .observable(storage.getItem('language') || 'en-GB')
+    .extend({ persist:'language' });
 
   // Redraw throttle
-  get redrawThrottle () { return this.storage.getItem('redrawThrottle') || '50'; };
-  set redrawThrottle (value) { this.storage.setItem('redrawThrottle', value); }
+  this.redrawThrottle = ko
+    .observable(parseInt(storage.getItem('redrawThrottle') || '50'))
+    .extend({ persist:'redrawThrottle' });
+
+  // Spellcheck enabled
+  this.spellcheckEnabled = ko
+    .observable(storage.getItem('spellcheckEnabled')==='true')
+    .extend({ persist:'spellcheckEnabled' });
 };
