@@ -893,10 +893,9 @@ export var App = function(name, version) {
   };
 
   this.toggleWordCompletion = function() {
-    const enabled = document.getElementById('toglAutocompleteWords').checked;
     self.editor.setOptions({
-      enableBasicAutocompletion: enabled,
-      enableLiveAutocompletion: enabled
+      enableBasicAutocompletion: app.settings.completeWordsEnabled(),
+      enableLiveAutocompletion: app.settings.completeWordsEnabled()
     });
   };
 
