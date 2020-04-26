@@ -36,31 +36,50 @@ export const Settings = function(app) {
 
   // Spellcheck enabled
   this.spellcheckEnabled = ko
-    .observable(storage.getItem('spellcheckEnabled')==='true')
-    .extend({ persist:'spellcheckEnabled' });
+    .observable(storage.getItem('spellcheckEnabled') !== null ?
+      storage.getItem('spellcheckEnabled') === 'true' :
+      true
+    ).extend({ persist:'spellcheckEnabled' });
 
   // Transcribe enabled
   this.transcribeEnabled = ko
-    .observable(storage.getItem('transcribeEnabled')==='true')
-    .extend({ persist:'transcribeEnabled' });
+    .observable(storage.getItem('transcribeEnabled') !== null ?
+      storage.getItem('transcribeEnabled') === 'true' :
+      false
+    ).extend({ persist:'transcribeEnabled' });
 
   // Autocomplete tags
   this.completeTagsEnabled = ko
-    .observable(storage.getItem('completeTagsEnabled')==='true')
-    .extend({ persist:'completeTagsEnabled' });
+    .observable(storage.getItem('completeTagsEnabled') !== null ?
+      storage.getItem('completeTagsEnabled') === 'true' :
+      true
+    ).extend({ persist:'completeTagsEnabled' });
 
   // Autocomplete words
   this.completeWordsEnabled = ko
-    .observable(storage.getItem('completeWordsEnabled')==='true')
-    .extend({ persist:'completeWordsEnabled' });
+    .observable(storage.getItem('completeWordsEnabled') !== null ?
+      storage.getItem('completeWordsEnabled') === 'true' :
+      true
+    ).extend({ persist:'completeWordsEnabled' });
 
   // Night mode
   this.nightModeEnabled = ko
-    .observable(storage.getItem('nightModeEnabled')==='true')
-    .extend({ persist:'nightModeEnabled' });
+    .observable(storage.getItem('nightModeEnabled') !== null ?
+      storage.getItem('nightModeEnabled') === 'true' :
+      false
+    ).extend({ persist:'nightModeEnabled' });
 
   // Autocreate nodes
   this.createNodesEnabled = ko
-    .observable(storage.getItem('createNodesEnabled')==='true')
-    .extend({ persist:'createNodesEnabled' });
+    .observable(storage.getItem('createNodesEnabled') !== null ?
+      storage.getItem('createNodesEnabled') === 'true' :
+      true
+    ).extend({ persist:'createNodesEnabled' });
+
+  // Editor stats
+  this.editorStatsEnabled = ko
+    .observable(storage.getItem('editorStatsEnabled') !== null ?
+      storage.getItem('editorStatsEnabled') === 'true' :
+      false
+    ).extend({ persist:'editorStatsEnabled' });
 };
