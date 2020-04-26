@@ -352,12 +352,31 @@
 								>
 							</div>
 
+							<!-- AutocompleteWords -->
 							<div class="settings-item">
-								<label class="settings-label" for="autocompletion">💬 Autocompletion</label>
-								<input id="autocompletion" type="checkbox" checked="true" class="settings-value">
+								<label class="settings-label" for="completeWords">💬 Complete words</label>
+								<input
+									id="completeWords"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.completeWordsEnabled"
+								>
 							</div>
+
+							<!-- AutocloseTags -->
 							<div class="settings-item">
-								<label class="settings-label" for="autocreation">➕ Auto create new nodes</label>
+								<label class="settings-label" for="completeTags">🔮 Complete tags</label>
+								<input
+									id="completeTags"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.completeTagsEnabled"
+								>
+							</div>
+
+							<!-- AutocreateNodes -->
+							<div class="settings-item">
+								<label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
 								<input id="autocreation" type="checkbox" checked="true" class="settings-value">
 							</div>
 							<div class="settings-item">

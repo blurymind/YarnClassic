@@ -74,7 +74,6 @@ export var App = function(name, version) {
     nightModeEnabled: false,
     showCounter: false,
     autocompleteWordsEnabled: true,
-    autocompleteEnabled: true,
     overwrites: {
       makeNewNodesFromLinks: true,
     },
@@ -702,7 +701,7 @@ export var App = function(name, version) {
     self.editor.navigateFileEnd();
 
     var autoCompleteButton = document.getElementById('toglAutocomplete');
-    autoCompleteButton.checked = self.config.autocompleteEnabled;
+    autoCompleteButton.checked = self.settings.completeTagsEnabled();
     var autoCompleteWordsButton = document.getElementById(
       'toglAutocompleteWords'
     );
@@ -1156,7 +1155,7 @@ export var App = function(name, version) {
 
       // Save user settings
       const autoCompleteButton = document.getElementById('toglAutocomplete');
-      self.config.autocompleteEnabled = autoCompleteButton.checked;
+      self.settings.completeTagsEnabled(autoCompleteButton.checked);
 
       const autoCompleteWordsButton = document.getElementById(
         'toglAutocompleteWords'

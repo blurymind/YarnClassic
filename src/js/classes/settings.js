@@ -42,4 +42,9 @@ export const Settings = function(app) {
   this.transcribeEnabled = ko
     .observable(storage.getItem('transcribeEnabled')==='true')
     .extend({ persist:'transcribeEnabled' });
+
+  // Autocomplete tags
+  this.completeTagsEnabled = ko
+    .observable(storage.getItem('completeTagsEnabled')==='true')
+    .extend({ persist:'completeTagsEnabled' });
 };
