@@ -70,7 +70,6 @@ export var App = function(name, version) {
   this.nodeClipboard = [];
   this.speachInstance = null;
 
-  // this.configFilePath = null;
   this.config = {
     nightModeEnabled: false,
     transcribeEnabled: false,
@@ -680,6 +679,7 @@ export var App = function(name, version) {
       return;
     }
 
+    // TODO: this makes the editor freeze form some seconds
     load_dictionary(self.settings.language().split('-')[0]);
 
     // Make sure we save the node being currently edited before editing a new
