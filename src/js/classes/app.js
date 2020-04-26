@@ -72,9 +72,6 @@ export var App = function(name, version) {
 
   this.config = {
     showCounter: false,
-    overwrites: {
-      makeNewNodesFromLinks: true,
-    },
     settings: {
       autoSave: -1,
     },
@@ -1274,13 +1271,8 @@ export var App = function(name, version) {
   };
 
   this.makeNewNodesFromLinks = function() {
-    if (
-      this.config &&
-      this.config.overwrites &&
-      !this.config.overwrites.makeNewNodesFromLinks
-    ) {
+    if (!self.settings.createNodesEnabled())
       return console.info('Autocreate new nodes disabled');
-    }
 
     var nodeLinks = self.editing().getLinksInNode();
     if (nodeLinks == undefined) {

@@ -398,8 +398,15 @@
 							<!-- AutocreateNodes -->
 							<div class="settings-item">
 								<label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
-								<input id="autocreation" type="checkbox" checked="true" class="settings-value">
+								<input
+									id="autocreation"
+									type="checkbox"
+									class="settings-value"
+									checked="true"
+									data-bind="checked: app.settings.createNodesEnabled"
+								>
 							</div>
+
 							<div class="settings-item">
 								<label class="settings-label" for="autosave">💾 Auto save</label>
 								<input id="autosave" type="checkbox" checked="true" class="settings-value">

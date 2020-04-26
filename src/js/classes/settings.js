@@ -58,4 +58,9 @@ export const Settings = function(app) {
   this.nightModeEnabled = ko
     .observable(storage.getItem('nightModeEnabled')==='true')
     .extend({ persist:'nightModeEnabled' });
+
+  // Autocreate nodes
+  this.createNodesEnabled = ko
+    .observable(storage.getItem('createNodesEnabled')==='true')
+    .extend({ persist:'createNodesEnabled' });
 };
