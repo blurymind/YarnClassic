@@ -7,7 +7,7 @@
 		<title>Yarn</title>
 	</head>
 	<body>
-		<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/dracula.css" >
+		<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/classic.css" >
 		<!-- Fancy Background -->
 		<div id="app-bg">&nbsp;</div>
 
@@ -59,7 +59,7 @@
 			<!-- navigation / menu -->
 			<div class="app-menu">
 				<div class="menu">
-					<span class="title" data-bind="click:app.openSettingsDialog">+ Node</span>
+					<span class="title" data-bind="click:app.newNode">+ Node</span>
 				</div>
 
 				<div class="menu">
@@ -106,6 +106,8 @@
 							&nbsp;
 							Send file
 						</span>
+						<span><hr></span>
+						<span class="item" data-bind="click:app.ui.openSettingsDialog">Settings</span>
 					</div>
 				</div>
 			</div>
@@ -322,7 +324,7 @@
 							<div class="settings-item">
 								<label class="settings-label" for="theme">Theme</label>
 
-								<select id="theme" class="settings-value" data-bind="
+								<select id="theme" class="settings-value" disabled data-bind="
 									options: app.ui.availableThemes,
 									optionsText: 'name',
 									optionsValue: 'id',
