@@ -69,14 +69,6 @@ export var App = function(name, version) {
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
-
-  this.config = {
-    showCounter: false,
-    settings: {
-      autoSave: -1,
-    },
-  };
-
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
 
@@ -690,10 +682,6 @@ export var App = function(name, version) {
     self.editor = ace.edit('editor');
     self.editor.navigateFileEnd();
 
-    // TODO: get rid of this
-    var showCounterButton = document.getElementById('toglShowCounter');
-    showCounterButton.checked = self.config.showCounter;
-
     /// set color picker
     $('#colorPicker').spectrum({
       flat: true,
@@ -893,9 +881,7 @@ export var App = function(name, version) {
   };
 
   this.toggleShowCounter = function() {
-    var showCounterButton = document.getElementById('toglShowCounter');
-    self.config.showCounter = showCounterButton.checked;
-    if (self.config.showCounter) {
+    if (self.settings.editorStatsEnabled()) {
       $('.node-editor .form .bbcode-toolbar .editor-counter').css({
         display: 'initial',
       });

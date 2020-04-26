@@ -165,7 +165,11 @@
 						</div>
 						&nbsp;
 						<span class="styled-checkbox hide-when-narrow">
-								<input type="checkbox" id="toglShowCounter" onclick="app.toggleShowCounter()"></input>
+								<input
+									id="toglShowCounter"
+									type="checkbox"
+									data-bind="checked: app.settings.editorStatsEnabled, event: { click: app.toggleShowCounter }"
+								></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
 						<span class="editor-counter">
@@ -405,11 +409,6 @@
 									checked="true"
 									data-bind="checked: app.settings.createNodesEnabled"
 								>
-							</div>
-
-							<div class="settings-item">
-								<label class="settings-label" for="autosave">💾 Auto save</label>
-								<input id="autosave" type="checkbox" checked="true" class="settings-value">
 							</div>
 						</div> <!-- settgins-column -->
 					</div> <!-- settgins-row -->
