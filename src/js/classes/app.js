@@ -324,7 +324,6 @@ export var App = function(name, version) {
       const available = spoken.listen.available();
       var transcribeButton = document.getElementById('toglTranscribing');
       var speakBubble = document.getElementById('speakTextBtnBubble');
-      self.settings.transcribeEnabled(transcribeButton.checked);
       if (transcribeButton.checked && available) {
         spoken.listen.on.partial(ts => {
           if (self.editing()) {
@@ -699,27 +698,12 @@ export var App = function(name, version) {
     self.editor = ace.edit('editor');
     self.editor.navigateFileEnd();
 
-    var autoCompleteButton = document.getElementById('toglAutocomplete');
-    autoCompleteButton.checked = self.settings.completeTagsEnabled();
-    var autoCompleteWordsButton = document.getElementById(
-      'toglAutocompleteWords'
-    );
-    autoCompleteWordsButton.checked = self.settings.completeWordsEnabled();
-    var spellCheckButton = document.getElementById('toglSpellCheck');
-    spellCheckButton.checked = self.settings.spellcheckEnabled();
-    var transcribeButton = document.getElementById('toglTranscribing');
-    transcribeButton.checked = self.settings.transcribeEnabled();
-    self.toglTranscribing();
+    // TODO: get rid of this
     var nightModeButton = document.getElementById('toglNightMode');
     nightModeButton.checked = self.config.nightModeEnabled;
-    self.toggleNightMode();
     var showCounterButton = document.getElementById('toglShowCounter');
     showCounterButton.checked = self.config.showCounter;
-    self.toggleShowCounter();
-    self.toggleWordCompletion();
 
-    //// warn if titlealready exists
-    self.validateTitle();
     /// set color picker
     $('#colorPicker').spectrum({
       flat: true,
@@ -812,7 +796,12 @@ export var App = function(name, version) {
       }
     );
 
+    self.toglTranscribing();
+    self.toggleNightMode();
+    self.toggleShowCounter();
+    self.toggleWordCompletion();
     self.toggleSpellCheck();
+    self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
   };
 
@@ -895,13 +884,10 @@ export var App = function(name, version) {
   };
 
   this.toggleSpellCheck = function() {
-    var spellCheckButton = document.getElementById('toglSpellCheck');
-    self.settings.spellcheckEnabled(spellCheckButton.checked);
-    if (spellCheckButton.checked) {
+    if (self.settings.spellcheckEnabled())
       enable_spellcheck();
-    } else {
+    else
       disable_spellcheck();
-    }
   };
 
   this.toggleNightMode = function() {
@@ -936,7 +922,6 @@ export var App = function(name, version) {
 
   this.toggleWordCompletion = function() {
     const enabled = document.getElementById('toglAutocompleteWords').checked;
-    self.settings.completeWordsEnabled(enabled);
     self.editor.setOptions({
       enableBasicAutocompletion: enabled,
       enableLiveAutocompletion: enabled
@@ -1151,12 +1136,6 @@ export var App = function(name, version) {
       self.makeNewNodesFromLinks();
       self.propagateUpdateFromNode(node);
       self.workspace.updateArrows();
-
-      // Save user settings
-      const autoCompleteButton = document.getElementById('toglAutocomplete');
-      self.settings.completeTagsEnabled(autoCompleteButton.checked);
-      const autoCompleteWordsButton = document.getElementById('toglAutocompleteWords');
-      self.settings.completeWordsEnabled(autoCompleteWordsButton.checked);
 
       setTimeout(self.updateSearch, 600);
 

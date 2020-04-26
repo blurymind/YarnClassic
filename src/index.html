@@ -182,13 +182,17 @@
 									Col: <span class="column-index">0</span>
 							</span>
 						</span>
-
 						<span class="styled-checkbox">
-							<input type="checkbox" id="toglAutocomplete"></input>
+							<input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
 							<label for="toglAutocomplete" title="Auto Close tags" style="color:#292929">🔮</label>
 						</span>
 						<span class="styled-checkbox hide-when-narrow">
-							<input type="checkbox" id="toglAutocompleteWords" onclick="app.toggleWordCompletion()"></input>
+							<input
+								id="toglAutocompleteWords"
+								type="checkbox"
+								data-bind="checked: app.settings.completeWordsEnabled"
+								onclick="app.toggleWordCompletion()"
+							></input>
 							<label for="toglAutocompleteWords" title="auto-completion">💬</label>
 						</span>
 						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
@@ -198,12 +202,24 @@
 						</span>
 						|
 							<span class="styled-checkbox">
-								<input class="styled-checkbox" type="checkbox" id="toglSpellCheck" onclick="app.toggleSpellCheck()"></input>
+								<input
+									id="toglSpellCheck"
+									class="styled-checkbox"
+									type="checkbox"
+									data-bind="checked: app.settings.spellcheckEnabled"
+									onclick="app.toggleSpellCheck()">
+								</input>
 								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
 							</span>
 						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
 						<span class="styled-checkbox hide-when-narrow">
-							<input class="styled-checkbox" type="checkbox" id="toglTranscribing" onclick="app.toglTranscribing()"></input>
+							<input
+								class="styled-checkbox"
+								type="checkbox"
+								id="toglTranscribing"
+								data-bind="checked: app.settings.transcribeEnabled"
+								onclick="app.toglTranscribing()"
+							></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.speakText()" title="Hear text">🔊</button>
