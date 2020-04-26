@@ -330,9 +330,15 @@
 
 						</div> <!-- settgins-column -->
 						<div class="settings-column">
+
+							<!-- Spellcheck -->
 							<div class="settings-item">
 								<label class="settings-label" for="spellcheck">Spell check</label>
-								<input id="spellcheck" type="checkbox" checked="true" class="settings-value">
+								<input
+									id="spellcheck"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.spellcheckEnabled">
 							</div>
 							<div class="settings-item">
 								<label class="settings-label" for="transcription">Transcription</label>

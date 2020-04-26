@@ -70,10 +70,9 @@ export var App = function(name, version) {
   this.nodeClipboard = [];
   this.speachInstance = null;
 
-  this.configFilePath = null;
+  // this.configFilePath = null;
   this.config = {
     nightModeEnabled: false,
-    spellcheckEnabled: true,
     transcribeEnabled: false,
     showCounter: false,
     autocompleteWordsEnabled: true,
@@ -710,7 +709,7 @@ export var App = function(name, version) {
     );
     autoCompleteWordsButton.checked = self.config.autocompleteWordsEnabled;
     var spellCheckButton = document.getElementById('toglSpellCheck');
-    spellCheckButton.checked = self.config.spellcheckEnabled;
+    spellCheckButton.checked = self.settings.spellcheckEnabled();
     var transcribeButton = document.getElementById('toglTranscribing');
     transcribeButton.checked = self.config.transcribeEnabled;
     self.toglTranscribing();
@@ -900,7 +899,7 @@ export var App = function(name, version) {
 
   this.toggleSpellCheck = function() {
     var spellCheckButton = document.getElementById('toglSpellCheck');
-    self.config.spellcheckEnabled = spellCheckButton.checked;
+    self.settings.spellcheckEnabled(spellCheckButton.checked);
     if (spellCheckButton.checked) {
       enable_spellcheck();
     } else {
@@ -1316,12 +1315,9 @@ export var App = function(name, version) {
       this.config.overwrites &&
       !this.config.overwrites.makeNewNodesFromLinks
     ) {
-      console.info(
-        'Autocreation of new nodes from links is disabled in:\n' +
-          this.configFilePath
-      );
-      return;
+      return console.info('Autocreate new nodes disabled');
     }
+
     var nodeLinks = self.editing().getLinksInNode();
     if (nodeLinks == undefined) {
       return;

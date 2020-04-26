@@ -3,6 +3,19 @@ export class Settings {
   constructor (app) {
     this.app = app;
     this.storage = window.localStorage;
+    const storage = window.localStorage;
+
+    ko.extenders.persist = function (target, option) {
+      target.subscribe(function (newValue) {
+        storage.setItem(option, newValue);
+      });
+      return target;
+    };
+
+    // Spellcheck enabled
+    this.spellcheckEnabled = ko
+      .observable(storage.getItem('spellcheckEnabled')==='true')
+      .extend({ persist:'spellcheckEnabled' });
   }
 
   // apply

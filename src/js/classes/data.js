@@ -15,28 +15,28 @@ export var data = {
       ? path.join(path.dirname(filePath), addSubPath)
       : path.dirname(filePath);
   },
-  tryLoadConfigFile: function() {
-    app.configFilePath = path.join(
-      remote.app.getPath('home'),
-      '.yarn-story-editor.json'
-    );
-    if (fs.existsSync(app.configFilePath)) {
-      app.config = JSON.parse(fs.readFileSync(app.configFilePath));
-      console.log('Settings loaded from:\n' + app.configFilePath);
-      // if autosaving has a value in the config - value is in minutes
-      if (app.config && app.config.settings && app.config.settings.autoSave) {
-        if (app.config.settings.autoSave < 0.1) {
-          return;
-        }
-        setInterval(function() {
-          if (data.editingPath()) {
-            data.trySaveCurrent();
-            console.log('Autosaved:\n' + data.editingPath());
-          }
-        }, app.config.settings.autoSave * 60000);
-      }
-    }
-  },
+  // tryLoadConfigFile: function() {
+  //   app.configFilePath = path.join(
+  //     remote.app.getPath('home'),
+  //     '.yarn-story-editor.json'
+  //   );
+  //   if (fs.existsSync(app.configFilePath)) {
+  //     app.config = JSON.parse(fs.readFileSync(app.configFilePath));
+  //     console.log('Settings loaded from:\n' + app.configFilePath);
+  //     // if autosaving has a value in the config - value is in minutes
+  //     if (app.config && app.config.settings && app.config.settings.autoSave) {
+  //       if (app.config.settings.autoSave < 0.1) {
+  //         return;
+  //       }
+  //       setInterval(function() {
+  //         if (data.editingPath()) {
+  //           data.trySaveCurrent();
+  //           console.log('Autosaved:\n' + data.editingPath());
+  //         }
+  //       }, app.config.settings.autoSave * 60000);
+  //     }
+  //   }
+  // },
   readFile: function(file, filename, clearNodes) {
     // Read approach that works for webapps
     var reader = new FileReader();
@@ -398,7 +398,7 @@ export var data = {
       new Blob([yarnData], {type: 'text/plain'}),
     ];
     const file = new File(parts, editingName, {});
-        
+
     if (navigator.canShare && navigator.canShare({
       files: [file]
     })) {
