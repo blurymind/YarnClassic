@@ -745,7 +745,7 @@ export var App = function(name, version) {
       ],
       change: function(color) {
         if ($('#colorPicker-container').is(':visible')) {
-          app.applyPickerColorEditor(color);
+          self.applyPickerColorEditor(color);
           $('#colorPicker').spectrum.set(color.toHexString());
         }
       },
@@ -824,7 +824,7 @@ export var App = function(name, version) {
 
   this.openNodeByTitle = function(nodeTitle) {
     self.makeNodeWithName(nodeTitle);
-    app.nodes().forEach(node => {
+    self.nodes().forEach(node => {
       if (
         node
           .title()
@@ -1090,7 +1090,7 @@ export var App = function(name, version) {
     var rootMenu = document.getElementById(action + 'HelperMenu');
     rootMenu.innerHTML = '';
 
-    app.nodes().forEach((node, i) => {
+    self.nodes().forEach((node, i) => {
       if (
         node
           .title()
@@ -1100,7 +1100,7 @@ export var App = function(name, version) {
       ) {
         var p = document.createElement('span');
         p.innerHTML = node.title();
-        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
+        $(p).addClass('item ' + self.nodes()[i].titleStyles[self.nodes()[i].colorID()]);
 
         if (action == 'link') {
           if (node.title() !== self.editing().title()) {
@@ -1184,8 +1184,8 @@ export var App = function(name, version) {
     var on = 1;
     var off = 0.25;
 
-    for (var i = 0; i < app.nodes().length; i++) {
-      var node = app.nodes()[i];
+    for (var i = 0; i < self.nodes().length; i++) {
+      var node = self.nodes()[i];
       var element = $(node.element);
 
       if (search.length > 0 && (title || body || tags)) {
@@ -1301,10 +1301,10 @@ export var App = function(name, version) {
     });
 
     // Remove unused tags
-    let i = app.tags().length;
+    let i = self.tags().length;
     while (i--) {
-      if(app.tags()[i].count === 0)
-        app.tags().splice(i, 1);
+      if(self.tags()[i].count === 0)
+        self.tags().splice(i, 1);
     }
   };
 
@@ -1345,7 +1345,7 @@ export var App = function(name, version) {
 
   this.titleExistsTwice = function(title) {
     return (
-      app.nodes().filter(node => node.title().trim() === title.trim()).length >
+      self.nodes().filter(node => node.title().trim() === title.trim()).length >
       1
     );
   };
@@ -1359,7 +1359,7 @@ export var App = function(name, version) {
 
   this.getOtherNodeTitles = function() {
     var result = [];
-    app.nodes().forEach(node => {
+    self.nodes().forEach(node => {
       if (!self.editing() || node.title() !== self.editing().title()) {
         result.push(node.title().trim());
       }
