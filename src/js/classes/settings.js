@@ -47,4 +47,9 @@ export const Settings = function(app) {
   this.completeTagsEnabled = ko
     .observable(storage.getItem('completeTagsEnabled')==='true')
     .extend({ persist:'completeTagsEnabled' });
+
+  // Autocomplete words
+  this.completeWordsEnabled = ko
+    .observable(storage.getItem('completeWordsEnabled')==='true')
+    .extend({ persist:'completeWordsEnabled' });
 };

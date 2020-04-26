@@ -73,7 +73,6 @@ export var App = function(name, version) {
   this.config = {
     nightModeEnabled: false,
     showCounter: false,
-    autocompleteWordsEnabled: true,
     overwrites: {
       makeNewNodesFromLinks: true,
     },
@@ -705,7 +704,7 @@ export var App = function(name, version) {
     var autoCompleteWordsButton = document.getElementById(
       'toglAutocompleteWords'
     );
-    autoCompleteWordsButton.checked = self.config.autocompleteWordsEnabled;
+    autoCompleteWordsButton.checked = self.settings.completeWordsEnabled();
     var spellCheckButton = document.getElementById('toglSpellCheck');
     spellCheckButton.checked = self.settings.spellcheckEnabled();
     var transcribeButton = document.getElementById('toglTranscribing');
@@ -936,11 +935,11 @@ export var App = function(name, version) {
   };
 
   this.toggleWordCompletion = function() {
-    var wordCompletionButton = document.getElementById('toglAutocompleteWords');
-    self.config.autocompleteWordsEnabled = wordCompletionButton.checked;
+    const enabled = document.getElementById('toglAutocompleteWords').checked;
+    self.settings.completeWordsEnabled(enabled);
     self.editor.setOptions({
-      enableBasicAutocompletion: self.config.autocompleteWordsEnabled,
-      enableLiveAutocompletion: self.config.autocompleteWordsEnabled,
+      enableBasicAutocompletion: enabled,
+      enableLiveAutocompletion: enabled
     });
   };
 
@@ -1156,11 +1155,8 @@ export var App = function(name, version) {
       // Save user settings
       const autoCompleteButton = document.getElementById('toglAutocomplete');
       self.settings.completeTagsEnabled(autoCompleteButton.checked);
-
-      const autoCompleteWordsButton = document.getElementById(
-        'toglAutocompleteWords'
-      );
-      self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
+      const autoCompleteWordsButton = document.getElementById('toglAutocompleteWords');
+      self.settings.completeWordsEnabled(autoCompleteWordsButton.checked);
 
       setTimeout(self.updateSearch, 600);
 
