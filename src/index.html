@@ -170,7 +170,8 @@
 								<input
 									id="toglShowCounter"
 									type="checkbox"
-									data-bind="checked: app.settings.editorStatsEnabled, event: { click: app.toggleShowCounter }"
+									data-bind="checked: app.settings.editorStatsEnabled"
+									onclick="app.toggleShowCounter()"
 								></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
