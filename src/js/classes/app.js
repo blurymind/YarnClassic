@@ -40,7 +40,7 @@ export var App = function(name, version) {
   this.setLanguage = function(language, e) {
     const languageId = e ? e.target.value : language;
     spoken.recognition.lang = languageId;
-    // TODO: load dictionary here
+    load_dictionary(self.settings.language().split('-')[0]);
   };
 
   // Ideally this dependencies should be injected by index.js
@@ -610,6 +610,7 @@ export var App = function(name, version) {
     });
   };
 
+  // TODO: used just once. Fuse with newNodeAt and makeNodeWithName
   this.newNode = function(updateLinks=true) {
     var node = new Node();
     self.nodes.push(node);
@@ -668,9 +669,6 @@ export var App = function(name, version) {
     if (!node.active()) {
       return;
     }
-
-    // TODO: this makes the editor freeze form some seconds
-    load_dictionary(self.settings.language().split('-')[0]);
 
     // Make sure we save the node being currently edited before editing a new
     // one using the context menu
