@@ -37,4 +37,9 @@ export const Settings = function(app) {
   this.spellcheckEnabled = ko
     .observable(storage.getItem('spellcheckEnabled')==='true')
     .extend({ persist:'spellcheckEnabled' });
+
+  // Transcribe enabled
+  this.transcribeEnabled = ko
+    .observable(storage.getItem('transcribeEnabled')==='true')
+    .extend({ persist:'transcribeEnabled' });
 };

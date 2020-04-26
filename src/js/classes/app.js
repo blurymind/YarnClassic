@@ -72,7 +72,6 @@ export var App = function(name, version) {
 
   this.config = {
     nightModeEnabled: false,
-    transcribeEnabled: false,
     showCounter: false,
     autocompleteWordsEnabled: true,
     autocompleteEnabled: true,
@@ -327,7 +326,7 @@ export var App = function(name, version) {
       const available = spoken.listen.available();
       var transcribeButton = document.getElementById('toglTranscribing');
       var speakBubble = document.getElementById('speakTextBtnBubble');
-      self.config.transcribeEnabled = transcribeButton.checked;
+      self.settings.transcribeEnabled(transcribeButton.checked);
       if (transcribeButton.checked && available) {
         spoken.listen.on.partial(ts => {
           if (self.editing()) {
@@ -711,7 +710,7 @@ export var App = function(name, version) {
     var spellCheckButton = document.getElementById('toglSpellCheck');
     spellCheckButton.checked = self.settings.spellcheckEnabled();
     var transcribeButton = document.getElementById('toglTranscribing');
-    transcribeButton.checked = self.config.transcribeEnabled;
+    transcribeButton.checked = self.settings.transcribeEnabled();
     self.toglTranscribing();
     var nightModeButton = document.getElementById('toglNightMode');
     nightModeButton.checked = self.config.nightModeEnabled;

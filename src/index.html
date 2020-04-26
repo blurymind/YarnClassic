@@ -333,27 +333,35 @@
 
 							<!-- Spellcheck -->
 							<div class="settings-item">
-								<label class="settings-label" for="spellcheck">Spell check</label>
+								<label class="settings-label" for="spellcheck">✔ Spell check</label>
 								<input
 									id="spellcheck"
 									type="checkbox"
 									class="settings-value"
 									data-bind="checked: app.settings.spellcheckEnabled">
 							</div>
+
+							<!-- Transcription -->
 							<div class="settings-item">
-								<label class="settings-label" for="transcription">Transcription</label>
-								<input id="transcription" type="checkbox" checked="true" class="settings-value">
+								<label class="settings-label" for="transcription">🎤 Transcription</label>
+								<input
+									id="transcription"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.transcribeEnabled"
+								>
 							</div>
+
 							<div class="settings-item">
-								<label class="settings-label" for="autocompletion">Autocompletion</label>
+								<label class="settings-label" for="autocompletion">💬 Autocompletion</label>
 								<input id="autocompletion" type="checkbox" checked="true" class="settings-value">
 							</div>
 							<div class="settings-item">
-								<label class="settings-label" for="autocreation">Auto create new nodes</label>
+								<label class="settings-label" for="autocreation">➕ Auto create new nodes</label>
 								<input id="autocreation" type="checkbox" checked="true" class="settings-value">
 							</div>
 							<div class="settings-item">
-								<label class="settings-label" for="autosave">Auto save</label>
+								<label class="settings-label" for="autosave">💾 Auto save</label>
 								<input id="autosave" type="checkbox" checked="true" class="settings-value">
 							</div>
 						</div> <!-- settgins-column -->
