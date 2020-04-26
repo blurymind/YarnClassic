@@ -400,12 +400,17 @@ export let Node = function(options = {}) {
     self.linkedFrom.removeAll();
 
     app.nodes().forEach(parent => {
-      let parentLinks = self.getLinksInNode(parent);
-      if (parentLinks && parentLinks.includes(self.oldTitle)) {
-        let re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
-        let newBody = parent.body().replace(re, '|' + self.title() + ']]');
-        parent.body(newBody);
-        self.linkedFrom.push(parent);
+      const parentLinks = self.getLinksInNode(parent);
+      if (parentLinks) {
+        if (parentLinks.includes(self.oldTitle)) {
+          const re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
+          const newBody = parent.body().replace(re, '|' + self.title() + ']]');
+          parent.body(newBody);
+          self.linkedFrom.push(parent);
+        }
+        else if (parentLinks.includes(self.title())) {
+          self.linkedFrom.push(parent);
+        }
       }
     });
 
