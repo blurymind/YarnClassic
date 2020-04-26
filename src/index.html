@@ -300,8 +300,8 @@
 			<div id="marquee"></div>
 
 			<!-- ko if:app.ui.settingsDialogVisible() === true -->
-			<div id="settings-dialog" class="settings-dialog">
-				<div class="settings-form">
+			<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
+				<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 					<p>Settings</p>
 					<hr/> <!-- ------------------------------------------------------ -->
 					<div class="settings-row">

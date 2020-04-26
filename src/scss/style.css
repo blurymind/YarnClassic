@@ -575,22 +575,36 @@ a:hover {
 .settings-form {
   position: absolute;
   box-sizing: border-box;
-  left: 25%;
+  left: 15%;
   top: 10%;
-  width: 50%;
+  width: 70%;
   height: 80%;
   padding: 15px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .settings-row {
   display: flex;
 }
+
+/* On screens that are 600px wide or less, make the columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+  .settings-row {
+    flex-direction: column;
+  }
+}
+
 .settings-column {
   flex: 50%;
+}
+
+@media screen and (max-width: 992px) {
+  .settings-column {
+    flex: 50%;
+  }
 }
 
 .settings-item {
