@@ -46,7 +46,7 @@ export const Settings = function(app) {
     .observable(storage.getItem('transcribeEnabled') !== null ?
       storage.getItem('transcribeEnabled') === 'true' :
       false
-    ).extend({ persist:'transcribeEnabled' });
+    );
 
   // Autocomplete tags
   this.completeTagsEnabled = ko
