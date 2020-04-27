@@ -205,24 +205,14 @@
 						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
 						<span class="styled-checkbox">
 							<input
-								id="toglNightMode"
+								id="toglSpellCheck"
 								class="styled-checkbox"
 								type="checkbox"
-								data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode}">
+								data-bind="checked: app.settings.spellcheckEnabled"
+								onclick="app.toggleSpellCheck()">
 							</input>
-							<label for="toglNightMode" title="Night Mode"> &#9728 </label>
+							<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
 						</span>
-						|
-							<span class="styled-checkbox">
-								<input
-									id="toglSpellCheck"
-									class="styled-checkbox"
-									type="checkbox"
-									data-bind="checked: app.settings.spellcheckEnabled"
-									onclick="app.toggleSpellCheck()">
-								</input>
-								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
-							</span>
 						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
 						<span class="styled-checkbox hide-when-narrow">
 							<input
@@ -400,6 +390,18 @@
 									class="settings-value"
 									checked="true"
 									data-bind="checked: app.settings.createNodesEnabled"
+								>
+							</div>
+
+							<!-- Night mode -->
+							<div class="settings-item">
+								<label class="settings-label" for="nightMode">&#9728 Night mode</label>
+								<input
+									id="nightMode"
+									type="checkbox"
+									class="settings-value"
+									checked="true"
+									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode}"
 								>
 							</div>
 						</div> <!-- settgins-column -->
