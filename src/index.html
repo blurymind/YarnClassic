@@ -208,8 +208,7 @@
 								class="styled-checkbox"
 								type="checkbox"
 								id="toglTranscribing"
-								data-bind="checked: app.settings.transcribeEnabled"
-								onclick="app.toggleTranscribing()"
+								data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"
 							></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
@@ -389,7 +388,7 @@
 									type="checkbox"
 									class="settings-value"
 									checked="true"
-									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode}"
+									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
 								>
 							</div>
 						</div> <!-- settgins-column -->

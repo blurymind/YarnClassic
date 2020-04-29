@@ -211,7 +211,7 @@ a:hover {
 }
 
 .app-menu .menu:hover .dropdown {
-  max-height: 450px;
+  max-height: 500px;
 }
 
 .app-menu .menu:hover .title {
