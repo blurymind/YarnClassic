@@ -50,7 +50,6 @@ function load_dictionary(dicLanguage) {
           console.log('Dictionary loaded from server');
           dictionary = new nspell(affData, dicData);
           contents_modified = true;
-          spell_check();
         });
       });
     })
@@ -61,7 +60,6 @@ function load_dictionary(dicLanguage) {
         console.log('Dictionary loaded locally');
         dictionary = new nspell(affData, dicData);
         contents_modified = true;
-        spell_check();
       });
     });
 }

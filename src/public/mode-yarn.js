@@ -142,7 +142,7 @@ define("ace/mode/yarn", [
           };
         }
         // suggest word corrections if the selected word is misspelled
-        if (app.config.spellcheckEnabled) {
+        if (app.settings.spellcheckEnabled()) {
           var suggestedCorrections = app.getSpellCheckSuggestionItems();
           if (suggestedCorrections !== false) {
             options.items.corrections = {
@@ -183,7 +183,7 @@ define("ace/mode/yarn", [
 
   /// Enable autocompletion via word guessing
   app.editor.setOptions({
-    enableBasicAutocompletion: app.config.autocompleteWordsEnabled,
-    enableLiveAutocompletion: app.config.autocompleteWordsEnabled
+    enableBasicAutocompletion: app.settings.completeWordsEnabled(),
+    enableLiveAutocompletion: app.settings.completeWordsEnabled()
   });
 });

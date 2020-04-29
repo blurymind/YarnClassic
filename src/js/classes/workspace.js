@@ -3,7 +3,6 @@ import { Utils } from './utils';
 export const Workspace = function(app) {
   const self = this;
 
-  const UPDATE_ARROWS_THROTTLE_MS = 50;
   const PAN_SMALL_STEP = 100;
   const PAN_BIG_STEP = 500;
   const PAN_TRANSITION_TIME = 100;
@@ -11,6 +10,7 @@ export const Workspace = function(app) {
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
 
+  this.updateArrowsThrottle = 50;
   this.updateArrowsInterval = undefined;
   this.deferredArrowsDrawInterval = undefined;
   this.nextArrowsUpdate = Number.NEGATIVE_INFINITY;
@@ -30,6 +30,14 @@ export const Workspace = function(app) {
   this.zoomSpeed = 0.005;
   this.zoomLimitMin = 0.05;
   this.zoomLimitMax = 1;
+
+  // setThrottle
+  //
+  // Sets the redraw throttle
+  this.setThrottle = function(value, e) {
+    const throttle = e ? e.target.value : value;
+    self.updateArrowsThrottle = Utils.clamp(throttle, 16, 250);
+  };
 
   // setTranslation
   //
@@ -313,7 +321,7 @@ export const Workspace = function(app) {
   // Keeps updating arrows during transition
   this.startUpdatingArrows = function() {
     self.stopUpdatingArrows();
-    self.updateArrowsInterval = setInterval(self.updateArrows, UPDATE_ARROWS_THROTTLE_MS);
+    self.updateArrowsInterval = setInterval(self.updateArrows, self.updateArrowsThrottle);
   };
 
   // stopUpdatingArrows
@@ -338,7 +346,7 @@ export const Workspace = function(app) {
     if (now < self.nextArrowsUpdate) {
       if (!self.deferredArrowsDrawInterval) {
         self.deferredArrowsDrawInterval =
-          window.setTimeout(self.updateArrows, (self.nextArrowsUpdate + UPDATE_ARROWS_THROTTLE_MS) - now);
+          window.setTimeout(self.updateArrows, (self.nextArrowsUpdate + self.updateArrowsThrottle) - now);
       }
       return;
     }
@@ -346,7 +354,7 @@ export const Workspace = function(app) {
     self.isDrawingArrows = true;
     window.clearInterval(self.deferredArrowsDrawInterval);
     self.deferredArrowsDrawInterval = undefined;
-    self.nextArrowsUpdate = (now + UPDATE_ARROWS_THROTTLE_MS);
+    self.nextArrowsUpdate = (now + self.updateArrowsThrottle);
 
     const nodes = app.nodes();
     const offset = $('.nodes-holder').offset();

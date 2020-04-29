@@ -7,6 +7,7 @@
 		<title>Yarn</title>
 	</head>
 	<body>
+		<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/classic.css" >
 		<!-- Fancy Background -->
 		<div id="app-bg">&nbsp;</div>
 
@@ -105,6 +106,7 @@
 							&nbsp;
 							Send file
 						</span>
+						<span class="item" data-bind="click:app.ui.openSettingsDialog">Settings</span>
 					</div>
 				</div>
 			</div>
@@ -158,13 +160,17 @@
 								<span class="title" onmouseover="app.openNodeListMenu('link')">Add Link</span>
 								<div class="dropdown">
 									<input class="search-field" style="text-align:center" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.openNodeListMenu('link')"></input>
-									<div  id="linkHelperMenu" ></div>
+									<div id="linkHelperMenu" ></div>
 								</div>
 							</div>
 						</div>
 						&nbsp;
 						<span class="styled-checkbox hide-when-narrow">
-								<input type="checkbox" id="toglShowCounter" onclick="app.toggleShowCounter()"></input>
+								<input
+									id="toglShowCounter"
+									type="checkbox"
+									data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
+								></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
 						<span class="editor-counter">
@@ -181,32 +187,28 @@
 									Col: <span class="column-index">0</span>
 							</span>
 						</span>
-
 						<span class="styled-checkbox">
-							<input type="checkbox" id="toglAutocomplete"></input>
+							<input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
 							<label for="toglAutocomplete" title="Auto Close tags" style="color:#292929">🔮</label>
 						</span>
 						<span class="styled-checkbox hide-when-narrow">
-							<input type="checkbox" id="toglAutocompleteWords" onclick="app.toggleWordCompletion()"></input>
+							<input
+								id="toglAutocompleteWords"
+								type="checkbox"
+								data-bind="checked: app.settings.completeWordsEnabled"
+								onclick="app.toggleWordCompletion()"
+							></input>
 							<label for="toglAutocompleteWords" title="auto-completion">💬</label>
 						</span>
 						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
-						<span class="styled-checkbox">
-							<input class="styled-checkbox" type="checkbox" id="toglNightMode" onclick="app.toggleNightMode()"></input>
-							<label for="toglNightMode" title="Night Mode"> &#9728 </label>
-						</span>
-						|
-						<span>
-							<select class="styled-dropdown" id="select_language" onchange="app.updateCountry()">
-								</select>
-							</span>
-							<span class="styled-checkbox">
-								<input class="styled-checkbox" type="checkbox" id="toglSpellCheck" onclick="app.toggleSpellCheck()"></input>
-								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
-							</span>
 						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
 						<span class="styled-checkbox hide-when-narrow">
-							<input class="styled-checkbox" type="checkbox" id="toglTranscribing" onclick="app.toglTranscribing()"></input>
+							<input
+								class="styled-checkbox"
+								type="checkbox"
+								id="toglTranscribing"
+								data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"
+							></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
 						<button class="bbcode-button" style="color:#19a4a8" onclick="app.speakText()" title="Hear text">🔊</button>
@@ -276,7 +278,125 @@
 
 			<!-- marquee -->
 			<div id="marquee"></div>
+
+			<!-- ko if:app.ui.settingsDialogVisible() === true -->
+			<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
+				<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+					<h3>Settings</h3>
+					<div class="settings-row">
+						<div class="settings-column">
+							<!-- Language -->
+							<div class="settings-item">
+								<label class="settings-label" for="language">Story language</label>
+								<select id="language" class="settings-value" data-bind="
+									options: app.ui.availableLanguages,
+									optionsText: 'name',
+									optionsValue: 'id',
+									value: app.settings.language,
+									event: { change: app.setLanguage }">
+								</select>
+							</div>
+
+							<!-- Theme -->
+							<div class="settings-item">
+								<label class="settings-label" for="theme">Theme</label>
+
+								<select id="theme" class="settings-value" disabled data-bind="
+									options: app.ui.availableThemes,
+									optionsText: 'name',
+									optionsValue: 'id',
+									value: app.settings.theme,
+									event: { change: app.setTheme }">
+								</select>
+							</div>
+
+							<!-- Markup -->
+							<div class="settings-item">
+								<label class="settings-label" for="markup">Markup</label>
+								<select id="markup" class="settings-value" disabled>
+									<option value="classic">BBcode</option>
+									<option value="blueprint">XML</option>
+								</select>
+							</div>
+
+							<!-- Throttle delay -->
+							<div class="settings-item">
+								<label class="settings-label" for="throttle-threshold">Redraw delay</label>
+								<div class="slidecontainer settings-value">
+									<input
+										type="range"
+										class="slider settings-value"
+										min="16"
+										max="250"
+										data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
+								</div>
+							</div> <!-- settgins-item -->
+
+						</div> <!-- settgins-column -->
+						<div class="settings-column">
+
+							<!-- Spellcheck -->
+							<div class="settings-item">
+								<label class="settings-label" for="spellcheck">✔ Spell check</label>
+								<input
+									id="spellcheck"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.spellcheckEnabled">
+							</div>
+
+							<!-- AutocompleteWords -->
+							<div class="settings-item">
+								<label class="settings-label" for="completeWords">💬 Complete words</label>
+								<input
+									id="completeWords"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.completeWordsEnabled"
+								>
+							</div>
+
+							<!-- AutocloseTags -->
+							<div class="settings-item">
+								<label class="settings-label" for="completeTags">🔮 Complete tags</label>
+								<input
+									id="completeTags"
+									type="checkbox"
+									class="settings-value"
+									data-bind="checked: app.settings.completeTagsEnabled"
+								>
+							</div>
+
+							<!-- AutocreateNodes -->
+							<div class="settings-item">
+								<label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
+								<input
+									id="autocreation"
+									type="checkbox"
+									class="settings-value"
+									checked="true"
+									data-bind="checked: app.settings.createNodesEnabled"
+								>
+							</div>
+
+							<!-- Night mode -->
+							<div class="settings-item">
+								<label class="settings-label" for="nightMode">&#9728 Night mode</label>
+								<input
+									id="nightMode"
+									type="checkbox"
+									class="settings-value"
+									checked="true"
+									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
+								>
+							</div>
+						</div> <!-- settgins-column -->
+					</div> <!-- settgins-row -->
+				</div> <!-- settgins-form -->
+			</div> <!-- settgins-dialog -->
+			<!-- /ko -->
 		</div>
+
 
 		<!-- Hidden fields, file dialogs, and elements -->
 		<div class="hidden">

@@ -7,17 +7,18 @@ import {
   suggest_word_for_misspelled,
   load_dictionary,
 } from '../libs/spellcheck_ace.js';
+
 import { Node } from './node';
 import { Workspace } from './workspace';
 import { Input } from './input';
+import { Settings } from './settings';
+import { UI } from './ui';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 
 // TODO: refactoring proposals
 //
-// Create Settings class: manages user settings using window.localStorage
-// Create UI class: manages menus, buttons, search, settings dialog...
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
@@ -30,9 +31,23 @@ import { Utils, FILETYPE } from './utils';
 export var App = function(name, version) {
   const self = this;
 
+  this.setTheme = function(name, e) {
+    let themeName = e ? e.target.value : name;
+    const theme = document.getElementById('theme-stylesheet');
+    theme.href = `./scss/themes/${themeName}.css`;
+  };
+
+  this.setLanguage = function(language, e) {
+    const languageId = e ? e.target.value : language;
+    spoken.recognition.lang = languageId;
+    load_dictionary(self.settings.language().split('-')[0]);
+  };
+
   // Ideally this dependencies should be injected by index.js
   this.workspace = new Workspace(self);
   this.input = new Input(self);
+  this.settings = new Settings(self);
+  this.ui = new UI(self);
   this.previewStory = new yarnRender();
 
   this.data = data;
@@ -54,25 +69,6 @@ export var App = function(name, version) {
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
-  this.selectedLanguageIndex = 6;
-  this.language = null;
-
-  this.configFilePath = null;
-  this.config = {
-    nightModeEnabled: false,
-    spellcheckEnabled: true,
-    transcribeEnabled: false,
-    showCounter: false,
-    autocompleteWordsEnabled: true,
-    autocompleteEnabled: true,
-    overwrites: {
-      makeNewNodesFromLinks: true,
-    },
-    settings: {
-      autoSave: -1,
-    },
-  };
-
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
 
@@ -84,7 +80,13 @@ export var App = function(name, version) {
   // inWorkspace
   //
   // Indicates if we are in the workspace view
-  this.inWorkspace = () => !self.editing();
+  this.inWorkspace = () =>
+    !self.editing() && !self.ui.settingsDialogVisible();
+
+  // inSettingsDialog
+  //
+  // Indicates if we are in the settings dialog
+  this.inSettingsDialog = () => self.ui.settingsDialogVisible();
 
   // run
   //
@@ -151,6 +153,8 @@ export var App = function(name, version) {
     ko.applyBindings(self, $('#app')[0]);
 
     self.newNode().title('Start');
+
+    self.settings.apply();
 
     // search field enter
     $('.search-title input').click(self.updateSearch);
@@ -242,15 +246,6 @@ export var App = function(name, version) {
       $('#emojiPicker-container').show();
     };
 
-    this.updateCountry = function() {
-      var select_language = document.getElementById('select_language');
-      self.selectedLanguageIndex = select_language.selectedIndex;
-
-      self.language = Utils.langs[select_language.selectedIndex][1][0];
-      spoken.recognition.lang = self.language;
-      load_dictionary(self.language.split('-')[0]);
-    };
-
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();
       const say = selectedText
@@ -258,7 +253,7 @@ export var App = function(name, version) {
         : self.editor.getSession().getValue();
 
       spoken.voices().then(countries => {
-        const lookUp = self.language.split('-')[0];
+        const lookUp = self.settings.language().split('-')[0];
         const voices = countries.filter(v => !v.lang.indexOf(lookUp));
 
         if (voices.length) {
@@ -313,12 +308,10 @@ export var App = function(name, version) {
       });
     };
 
-    this.toglTranscribing = function() {
+    this.toggleTranscribing = function() {
       const available = spoken.listen.available();
-      var transcribeButton = document.getElementById('toglTranscribing');
       var speakBubble = document.getElementById('speakTextBtnBubble');
-      self.config.transcribeEnabled = transcribeButton.checked;
-      if (transcribeButton.checked && available) {
+      if (available && self.settings.transcribeEnabled()) {
         spoken.listen.on.partial(ts => {
           if (self.editing()) {
             speakBubble.style.visibility = 'visible';
@@ -330,7 +323,6 @@ export var App = function(name, version) {
         self.startCapture();
       } else {
         speakBubble.style.visibility = 'hidden';
-        transcribeButton.checked = false;
         spoken.recognition.continuous = false;
         spoken.listen.stop();
       }
@@ -610,6 +602,7 @@ export var App = function(name, version) {
     });
   };
 
+  // TODO: used just once. Fuse with newNodeAt and makeNodeWithName
   this.newNode = function(updateLinks=true) {
     var node = new Node();
     self.nodes.push(node);
@@ -669,7 +662,7 @@ export var App = function(name, version) {
       return;
     }
 
-    // Make sure we save the currently node being edited before editing a new
+    // Make sure we save the node being currently edited before editing a new
     // one using the context menu
     if (self.editing() && self.editing() !== node)
       self.saveNode(false);
@@ -689,27 +682,6 @@ export var App = function(name, version) {
     self.editor = ace.edit('editor');
     self.editor.navigateFileEnd();
 
-    var autoCompleteButton = document.getElementById('toglAutocomplete');
-    autoCompleteButton.checked = self.config.autocompleteEnabled;
-    var autoCompleteWordsButton = document.getElementById(
-      'toglAutocompleteWords'
-    );
-    autoCompleteWordsButton.checked = self.config.autocompleteWordsEnabled;
-    var spellCheckButton = document.getElementById('toglSpellCheck');
-    spellCheckButton.checked = self.config.spellcheckEnabled;
-    var transcribeButton = document.getElementById('toglTranscribing');
-    transcribeButton.checked = self.config.transcribeEnabled;
-    self.toglTranscribing();
-    var nightModeButton = document.getElementById('toglNightMode');
-    nightModeButton.checked = self.config.nightModeEnabled;
-    self.toggleNightMode();
-    var showCounterButton = document.getElementById('toglShowCounter');
-    showCounterButton.checked = self.config.showCounter;
-    self.toggleShowCounter();
-    self.toggleWordCompletion();
-
-    //// warn if titlealready exists
-    self.validateTitle();
     /// set color picker
     $('#colorPicker').spectrum({
       flat: true,
@@ -733,7 +705,7 @@ export var App = function(name, version) {
       ],
       change: function(color) {
         if ($('#colorPicker-container').is(':visible')) {
-          app.applyPickerColorEditor(color);
+          self.applyPickerColorEditor(color);
           $('#colorPicker').spectrum.set(color.toHexString());
         }
       },
@@ -802,21 +774,12 @@ export var App = function(name, version) {
       }
     );
 
-    /// init language selector
-    var select_language = document.getElementById('select_language');
-    for (var i = 0; i < Utils.langs.length; i++) {
-      var option = document.createElement('option');
-      option.text = Utils.langs[i][0];
-      select_language.add(option);
-    }
-
-    select_language.selectedIndex = self.selectedLanguageIndex;
-    if (!self.language) {
-      self.language = 'en-US';
-      self.updateCountry();
-    }
-
+    self.toggleTranscribing();
+    self.toggleNightMode();
+    self.toggleShowCounter();
+    self.toggleWordCompletion();
     self.toggleSpellCheck();
+    self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
   };
 
@@ -826,7 +789,7 @@ export var App = function(name, version) {
 
   this.openNodeByTitle = function(nodeTitle) {
     self.makeNodeWithName(nodeTitle);
-    app.nodes().forEach(node => {
+    self.nodes().forEach(node => {
       if (
         node
           .title()
@@ -899,24 +862,17 @@ export var App = function(name, version) {
   };
 
   this.toggleSpellCheck = function() {
-    var spellCheckButton = document.getElementById('toglSpellCheck');
-    self.config.spellcheckEnabled = spellCheckButton.checked;
-    if (spellCheckButton.checked) {
+    if (self.settings.spellcheckEnabled())
       enable_spellcheck();
-    } else {
+    else
       disable_spellcheck();
-    }
   };
 
   this.toggleNightMode = function() {
-    var nightModeButton = document.getElementById('toglNightMode');
-    self.config.nightModeEnabled = nightModeButton.checked;
-    var cssOverwrite = {};
-    if (self.config.nightModeEnabled) {
-      cssOverwrite = { filter: 'invert(100%)' };
-    } else {
-      cssOverwrite = { filter: 'invert(0%)' };
-    }
+    const cssOverwrite = self.settings.nightModeEnabled() ?
+      { filter: 'invert(100%)' } :
+      { filter: 'invert(0%)' };
+
     $('#app').css(cssOverwrite);
     $('#app-bg').css(cssOverwrite);
     $('.tooltip').css(cssOverwrite);
@@ -925,9 +881,7 @@ export var App = function(name, version) {
   };
 
   this.toggleShowCounter = function() {
-    var showCounterButton = document.getElementById('toglShowCounter');
-    self.config.showCounter = showCounterButton.checked;
-    if (self.config.showCounter) {
+    if (self.settings.editorStatsEnabled()) {
       $('.node-editor .form .bbcode-toolbar .editor-counter').css({
         display: 'initial',
       });
@@ -939,11 +893,9 @@ export var App = function(name, version) {
   };
 
   this.toggleWordCompletion = function() {
-    var wordCompletionButton = document.getElementById('toglAutocompleteWords');
-    self.config.autocompleteWordsEnabled = wordCompletionButton.checked;
     self.editor.setOptions({
-      enableBasicAutocompletion: self.config.autocompleteWordsEnabled,
-      enableLiveAutocompletion: self.config.autocompleteWordsEnabled,
+      enableBasicAutocompletion: app.settings.completeWordsEnabled(),
+      enableLiveAutocompletion: app.settings.completeWordsEnabled()
     });
   };
 
@@ -1092,7 +1044,7 @@ export var App = function(name, version) {
     var rootMenu = document.getElementById(action + 'HelperMenu');
     rootMenu.innerHTML = '';
 
-    app.nodes().forEach((node, i) => {
+    self.nodes().forEach((node, i) => {
       if (
         node
           .title()
@@ -1102,7 +1054,7 @@ export var App = function(name, version) {
       ) {
         var p = document.createElement('span');
         p.innerHTML = node.title();
-        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
+        $(p).addClass('item ' + self.nodes()[i].titleStyles[self.nodes()[i].colorID()]);
 
         if (action == 'link') {
           if (node.title() !== self.editing().title()) {
@@ -1156,15 +1108,6 @@ export var App = function(name, version) {
       self.propagateUpdateFromNode(node);
       self.workspace.updateArrows();
 
-      // Save user settings
-      const autoCompleteButton = document.getElementById('toglAutocomplete');
-      self.config.autocompleteEnabled = autoCompleteButton.checked;
-
-      const autoCompleteWordsButton = document.getElementById(
-        'toglAutocompleteWords'
-      );
-      self.config.autocompleteWordsEnabled = autoCompleteWordsButton.checked;
-
       setTimeout(self.updateSearch, 600);
 
       // Close editor. SaveNode and CloseEditor should be different functions
@@ -1186,8 +1129,8 @@ export var App = function(name, version) {
     var on = 1;
     var off = 0.25;
 
-    for (var i = 0; i < app.nodes().length; i++) {
-      var node = app.nodes()[i];
+    for (var i = 0; i < self.nodes().length; i++) {
+      var node = self.nodes()[i];
       var element = $(node.element);
 
       if (search.length > 0 && (title || body || tags)) {
@@ -1303,25 +1246,17 @@ export var App = function(name, version) {
     });
 
     // Remove unused tags
-    let i = app.tags().length;
+    let i = self.tags().length;
     while (i--) {
-      if(app.tags()[i].count === 0)
-        app.tags().splice(i, 1);
+      if(self.tags()[i].count === 0)
+        self.tags().splice(i, 1);
     }
   };
 
   this.makeNewNodesFromLinks = function() {
-    if (
-      this.config &&
-      this.config.overwrites &&
-      !this.config.overwrites.makeNewNodesFromLinks
-    ) {
-      console.info(
-        'Autocreation of new nodes from links is disabled in:\n' +
-          this.configFilePath
-      );
-      return;
-    }
+    if (!self.settings.createNodesEnabled())
+      return console.info('Autocreate new nodes disabled');
+
     var nodeLinks = self.editing().getLinksInNode();
     if (nodeLinks == undefined) {
       return;
@@ -1350,7 +1285,7 @@ export var App = function(name, version) {
 
   this.titleExistsTwice = function(title) {
     return (
-      app.nodes().filter(node => node.title().trim() === title.trim()).length >
+      self.nodes().filter(node => node.title().trim() === title.trim()).length >
       1
     );
   };
@@ -1364,7 +1299,7 @@ export var App = function(name, version) {
 
   this.getOtherNodeTitles = function() {
     var result = [];
-    app.nodes().forEach(node => {
+    self.nodes().forEach(node => {
       if (!self.editing() || node.title() !== self.editing().title()) {
         result.push(node.title().trim());
       }
