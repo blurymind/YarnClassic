@@ -1205,7 +1205,9 @@ export var App = function(name, version) {
       });
 
       node.linkedFrom().forEach(parent => {
-        if (!updated.includes(parent)) toUpdate.push(parent);
+        if (!updated.includes(parent)) {
+          toUpdate.push(parent);
+        }
       });
     }
   };
