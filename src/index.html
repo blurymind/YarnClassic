@@ -106,7 +106,6 @@
 							&nbsp;
 							Send file
 						</span>
-						<span><hr></span>
 						<span class="item" data-bind="click:app.ui.openSettingsDialog">Settings</span>
 					</div>
 				</div>
@@ -285,8 +284,7 @@
 			<!-- ko if:app.ui.settingsDialogVisible() === true -->
 			<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
 				<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-					<p>Settings</p>
-					<hr/> <!-- ------------------------------------------------------ -->
+					<h3>Settings</h3>
 					<div class="settings-row">
 						<div class="settings-column">
 							<!-- Language -->
