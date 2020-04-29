@@ -160,7 +160,7 @@
 								<span class="title" onmouseover="app.openNodeListMenu('link')">Add Link</span>
 								<div class="dropdown">
 									<input class="search-field" style="text-align:center" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.openNodeListMenu('link')"></input>
-									<div  id="linkHelperMenu" ></div>
+									<div id="linkHelperMenu" ></div>
 								</div>
 							</div>
 						</div>
@@ -169,8 +169,7 @@
 								<input
 									id="toglShowCounter"
 									type="checkbox"
-									data-bind="checked: app.settings.editorStatsEnabled"
-									onclick="app.toggleShowCounter()"
+									data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
 								></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
