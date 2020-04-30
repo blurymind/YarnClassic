@@ -106,7 +106,6 @@
 							&nbsp;
 							Send file
 						</span>
-						<span><hr></span>
 						<span class="item" data-bind="click:app.ui.openSettingsDialog">Settings</span>
 					</div>
 				</div>
@@ -161,7 +160,7 @@
 								<span class="title" onmouseover="app.openNodeListMenu('link')">Add Link</span>
 								<div class="dropdown">
 									<input class="search-field" style="text-align:center" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.openNodeListMenu('link')"></input>
-									<div  id="linkHelperMenu" ></div>
+									<div id="linkHelperMenu" ></div>
 								</div>
 							</div>
 						</div>
@@ -170,8 +169,7 @@
 								<input
 									id="toglShowCounter"
 									type="checkbox"
-									data-bind="checked: app.settings.editorStatsEnabled"
-									onclick="app.toggleShowCounter()"
+									data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
 								></input>
 								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
 						</span>
@@ -203,34 +201,13 @@
 							<label for="toglAutocompleteWords" title="auto-completion">💬</label>
 						</span>
 						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
-						<span class="styled-checkbox">
-							<input
-								id="toglNightMode"
-								class="styled-checkbox"
-								type="checkbox"
-								data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode}">
-							</input>
-							<label for="toglNightMode" title="Night Mode"> &#9728 </label>
-						</span>
-						|
-							<span class="styled-checkbox">
-								<input
-									id="toglSpellCheck"
-									class="styled-checkbox"
-									type="checkbox"
-									data-bind="checked: app.settings.spellcheckEnabled"
-									onclick="app.toggleSpellCheck()">
-								</input>
-								<label for="toglSpellCheck" title="Spellcheck">&#9745abc</label>
-							</span>
 						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
 						<span class="styled-checkbox hide-when-narrow">
 							<input
 								class="styled-checkbox"
 								type="checkbox"
 								id="toglTranscribing"
-								data-bind="checked: app.settings.transcribeEnabled"
-								onclick="app.toggleTranscribing()"
+								data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"
 							></input>
 							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
 						</span>
@@ -305,8 +282,7 @@
 			<!-- ko if:app.ui.settingsDialogVisible() === true -->
 			<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
 				<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-					<p>Settings</p>
-					<hr/> <!-- ------------------------------------------------------ -->
+					<h3>Settings</h3>
 					<div class="settings-row">
 						<div class="settings-column">
 							<!-- Language -->
@@ -369,17 +345,6 @@
 									data-bind="checked: app.settings.spellcheckEnabled">
 							</div>
 
-							<!-- Transcription -->
-							<div class="settings-item">
-								<label class="settings-label" for="transcription">🎤 Transcription</label>
-								<input
-									id="transcription"
-									type="checkbox"
-									class="settings-value"
-									data-bind="checked: app.settings.transcribeEnabled"
-								>
-							</div>
-
 							<!-- AutocompleteWords -->
 							<div class="settings-item">
 								<label class="settings-label" for="completeWords">💬 Complete words</label>
@@ -411,6 +376,18 @@
 									class="settings-value"
 									checked="true"
 									data-bind="checked: app.settings.createNodesEnabled"
+								>
+							</div>
+
+							<!-- Night mode -->
+							<div class="settings-item">
+								<label class="settings-label" for="nightMode">&#9728 Night mode</label>
+								<input
+									id="nightMode"
+									type="checkbox"
+									class="settings-value"
+									checked="true"
+									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
 								>
 							</div>
 						</div> <!-- settgins-column -->
