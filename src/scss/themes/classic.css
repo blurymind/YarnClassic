@@ -1,0 +1,235 @@
+/*-- General ------------------------------------------------------------------ */
+
+#app-bg {
+  background: -webkit-linear-gradient(45deg, #ddc9b9 0%, #daf0f2 100%);
+}
+
+a {
+  color: #2f919a;
+  text-decoration: none;
+  transition: color 0.25s;
+}
+
+a:hover {
+  color: #000;
+}
+
+/*-- Menu ------------------------------------------------------------------ */
+
+.app-menu {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
+}
+
+.app-menu .menu {
+  width: 160px;
+  float: left;
+  margin-left: 10px;
+  border-radius: 2px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  font-size: 0.9em;
+  color: #666;
+  text-transform: uppercase;
+  background: #fff;
+  cursor: pointer;
+}
+
+.app-menu .menu:first-child {
+  margin-left: 0;
+}
+
+.app-menu .title {
+  box-sizing: border-box;
+  padding: 15px;
+  width: 100%;
+  height: 50px;
+  line-height: 20px;
+  font-weight: bold;
+  float: left;
+  transition: background 0.25s;
+}
+
+.app-menu .menu .add.node {
+  box-sizing: border-box;
+  padding: 15px;
+  width: 100%;
+  height: 50px;
+  line-height: 20px;
+  font-weight: bold;
+  float: left;
+}
+
+.app-menu .dropdown {
+  transition: max-height 0.5s;
+  max-height: 0px;
+  overflow: hidden;
+  float: left;
+}
+
+.app-menu .dropdown .item {
+  box-sizing: border-box;
+  float: left;
+  display: block;
+  width: 100%;
+  padding: 7px;
+}
+
+.app-menu .dropdown .item:hover {
+  background: #eee;
+  color: #000;
+}
+
+.app-menu .dropdown .item:active {
+  background: #ddd;
+  color: #555;
+}
+
+.app-menu .menu .dropdown .search-field {
+  box-sizing: border-box;
+  float: left;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align:center;
+}
+
+.app-menu .menu:hover .dropdown {
+  max-height: 500px;
+}
+
+.app-menu .menu:hover .title {
+  background: #f4f4f4;
+}
+
+.app-menu .menu:active .title {
+  background: #ddd;
+  color: #555;
+}
+
+/*-- Search ------------------------------------------------------------------ */
+
+.app-search {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  height: 33px;
+  z-index: 10002;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  padding: 10px 20px 10px 10px;
+}
+
+.app-search input {
+  padding: 4px 8px 4px 8px;
+  font-family: 'Lucida Console', Monaco, monospace;
+  margin-left: 10px;
+  margin-right: 4px;
+}
+.app-search .search-field {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.app-search input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.app-search .searchResults {
+  width: 100%;
+  max-height: 0px;
+  overflow: hidden;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  transition: max-height 0.5s;
+  background-color: white;
+}
+
+.app-search:hover .searchResults {
+  max-height: 500px;
+}
+
+.app-search .dropdown .item {
+  display: block;
+  box-sizing: border-box;
+  padding: 7px;
+}
+
+/*-- Node ------------------------------------------------------------------ */
+
+.title-style-1 {
+  background-color: #EBEBEB;
+  color: black;
+}
+.title-style-2 {
+  background-color: #6EA5E0;
+}
+.title-style-3 {
+  background-color: #9EDE74;
+}
+.title-style-4 {
+  background-color: #FFE374;
+}
+
+.title-style-5 {
+  background-color: #F7A666;
+}
+.title-style-6 {
+  background-color: #C47862;
+}
+.title-style-7 {
+  background-color: #97E1E9;
+}
+.title-style-8 {
+  background-color: #576574;
+  color: white;
+}
+.title-style-9 {
+  background-color: black;
+  color: white;
+}
+
+
+/*-- ----------------------------Narrow overrides---------------------------- */
+
+@media only screen and (max-width: 500px) {
+  .app-menu {
+    top: 10px;
+    right: 30px;
+    margin-top: 0px;
+  }
+  .app-menu .menu {
+    width: 100px;
+    font-size: 0.8em;
+  }
+  .app-menu .title {
+    height: 30px;
+    line-height: 0px;
+  }
+
+  .app-search {
+    position: relative;
+    float: left;
+    z-index: 10000;
+  }
+
+  .app-search {
+    top: 5px;
+    left: 10px;
+    padding: 5px 10px 5px 5px;
+  }
+  .app-search > input {
+    padding: unset;
+    width: 170px;
+  }
+}
+
+@media (max-width: 830px) {
+  .app-menu {
+    position: relative;
+    float: right;
+    margin-top: 20px;
+  }
+}

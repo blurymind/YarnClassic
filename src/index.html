@@ -1,412 +1,433 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-		<link rel="manifest" href="./manifest.json" >
+<head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="manifest" href="./manifest.json" >
+	<title>Yarn</title>
+</head>
+<body>
+	<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/classic.css" >
+	<!-- Fancy Background -->
+	<div id="app-bg">&nbsp;</div>
 
-		<title>Yarn</title>
-	</head>
-	<body>
-		<link id="theme-stylesheet" rel="stylesheet" href="./scss/themes/classic.css" >
-		<!-- Fancy Background -->
-		<div id="app-bg">&nbsp;</div>
+	<!-- Container -->
+	<div id="app">
 
-		<!-- Entry Point / Container -->
-		<div id="app">
-
-			<!-- search form -->
-			<div class="app-search">
-				<input id="nodeSearchInput" type="text" class="search-field" placeholder="Search"/>
+		<!-- search form -->
+		<div class="app-search" onmouseenter="app.ui.openNodeListMenu('open')">
+			<div class="menu">
+				<input
+					id="nodeSearchInput"
+					type="text"
+					class="search-field"
+					placeholder="Search"
+					oninput="app.ui.openNodeListMenu('open')">
 
 				<span>
-						<span class="search-title styled-checkbox">
-								<input type="checkbox" checked="checked" id="search-title" />
-								<label for="search-title">Title</label>
+					<span class="search-title styled-checkbox">
+						<input type="checkbox" checked="checked" id="search-title" />
+						<label for="search-title">Title</label>
+					</span>
+					<span class="search-body styled-checkbox">
+						<input type="checkbox" id="search-body" />
+						<label for="search-body">Body</label>
+					</span>
+					<span class="search-tags styled-checkbox">
+						<input type="checkbox" id="search-tags" />
+						<label for="search-tags">Tags</label>
+					</span>
+				</span>
+
+				<div class="dropdown">
+					<div id="openHelperMenu" class="searchResults"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- add node -->
+		<div class="app-add-node" data-bind="click:app.newNode">
+			<span class="add-node"></span>
+		</div>
+
+		<!-- undo/redo controls -->
+		<div class="app-undo-redo">
+			<span data-bind="click: function() { app.historyDirection('undo'); }"></span>
+			<span data-bind="click: function() { app.historyDirection('redo'); }"></span>
+		</div>
+
+		<!-- align controls -->
+		<div class="app-sort">
+			<span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
+			<span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
+			<span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
+			<span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
+		</div>
+
+		<!-- zoom controls -->
+		<div class="app-zoom">
+			<span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"></span>
+			<span data-bind="click: function() { app.workspace.setZoom(3); }" title="Zoom 2:1"></span>
+			<span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"></span>
+			<span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"></span>
+		</div>
+
+		<!-- main menu -->
+		<div class="app-menu">
+			<!-- File menu -->
+			<div class="menu">
+				<span class="title">File</span>
+				<div class="dropdown">
+					<span class="item" data-bind="click: app.data.tryOpenFile">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/open.png"/>
+						&nbsp;
+						Open
+					</span>
+					<!--<span class="item" data-bind="click: data.tryOpenFolder">Open Folder...</span>-->
+					<span class="item" data-bind="click: app.data.tryAppend">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/pixel.png"/>
+						&nbsp;
+						Append
+					</span>
+					<!-- ko if:data.editingPath() != null -->
+					<span class="item" data-bind="click: app.data.trySaveCurrent">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/pixel.png"/>
+						&nbsp;
+						Save
+					</span>
+					<!-- /ko -->
+					<span class="item" data-bind="click: function() { app.data.trySave('json');}">
+						<img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+						&nbsp;
+						Save As Json
+					</span>
+					<span class="item" data-bind="click: function() { app.data.trySave('yarn'); }">
+						<img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+						&nbsp;
+						Save As Yarn
+					</span>
+					<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
+						&nbsp;
+						Save As Twee
+					</span>
+					<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
+						&nbsp;
+						Save As Twee2
+					</span>
+					<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/xml.png" alt="Twine Icon" />
+						&nbsp;
+						Save As Xml
+					</span>
+					<span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
+						<img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+						&nbsp;
+						Send file
+					</span>
+					<span class="item" data-bind="click:app.ui.openSettingsDialog">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/settings.png"/>
+						&nbsp;
+						Settings
+					</span>
+				</div>
+			</div> <!-- file menu -->
+		</div> <!-- app-menu -->
+
+		<!-- arrow bg canvas for linked nodes -->
+		<canvas class="arrows"></canvas>
+
+		<!-- foreach loop  of the nodes -->
+		<div class="nodes">
+			<div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
+				<div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
+					<div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
+					<div class="body" data-bind="html: node.clippedBody"></div>
+					<div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }">
+						<span data-bind="text: tag.text, css: tag.style"></span>
+					</div>
+					<div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>
+					<div class="icon colorUp" data-bind="click: node.cycleColorUp"></div>
+					<!--<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>-->
+					<div class="icon delete" data-bind="click: node.tryRemove"></div>
+					<!--<div class="resize" data-bind="click:node.toggleExpand"></div>-->
+				</div>
+			</div>
+		</div>
+
+		<!-- ko if:app.editing() != null -->
+		<div class="node-editor" data-bind="mousedown:app.saveNode">
+
+			<div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+				<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
+				<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
+
+				<div class="bbcode-toolbar">
+					<button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
+					&nbsp;
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('b')" title="Bold"><b>B</b></button>
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('u')" title="Underlined"><u>U</u></button>
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('i')" title="Italic"><i>I</i></button>
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('color=#')">🌈</button>
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('img')" title="Image">🦄</button>
+					<button class="bbcode-button" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
+					<span class="hide-when-narrow">
+						<button class="bbcode-button" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
+					</span>
+
+					<button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
+
+					<div class="add-link" style="position: absolute;">
+						<div class="menu">
+							<span class="title" onmouseover="app.ui.openNodeListMenu('link')">Add Link</span>
+							<div class="dropdown">
+								<input class="search-field" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.ui.openNodeListMenu('link')"></input>
+								<div id="linkHelperMenu"></div>
+							</div>
+						</div>
+					</div>
+
+					&nbsp;
+
+					<span class="styled-checkbox hide-when-narrow">
+						<input
+						id="toglShowCounter"
+						type="checkbox"
+						data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
+						></input>
+						<label for="toglShowCounter" title="Show line counter">&#9779</label>
+					</span>
+					<span class="editor-counter">
+						<span class="hide-when-narrow">
+							&nbsp;
+							Length: <span class="character-count">0</span>
+							&nbsp;
+							Lines: <span class="line-count">0</span>
+							&nbsp;
+							<span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
+							&nbsp;
+							Line: <span class="row-index">0</span>
+							&nbsp;
+							Col: <span class="column-index">0</span>
 						</span>
-						<span class="search-body styled-checkbox">
-								<input type="checkbox" id="search-body" />
-								<label for="search-body">Body</label>
-						</span>
-						<span class="search-tags styled-checkbox">
-								<input type="checkbox" id="search-tags" />
-								<label for="search-tags">Tags</label>
-						</span>
+					</span>
+					<span class="styled-checkbox">
+						<input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
+						<label for="toglAutocomplete" title="Auto Close tags">🔮</label>
+					</span>
+					<span class="styled-checkbox hide-when-narrow">
+						<input
+						id="toglAutocompleteWords"
+						type="checkbox"
+						data-bind="checked: app.settings.completeWordsEnabled"
+						onclick="app.toggleWordCompletion()"
+						></input>
+						<label for="toglAutocompleteWords" title="auto-completion">💬</label>
+					</span>
+					<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
+					<span class="styled-checkbox hide-when-narrow">
+						<input
+						class="styled-checkbox"
+						type="checkbox"
+						id="toglTranscribing"
+						data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }">
+					</input>
+					<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
+				</span>
+				<button class="bbcode-button" onclick="app.speakText()" title="Hear text">🔊</button>
+				<button id="storyPlayButton" class="bbcode-button" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
+
+				<span class="show-when-narrow">
+					|
+					<button class="bbcode-button" onclick="app.editor.undo()" title="Undo">↶</button>
+					<button class="bbcode-button" onclick="app.editor.redo()" title="Redo">↷</button>
 				</span>
 			</div>
 
-			<!-- align controls -->
-			<div class="app-sort hide-when-narrow">
-        <span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
-				<span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
-				<span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
-				<span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
-			</div>
-
-      <!-- undo/redo controls -->
-			<div class="app-undo-redo">
-        <span data-bind="click: function() { app.historyDirection('undo'); }"></span>
-				<span data-bind="click: function() { app.historyDirection('redo'); }"></span>
-			</div>
-
-      <!-- zoom controls -->
-			<div class="app-zoom">
-					<span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"></span>
-					<span data-bind="click: function() { app.workspace.setZoom(3); }" title="Zoom 2:1"></span>
-					<span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"></span>
-					<span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"></span>
+			<div class="editor-container">
+				<div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
+				<div class="editor-play" id="editor-play" onpointermove="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
+					<p id="NVrichTextLabel"></p>
+					<div id="commandDebugLabel"></div>
 				</div>
-
-			<!-- navigation / menu -->
-			<div class="app-menu">
-				<div class="menu">
-					<span class="title" data-bind="click:app.newNode">+ Node</span>
-				</div>
-
-				<div class="menu">
-					<span class="title" onmouseover="app.openNodeListMenu('open')">Open</span>
-					<div class="dropdown">
-						<input id="openHelperMenuFilter" class="search-field" placeholder="search" type="text"  oninput="app.openNodeListMenu('open')"></input>
-						<div  id="openHelperMenu" ></div>
-					</div>
-				</div>
-
-				<div class="menu">
-					<span class="title">File</span>
-					<div class="dropdown">
-						<span class="item" data-bind="click: app.data.tryOpenFile">Open</span>
-						<!--<span class="item" data-bind="click: data.tryOpenFolder">Open Folder...</span>-->
-						<span class="item" data-bind="click: app.data.tryAppend">Append</span>
-						<!-- ko if:data.editingPath() != null -->
-						<span class="item" data-bind="click: app.data.trySaveCurrent">Save</span>
-						<!-- /ko -->
-						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('json');}">
-							<img width="12px" src="./public/icon.ico" alt="Yarn Icon" />
-							&nbsp;
-							Save As Json
-						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('yarn'); }">
-							<img width="12px" src="./public/icon.ico" alt="Yarn Icon" />
-							&nbsp;
-							Save As Yarn
-						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('twee'); }">
-							<img width="12px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
-								&nbsp;
-							Save As Twee
-						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">
-								<img width="12px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
-								&nbsp;
-							Save As Twee2
-						</span>
-						<span class="item" data-bind="click: function() { app.data.trySave('xml'); }">Save As Xml</span>
-						<span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
-							<img width="12px" src="./public/icon.ico" alt="Yarn Icon" />
-							&nbsp;
-							Send file
-						</span>
-						<span class="item" data-bind="click:app.ui.openSettingsDialog">Settings</span>
-					</div>
-				</div>
+				<div class="editor" id="editor"
+				data-bind="
+				ace: app.editing().body,
+				aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
+				enableBasicAutocompletion: true,
+				enableLiveAutocompletion: true }"
+				>
 			</div>
-
-			<!-- arrow bg canvas for linked nodes -->
-			<canvas class="arrows">
-
-			</canvas>
-			<!-- foreach loop  of the nodes -->
-			<div class="nodes">
-				<div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
-					<div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
-						<div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
-						<div class="body" data-bind="html: node.clippedBody"></div>
-						<div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }">
-							<span data-bind="text: tag.text, css: tag.style"></span>
-						</div>
-						<div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>
-						<div class="icon colorUp" data-bind="click: node.cycleColorUp"></div>
-						<!--<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>-->
-						<div class="icon delete" data-bind="click: node.tryRemove"></div>
-						<!--<div class="resize" data-bind="click:node.toggleExpand"></div>-->
-					</div>
-				</div>
-			</div>
-
-			<!-- ko if:app.editing() != null -->
-			<div class="node-editor" data-bind="mousedown:app.saveNode">
-
-				<div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-					<input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
-					<input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
-
-					<div class="bbcode-toolbar">
-						<button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
-						&nbsp;
-						<button class="bbcode-button" onclick="app.insertBBcodeTags('b')" title="Bold"><b>B</b></button>
-						<button class="bbcode-button" onclick="app.insertBBcodeTags('u')" title="Underlined"><u>U</u></button>
-						<button class="bbcode-button" onclick="app.insertBBcodeTags('i')" title="Italic"><i>I</i></button>
-						<button class="bbcode-button" style="color:green" onclick="app.insertBBcodeTags('color=#')"><text color="pink" title="Color">🌈</text></button>
-						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('img')" title="Image">🦄</button>
-						<button class="bbcode-button" style="color:purple" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
-						<span class="hide-when-narrow">
-							<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
-						</span>
-
-						<button class="bbcode-button" style="color:#19a4a8" onclick="app.insertEmoji()" title="Emoji">😉</button>
-
-						<div class="app-menu" style="position: absolute;">
-							<div class="menu">
-								<span class="title" onmouseover="app.openNodeListMenu('link')">Add Link</span>
-								<div class="dropdown">
-									<input class="search-field" style="text-align:center" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.openNodeListMenu('link')"></input>
-									<div id="linkHelperMenu" ></div>
-								</div>
-							</div>
-						</div>
-						&nbsp;
-						<span class="styled-checkbox hide-when-narrow">
-								<input
-									id="toglShowCounter"
-									type="checkbox"
-									data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
-								></input>
-								<label for="toglShowCounter" title="Show line counter" style="color:#292929">&#9779</label>
-						</span>
-						<span class="editor-counter">
-							<span class="hide-when-narrow">
-									&nbsp;
-									Length: <span class="character-count">0</span>
-									&nbsp;
-									Lines: <span class="line-count">0</span>
-									&nbsp;
-									<span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
-									&nbsp;
-									Line: <span class="row-index">0</span>
-									&nbsp;
-									Col: <span class="column-index">0</span>
-							</span>
-						</span>
-						<span class="styled-checkbox">
-							<input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
-							<label for="toglAutocomplete" title="Auto Close tags" style="color:#292929">🔮</label>
-						</span>
-						<span class="styled-checkbox hide-when-narrow">
-							<input
-								id="toglAutocompleteWords"
-								type="checkbox"
-								data-bind="checked: app.settings.completeWordsEnabled"
-								onclick="app.toggleWordCompletion()"
-							></input>
-							<label for="toglAutocompleteWords" title="auto-completion">💬</label>
-						</span>
-						<button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
-						<!-- <button  class="bbcode-button" style="color:#19a4a8" onclick="app.hearText()" ><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</button> -->
-						<span class="styled-checkbox hide-when-narrow">
-							<input
-								class="styled-checkbox"
-								type="checkbox"
-								id="toglTranscribing"
-								data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"
-							></input>
-							<label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
-						</span>
-						<button class="bbcode-button" style="color:#19a4a8" onclick="app.speakText()" title="Hear text">🔊</button>
-						<button id="storyPlayButton" class="bbcode-button" style="color:#19a4a8" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
-
-						<span class="show-when-narrow">
-							|
-							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.undo()" title="Undo">↶</button>
-							<button class="bbcode-button" style="color:#19a4a8" onclick="app.editor.redo()" title="Redo">↷</button>
-						</span>
-
-					</div>
-
-					<div class="editor-container">
-						<div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
-						<div class="editor-play" id="editor-play" onpointermove="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
-							<p id="NVrichTextLabel"></p>
-							<div id="commandDebugLabel"></div>
-						</div>
-						<div class="editor" id="editor"
-						data-bind="
-						ace: app.editing().body,
-						aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
-						enableBasicAutocompletion: true,
-						enableLiveAutocompletion: true }"
-						>
-						</div>
-					</div>
-					<!--<div class="icon close" data-bind="click:app.saveNode"></div>-->
-
-					<div class="tooltip" id="colorPicker-container" hidden>
-						<input type='text' id="colorPicker" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"/>
-					</div>
-
-					<div class="tooltip" id="emojiPicker-container">
-						<div id="emojiPickerDom"></div>
-					</div>
-
-				</div>
-			</div>
-			<!-- /ko -->
-			<!-- ko if:app.deleting() != null -->
-			<div class="node-delete" data-bind="click: function() { app.deleting(null); }">
-
-				<div class="form" data-bind="preventBubble: 'click'">
-					<!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length > 1)) -->
-					<div>Remove all selected</div>
-					<!-- /ko -->
-					<!-- ko ifnot: (app.deleting().selected) -->
-					<div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
-					<!-- /ko -->
-					<!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length == 1)) -->
-					<div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
-					<!-- /ko -->
-					<div class="icon close" data-bind="click:app.deleting().remove;"></div>
-				</div>
-
-			</div>
-			<!-- /ko -->
-
-			<!-- app info -->
-			<div class="app-info">
-				<span class="app-title" data-bind="text:app.name"></span>
-				<span class="app-version" data-bind="text:app.version"></span>
-				<span class="title" id="addPwa">Add to Homescreen</span>
-			</div>
-
-			<!-- marquee -->
-			<div id="marquee"></div>
-
-			<!-- ko if:app.ui.settingsDialogVisible() === true -->
-			<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
-				<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-					<h3>Settings</h3>
-					<div class="settings-row">
-						<div class="settings-column">
-							<!-- Language -->
-							<div class="settings-item">
-								<label class="settings-label" for="language">Story language</label>
-								<select id="language" class="settings-value" data-bind="
-									options: app.ui.availableLanguages,
-									optionsText: 'name',
-									optionsValue: 'id',
-									value: app.settings.language,
-									event: { change: app.setLanguage }">
-								</select>
-							</div>
-
-							<!-- Theme -->
-							<div class="settings-item">
-								<label class="settings-label" for="theme">Theme</label>
-
-								<select id="theme" class="settings-value" disabled data-bind="
-									options: app.ui.availableThemes,
-									optionsText: 'name',
-									optionsValue: 'id',
-									value: app.settings.theme,
-									event: { change: app.setTheme }">
-								</select>
-							</div>
-
-							<!-- Markup -->
-							<div class="settings-item">
-								<label class="settings-label" for="markup">Markup</label>
-								<select id="markup" class="settings-value" disabled>
-									<option value="classic">BBcode</option>
-									<option value="blueprint">XML</option>
-								</select>
-							</div>
-
-							<!-- Throttle delay -->
-							<div class="settings-item">
-								<label class="settings-label" for="throttle-threshold">Redraw delay</label>
-								<div class="slidecontainer settings-value">
-									<input
-										type="range"
-										class="slider settings-value"
-										min="16"
-										max="250"
-										data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
-								</div>
-							</div> <!-- settgins-item -->
-
-						</div> <!-- settgins-column -->
-						<div class="settings-column">
-
-							<!-- Spellcheck -->
-							<div class="settings-item">
-								<label class="settings-label" for="spellcheck">✔ Spell check</label>
-								<input
-									id="spellcheck"
-									type="checkbox"
-									class="settings-value"
-									data-bind="checked: app.settings.spellcheckEnabled">
-							</div>
-
-							<!-- AutocompleteWords -->
-							<div class="settings-item">
-								<label class="settings-label" for="completeWords">💬 Complete words</label>
-								<input
-									id="completeWords"
-									type="checkbox"
-									class="settings-value"
-									data-bind="checked: app.settings.completeWordsEnabled"
-								>
-							</div>
-
-							<!-- AutocloseTags -->
-							<div class="settings-item">
-								<label class="settings-label" for="completeTags">🔮 Complete tags</label>
-								<input
-									id="completeTags"
-									type="checkbox"
-									class="settings-value"
-									data-bind="checked: app.settings.completeTagsEnabled"
-								>
-							</div>
-
-							<!-- AutocreateNodes -->
-							<div class="settings-item">
-								<label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
-								<input
-									id="autocreation"
-									type="checkbox"
-									class="settings-value"
-									checked="true"
-									data-bind="checked: app.settings.createNodesEnabled"
-								>
-							</div>
-
-							<!-- Night mode -->
-							<div class="settings-item">
-								<label class="settings-label" for="nightMode">&#9728 Night mode</label>
-								<input
-									id="nightMode"
-									type="checkbox"
-									class="settings-value"
-									checked="true"
-									data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
-								>
-							</div>
-						</div> <!-- settgins-column -->
-					</div> <!-- settgins-row -->
-				</div> <!-- settgins-form -->
-			</div> <!-- settgins-dialog -->
-			<!-- /ko -->
 		</div>
 
+		<div class="tooltip" id="colorPicker-container" hidden>
+			<input type='text' id="colorPicker" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"/>
+		</div>
 
-		<!-- Hidden fields, file dialogs, and elements -->
-		<div class="hidden">
-			<input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp"/>
-			<input type="file" id="open-file" accept=".yarn,.txt,.xml,.json,.twee,.tw2"/>
-			<input type="file" id="open-folder" webkitdirectory directory/>
-			<input type="file" id="save-file" nwsaveas="filename.txt" />
+		<div class="tooltip" id="emojiPicker-container">
+			<div id="emojiPickerDom"></div>
 		</div>
-		<!-- templates container (they get loaded into this) -->
-		<div class="templates">
+
+	</div>
+</div>
+<!-- /ko -->
+<!-- ko if:app.deleting() != null -->
+<div class="node-delete" data-bind="click: function() { app.deleting(null); }">
+
+	<div class="form" data-bind="preventBubble: 'click'">
+		<!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length > 1)) -->
+		<div>Remove all selected</div>
+		<!-- /ko -->
+		<!-- ko ifnot: (app.deleting().selected) -->
+		<div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
+		<!-- /ko -->
+		<!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length == 1)) -->
+		<div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
+		<!-- /ko -->
+		<div class="icon close" data-bind="click:app.deleting().remove;"></div>
+	</div>
+
+</div>
+<!-- /ko -->
+
+<!-- app info -->
+<div class="app-info">
+	<span class="app-title" data-bind="text:app.name"></span>
+	<span class="app-version" data-bind="text:app.version"></span>
+	<span class="title" id="addPwa">Add to Homescreen</span>
+</div>
+
+<!-- marquee -->
+<div id="marquee"></div>
+
+<!-- ko if:app.ui.settingsDialogVisible() === true -->
+<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
+	<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+		<h3>Settings</h3>
+		<div class="settings-row">
+			<div class="settings-column">
+				<!-- Language -->
+				<div class="settings-item">
+					<label class="settings-label" for="language">Story language</label>
+					<select id="language" class="settings-value" data-bind="
+					options: app.ui.availableLanguages,
+					optionsText: 'name',
+					optionsValue: 'id',
+					value: app.settings.language,
+					event: { change: app.setLanguage }">
+				</select>
+			</div>
+
+			<!-- Theme -->
+			<div class="settings-item">
+				<label class="settings-label" for="theme">Theme</label>
+
+				<select id="theme" class="settings-value" data-bind="
+				options: app.ui.availableThemes,
+				optionsText: 'name',
+				optionsValue: 'id',
+				value: app.settings.theme,
+				event: { change: app.setTheme }">
+			</select>
 		</div>
-	</body>
+
+		<!-- Markup -->
+		<div class="settings-item">
+			<label class="settings-label" for="markup">Markup</label>
+			<select id="markup" class="settings-value" disabled>
+				<option value="classic">BBcode</option>
+				<option value="blueprint">XML</option>
+			</select>
+		</div>
+
+		<!-- Throttle delay -->
+		<div class="settings-item">
+			<label class="settings-label" for="throttle-threshold">Redraw delay</label>
+			<div class="slidecontainer settings-value">
+				<input
+				type="range"
+				class="slider settings-value"
+				min="16"
+				max="250"
+				data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
+			</div>
+		</div> <!-- settgins-item -->
+
+	</div> <!-- settgins-column -->
+	<div class="settings-column">
+
+		<!-- Spellcheck -->
+		<div class="settings-item">
+			<label class="settings-label" for="spellcheck">✔ Spell check</label>
+			<input
+			id="spellcheck"
+			type="checkbox"
+			class="settings-value"
+			data-bind="checked: app.settings.spellcheckEnabled">
+		</div>
+
+		<!-- AutocompleteWords -->
+		<div class="settings-item">
+			<label class="settings-label" for="completeWords">💬 Complete words</label>
+			<input
+			id="completeWords"
+			type="checkbox"
+			class="settings-value"
+			data-bind="checked: app.settings.completeWordsEnabled"
+			>
+		</div>
+
+		<!-- AutocloseTags -->
+		<div class="settings-item">
+			<label class="settings-label" for="completeTags">🔮 Complete tags</label>
+			<input
+			id="completeTags"
+			type="checkbox"
+			class="settings-value"
+			data-bind="checked: app.settings.completeTagsEnabled"
+			>
+		</div>
+
+		<!-- AutocreateNodes -->
+		<div class="settings-item">
+			<label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
+			<input
+			id="autocreation"
+			type="checkbox"
+			class="settings-value"
+			checked="true"
+			data-bind="checked: app.settings.createNodesEnabled"
+			>
+		</div>
+
+		<!-- Night mode -->
+		<div class="settings-item">
+			<label class="settings-label" for="nightMode">&#9728 Night mode</label>
+			<input
+			id="nightMode"
+			type="checkbox"
+			class="settings-value"
+			checked="true"
+			data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
+			>
+		</div>
+	</div> <!-- settgins-column -->
+</div> <!-- settgins-row -->
+</div> <!-- settgins-form -->
+</div> <!-- settgins-dialog -->
+<!-- /ko -->
+</div>
+
+<!-- Hidden fields, file dialogs, and elements -->
+<div class="hidden">
+	<input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp"/>
+	<input type="file" id="open-file" accept=".yarn,.txt,.xml,.json,.twee,.tw2"/>
+	<input type="file" id="open-folder" webkitdirectory directory/>
+	<input type="file" id="save-file" nwsaveas="filename.txt" />
+</div>
+
+<!-- templates container (they get loaded into this) -->
+<div class="templates">
+</div>
+</body>
 </html>

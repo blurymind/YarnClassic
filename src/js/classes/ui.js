@@ -6,7 +6,7 @@ export const UI = function(app) {
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
     { id: 'classic', name: 'Classic' },
-    // { id: 'blueprint', name: 'Blueprint' },
+    { id: 'blueprint', name: 'Blueprint' },
     // { id: 'dracula', name: 'Dracula' }
   ];
 
@@ -71,4 +71,60 @@ export const UI = function(app) {
       .css({ y: '0' })
       .transition({ y: '-100' }, 250);
   };
+
+  // openNodeListMenu
+  this.openNodeListMenu = function(action) {
+    const searchText = action === 'link' ?
+      document.getElementById('linkHelperMenuFilter').value.toLowerCase() :
+      document.getElementById('nodeSearchInput').value.toLowerCase();
+
+    const rootMenu = document.getElementById(action + 'HelperMenu');
+    rootMenu.innerHTML = '';
+
+    app.nodes().forEach((node, i) => {
+      if (
+        node
+          .title()
+          .toLowerCase()
+          .indexOf(searchText) >= 0 ||
+        searchText.length == 0
+      ) {
+        const p = document.createElement('span');
+        p.innerHTML = node.title();
+        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
+
+        if (action == 'link') {
+          if (node.title() !== app.editing().title()) {
+            p.setAttribute(
+              'onclick',
+              'app.insertTextAtCursor(\' [[Answer:' +
+                node.title() +
+                '|' +
+                node.title() +
+                ']]\')'
+            );
+            rootMenu.appendChild(p);
+          }
+        } else if (action == 'open') {
+          if (
+            node
+              .title()
+              .toLowerCase()
+              .indexOf(searchText) >= 0 ||
+            searchText.length == 0
+          ) {
+            p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
+            p.setAttribute(
+              'onmouseenter',
+              `app.workspace.warpToNodeByIdx(${app.nodes.indexOf(node)})`
+            );
+            rootMenu.appendChild(p);
+          }
+        }
+      }
+    });
+  };
+
+
+
 };
