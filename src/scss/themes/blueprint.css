@@ -32,8 +32,8 @@
 }
 
 .menu .dropdown {
-  background-color: orange;
-  color: black;
+  color: gray;
+  background-color: white;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
@@ -81,21 +81,6 @@
   border-left: 0;
   border-right: 0;
   border-bottom: 1px solid darkgray;
-}
-
-.app-search .searchResults {
-  width: 100%;
-  max-height: 0px;
-  overflow: hidden;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  transition: max-height 0.5s;
-  background-color: white;
-}
-
-.app-search:hover .searchResults {
-  max-height: 500px;
 }
 
 .app-search .dropdown .item {

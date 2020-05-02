@@ -36,14 +36,6 @@ a:hover {
   cursor: pointer;
 }
 
-.menu .dropdown {
-  background-color: white;
-}
-
-.app-menu .menu:first-child {
-  margin-left: 0;
-}
-
 .app-menu .title {
   box-sizing: border-box;
   padding: 15px;
@@ -138,19 +130,6 @@ a:hover {
 }
 .app-search input[type='checkbox'] {
   cursor: pointer;
-}
-
-.app-search .searchResults {
-  width: 100%;
-  max-height: 0px;
-  overflow: hidden;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  transition: max-height 0.5s;
-  background-color: white;
-}
-
-.app-search:hover .searchResults {
-  max-height: 500px;
 }
 
 .app-search .dropdown .item {

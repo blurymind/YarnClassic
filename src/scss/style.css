@@ -82,7 +82,6 @@ input[type='checkbox'] {
   display: none;
 }
 
-
 .icon {
   border-radius: 4px;
   width: 32px;
@@ -114,6 +113,7 @@ input[type='checkbox'] {
   z-index: 10000;
   opacity: 0.2;
 }
+
 .app-zoom:hover {
   opacity: 0.6;
 }
@@ -156,6 +156,7 @@ input[type='checkbox'] {
   z-index: 10000;
   opacity: 0.2;
 }
+
 .app-sort:hover {
   opacity: 0.6;
 }
@@ -275,7 +276,6 @@ input[type='checkbox'] {
   transition: color 0.25s, background 0.25s;
   overflow: hidden;
 }
-
 
 .node .body {
   position: absolute;
@@ -713,8 +713,6 @@ input[type='checkbox'] {
   clear: left;
   overflow: hidden;
   max-height: 0px;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  background-color: white;
   max-height: 0px;
   transition: max-height 0.5s;
 }
