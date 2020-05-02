@@ -26,8 +26,8 @@ export let Node = function(options = {}) {
   this.tags = ko.observable(options.tags || '');
   this.body = ko.observable(options.body || 'Empty Text');
   this.active = ko.observable(options.active || true);
-  this.tempWidth = null;
-  this.tempHeight = null;
+  this.width = 200;
+  this.height = 200;
   this.tempOpacity = null;
   this.style = null;
   this.colorID = ko.observable(options.colorID || 0);
