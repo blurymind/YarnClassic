@@ -36,6 +36,10 @@ a:hover {
   cursor: pointer;
 }
 
+.menu .dropdown {
+  background-color: white;
+}
+
 .app-menu .menu:first-child {
   margin-left: 0;
 }
@@ -140,8 +144,6 @@ a:hover {
   width: 100%;
   max-height: 0px;
   overflow: hidden;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
   transition: max-height 0.5s;
   background-color: white;
