@@ -104,7 +104,7 @@ a:hover {
   color: #555;
 }
 
-/*-- Search ------------------------------------------------------------------ */
+/*-- Search ----------------------------------------------------------------- */
 
 .app-search {
   position: absolute;
@@ -175,42 +175,41 @@ a:hover {
 
 /*-- ----------------------------Narrow overrides---------------------------- */
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
   .app-menu {
-    top: 10px;
-    right: 30px;
-    margin-top: 0px;
+    position: relative;
+    top: 5px;
+    left: 5px;
   }
+
   .app-menu .menu {
-    width: 100px;
     font-size: 0.8em;
+    margin: 0;
   }
+
   .app-menu .title {
     height: 30px;
     line-height: 0px;
-  }
-
-  .app-search {
-    position: relative;
-    float: left;
     z-index: 10000;
   }
 
   .app-search {
-    top: 5px;
-    left: 10px;
+    position: relative;
+    min-width: 380px;
+    float: left;
+    z-index: 10000;
+    overflow: hidden;
+  }
+
+  .app-search {
+    top: 0px;
+    left: 0px;
+    width: 100%;
     padding: 5px 10px 5px 5px;
   }
+
   .app-search > input {
     padding: unset;
     width: 170px;
-  }
-}
-
-@media (max-width: 830px) {
-  .app-menu {
-    position: relative;
-    float: right;
-    margin-top: 20px;
   }
 }
