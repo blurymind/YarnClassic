@@ -57,13 +57,6 @@ a:hover {
   float: left;
 }
 
-.app-menu .dropdown {
-  transition: max-height 0.5s;
-  max-height: 0px;
-  overflow: hidden;
-  float: left;
-}
-
 .app-menu .dropdown .item {
   box-sizing: border-box;
   float: left;
@@ -89,10 +82,6 @@ a:hover {
   width: 100%;
   padding: 10px;
   text-align:center;
-}
-
-.app-menu .menu:hover .dropdown {
-  max-height: 500px;
 }
 
 .app-menu .menu:hover .title {
@@ -124,10 +113,12 @@ a:hover {
   margin-left: 10px;
   margin-right: 4px;
 }
+
 .app-search .search-field {
   margin-left: 0px;
   margin-right: 0px;
 }
+
 .app-search input[type='checkbox'] {
   cursor: pointer;
 }
