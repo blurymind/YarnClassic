@@ -40,7 +40,7 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
-      if: github.github.event_name == 'push'
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
@@ -64,7 +64,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: echo ${{ github.github.event_name }}
+    - run: echo ${{ github.event_name }}
+    - run: echo ${{ github.ref }}
+    - run: echo ${{ github }}
+    - run: echo ${{ env }}
+    - run: echo ${{ job }}
+    - run: echo ${{ runner }}
+    - run: echo ${{ secrets }}
 
     - run: npm ci
 
@@ -78,7 +84,7 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
-      if: github.github.event_name == 'push'
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
@@ -114,7 +120,7 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
-      if: github.github.event_name == 'push'
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Mac - Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
