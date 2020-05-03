@@ -99,7 +99,6 @@ a:hover {
   position: absolute;
   top: 20px;
   left: 20px;
-  height: 33px;
   z-index: 10002;
   background: #fff;
   border-radius: 2px;
@@ -108,10 +107,10 @@ a:hover {
 }
 
 .app-search input {
-  padding: 4px 8px 4px 8px;
+  padding: 4px 0px 4px 0px;
   font-family: 'Lucida Console', Monaco, monospace;
-  margin-left: 10px;
-  margin-right: 4px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .app-search .search-field {
@@ -169,8 +168,8 @@ a:hover {
 @media only screen and (max-width: 600px) {
   .app-menu {
     position: relative;
-    top: 5px;
-    left: 5px;
+    top: 25px;
+    left: 20px;
   }
 
   .app-menu .menu {
@@ -186,16 +185,14 @@ a:hover {
 
   .app-search {
     position: relative;
-    min-width: 380px;
     float: left;
     z-index: 10000;
     overflow: hidden;
   }
 
   .app-search {
-    top: 0px;
-    left: 0px;
-    width: 100%;
+    top: 20px;
+    left: 20px;
     padding: 5px 10px 5px 5px;
   }
 
