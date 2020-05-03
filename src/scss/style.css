@@ -877,13 +877,13 @@ span.add-node:after {
   }
 }
 
-@media only screen and (min-width: 500px) {
+@media only screen and (min-width: 600px) {
   .show-when-narrow {
     display: none;
   }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
   .hide-when-narrow {
     display: none !important;
   }
@@ -925,5 +925,18 @@ span.add-node:after {
 
   .app-undo-redo span {
     display: inline;
+  }
+
+  .app-sort {
+    display: none;
+  }
+
+  .app-undo-redo {
+    bottom: 60px;
+  }
+
+  .app-add-node {
+    bottom: 60px;
+
   }
 }
