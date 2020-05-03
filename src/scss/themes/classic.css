@@ -57,13 +57,6 @@ a:hover {
   float: left;
 }
 
-.app-menu .dropdown {
-  transition: max-height 0.5s;
-  max-height: 0px;
-  overflow: hidden;
-  float: left;
-}
-
 .app-menu .dropdown .item {
   box-sizing: border-box;
   float: left;
@@ -91,10 +84,6 @@ a:hover {
   text-align:center;
 }
 
-.app-menu .menu:hover .dropdown {
-  max-height: 500px;
-}
-
 .app-menu .menu:hover .title {
   background: #f4f4f4;
 }
@@ -104,13 +93,12 @@ a:hover {
   color: #555;
 }
 
-/*-- Search ------------------------------------------------------------------ */
+/*-- Search ----------------------------------------------------------------- */
 
 .app-search {
   position: absolute;
   top: 20px;
   left: 20px;
-  height: 33px;
   z-index: 10002;
   background: #fff;
   border-radius: 2px;
@@ -119,15 +107,16 @@ a:hover {
 }
 
 .app-search input {
-  padding: 4px 8px 4px 8px;
   font-family: 'Lucida Console', Monaco, monospace;
-  margin-left: 10px;
-  margin-right: 4px;
+  margin-left: 1px;
+  margin-right: 1px;
 }
+
 .app-search .search-field {
   margin-left: 0px;
   margin-right: 0px;
 }
+
 .app-search input[type='checkbox'] {
   cursor: pointer;
 }
@@ -175,42 +164,37 @@ a:hover {
 
 /*-- ----------------------------Narrow overrides---------------------------- */
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
   .app-menu {
+    position: relative;
     top: 10px;
-    right: 30px;
-    margin-top: 0px;
+    left: 10px;
   }
+
   .app-menu .menu {
-    width: 100px;
     font-size: 0.8em;
+    margin: 0;
   }
+
   .app-menu .title {
     height: 30px;
     line-height: 0px;
-  }
-
-  .app-search {
-    position: relative;
-    float: left;
     z-index: 10000;
   }
+
 
   .app-search {
     top: 5px;
     left: 10px;
+    position: relative;
+    float: left;
+    z-index: 10000;
+    overflow: hidden;
     padding: 5px 10px 5px 5px;
   }
-  .app-search > input {
+
+  .app-search input {
     padding: unset;
     width: 170px;
-  }
-}
-
-@media (max-width: 830px) {
-  .app-menu {
-    position: relative;
-    float: right;
-    margin-top: 20px;
   }
 }

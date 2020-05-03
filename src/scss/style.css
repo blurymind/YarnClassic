@@ -709,6 +709,23 @@ input[type='checkbox'] {
   float: left;
 }
 
+/*-- Menu -------------------------------------------------------------- */
+
+.app-menu .dropdown {
+  max-height: 0px;
+  transition: max-height 0.5s;
+  overflow: hidden;
+  float: left;
+}
+
+.app-menu .menu:hover .dropdown {
+  max-height: 500px;
+}
+
+input:focus + span + .dropdown {
+  max-height: 500px;
+}
+
 .menu .dropdown {
   clear: left;
   overflow: hidden;
@@ -860,13 +877,13 @@ span.add-node:after {
   }
 }
 
-@media only screen and (min-width: 500px) {
+@media only screen and (min-width: 600px) {
   .show-when-narrow {
     display: none;
   }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
   .hide-when-narrow {
     display: none !important;
   }
@@ -908,5 +925,18 @@ span.add-node:after {
 
   .app-undo-redo span {
     display: inline;
+  }
+
+  .app-sort {
+    display: none;
+  }
+
+  .app-undo-redo {
+    bottom: 60px;
+  }
+
+  .app-add-node {
+    bottom: 60px;
+
   }
 }

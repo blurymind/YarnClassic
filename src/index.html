@@ -13,14 +13,14 @@
 	<div id="app">
 
 		<!-- search form -->
-		<div class="app-search" onmouseenter="app.ui.openNodeListMenu('open')">
+		<div class="app-search">
 			<div class="menu">
 				<input
 					id="nodeSearchInput"
-					type="text"
+					type="search"
 					class="search-field"
 					placeholder="Search"
-					oninput="app.ui.openNodeListMenu('open')">
+					oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
 
 				<span>
 					<span class="search-title styled-checkbox">
@@ -81,9 +81,8 @@
 						&nbsp;
 						Open
 					</span>
-					<!--<span class="item" data-bind="click: data.tryOpenFolder">Open Folder...</span>-->
 					<span class="item" data-bind="click: app.data.tryAppend">
-						<img style="margin:0; padding:0" width="20px" src="./public/images/pixel.png"/>
+						<img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
 						&nbsp;
 						Append
 					</span>
