@@ -32,6 +32,8 @@ jobs:
 
     - name: npm install and build
       run: cd electron && yarn install && yarn run build-windows
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Read package.json
       uses: tyankatsu0105/read-package-version-actions@v1
@@ -62,10 +64,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - run: echo ${{ github.github.event_name }}
+
     - run: npm ci
 
     - name: npm install and build
       run: cd electron && yarn install && yarn run build-linux
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Read package.json
       uses: tyankatsu0105/read-package-version-actions@v1
@@ -100,6 +106,8 @@ jobs:
 
     - name: npm install and build
       run: cd electron && yarn install && yarn run build-mac
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Read package.json
       uses: tyankatsu0105/read-package-version-actions@v1
