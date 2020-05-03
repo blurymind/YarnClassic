@@ -64,14 +64,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: echo ${{ github.event_name }}
-    - run: echo ${{ github.ref }}
-    - run: echo ${{ github }}
-    - run: echo ${{ env }}
-    - run: echo ${{ job }}
-    - run: echo ${{ runner }}
-    - run: echo ${{ secrets }}
-
     - run: npm ci
 
     - name: npm install and build
