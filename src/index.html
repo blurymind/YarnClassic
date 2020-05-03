@@ -13,14 +13,14 @@
 	<div id="app">
 
 		<!-- search form -->
-		<div class="app-search" onmouseenter="app.ui.openNodeListMenu('open')">
+		<div class="app-search">
 			<div class="menu">
 				<input
 					id="nodeSearchInput"
 					type="text"
 					class="search-field"
 					placeholder="Search"
-					oninput="app.ui.openNodeListMenu('open')">
+					oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
 
 				<span>
 					<span class="search-title styled-checkbox">
