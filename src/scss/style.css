@@ -730,12 +730,7 @@ input:focus + span + .dropdown {
   clear: left;
   overflow: hidden;
   max-height: 0px;
-  max-height: 0px;
   transition: max-height 0.5s;
-}
-
-.menu:hover .dropdown {
-  max-height: 500px;
 }
 
 .menu .dropdown .item {
@@ -780,6 +775,7 @@ input:focus + span + .dropdown {
   position: absolute;
   overflow-wrap: break-word;
 }
+
 .button-bubble:after {
   display: -webkit-flex;
   display: flex;
@@ -795,6 +791,7 @@ input:focus + span + .dropdown {
   width: 220px;
   z-index: 99 !important;
 }
+
 .button-bubble:before {
   border: solid;
   border-color: #444 transparent;
