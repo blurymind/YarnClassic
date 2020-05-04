@@ -66,28 +66,30 @@ export const Workspace = function(app) {
     if (speed)
       self.startUpdatingArrows();
 
-    $('.nodes-holder').transition(
-      {
-        transform:
-          'matrix(' +
-          self.scale +
-          ',0,0,' +
-          self.scale +
-          ',' +
-          self.transform.x +
-          ',' +
-          self.transform.y +
-          ')',
-      },
-      speed || 0,
-      'easeInQuad',
-      function() {
-        if (speed) {
-          self.stopUpdatingArrows();
+    $('.nodes-holder')
+      .finish()
+      .transition(
+        {
+          transform:
+            'matrix(' +
+            self.scale +
+            ',0,0,' +
+            self.scale +
+            ',' +
+            self.transform.x +
+            ',' +
+            self.transform.y +
+            ')',
+        },
+        speed || 0,
+        'easeInQuad',
+        function() {
+          if (speed) {
+            self.stopUpdatingArrows();
+          }
+          self.updateArrows();
         }
-        self.updateArrows();
-      }
-    );
+      );
   };
 
   // toWorkspaceCoordinates

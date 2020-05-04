@@ -1038,56 +1038,6 @@ export var App = function(name, version) {
     return tagBeforeCursor;
   };
 
-  this.openNodeListMenu = function(action) {
-    var helperLinkSearch = document.getElementById(action + 'HelperMenuFilter')
-      .value;
-    var rootMenu = document.getElementById(action + 'HelperMenu');
-    rootMenu.innerHTML = '';
-
-    self.nodes().forEach((node, i) => {
-      if (
-        node
-          .title()
-          .toLowerCase()
-          .indexOf(helperLinkSearch) >= 0 ||
-        helperLinkSearch.length == 0
-      ) {
-        var p = document.createElement('span');
-        p.innerHTML = node.title();
-        $(p).addClass('item ' + self.nodes()[i].titleStyles[self.nodes()[i].colorID()]);
-
-        if (action == 'link') {
-          if (node.title() !== self.editing().title()) {
-            p.setAttribute(
-              'onclick',
-              'app.insertTextAtCursor(\' [[Answer:' +
-                node.title() +
-                '|' +
-                node.title() +
-                ']]\')'
-            );
-            rootMenu.appendChild(p);
-          }
-        } else if (action == 'open') {
-          if (
-            node
-              .title()
-              .toLowerCase()
-              .indexOf(helperLinkSearch) >= 0 ||
-            helperLinkSearch.length == 0
-          ) {
-            p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
-            p.setAttribute(
-              'onmouseover',
-              `app.workspace.warpToNodeByIdx(${self.nodes.indexOf(node)})`
-            );
-            rootMenu.appendChild(p);
-          }
-        }
-      }
-    });
-  };
-
   this.saveNode = function(closeEditor = true) {
     const node = self.editing();
     if (node) {
