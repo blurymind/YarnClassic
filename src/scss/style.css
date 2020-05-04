@@ -3,34 +3,11 @@
   src: url('../public/droid-sans-mono.ttf');
 }
 /* --- ROOT CSS --- */
-
 body {
   overflow: hidden;
   -webkit-user-select: none;
   line-height: 1.6em;
-  background: #000;
 }
-
-#app-bg {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-  background: -webkit-linear-gradient(45deg, #ddc9b9 0%, #daf0f2 100%);
-  transform-style: preserve-3d;
-  z-index: -1000;
-}
-
-#app {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  cursor: default;
-  display: none;
-}
-
-/* --- GLOBAL CSS --- */
 
 h1,
 h2,
@@ -60,15 +37,6 @@ input[type='checkbox'] {
   margin-bottom: 6px;
 }
 
-a {
-  color: #2f919a;
-  text-decoration: none;
-  transition: color 0.25s;
-}
-a:hover {
-  color: #000;
-}
-
 ::-webkit-scrollbar {
   background: -webkit-linear-gradient(top, #eee, #f4f4f4 50%, #eee);
   border-radius: 12px;
@@ -96,29 +64,22 @@ a:hover {
 }
 
 /* --- VARIOUS CSS --- */
+#app-bg {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  transform-style: preserve-3d;
+  z-index: -1;
+}
 
-.app-info {
+#app {
   position: absolute;
-  left: 20px;
-  bottom: 20px;
-  color: #000;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  opacity: 0.4;
-  line-height: 1.2em;
-  /* z-index: -10; */
-}
-
-.app-info span {
-  display: block;
-}
-
-.app-title {
-  font-weight: bold;
-}
-
-.app-version::before {
-  content: 'Version ';
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  display: none;
 }
 
 .icon {
@@ -138,118 +99,6 @@ a:hover {
   background-color: #fff;
 }
 
-/* --- MENU --- */
-
-.app-menu {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 100;
-}
-
-.app-menu .menu {
-  width: 140px;
-  float: left;
-  display: inline;
-  margin-left: 10px;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  font-size: 0.9em;
-  color: #666;
-  text-transform: uppercase;
-  background: #fff;
-  cursor: pointer;
-}
-
-.app-menu .menu:first-child {
-  margin-left: 0;
-}
-
-.app-menu .title {
-  box-sizing: border-box;
-  padding: 15px;
-  width: 100%;
-  height: 50px;
-  line-height: 20px;
-  font-weight: bold;
-  float: left;
-  transition: background 0.25s;
-}
-
-.app-menu .dropdown {
-  transition: max-height 0.5s;
-  max-height: 0px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  float: left;
-}
-
-.app-menu .dropdown .item {
-  box-sizing: border-box;
-  float: left;
-  display: block;
-  width: 100%;
-  padding: 7px;
-}
-
-.app-menu .dropdown .item:hover {
-  background: #eee;
-  color: #000;
-}
-
-.app-menu .dropdown .item:active {
-  background: #ddd;
-  color: #555;
-}
-
-.app-menu .dropdown .search-field {
-  box-sizing: border-box;
-  float: left;
-  display: block;
-  width: 100%;
-  padding: 10px;
-}
-
-.app-menu .menu:hover .dropdown {
-  max-height: 500px;
-}
-
-.app-menu .menu:hover .title {
-  background: #f4f4f4;
-}
-
-.app-menu .menu:active .title {
-  background: #ddd;
-  color: #555;
-}
-
-/* --- NODE SEARCH--- */
-
-.app-search {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 100;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 10px 20px 10px 10px;
-}
-
-.app-search input {
-  padding: 4px 8px 4px 8px;
-  font-family: 'Lucida Console', Monaco, monospace;
-  margin-left: 10px;
-  margin-right: 4px;
-}
-.app-search .search-field {
-  margin-left: 0px;
-  margin-right: 0px;
-}
-.app-search input[type='checkbox'] {
-  cursor: pointer;
-}
-
 /* --- ZOOM --- */
 
 .app-zoom {
@@ -261,9 +110,10 @@ a:hover {
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
   padding: 5px 5px 5px 5px;
-  z-index: 99;
+  z-index: 10000;
   opacity: 0.2;
 }
+
 .app-zoom:hover {
   opacity: 0.6;
 }
@@ -272,8 +122,8 @@ a:hover {
   width: 22px;
   height: 22px;
   margin: 8px;
-  background: #fff url('../public/images/zooms.png') no-repeat;
   float: left;
+  background: #fff url('../public/images/zooms.png') no-repeat;
   display: inline;
   opacity: 0.15;
   cursor: pointer;
@@ -303,9 +153,10 @@ a:hover {
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
   padding: 5px 5px 5px 5px;
-  z-index: 99;
+  z-index: 10000;
   opacity: 0.2;
 }
+
 .app-sort:hover {
   opacity: 0.6;
 }
@@ -338,15 +189,16 @@ a:hover {
 /* --- UNDO REDO --- */
 .app-undo-redo {
   position: absolute;
-  bottom: 60px;
+  bottom: 115px;
   right: 5px;
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
   padding: 5px 5px 5px 5px;
-  z-index: 99;
+  z-index: 10000;
   opacity: 0.2;
 }
+
 .app-undo-redo:hover {
   opacity: 0.6;
 }
@@ -357,7 +209,6 @@ a:hover {
   margin: 8px;
   background: #fff url('../public/images/undo-redo.png') no-repeat;
   float: left;
-  display: none;
   opacity: 0.25;
   cursor: pointer;
   transition: opacity 0.25s;
@@ -424,38 +275,6 @@ a:hover {
   font-weight: bold;
   transition: color 0.25s, background 0.25s;
   overflow: hidden;
-}
-
-.title-style-1 {
-  background-color: #EBEBEB;
-  color: black;
-}
-.title-style-2 {
-  background-color: #6EA5E0;
-}
-.title-style-3 {
-  background-color: #9EDE74;
-}
-.title-style-4 {
-  background-color: #FFE374;
-}
-
-.title-style-5 {
-  background-color: #F7A666;
-}
-.title-style-6 {
-  background-color: #C47862;
-}
-.title-style-7 {
-  background-color: #97E1E9;
-}
-.title-style-8 {
-  background-color: #576574;
-  color: white;
-}
-.title-style-9 {
-  background-color: black;
-  color: white;
 }
 
 .node .body {
@@ -568,7 +387,7 @@ a:hover {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 200;
+  z-index: 10002;
   background: rgba(0, 0, 0, 0.5);
   color: grey;
 }
@@ -596,20 +415,8 @@ a:hover {
   display: flex;
 }
 
-@media screen and (max-width: 800px) {
-  .settings-row {
-    flex-direction: column;
-  }
-}
-
 .settings-column {
   flex: 50%;
-}
-
-@media screen and (max-width: 992px) {
-  .settings-column {
-    flex: 50%;
-  }
 }
 
 .settings-item {
@@ -618,6 +425,7 @@ a:hover {
   margin-bottom: 5px;
   margin-right: 5px;
   display: flex;
+  text-align: left;
 }
 
 .settings-label {
@@ -663,7 +471,7 @@ a:hover {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 200;
+  z-index: 10002;
   background: rgba(0, 0, 0, 0.5);
 }
 
@@ -856,7 +664,7 @@ a:hover {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 200;
+  z-index: 10002;
   background: rgba(0, 0, 0, 0.5);
 }
 
@@ -880,109 +688,79 @@ a:hover {
   background-position: -64px 0px;
 }
 
-.styled-dropdown {
-  width: 70px;
-}
 /* --- MARQUEE --- */
 
 #marquee {
   z-index: 10000;
-  display: block;
+  display: none;
   position: absolute;
   pointer-events: none;
   border: 1px solid #49eff1;
   background-color: rgba(29, 94, 95, 0.2);
 }
 
-/* --- MEDIA --- */
-
-@media (max-width: 830px) {
-  .app-search {
-    position: relative;
-    float: left;
-  }
-  .app-menu {
-    position: relative;
-    float: right;
-    margin-top: 20px;
-  }
+/*-- Add link -------------------------------------------------------------- */
+.title {
+  box-sizing: border-box;
+  padding: 5px;
+  width: 100%;
+  line-height: 20px;
+  font-weight: bold;
+  float: left;
 }
 
-@media only screen and (min-width: 500px) {
-  .show-when-narrow {
-    display: none;
-  }
+/*-- Menu -------------------------------------------------------------- */
+
+.app-menu .dropdown {
+  max-height: 0px;
+  transition: max-height 0.5s;
+  overflow: hidden;
+  float: left;
 }
 
-@media only screen and (max-width: 500px) {
-  .hide-when-narrow {
-    display: none !important;
-  }
-  .show-when-narrow {
-    display: visible;
-  }
-  /* portrait mode css */
-  .app-menu {
-    top: 10px;
-    right: 30px;
-    margin-top: 0px;
-  }
-  .app-menu .menu {
-    width: 100px;
-    font-size: 0.8em;
-  }
-  .app-menu .title {
-    height: 30px;
-    line-height: 0px;
-  }
-  .app-search {
-    top: 5px;
-    left: 10px;
-    padding: 5px 10px 5px 5px;
-  }
-  .app-search > input {
-    padding: unset;
-    width: 170px;
-  }
+.app-menu .menu:hover .dropdown {
+  max-height: 500px;
+}
 
-  .node-editor .form {
-    top: 8%;
-    height: 92%;
-    padding: 2px 2px 5px 2px;
-    line-height: 0em;
-    border-radius: 4px;
-  }
-  .node-editor .form input[type='text'] {
-    font-size: 1em !important;
-    padding: 0px 0px 0px 0px !important;
-    margin-top: 0em !important;
-    margin-bottom: 0px !important;
-    border-bottom: 0px !important;
-  }
+input:focus + span + .dropdown {
+  max-height: 500px;
+  overflow-y: auto;
+}
 
-  .context-menu-visible > .context-menu-list {
-    left: 0px !important;
-    top: 40px !important;
-  }
+.menu .dropdown {
+  clear: left;
+  overflow: hidden;
+  max-height: 0px;
+  transition: max-height 0.5s;
+}
 
-  .tooltip {
-    top: 15% !important;
-    left: 15% !important;
-  }
-  .emojipicker-container {
-    top: 15% !important;
-    left: 15% !important;
-  }
+.menu .dropdown .item {
+  display: block;
+  box-sizing: border-box;
+  padding: 7px;
+}
 
-  .app-undo-redo span {
-    display: inline;
-  }
-  /* .ace_gutter {
-    left: -10px !important;
-  }
-  .ace_scroller {
-    left: 30px !important;
-  } */
+.menu .dropdown .search-field {
+  box-sizing: border-box;
+  float: left;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align:center;
+}
+
+.add-link {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  height: 30px;
+  font-family: sans-serif;
+  line-height: 1.6em;
+  font-size: 0.8em;
+  cursor: default;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+  background-color: white;
 }
 
 .tooltip {
@@ -993,12 +771,12 @@ a:hover {
 }
 
 .button-bubble {
-  /* display: inline; */
   width: 20px;
   height: 20px;
   position: absolute;
   overflow-wrap: break-word;
 }
+
 .button-bubble:after {
   display: -webkit-flex;
   display: flex;
@@ -1014,6 +792,7 @@ a:hover {
   width: 220px;
   z-index: 99 !important;
 }
+
 .button-bubble:before {
   border: solid;
   border-color: #444 transparent;
@@ -1033,4 +812,129 @@ a:hover {
 .storyPreviewChoiceButton {
   color: #f5ff6f;
   font-size: 1.2em;
+}
+
+.app-info {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  color: #000;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  line-height: 1.2em;
+}
+
+.app-info span {
+  display: block;
+}
+
+.app-title {
+  font-weight: bold;
+}
+
+.app-version::before {
+  content: 'Version ';
+}
+
+/*-- New node button ------------------------------------------------------- */
+.app-add-node {
+  position: absolute;
+  bottom: 115px;
+  right: 110px;
+  width: 35px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  padding-top: 11px;
+  padding-left: 17px;
+  z-index: 10000;
+  opacity: 0.2;
+}
+
+span.add-node:after {
+  font-weight: bolder;
+  font-size: xx-large;
+  color: lightgray;
+  content: '+';
+}
+
+.app-add-node:hover {
+  opacity: 0.6;
+}
+
+.add-node:active {
+  color: gray;
+}
+
+/*-- ----------------------------Narrow overrides---------------------------- */
+@media screen and (max-width: 900px) {
+  .settings-row {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .show-when-narrow {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .hide-when-narrow {
+    display: none !important;
+  }
+
+  .show-when-narrow {
+    display: block !important;
+  }
+
+  .node-editor .form {
+    top: 8%;
+    height: 92%;
+    padding: 2px 2px 5px 2px;
+    line-height: 0em;
+    border-radius: 4px;
+  }
+
+  .node-editor .form input[type='text'] {
+    font-size: 1em !important;
+    padding: 0px 0px 0px 0px !important;
+    margin-top: 0em !important;
+    margin-bottom: 0px !important;
+    border-bottom: 0px !important;
+  }
+
+  .context-menu-visible > .context-menu-list {
+    left: 0px !important;
+    top: 40px !important;
+  }
+
+  .tooltip {
+    top: 15% !important;
+    left: 15% !important;
+  }
+
+  .emojipicker-container {
+    top: 15% !important;
+    left: 15% !important;
+  }
+
+  .app-undo-redo span {
+    display: inline;
+  }
+
+  .app-sort {
+    display: none;
+  }
+
+  .app-undo-redo {
+    bottom: 60px;
+  }
+
+  .app-add-node {
+    bottom: 60px;
+
+  }
 }
