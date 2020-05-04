@@ -724,6 +724,7 @@ input[type='checkbox'] {
 
 input:focus + span + .dropdown {
   max-height: 500px;
+  overflow-y: auto;
 }
 
 .menu .dropdown {
