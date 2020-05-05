@@ -265,27 +265,27 @@ export const Workspace = function(app) {
   // selected nodes and deselecting onces which have been selected
   // by the marquee.
   this.selectNodesInsideMarquee = function () {
+    const m1 = self.toWorkspaceCoordinates(self.marqueeRect.x1, self.marqueeRect.y1);
+    const m2 = self.toWorkspaceCoordinates(self.marqueeRect.x2, self.marqueeRect.y2);
+    const marqueeCoords = { left: m1.x, right: m2.x, top: m1.y, bottom: m2.y };
+
     app.nodes().forEach(node => {
       const index = self.marqueeSelection.indexOf(node);
-      const inMarqueeSelection = index >= 0;
+      const alreadySelected = index >= 0;
 
-      const holder = $('.nodes-holder').offset();
-      const marqueeOverNode =
-        (self.marqueeRect.x2 - holder.left) / self.scale > node.x() &&
-        (self.marqueeRect.x1 - holder.left) / self.scale < node.x() + node.tempWidth &&
-        (self.marqueeRect.y2 - holder.top)  / self.scale > node.y() &&
-        (self.marqueeRect.y1 - holder.top)  / self.scale < node.y() + node.tempHeight;
+      const nx = node.x();
+      const ny = node.y();
+      const nodeCoords = { left: nx, right: nx + node.width, top: ny, bottom: ny + node.height };
+      const marqueeOverNode = Utils.rectanglesOverlap(marqueeCoords, nodeCoords);
 
-      if (marqueeOverNode) {
-        if (!inMarqueeSelection) {
-          self.addNodesToSelection(node);
-          self.marqueeSelection.push(node);
-        }
-      } else {
-        if (inMarqueeSelection) {
-          self.removeNodesFromSelection(node);
-          self.marqueeSelection.splice(index, 1);
-        }
+      if (marqueeOverNode && !alreadySelected) {
+        self.addNodesToSelection(node);
+        self.marqueeSelection.push(node);
+      }
+
+      if (!marqueeOverNode && alreadySelected) {
+        self.removeNodesFromSelection(node);
+        self.marqueeSelection.splice(index, 1);
       }
     });
   };

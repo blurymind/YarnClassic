@@ -79,6 +79,13 @@ export var Utils = {
     return Math.max(Math.min(value, max), min);
   },
 
+  rectanglesOverlap: function(r1, r2) {
+    return !(r2.left > r1.right ||
+      r2.right < r1.left ||
+      r2.top > r1.bottom ||
+      r2.bottom < r1.top);
+  },
+
   stripHtml: function(html) {
     while (html.indexOf('<') >= 0) html = html.replace('<', '&lt;');
     while (html.indexOf('>') >= 0) html = html.replace('>', '&gt');
