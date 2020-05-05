@@ -5,9 +5,9 @@ name: Yarn Editor CI
 
 on:
   push:
-    branches: [ ci, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ ci, master ]
+    branches: [ master ]
 
 jobs:
   # TODO: write a job to update version and publish artifact to share the version between jobs
@@ -40,10 +40,13 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
         path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -73,10 +76,13 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
         path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   build-mac:
     runs-on: macos-latest
@@ -106,7 +112,10 @@ jobs:
       id: package-version
 
     - name: Archive production artifacts
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v1
       with:
         name: Mac - Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
         path: ./electron/dist/Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
