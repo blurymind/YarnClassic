@@ -6,8 +6,6 @@ name: Yarn Editor CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   # TODO: write a job to update version and publish artifact to share the version between jobs
