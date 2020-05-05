@@ -278,16 +278,14 @@ export const Workspace = function(app) {
       const nodeCoords = { left: nx, right: nx + node.width, top: ny, bottom: ny + node.height };
       const marqueeOverNode = Utils.rectanglesOverlap(marqueeCoords, nodeCoords);
 
-      if (marqueeOverNode) {
-        if (!alreadySelected) {
-          self.addNodesToSelection(node);
-          self.marqueeSelection.push(node);
-        }
-      } else {
-        if (alreadySelected) {
-          self.removeNodesFromSelection(node);
-          self.marqueeSelection.splice(index, 1);
-        }
+      if (marqueeOverNode && !alreadySelected) {
+        self.addNodesToSelection(node);
+        self.marqueeSelection.push(node);
+      }
+
+      if (!marqueeOverNode && alreadySelected) {
+        self.removeNodesFromSelection(node);
+        self.marqueeSelection.splice(index, 1);
       }
     });
   };
