@@ -81,12 +81,19 @@ export var App = function(name, version) {
   //
   // Indicates if we are in the workspace view
   this.inWorkspace = () =>
-    !self.editing() && !self.ui.settingsDialogVisible();
+    !self.editing() &&
+    !self.ui.settingsDialogVisible() &&
+    !self.ui.helpDialogVisible();
 
   // inSettingsDialog
   //
   // Indicates if we are in the settings dialog
   this.inSettingsDialog = () => self.ui.settingsDialogVisible();
+
+  // inHelpDialog
+  //
+  // Indicates if we are in the help dialog
+  this.inHelpDialog = () => self.ui.helpDialogVisible();
 
   // run
   //

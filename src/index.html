@@ -72,6 +72,7 @@
 
 		<!-- main menu -->
 		<div class="app-menu">
+
 			<!-- File menu -->
 			<div class="menu">
 				<span class="title">File</span>
@@ -140,10 +141,10 @@
 						&nbsp;
 						Help
 					</span>
-					<span class="item" data-bind="click: app.data.tryAppend">
+					<span class="item">
 						<img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
 						&nbsp;
-						About
+						Online help
 					</span>
 				</div>
 			</div> <!-- help menu -->
@@ -152,7 +153,7 @@
 		<!-- arrow bg canvas for linked nodes -->
 		<canvas class="arrows"></canvas>
 
-		<!-- foreach loop  of the nodes -->
+		<!-- foreach loop of the nodes -->
 		<div class="nodes">
 			<div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
 				<div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
@@ -435,12 +436,30 @@
 <!-- ko if:app.ui.helpDialogVisible() === true -->
 <div id="help-dialog" class="dialog" data-bind="mousedown: (data, event) => { app.ui.closeDialog('help-dialog'); }">
 	<div class="dialog-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-		<h3>Help</h3>
-		<div class="settings-row">
-			<div class="settings-column">
-			</div> <!-- settgins-column -->
-		</div> <!-- settgins-row -->
-	</div> <!-- settgins-form -->
+		<!-- Tabs -->
+		<div class="tab">
+			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Syntax')">Syntax</button>
+			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Shortcuts')">Shortcuts</button>
+			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'About')">About</button>
+		</div> <!-- Tabs -->
+
+		<!-- Pages -->
+		<div id="Syntax" class="tabcontent">
+			<h2>Syntax</h2>
+		</div>
+
+		<div id="Shortcuts" class="tabcontent">
+			<p>Ctrl+C Copy</p>
+			<p>Ctrl+V Paste</p>
+			<p>Spacebar focus next node in workspace</p>
+			<p>Alt+Spacebar focus next node in editor</p>
+			<p>Enter Edit focused node</p>
+		</div>
+
+		<div id="About" class="tabcontent">
+			<h2>About</h2>
+		</div>
+	</div> <!-- help-form -->
 </div> <!-- help-dialog -->
 <!-- /ko -->
 </div>

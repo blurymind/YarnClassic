@@ -278,16 +278,18 @@ export const Input = function(app) {
       }
     });
 
-    // Settings dialog shortcuts
+    // Settings/Help dialog shortcuts
     $(document).on('keydown', function(e) {
-      if (!app.inSettingsDialog())
+      if (!app.inSettingsDialog() && !app.inHelpDialog())
         return;
 
       switch (e.keyCode) {
-      case Key.Escape: app.ui.closeDialog('settings-dialog'); break;
+      case Key.Escape:
+        app.inSettingsDialog() && app.ui.closeDialog('settings-dialog');
+        app.inHelpDialog() && app.ui.closeDialog('help-dialog');
+        break;
       }
     });
-
 
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
       if (!app.inEditor())

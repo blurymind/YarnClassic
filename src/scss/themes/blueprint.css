@@ -7,13 +7,13 @@
   height: 30px;
   background-color: white;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  padding-left: 10px;
   z-index: 10001;
 }
 
 .app-menu .menu {
   display: block;
   float: left;
-  margin-left: 10px;
   font-size: 0.9em;
   color: #666;
   cursor: pointer;
@@ -22,7 +22,6 @@
 .title {
   box-sizing: border-box;
   padding: 5px;
-  width: fit-content;
   min-width: 100px;
   line-height: 20px;
   font-weight: bold;
