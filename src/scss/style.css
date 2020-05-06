@@ -2,6 +2,10 @@
   font-family: yarnFont;
   src: url('../public/droid-sans-mono.ttf');
 }
+@font-face {
+  font-family: keystroke;
+  src: url('../public/keystrkn.ttf');
+}
 /* --- ROOT CSS --- */
 body {
   overflow: hidden;
@@ -443,14 +447,14 @@ input[type='checkbox'] {
 
 /* --- TABS --- */
 
-/* Style the tab */
 .tab {
+  margin: 0;
+  padding: 0;
+  width: 100%;
   overflow: hidden;
-  border: 1px solid #ccc;
   background-color: #f1f1f1;
 }
 
-/* Style the buttons that are used to open the tab content */
 .tab button {
   background-color: inherit;
   float: left;
@@ -461,22 +465,17 @@ input[type='checkbox'] {
   transition: 0.3s;
 }
 
-/* Change background color of buttons on hover */
 .tab button:hover {
   background-color: #ddd;
 }
 
-/* Create an active/current tablink class */
 .tab button.active {
   background-color: #ccc;
 }
 
-/* Style the tab content */
 .tabcontent {
   display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-top: none;
+  padding: 5px 5px;
 }
 
 /* --- SETTINGS --- */
@@ -504,6 +503,17 @@ input[type='checkbox'] {
 
 .settings-value {
   flex: 50%;
+}
+
+/* --- HELP --- */
+
+#help-dialog .dialog-form {
+  padding: 0;
+}
+
+.keystroke {
+  font-family: 'keystroke';
+  font-size: x-large;
 }
 
 /* --- NODE EDITOR --- */

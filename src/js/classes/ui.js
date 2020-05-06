@@ -83,19 +83,16 @@ export const UI = function(app) {
 
   // showHelpTab
   this.showHelpTab = function(evt, tab) {
-    // Get all elements with class="tabcontent" and hide them
     const tabcontent = document.getElementsByClassName('tabcontent');
     Array.prototype.forEach.call(tabcontent, content => {
       content.style.display = 'none';
     });
 
-    // Get all elements with class='tablinks' and remove the class 'active'
     const tablinks = document.getElementsByClassName('tablinks');
     Array.prototype.forEach.call(tablinks, link => {
       link.className = link.className.replace(' active', '');
     });
 
-    // Show the current tab, and add an 'active' class to the button that opened the tab
     document.getElementById(tab).style.display = 'block';
     evt.currentTarget.className += ' active';
   };

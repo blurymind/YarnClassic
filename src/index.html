@@ -438,23 +438,24 @@
 	<div class="dialog-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 		<!-- Tabs -->
 		<div class="tab">
+			<button class="tablinks active" onclick="app.ui.showHelpTab(event, 'Shortcuts')">Shortcuts</button>
 			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Syntax')">Syntax</button>
-			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Shortcuts')">Shortcuts</button>
 			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'About')">About</button>
 		</div> <!-- Tabs -->
 
 		<!-- Pages -->
-		<div id="Syntax" class="tabcontent">
-			<h2>Syntax</h2>
-		</div>
+		<div id="Shortcuts" class="tabcontent" style="display: block;">
+      <p><span class="keystroke"></span> this help</span></p>
+			<p><span class="keystroke">&sect;</span>+<span class="keystroke">c</span><span> copy</span></p>
+			<p><span class="keystroke">&sect;</span>+<span class="keystroke">v</span><span> paste</span></p>
+			<p><span class="keystroke">&iexcl</span> focus next node in workspace</span></p>
+			<p><span class="keystroke">&brvbar</span>+<span class="keystroke">&iexcl</span><span> focus next node in editor</span></p>
+			<p><span class="keystroke">&not</span> edit focused node</span></p>
+    </div>
 
-		<div id="Shortcuts" class="tabcontent">
-			<p>Ctrl+C Copy</p>
-			<p>Ctrl+V Paste</p>
-			<p>Spacebar focus next node in workspace</p>
-			<p>Alt+Spacebar focus next node in editor</p>
-			<p>Enter Edit focused node</p>
-		</div>
+    <div id="Syntax" class="tabcontent">
+      <h2>Syntax</h2>
+    </div>
 
 		<div id="About" class="tabcontent">
 			<h2>About</h2>
