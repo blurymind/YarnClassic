@@ -123,13 +123,30 @@
 						&nbsp;
 						Send file
 					</span>
-					<span class="item" data-bind="click:app.ui.openSettingsDialog">
+					<span class="item" data-bind="click: (data, event) => { app.ui.openDialog('settings-dialog'); }">
 						<img style="margin:0; padding:0" width="20px" src="./public/images/settings.png"/>
 						&nbsp;
 						Settings
 					</span>
 				</div>
 			</div> <!-- file menu -->
+
+			<!-- Help menu -->
+			<div class="menu">
+				<span class="title">Help</span>
+				<div class="dropdown">
+					<span class="item" data-bind="click: (data, event) => { app.ui.openDialog('help-dialog'); }">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/open.png"/>
+						&nbsp;
+						Help
+					</span>
+					<span class="item" data-bind="click: app.data.tryAppend">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
+						&nbsp;
+						About
+					</span>
+				</div>
+			</div> <!-- help menu -->
 		</div> <!-- app-menu -->
 
 		<!-- arrow bg canvas for linked nodes -->
@@ -299,8 +316,8 @@
 <div id="marquee"></div>
 
 <!-- ko if:app.ui.settingsDialogVisible() === true -->
-<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
-	<div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+<div id="settings-dialog" class="dialog" data-bind="mousedown: (data, event) => { app.ui.closeDialog('settings-dialog'); }">
+	<div class="dialog-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 		<h3>Settings</h3>
 		<div class="settings-row">
 			<div class="settings-column">
@@ -413,6 +430,18 @@
 </div> <!-- settgins-row -->
 </div> <!-- settgins-form -->
 </div> <!-- settgins-dialog -->
+<!-- /ko -->
+
+<!-- ko if:app.ui.helpDialogVisible() === true -->
+<div id="help-dialog" class="dialog" data-bind="mousedown: (data, event) => { app.ui.closeDialog('help-dialog'); }">
+	<div class="dialog-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+		<h3>Help</h3>
+		<div class="settings-row">
+			<div class="settings-column">
+			</div> <!-- settgins-column -->
+		</div> <!-- settgins-row -->
+	</div> <!-- settgins-form -->
+</div> <!-- help-dialog -->
 <!-- /ko -->
 </div>
 

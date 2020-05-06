@@ -284,7 +284,7 @@ export const Input = function(app) {
         return;
 
       switch (e.keyCode) {
-      case Key.Escape: app.ui.closeSettingsDialog(); break;
+      case Key.Escape: app.ui.closeDialog('settings-dialog'); break;
       }
     });
 

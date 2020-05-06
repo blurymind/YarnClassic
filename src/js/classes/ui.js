@@ -2,6 +2,7 @@ export const UI = function(app) {
   const self = this;
 
   this.settingsDialogVisible = ko.observable(false);
+  this.helpDialogVisible = ko.observable(false);
 
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
@@ -45,28 +46,31 @@ export const UI = function(app) {
     { name: 'Lingua latīna', id: 'la' }
   ];
 
-  // openSettingsDialog
-  this.openSettingsDialog = function() {
-    self.settingsDialogVisible(true);
+  // openDialog
+  this.openDialog = function(dialogId) {
+    switch (dialogId) {
+    case 'settings-dialog': self.settingsDialogVisible(true); break;
+    case 'help-dialog': self.helpDialogVisible(true); break;
+    }
 
-    $('.settings-dialog')
+    $(`#${dialogId}`)
       .css({ opacity: 0 })
       .transition({ opacity: 1 }, 250);
 
-    $('.settings-dialog .form')
+    $(`#${dialogId} .form`)
       .css({ y: '-100' })
       .transition({ y: '0' }, 250);
   };
 
-  // closeSettingsDialog
-  this.closeSettingsDialog = function () {
-    $('.settings-dialog')
+  // closeDialog
+  this.closeDialog = function(dialogId) {
+    $(`#${dialogId}`)
       .css({ opacity: 1 })
       .transition({ opacity: 0 }, 250, e => {
         self.settingsDialogVisible(false);
       });
 
-    $('.settings-dialog .form')
+    $(`#${dialogId} .form`)
       .css({ y: '0' })
       .transition({ y: '-100' }, 250);
   };

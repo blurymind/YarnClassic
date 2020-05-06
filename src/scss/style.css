@@ -382,8 +382,8 @@ input[type='checkbox'] {
   opacity: 0;
 }
 
-/* --- SETTINGS --- */
-.settings-dialog {
+/* --- DIALOGS --- */
+.dialog {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -392,7 +392,7 @@ input[type='checkbox'] {
   color: grey;
 }
 
-.settings-form {
+.dialog-form {
   position: absolute;
   box-sizing: border-box;
   left: 15%;
@@ -407,33 +407,8 @@ input[type='checkbox'] {
   text-align: center;
 }
 
-.settings-form h3 {
+.dialog-form h3 {
   margin-bottom: 10px;
-}
-
-.settings-row {
-  display: flex;
-}
-
-.settings-column {
-  flex: 50%;
-}
-
-.settings-item {
-  width: auto;
-  padding: 10px;
-  margin-bottom: 5px;
-  margin-right: 5px;
-  display: flex;
-  text-align: left;
-}
-
-.settings-label {
-  flex: 50%;
-}
-
-.settings-value {
-  flex: 50%;
 }
 
 .slider {
@@ -465,6 +440,34 @@ input[type='checkbox'] {
   background: #2470F7;
   cursor: pointer;
 }
+
+/* --- SETTINGS --- */
+
+.settings-row {
+  display: flex;
+}
+
+.settings-column {
+  flex: 50%;
+}
+
+.settings-item {
+  width: auto;
+  padding: 10px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  display: flex;
+  text-align: left;
+}
+
+.settings-label {
+  flex: 50%;
+}
+
+.settings-value {
+  flex: 50%;
+}
+
 /* --- NODE EDITOR --- */
 
 .node-editor {
