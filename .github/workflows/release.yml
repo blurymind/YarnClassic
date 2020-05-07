@@ -6,40 +6,43 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  # TODO: write a job to update version
-  #
-  # update-version:
-
   build:
     strategy:
       matrix:
         include:
-          # - os: windows-latest
-          #   build-task: build-windows
-          #   artifact_name: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+          - os: windows-latest
+            build-task: build-windows
           - os: ubuntu-latest
             build-task: build-linux
-            # artifact_file: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
-            # artifact_name: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
-          # - os: macos-latest
-          #   artifact_name: mything
-          #   asset_name: mything-macos-amd64
+          - os: macos-latest
+            build-task: build-mac
 
     name: Publish for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Get tag
-      run: echo ::set-env name=RELEASE_TAG::${GITHUB_REF:10}
+    - name: Get tag and version
+      run: |
+        echo ::set-env name=RELEASE_TAG::${GITHUB_REF:10}
+        echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:11}
 
-    - name: Get version
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:11}
+    - name: Set environment vars for Windows build
+      if: matrix.os == 'windows-latest'
+      run: |
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe
+        echo ::set-env name=ARTIFACT_NAME::Windows - Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe
 
     - name: Set environment vars for Linux build
       if: matrix.os == 'ubuntu-latest'
       run: |
         echo ::set-env name=ARTIFACT_FILE::./electron/dist/yarn-editor_${{ env.RELEASE_VERSION }}_amd64.snap
-        echo ::set-env name=ARTIFACT_NAME::Yarn-Editor-${{ env.RELEASE_VERSION }}-amd64.snap
+        echo ::set-env name=ARTIFACT_NAME::Linux - Yarn Editor Setup ${{ env.RELEASE_VERSION }}-amd64.snap
+
+    - name: Set environment vars for Mac build
+      if: matrix.os == 'macos-latest'
+      run: |
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor-${{ env.RELEASE_VERSION }}.dmg
+        echo ::set-env name=ARTIFACT_NAME::Mac - Yarn Editor-${{ env.RELEASE_VERSION }}.dmg
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -56,9 +59,9 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: Read package.json
-      uses: tyankatsu0105/read-package-version-actions@v1
-      id: package-version
+    # - name: Read package.json
+    #   uses: tyankatsu0105/read-package-version-actions@v1
+    #   id: package-version
 
     # - name: Archive production artifacts
     #   if: github.event_name == 'push'
