@@ -29,8 +29,8 @@ jobs:
     - name: Set environment vars for Windows build
       if: matrix.os == 'windows-latest'
       run: |
-        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe
-        echo ::set-env name=ARTIFACT_NAME::Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe
+        echo "::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe"
+        echo "::set-env name=ARTIFACT_NAME::Yarn Editor Setup ${{ env.RELEASE_VERSION }}.exe"
       shell: pwsh
 
     - name: Set environment vars for Linux build
