@@ -19,7 +19,7 @@ jobs:
           #   artifact_name: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
           - os: ubuntu-latest
             build-task: build-linux
-            artifact_file: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
+            # artifact_file: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
             artifact_name: Yarn-editor_${{ github.ref }}_amd64.snap
           # - os: macos-latest
           #   artifact_name: mything
@@ -44,9 +44,9 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    # - name: Read package.json
-    #   uses: tyankatsu0105/read-package-version-actions@v1
-    #   id: package-version
+    - name: Read package.json
+      uses: tyankatsu0105/read-package-version-actions@v1
+      id: package-version
 
     # - name: Archive production artifacts
     #   if: github.event_name == 'push'
@@ -61,7 +61,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{ matrix.artifact_file }}
+        file: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
         asset_name: ${{ matrix.artifact_name }}
         tag: ${{ github.ref }}
 
