@@ -718,7 +718,7 @@ input[type='checkbox'] {
   float: left;
 }
 
-.app-menu .menu:hover .dropdown {
+.menu:hover .dropdown {
   max-height: 500px;
 }
 
