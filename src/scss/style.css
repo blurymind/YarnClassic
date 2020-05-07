@@ -887,7 +887,7 @@ span.add-node:after {
   }
 
   .show-when-narrow {
-    display: block !important;
+    display: inline !important;
   }
 
   .node-editor .form {
