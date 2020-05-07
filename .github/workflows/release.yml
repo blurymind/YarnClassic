@@ -19,7 +19,7 @@ jobs:
           #   artifact_name: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
           - os: ubuntu-latest
             build-task: build-linux
-            artifact_path: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
+            artifact_file: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
             artifact_name: Yarn-editor_${{ github.ref }}_amd64.snap
           # - os: macos-latest
           #   artifact_name: mything
