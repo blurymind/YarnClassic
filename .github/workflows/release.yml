@@ -12,23 +12,28 @@ jobs:
         include:
           - os: windows-latest
             build-task: build-windows
-          - os: ubuntu-latest
-            build-task: build-linux
-          - os: macos-latest
-            build-task: build-mac
+          # - os: ubuntu-latest
+          #   build-task: build-linux
+          # - os: macos-latest
+          #   build-task: build-mac
 
     name: Publish for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Get tag and version
+      if: matrix.os == 'ubuntu-latest'
       run: |
         echo ::set-env name=RELEASE_TAG::${GITHUB_REF:10}
         echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:11}
 
     - name: Set environment vars for Windows build
       if: matrix.os == 'windows-latest'
-      run: echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn\ Editor\ Setup\ ${{ env.RELEASE_VERSION }}.exe" && echo ::set-env name=ARTIFACT_NAME::Yarn\ Editor\ Setup\ ${{ env.RELEASE_VERSION }}.exe"
+      run: |
+        echo "::set-env name=RELEASE_TAG::$env:GITHUB_REF.Substring(10)"
+        echo "::set-env name=RELEASE_VERSION::$env:GITHUB_REF.Substring(11)"
+        echo "::set-env name=ARTIFACT_FILE::./electron/dist/Yarn\ Editor\ Setup\ $env:RELEASE_VERSION.exe"
+        echo "::set-env name=ARTIFACT_NAME::Yarn\ Editor\ Setup\ $env.RELEASE_VERSION.exe"
 
     - name: Set environment vars for Linux build
       if: matrix.os == 'ubuntu-latest'
@@ -57,19 +62,6 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    # - name: Read package.json
-    #   uses: tyankatsu0105/read-package-version-actions@v1
-    #   id: package-version
-
-    # - name: Archive production artifacts
-    #   if: github.event_name == 'push'
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-    #     path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-    #   env:
-    #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v1-release
       with:
@@ -77,75 +69,3 @@ jobs:
         file: ${{ env.ARTIFACT_FILE }}
         asset_name: ${{ env.ARTIFACT_NAME }}
         tag: ${{ env.RELEASE_TAG }}
-
-  # build-linux:
-  #   runs-on: ubuntu-latest
-
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x]
-
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
-
-  #   - name: Use Node.js 12.x
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: 12.x
-
-  #   - run: npm ci
-
-  #   - name: npm install and build
-  #     run: cd electron && yarn install && yarn run build-linux
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  #   - name: Read package.json
-  #     uses: tyankatsu0105/read-package-version-actions@v1
-  #     id: package-version
-
-  #   - name: Archive production artifacts
-  #     if: github.event_name == 'push'
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-  #       path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  # build-mac:
-  #   runs-on: macos-latest
-
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x]
-
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
-
-  #   - name: Use Node.js 12.x
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: 12.x
-
-  #   - run: npm ci
-
-  #   - name: npm install and build
-  #     run: cd electron && yarn install && yarn run build-mac
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  #   - name: Read package.json
-  #     uses: tyankatsu0105/read-package-version-actions@v1
-  #     id: package-version
-
-  #   - name: Archive production artifacts
-  #     if: github.event_name == 'push'
-  #     uses: actions/upload-artifact@v1
-  #     with:
-  #       name: Mac - Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
-  #       path: ./electron/dist/Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
-  #     env:
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
