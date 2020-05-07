@@ -20,7 +20,7 @@ jobs:
           - os: ubuntu-latest
             build-task: build-linux
             # artifact_file: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
-            artifact_suffix: amd64.snap
+            # artifact_name: ./electron/dist/yarn-editor_${{ github.ref }}_amd64.snap
           # - os: macos-latest
           #   artifact_name: mything
           #   asset_name: mything-macos-amd64
@@ -31,6 +31,12 @@ jobs:
     steps:
     - name: Get release version
       run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+
+    - name: Set environment vars for Linux build
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/yarn-editor_${{ env.RELEASE_VERSION }}_amd64.snap
+        echo ::set-env name=ARTIFACT_NAME::Yarn-Editor_${{ env.RELEASE_VERSION }}_amd64.snap
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -64,8 +70,8 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./electron/dist/*_amd64.snap
-        asset_name: Yarn_Editor_${{ env.RELEASE_VERSION }}_${{ matrix.artifact_suffix }}
+        file: ${{ env.ARTIFACT_FILE }}
+        asset_name: ${{ env.ARTIFACT_NAME }}
         tag: ${{ env.RELEASE_VERSION }}
 
   # build-linux:
