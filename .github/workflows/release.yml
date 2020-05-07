@@ -29,14 +29,17 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Get release version
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+    - name: Get tag
+      run: echo ::set-env name=RELEASE_TAG::${GITHUB_REF:10}
+
+    - name: Get version
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:11}
 
     - name: Set environment vars for Linux build
       if: matrix.os == 'ubuntu-latest'
       run: |
-        echo ::set-env name=ARTIFACT_FILE::./electron/dist/yarn-editor_${{ env.RELEASE_VERSION }}_amd64.snap
-        echo ::set-env name=ARTIFACT_NAME::Yarn-Editor_${{ env.RELEASE_VERSION }}_amd64.snap
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/yarn-editor_${{ env.RELEASE_VERSION }}_TAGnap
+        echo ::set-env name=ARTIFACT_NAME::Yarn-Editor-${{ env.RELEASE_VERSION }}-TAGnap
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -72,7 +75,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ env.ARTIFACT_FILE }}
         asset_name: ${{ env.ARTIFACT_NAME }}
-        tag: ${{ env.RELEASE_VERSION }}
+        tag: ${{ env.RELEASE_TAG }}
 
   # build-linux:
   #   runs-on: ubuntu-latest
