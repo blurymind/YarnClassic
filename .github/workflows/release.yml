@@ -6,28 +6,41 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  # TODO: write a job to update version and publish artifact to share the version between jobs
+  # TODO: write a job to update version
+  #
+  # update-version:
 
-  build-windows:
-    runs-on: windows-latest
-
+  build:
     strategy:
       matrix:
-        node-version: [12.x]
+        include:
+          # - os: windows-latest
+          #   build-task: build-windows
+          #   artifact_name: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+          - os: ubuntu-latest
+            build-task: build-linux
+            artifact_path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+            artifact_name: Yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+          # - os: macos-latest
+          #   artifact_name: mything
+          #   asset_name: mything-macos-amd64
+
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 12.x
 
     - run: npm ci
 
     - name: npm install and build
-      run: cd electron && yarn install && yarn run build-windows
+      run: cd electron && yarn install && yarn run ${{ matrix.build-task }}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -35,29 +48,22 @@ jobs:
       uses: tyankatsu0105/read-package-version-actions@v1
       id: package-version
 
-    - name: Archive production artifacts
-      if: github.event_name == 'push'
-      uses: actions/upload-artifact@v1
-      with:
-        name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-        path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    # - name: Archive production artifacts
+    #   if: github.event_name == 'push'
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+    #     path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
+    #   env:
+    #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v1-release
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Changes in this Release
-          - First Change
-          - Second Change
-        draft: false
-        prerelease: false
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ matrix.artifact_file }}
+        asset_name: ${{ matrix.artifact_name }}
+        tag: ${{ github.ref }}
 
   # build-linux:
   #   runs-on: ubuntu-latest
@@ -70,10 +76,10 @@ jobs:
   #   - name: Checkout repository
   #     uses: actions/checkout@v2
 
-  #   - name: Use Node.js ${{ matrix.node-version }}
+  #   - name: Use Node.js 12.x
   #     uses: actions/setup-node@v1
   #     with:
-  #       node-version: ${{ matrix.node-version }}
+  #       node-version: 12.x
 
   #   - run: npm ci
 
@@ -106,10 +112,10 @@ jobs:
   #   - name: Checkout repository
   #     uses: actions/checkout@v2
 
-  #   - name: Use Node.js ${{ matrix.node-version }}
+  #   - name: Use Node.js 12.x
   #     uses: actions/setup-node@v1
   #     with:
-  #       node-version: ${{ matrix.node-version }}
+  #       node-version: 12.x
 
   #   - run: npm ci
 
