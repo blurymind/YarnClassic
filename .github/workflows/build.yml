@@ -5,112 +5,91 @@ on:
     branches: [ master ]
 
 jobs:
-  # TODO: write a job to update version and publish artifact to share the version between jobs
-
-  build-windows:
-    runs-on: windows-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x]
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - run: npm ci
-
-    - name: npm install and build
-      run: cd electron && yarn install && yarn run build-windows
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-    - name: Read package.json
-      uses: tyankatsu0105/read-package-version-actions@v1
-      id: package-version
-
-    - name: Archive production artifacts
-      if: github.event_name == 'push'
-      uses: actions/upload-artifact@v1
-      with:
-        name: Windows - Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-        path: ./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  build-linux:
+  update-version:
+    name: Update version
     runs-on: ubuntu-latest
 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - run: npm run update-version
+
+    - name: Commit updated files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Update version" -a
+
+    - name: Push updated files
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GH_TOKEN }}
+
+  build:
+    needs: update-version
+
     strategy:
-      matrix:
-        node-version: [12.x]
+        matrix:
+          include:
+            - os: windows-latest
+              build-task: build-windows
+            - os: ubuntu-latest
+              build-task: build-linux
+            - os: macos-latest
+              build-task: build-mac
+
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 12.x
 
     - run: npm ci
-
-    - name: npm install and build
-      run: cd electron && yarn install && yarn run build-linux
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Read package.json
       uses: tyankatsu0105/read-package-version-actions@v1
       id: package-version
 
-    - name: Archive production artifacts
-      if: github.event_name == 'push'
-      uses: actions/upload-artifact@v1
-      with:
-        name: Linux - yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-        path: ./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Set environment vars for Windows
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        echo "::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe"
+        echo "::set-env name=ARTIFACT_NAME::Yarn.Editor.Setup.${{ steps.package-version.outputs.version }}.exe"
 
-  build-mac:
-    runs-on: macos-latest
+    - name: Set environment vars for Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/yarn-editor_${{ steps.package-version.outputs.version }}_amd64.snap
+        echo ::set-env name=ARTIFACT_NAME::Yarn.Editor.Setup.${{ steps.package-version.outputs.version }}.snap
 
-    strategy:
-      matrix:
-        node-version: [12.x]
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - run: npm ci
+    - name: Set environment vars for Mac
+      if: matrix.os == 'macos-latest'
+      run: |
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
+        echo ::set-env name=ARTIFACT_NAME::Yarn.Editor.Setup.${{ steps.package-version.outputs.version }}.dmg
 
     - name: npm install and build
-      run: cd electron && yarn install && yarn run build-mac
+      run: cd electron && yarn install && yarn run ${{ matrix.build-task }}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: Read package.json
-      uses: tyankatsu0105/read-package-version-actions@v1
-      id: package-version
-
-    - name: Archive production artifacts
-      if: github.event_name == 'push'
+    - name: Archive artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: Mac - Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
-        path: ./electron/dist/Yarn Editor-${{ steps.package-version.outputs.version }}.dmg
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ${{ env.ARTIFACT_FILE }}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
