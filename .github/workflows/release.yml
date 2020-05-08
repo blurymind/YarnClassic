@@ -46,8 +46,8 @@ jobs:
     - name: Set environment vars for Mac
       if: matrix.os == 'macos-latest'
       run: |
-        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn.Editor.Setup.${{ env.RELEASE_VERSION }}.dmg
-        echo ::set-env name=ARTIFACT_NAME::Yarn Editor-${{ env.RELEASE_VERSION }}.dmg
+        echo ::set-env name=ARTIFACT_FILE::./electron/dist/Yarn Editor-${{ env.RELEASE_VERSION }}.dmg
+        echo ::set-env name=ARTIFACT_NAME::Yarn.Editor.Setup.${{ env.RELEASE_VERSION }}.dmg
 
     - name: Checkout repository
       uses: actions/checkout@v2
