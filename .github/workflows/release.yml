@@ -22,7 +22,6 @@ jobs:
 
     steps:
     - name: Get tag and version
-      if: matrix.os == 'ubuntu-latest'
       run: |
         echo ::set-env name=RELEASE_TAG::${GITHUB_REF:10}
         echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:11}
