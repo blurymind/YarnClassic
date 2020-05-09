@@ -444,13 +444,60 @@
 		</div> <!-- Tabs -->
 
 		<!-- Pages -->
-		<div id="Shortcuts" class="tabcontent" style="display: block;">
-      <p><span class="keystroke"></span> this help</span></p>
-			<p><span class="keystroke">&sect;</span>+<span class="keystroke">c</span><span> copy</span></p>
-			<p><span class="keystroke">&sect;</span>+<span class="keystroke">v</span><span> paste</span></p>
-			<p><span class="keystroke">&iexcl</span> focus next node in workspace</span></p>
-			<p><span class="keystroke">&brvbar</span>+<span class="keystroke">&iexcl</span><span> focus next node in editor</span></p>
-			<p><span class="keystroke">&not</span> edit focused node</span></p>
+    <div id="Shortcuts" class="tabcontent" style="display: block;">
+      <div class="shortcuts-row">
+        <div class="shortcuts-column">
+          <h2>Workspace</h2>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>O</kbd></span><span class="shortcuts-label"> open story</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>A</kbd></span><span class="shortcuts-label"> append story</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save story as JSON</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save story as YARN</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>A</kbd></span><span class="shortcuts-label"> select all</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>D</kbd></span><span class="shortcuts-label"> deselect all</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Del</kbd></span><span class="shortcuts-label"> delete selected nodes</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>C</kbd></span><span class="shortcuts-label"> copy nodes</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>X</kbd></span><span class="shortcuts-label"> cut nodes</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>V</kbd></span><span class="shortcuts-label"> paste nodes</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Z</kbd></span><span class="shortcuts-label"> undo</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Y</kbd></span><span class="shortcuts-label"> redo</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Spacebar</kbd></span><span class="shortcuts-label"> focus next node</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>↲</kbd></span><span class="shortcuts-label"> edit focused node</span></p>
+
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span class="shortcuts-label"> move around workspace</span></p>
+
+        </div>
+
+        <div class="shortcuts-column">
+          <h2>Editor</h2>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>C</kbd></span><span class="shortcuts-label"> copy text</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>X</kbd></span><span class="shortcuts-label"> cut text</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>V</kbd></span><span class="shortcuts-label"> paste text</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Esc</kbd></span><span class="shortcuts-label"> save and close</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>↲</kbd></span><span class="shortcuts-label"> save and close</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Alt</kbd><kbd>Spacebar</kbd></span><span class="shortcuts-label"> focus next node</span></p>
+
+          <br>
+          <h2>Story Player</h2>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Z</kbd></span><span class="shortcuts-label"> speed up / select</span></p>
+
+          <br>
+          <h2>Help dialog</h2>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Esc</kbd></span><span class="shortcuts-label"> close</span></p>
+
+          <br>
+          <h2>Settings dialog</h2>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Esc</kbd></span><span class="shortcuts-label"> close</span></p>
+        </div>
+
+        <div class="shortcuts-column">
+          <h2>Reserved</h2>
+        </div>
+      </div>
     </div>
 
     <div id="Syntax" class="tabcontent">

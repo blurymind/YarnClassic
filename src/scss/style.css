@@ -2,10 +2,6 @@
   font-family: yarnFont;
   src: url('../public/droid-sans-mono.ttf');
 }
-@font-face {
-  font-family: keystroke;
-  src: url('../public/keystrkn.ttf');
-}
 /* --- ROOT CSS --- */
 body {
   overflow: hidden;
@@ -65,6 +61,17 @@ input[type='checkbox'] {
 .templates,
 .hidden {
   display: none;
+}
+
+kbd {
+  border:1px solid gray;
+  font-size:0.6em;
+  box-shadow:1px 0 1px 0 #eee, 0 2px 0 2px #ccc, 0 2px 0 3px #444;
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  margin:2px 3px;
+  padding:2px 3px;
 }
 
 /* --- VARIOUS CSS --- */
@@ -507,13 +514,32 @@ input[type='checkbox'] {
 
 /* --- HELP --- */
 
-#help-dialog .dialog-form {
-  padding: 0;
+.shortcuts-row {
+  display: flex;
 }
 
-.keystroke {
-  font-family: 'keystroke';
-  font-size: x-large;
+.shortcuts-column {
+  flex: 33%;
+}
+
+.shortcuts-item {
+  display: flex;
+  margin: 3px;
+}
+
+.shortcuts-keystroke {
+  flex: 40%;
+  text-align: right;
+}
+
+.shortcuts-label {
+  flex: 60%;
+  text-align: left;
+  padding-left: 10px;
+}
+
+#help-dialog .dialog-form {
+  padding: 0;
 }
 
 /* --- NODE EDITOR --- */
@@ -922,6 +948,9 @@ span.add-node:after {
 /*-- ----------------------------Narrow overrides---------------------------- */
 @media screen and (max-width: 900px) {
   .settings-row {
+    flex-direction: column;
+  }
+  .shortcuts-row {
     flex-direction: column;
   }
 }
