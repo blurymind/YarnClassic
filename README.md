@@ -1,4 +1,4 @@
-![Yarn Editor CI](https://github.com/daviddq/YarnEditor/workflows/Yarn%20Editor%20CI/badge.svg?branch=ci)
+![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
 
 # Yarn 🐱 🧺
 
