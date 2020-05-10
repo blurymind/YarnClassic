@@ -3,6 +3,12 @@ export const UI = function(app) {
 
   this.settingsDialogVisible = ko.observable(false);
 
+  // Markup selector -----------------------------------------------------------
+  this.availableMarkupLanguages = [
+    { id: 'bbcode', name: 'Bbcode' },
+    { id: 'html', name: 'Html' }
+  ];
+
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
     { id: 'classic', name: 'Classic' },

@@ -1,6 +1,6 @@
 const bbcode = require('bbcode');
 
-export const  BbcodeRichTextFormatter = function(app) {
+export const BbcodeRichTextFormatter = function(app) {
   const self = this;
 
   this.getTagOpen = function(tag) {
@@ -69,7 +69,7 @@ export const  BbcodeRichTextFormatter = function(app) {
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
     let result = showRowNumbers
-      ? '<font color="pink">' + rowCounter + '.   </font>' + text // TODO: style this
+      ? '<font color="pink">' + rowCounter + '. </font>' + text // TODO: style this
       : text;
 
     /// Links in preview mode
@@ -125,7 +125,7 @@ export const  BbcodeRichTextFormatter = function(app) {
       let rowAppend = '<br/>';
       rowCounter += 1;
       if (showRowNumbers) {
-        rowAppend += '<font color="pink">' + rowCounter + '.   </font>';
+        rowAppend += '<font color="pink">' + rowCounter + '. </font>';
       }
       return rowAppend;
     });

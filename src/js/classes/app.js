@@ -40,6 +40,11 @@ export var App = function(name, version) {
     load_dictionary(self.settings.language().split('-')[0]);
   };
 
+  this.setMarkupLanguage = function(language, e) {
+    const markupLanguage = e ? e.target.value : language;
+    this.richTextFormatter = new RichTextFormatter(self);
+  };
+
   // Ideally this dependencies should be injected by index.js
   this.input = new Input(self);
   this.settings = new Settings(self);
@@ -47,9 +52,6 @@ export var App = function(name, version) {
   this.ui = new UI(self);
   this.previewStory = new yarnRender();
   this.richTextFormatter = new RichTextFormatter(self);
-
-  console.log(RichTextFormatter);
-  console.log(this.richTextFormatter);
 
   this.data = data;
   this.name = ko.observable(name);

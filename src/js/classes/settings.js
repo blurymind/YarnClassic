@@ -79,4 +79,9 @@ export const Settings = function(app) {
       storage.getItem('editorStatsEnabled') === 'true' :
       false
     ).extend({ persist:'editorStatsEnabled' });
+
+  // Markup language
+  this.markupLanguage = ko
+    .observable(storage.getItem('markupLanguage') || 'bbcode')
+    .extend({ persist:'markupLanguage' });
 };

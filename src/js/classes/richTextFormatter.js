@@ -2,7 +2,7 @@ import { BbcodeRichTextFormatter } from './richTextFormatterBbcode';
 import { HtmlRichTextFormatter } from './richTextFormatterHtml';
 
 export const RichTextFormatter = function(app) {
-  const type = 'bbcode'; // TODO: put into settings
+  const type = app.settings.markupLanguage();
 
   return type === 'html' ?
     new HtmlRichTextFormatter(app) :
