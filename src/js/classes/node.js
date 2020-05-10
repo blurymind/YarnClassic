@@ -1,9 +1,7 @@
-import { data } from './data';
 import { Utils } from './utils';
 
 let globalNodeIndex = 0;
 const ClipNodeTextLength = 1024;
-const bbcode = require('bbcode');
 
 export let Node = function(options = {}) {
   const self = this;
@@ -49,80 +47,12 @@ export let Node = function(options = {}) {
       .filter (item => item);
   }, this);
 
-  this.textToHtml = function(text, showRowNumbers = false) {
-    let rowCounter = 1;
-    let result = showRowNumbers
-      ? '<font color="pink">' + rowCounter + '.   </font>' + text
-      : text;
-
-    /// Links in preview mode
-    result = result.replace(/\[\[[^\[]+\]\]/gi, function(goto) {
-      const extractedGoto = goto.match(/\[\[(.*)\]\]/i);
-      if (extractedGoto.length > 1) {
-        return '<font color="tomato">(go:' + extractedGoto[1] + ')</font>';
-      }
-    });
-
-    /// Commands in preview mode
-    result = result.replace(/<</gi, '<font color=\'violet\'>(run:');
-    result = result.replace(/>>/gi, ')</font>');
-
-    /// bbcode color tags in preview mode
-    result = result.replace(/\[color=#[A-Za-z0-9]+\]/gi, function(colorCode) {
-      const extractedCol = colorCode.match(/\[color=#([A-Za-z0-9]+)\]/i);
-      if (extractedCol && extractedCol.length > 1) {
-        return (
-          '[color=#' +
-          extractedCol[1] +
-          ']<font color=#' +
-          extractedCol[1] +
-          '>&#9751</font>'
-        );
-      }
-    });
-
-    /// bbcode local images with path relative to the opened yarn file
-    result = result.replace(/\[img\][^\[]+\[\/img\]/gi, function(imgTag) {
-      const extractedImgPath = imgTag.match(/\[img\](.*)\[\/img\]/i);
-      if (extractedImgPath.length > 1) {
-        const fullPathToFile = data.editingFileFolder(extractedImgPath[1]);
-        if (data.doesFileExist(fullPathToFile)) {
-          return showRowNumbers
-            ? '<img src="' + fullPathToFile + '"> </img>'
-            : '<img src="' +
-                fullPathToFile +
-                '" width="128" height="auto"> </img>';
-        } else {
-          // if not a local file, try to load it as a link
-          return showRowNumbers
-            ? '<img src="' + extractedImgPath[1] + '"> </img>'
-            : '<img src="' +
-                extractedImgPath[1] +
-                '" width="128" height="auto"> </img>';
-        }
-      }
-    });
-
-    /// do this last, as we need the newline characters in previous regex tests
-    result = result.replace(/[\n\r]/g, function(row) {
-      let rowAppend = '<br/>';
-      rowCounter += 1;
-      if (showRowNumbers) {
-        rowAppend += '<font color="pink">' + rowCounter + '.   </font>';
-      }
-      return rowAppend;
-    });
-    /// other bbcode tag parsing in preview mode
-    result = bbcode.parse(result);
-    return result;
-  };
-
   this.clippedBody = ko.computed(function() {
     if (app.editing()) {
       return;
     }
     let result = app.getHighlightedText(this.body());
-    result = self.textToHtml(result);
+    result = app.richTextFormatter.richTextToHtml(result);
     result = result.substr(0, ClipNodeTextLength);
     return result;
   }, this);

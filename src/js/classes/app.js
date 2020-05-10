@@ -16,16 +16,13 @@ import { UI } from './ui';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
+import { RichTextFormatter } from './richText';
 
 // TODO: refactoring proposals
 //
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
-// Create:
-//   RichTextFormater interface
-//   RichTextFormaterBbcode implementation
-//   RichTextFormaterXml implementation
 // Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
@@ -44,11 +41,12 @@ export var App = function(name, version) {
   };
 
   // Ideally this dependencies should be injected by index.js
-  this.workspace = new Workspace(self);
   this.input = new Input(self);
   this.settings = new Settings(self);
+  this.workspace = new Workspace(self);
   this.ui = new UI(self);
   this.previewStory = new yarnRender();
+  this.richTextFormatter = new RichTextFormatter(self);
 
   this.data = data;
   this.name = ko.observable(name);
@@ -181,45 +179,35 @@ export var App = function(name, version) {
     };
 
     this.insertBBcodeTags = function(tag) {
-      var tagClose = '[/' + tag.replace(/[\"#=]/gi, '') + ']';
-      if (tag === 'cmd') {
-        tag = '<<';
-        tagClose = '>>';
-      } else if (tag === 'opt') {
-        tag = '[[';
-        tagClose = '|]]';
-      } else {
-        tag = '[' + tag + ']';
-      }
+      const tagOpen = self.richTextFormatter.getTagOpen(tag);
+      const tagClose = self.richTextFormatter.getTagClose(tag);
 
-      var selectRange = JSON.parse(
+      const selectRange = JSON.parse(
         JSON.stringify(self.editor.selection.getRange())
       );
-      self.editor.session.insert(selectRange.start, tag);
-      self.editor.session.insert(
-        {
-          column: selectRange.end.column + tag.length,
-          row: selectRange.end.row,
-        },
-        tagClose
-      );
 
-      if (tag === '[color=#]') {
+      self.editor.session.insert(selectRange.start, tagOpen);
+      self.editor.session.insert({
+        column: selectRange.end.column + tagOpen.length,
+        row: selectRange.end.row,
+      }, tagClose);
+
+      if (tag === 'color') {
         if (self.editor.getSelectedText().length === 0) {
           self.moveEditCursor(-9);
-          self.insertColorCode();
-          return;
         }
-        self.editor.selection.setRange({
-          start: {
-            row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1,
-          },
-          end: {
-            row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1,
-          },
-        });
+        else {
+          self.editor.selection.setRange({
+            start: {
+              row: self.editor.selection.getRange().start.row,
+              column: self.editor.selection.getRange().start.column - 1,
+            },
+            end: {
+              row: self.editor.selection.getRange().start.row,
+              column: self.editor.selection.getRange().start.column - 1,
+            },
+          });
+        }
         self.insertColorCode();
       } else if (self.editor.getSelectedText().length === 0) {
         self.moveEditCursor(-tagClose.length);
@@ -354,7 +342,7 @@ export var App = function(name, version) {
       if ($('#colorPicker-container').is(':visible')) {
         return;
       }
-      // http://bgrins.github.io/spectrum/
+
       $('#colorPicker').spectrum('set', self.editor.getSelectedText());
       $('#colorPicker').spectrum('toggle');
       $('#colorPicker-container').css({
@@ -951,17 +939,17 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO: move to UI?
   this.togglePreviewMode = function(previewModeOverwrite) {
-    var editor = $('.editor')[0];
-    var editorPreviewer = document.getElementById('editor-preview');
+    const editor = $('.editor')[0];
+    const editorPreviewer = $('#editor-preview')[0];
+
     if (previewModeOverwrite) {
       self.togglePlayMode(false);
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self
-        .editing()
-        .textToHtml(self.editing().body(), true);
+      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(self.editing().body(), true)
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
       //edit mode
