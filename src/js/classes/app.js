@@ -163,6 +163,11 @@ export var App = function(name, version) {
 
     self.settings.apply();
 
+    if (!self.settings.helpDialogVisited()) {
+      self.settings.helpDialogVisited(true);
+      app.ui.openDialog('help-dialog');
+    }
+
     // search field enter
     $('.search-title input').click(self.updateSearch);
     $('.search-body input').click(self.updateSearch);

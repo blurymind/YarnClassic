@@ -79,4 +79,11 @@ export const Settings = function(app) {
       storage.getItem('editorStatsEnabled') === 'true' :
       false
     ).extend({ persist:'editorStatsEnabled' });
+
+  // Help dialog visited
+  this.helpDialogVisited = ko
+    .observable(storage.getItem('helpDialogVisited') !== null ?
+      storage.getItem('helpDialogVisited') === 'true' :
+      false
+    ).extend({ persist:'helpDialogVisited' });
 };

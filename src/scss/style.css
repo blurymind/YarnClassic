@@ -468,7 +468,7 @@ kbd {
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 10px 10px;
   transition: 0.3s;
 }
 
@@ -540,6 +540,11 @@ kbd {
 
 #help-dialog .dialog-form {
   padding: 0;
+}
+
+.about-tab img {
+  width: 200px;
+  height: 200px;
 }
 
 /* --- NODE EDITOR --- */
@@ -824,6 +829,14 @@ input:focus + span + .dropdown {
   width: 100%;
   padding: 10px;
   text-align:center;
+}
+
+.menu a {
+  text-decoration: none;
+}
+
+.menu a:visited {
+  color: inherit;
 }
 
 .add-link {

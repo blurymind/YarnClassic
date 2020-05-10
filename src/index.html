@@ -137,14 +137,19 @@
 				<span class="title">Help</span>
 				<div class="dropdown">
 					<span class="item" data-bind="click: (data, event) => { app.ui.openDialog('help-dialog'); }">
-						<img style="margin:0; padding:0" width="20px" src="./public/images/open.png"/>
+						<img style="margin:0; padding:0" width="20px" src="./public/images/question.png"/>
 						&nbsp;
-						Help
+						Cheat sheets
 					</span>
 					<span class="item">
-						<img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
+						<img style="margin:0; padding:0" width="20px" src="./public/images/yarnspinner.png"/>
 						&nbsp;
-						Online help
+						<a href="https://yarnspinner.dev/docs/syntax" target="_blank">Yarn syntax online</a>
+					</span>
+					<span class="item">
+						<img style="margin:0; padding:0" width="20px" src="./public/images/github.png"/>
+						&nbsp;
+						<a href="https://github.com/YarnSpinnerTool/YarnEditor" target="_blank">Main page</a>
 					</span>
 				</div>
 			</div> <!-- help menu -->
@@ -438,25 +443,45 @@
 	<div class="dialog-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
 		<!-- Tabs -->
 		<div class="tab">
-			<button class="tablinks active" onclick="app.ui.showHelpTab(event, 'Shortcuts')">Shortcuts</button>
+			<button class="tablinks active" onclick="app.ui.showHelpTab(event, 'About')">About</button>
 			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Syntax')">Syntax</button>
-			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'About')">About</button>
+			<button class="tablinks" onclick="app.ui.showHelpTab(event, 'Shortcuts')">Shortcuts</button>
 		</div> <!-- Tabs -->
 
-		<!-- Pages -->
-    <div id="Shortcuts" class="tabcontent" style="display: block;">
+    <!-- Pages -->
+		<div id="About" class="tabcontent about-tab" style="display: block;">
+      <p>
+        <img src="public/icon.png" />
+      </p>
+      <p>
+        Yarn Editor <span data-bind="text:app.version"></span>
+      </p>
+      <p>
+        Dialogue graph editor originally created for <a href="http://wikipedia.org/wiki/Night_in_the_Woods" target="_blank">"Night in the Woods"</a> by Noel Berry (@NoelFB), Todor Imreorov (@blurymind) and Alec Holowka (@infinite_ammo).
+      </p>
+      <p>
+        Contributors:<br>
+        Kyle J. Kemp (@seiyria), Stuart Lee (@beeglebug), David Díaz (@daviddq)
+      </p>
+		</div> <!-- About -->
+
+    <div id="Syntax" class="tabcontent">
+      <h2>Syntax</h2>
+    </div> <!-- Syntax -->
+
+    <div id="Shortcuts" class="tabcontent">
       <div class="shortcuts-row">
         <div class="shortcuts-column">
           <h2>Workspace</h2>
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>O</kbd></span><span class="shortcuts-label"> open story</span></p>
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>A</kbd></span><span class="shortcuts-label"> append story</span></p>
-          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save story as JSON</span></p>
-          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save story as YARN</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save JSON</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>S</kbd></span><span class="shortcuts-label"> save YARN</span></p>
 
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>A</kbd></span><span class="shortcuts-label"> select all</span></p>
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>D</kbd></span><span class="shortcuts-label"> deselect all</span></p>
 
-          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Del</kbd></span><span class="shortcuts-label"> delete selected nodes</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Del</kbd></span><span class="shortcuts-label"> delete selected</span></p>
 
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>C</kbd></span><span class="shortcuts-label"> copy nodes</span></p>
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Ctrl</kbd><kbd>X</kbd></span><span class="shortcuts-label"> cut nodes</span></p>
@@ -468,7 +493,7 @@
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>Spacebar</kbd></span><span class="shortcuts-label"> focus next node</span></p>
           <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>↲</kbd></span><span class="shortcuts-label"> edit focused node</span></p>
 
-          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span class="shortcuts-label"> move around workspace</span></p>
+          <p class="shortcuts-item"><span class="shortcuts-keystroke"><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span class="shortcuts-label"> move around</span></p>
 
         </div>
 
@@ -498,15 +523,7 @@
           <h2>Reserved</h2>
         </div>
       </div>
-    </div>
-
-    <div id="Syntax" class="tabcontent">
-      <h2>Syntax</h2>
-    </div>
-
-		<div id="About" class="tabcontent">
-			<h2>About</h2>
-		</div>
+    </div> <!-- Shortcuts -->
 	</div> <!-- help-form -->
 </div> <!-- help-dialog -->
 <!-- /ko -->
