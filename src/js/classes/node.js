@@ -39,6 +39,7 @@ export let Node = function(options = {}) {
   // Returns an array of tags objects with id, style and count
   this.clippedTags = ko.computed(function() {
     app.updateTagsRepository();
+
     return Utils
       .uniqueSplit(self.tags(), ' ')
       .map (
@@ -51,6 +52,9 @@ export let Node = function(options = {}) {
     if (app.editing()) {
       return;
     }
+
+    app.mustRefreshNodes(); // Trick to be able to refresh nodes
+
     let result = app.getHighlightedText(this.body());
     result = app.richTextFormatter.richTextToHtml(result);
     result = result.substr(0, ClipNodeTextLength);

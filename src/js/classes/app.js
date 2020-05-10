@@ -42,7 +42,8 @@ export var App = function(name, version) {
 
   this.setMarkupLanguage = function(language, e) {
     const markupLanguage = e ? e.target.value : language;
-    this.richTextFormatter = new RichTextFormatter(self);
+    self.richTextFormatter = new RichTextFormatter(self);
+    self.mustRefreshNodes.notifySubscribers();
   };
 
   // Ideally this dependencies should be injected by index.js
@@ -60,6 +61,7 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
+  this.mustRefreshNodes = ko.observable();
   this.mustUpdateTags = true;
   this.nodeHistory = [];
   this.nodeFuture = [];
