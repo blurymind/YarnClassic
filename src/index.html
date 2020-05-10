@@ -163,14 +163,14 @@
 				<div class="bbcode-toolbar">
 					<button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
 					&nbsp;
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('b')" title="Bold"><b>B</b></button>
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('u')" title="Underlined"><u>U</u></button>
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('i')" title="Italic"><i>I</i></button>
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('color')">🌈</button>
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('img')" title="Image">🦄</button>
-					<button class="bbcode-button" onclick="app.insertBBcodeTags('cmd')" title="Command">🎮</button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold"><b>B</b></button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined"><u>U</u></button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic"><i>I</i></button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('color')">🌈</button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('img')" title="Image">🦄</button>
+					<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command">🎮</button>
 					<span class="hide-when-narrow">
-						<button class="bbcode-button" onclick="app.insertBBcodeTags('opt')" title="Choice/Link">❔</button>
+						<button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link">❔</button>
 					</span>
 
 					<button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>

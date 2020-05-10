@@ -16,7 +16,7 @@ import { UI } from './ui';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
-import { RichTextFormatter } from './richText';
+import { RichTextFormatter } from './richTextFormatter';
 
 // TODO: refactoring proposals
 //
@@ -47,6 +47,9 @@ export var App = function(name, version) {
   this.ui = new UI(self);
   this.previewStory = new yarnRender();
   this.richTextFormatter = new RichTextFormatter(self);
+
+  console.log(RichTextFormatter);
+  console.log(this.richTextFormatter);
 
   this.data = data;
   this.name = ko.observable(name);
@@ -178,52 +181,7 @@ export var App = function(name, version) {
       }
     };
 
-    this.insertBBcodeTags = function(tag) {
-      const tagOpen = self.richTextFormatter.getTagOpen(tag);
-      const tagClose = self.richTextFormatter.getTagClose(tag);
-
-      const selectRange = JSON.parse(
-        JSON.stringify(self.editor.selection.getRange())
-      );
-
-      self.editor.session.insert(selectRange.start, tagOpen);
-      self.editor.session.insert({
-        column: selectRange.end.column + tagOpen.length,
-        row: selectRange.end.row,
-      }, tagClose);
-
-      if (tag === 'color') {
-        if (self.editor.getSelectedText().length === 0) {
-          self.moveEditCursor(-9);
-        }
-        else {
-          self.editor.selection.setRange({
-            start: {
-              row: self.editor.selection.getRange().start.row,
-              column: self.editor.selection.getRange().start.column - 1,
-            },
-            end: {
-              row: self.editor.selection.getRange().start.row,
-              column: self.editor.selection.getRange().start.column - 1,
-            },
-          });
-        }
-        self.insertColorCode();
-      } else if (self.editor.getSelectedText().length === 0) {
-        self.moveEditCursor(-tagClose.length);
-      } else {
-        self.editor.selection.setRange({
-          start: self.editor.selection.getRange().start,
-          end: {
-            row: self.editor.selection.getRange().end.row,
-            column:
-              self.editor.selection.getRange().end.column - tagClose.length,
-          },
-        });
-      }
-      self.editor.focus();
-    };
-
+    // TODO: move to editor
     this.insertEmoji = function() {
       this.emPicker.toggle();
       self.togglePreviewMode(true);
@@ -233,6 +191,57 @@ export var App = function(name, version) {
       });
       $('#emojiPicker-container').show();
     };
+
+    // TODO: move to editor
+    this.insertColorCode = function() {
+      if ($('#colorPicker-container').is(':visible')) {
+        return;
+      }
+
+      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
+      $('#colorPicker').spectrum('toggle');
+      $('#colorPicker-container').css({
+        left: self.input.mouse.x - 70,
+        top: self.input.mouse.y - 50
+      });
+      $('#colorPicker-container').show();
+      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
+        self.applyPickerColorEditor(color);
+      });
+
+      self.togglePreviewMode(true);
+    };
+
+    // TODO: move to editor
+    this.applyPickerColorEditor = function(color) {
+      var selectRange = JSON.parse(
+        JSON.stringify(self.editor.selection.getRange())
+      );
+      self.editor.selection.setRange(selectRange);
+      var colorCode = color.toHexString().replace('#', '');
+      self.editor.session.replace(selectRange, colorCode);
+      self.editor.selection.setRange({
+        start: self.editor.getCursorPosition(),
+        end: {
+          row: self.editor.getCursorPosition().row,
+          column: self.editor.getCursorPosition().column - colorCode.length,
+        },
+      });
+      self.togglePreviewMode(true);
+    };
+
+    document.addEventListener(
+      'contextmenu',
+      function(evt) {
+        if (self.editing()) evt.preventDefault();
+      },
+      false
+    );
+    $(document).on('pointerup', function(e) {
+      if (self.editing() && e.button === 2) {
+        self.guessPopUpHelper();
+      }
+    });
 
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();
@@ -337,55 +346,6 @@ export var App = function(name, version) {
         })
         .catch(error => console.warn(error.message));
     };
-
-    this.insertColorCode = function() {
-      if ($('#colorPicker-container').is(':visible')) {
-        return;
-      }
-
-      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
-      $('#colorPicker').spectrum('toggle');
-      $('#colorPicker-container').css({
-        left: self.input.mouse.x - 70,
-        top: self.input.mouse.y - 50
-      });
-      $('#colorPicker-container').show();
-      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
-        self.applyPickerColorEditor(color);
-      });
-
-      self.togglePreviewMode(true);
-    };
-
-    this.applyPickerColorEditor = function(color) {
-      var selectRange = JSON.parse(
-        JSON.stringify(self.editor.selection.getRange())
-      );
-      self.editor.selection.setRange(selectRange);
-      var colorCode = color.toHexString().replace('#', '');
-      self.editor.session.replace(selectRange, colorCode);
-      self.editor.selection.setRange({
-        start: self.editor.getCursorPosition(),
-        end: {
-          row: self.editor.getCursorPosition().row,
-          column: self.editor.getCursorPosition().column - colorCode.length,
-        },
-      });
-      self.togglePreviewMode(true);
-    };
-
-    document.addEventListener(
-      'contextmenu',
-      function(evt) {
-        if (self.editing()) evt.preventDefault();
-      },
-      false
-    );
-    $(document).on('pointerup', function(e) {
-      if (self.editing() && e.button === 2) {
-        self.guessPopUpHelper();
-      }
-    });
 
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
@@ -968,6 +928,7 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO: move to editor class
   this.appendText = function(textToAppend) {
     self.editing().body(self.editing().body() + textToAppend);
     // scroll to end of line
@@ -976,18 +937,21 @@ export var App = function(name, version) {
     self.editor.gotoLine(row + 1, column);
   };
 
+  // TODO: move to editor class
   this.moveEditCursor = function(offset) {
     var position = self.editor.getCursorPosition();
     self.editor.gotoLine(position.row + 1, position.column + offset);
     self.editor.focus();
   };
 
+  // TODO: move to editor class
   this.insertTextAtCursor = function(textToInsert) {
     self.editor.session.replace(self.editor.selection.getRange(), '');
     self.editor.session.insert(self.editor.getCursorPosition(), textToInsert);
     self.editor.focus();
   };
 
+  // TODO: move to editor class
   this.getTagBeforeCursor = function() {
     var selectionRange = self.editor.getSelectionRange();
     var currline = selectionRange.start.row;

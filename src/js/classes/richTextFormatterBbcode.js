@@ -1,14 +1,8 @@
 const bbcode = require('bbcode');
 
-// -- HTML ------------------------------------------------------------------
-exports.HtmlRichTextFormatter = function(app) {
-  this.greet = function() {
-    return "hello HTML";
-  }
-};
+export const  BbcodeRichTextFormatter = function(app) {
+  const self = this;
 
-// -- Bbcode ----------------------------------------------------------------
-exports.BbcodeRichTextFormatter = function(app) {
   this.getTagOpen = function(tag) {
     switch (tag) {
       case 'cmd': return '<<';
@@ -16,7 +10,7 @@ exports.BbcodeRichTextFormatter = function(app) {
       case 'color': return '[color=#]';
       default: return `[${tag}]`
     };
-  }
+  };
 
   this.getTagClose = function(tag) {
     switch (tag) {
@@ -24,7 +18,53 @@ exports.BbcodeRichTextFormatter = function(app) {
       case 'opt': return '|]]';
       default: return `[/${tag}]`
     };
-  }
+  };
+
+  this.insertTag = function(tag) {
+    const tagOpen = self.getTagOpen(tag);
+    const tagClose = self.getTagClose(tag);
+
+    const selectedRange = JSON.parse(
+      JSON.stringify(app.editor.selection.getRange())
+    );
+
+    app.editor.session.insert(selectedRange.start, tagOpen);
+    app.editor.session.insert({
+      column: selectedRange.end.column + tagOpen.length,
+      row: selectedRange.end.row,
+    }, tagClose);
+
+    if (tag === 'color') {
+      if (app.editor.getSelectedText().length === 0) {
+        app.moveEditCursor(-9);
+      }
+      else {
+        app.editor.selection.setRange({
+          start: {
+            row: app.editor.selection.getRange().start.row,
+            column: app.editor.selection.getRange().start.column - 1,
+          },
+          end: {
+            row: app.editor.selection.getRange().start.row,
+            column: app.editor.selection.getRange().start.column - 1,
+          },
+        });
+      }
+      app.insertColorCode();
+    } else if (app.editor.getSelectedText().length === 0) {
+      app.moveEditCursor(-tagClose.length);
+    } else {
+      app.editor.selection.setRange({
+        start: app.editor.selection.getRange().start,
+        end: {
+          row: app.editor.selection.getRange().end.row,
+          column:
+            app.editor.selection.getRange().end.column - tagClose.length,
+        },
+      });
+    }
+    app.editor.focus();
+  };
 
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
@@ -95,12 +135,3 @@ exports.BbcodeRichTextFormatter = function(app) {
     return result;
   };
 };
-
-// -- Factory ---------------------------------------------------------------
-exports.RichTextFormatter = function(app) {
-  // const type = app.settings.markUpLanguage; // TODO: put in settings
-  const type = 'bbcode';
-  return type === 'html' ?
-  new exports.HtmlRichTextFormatter(app) :
-  new exports.BbcodeRichTextFormatter(app);
-}
