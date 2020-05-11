@@ -242,10 +242,14 @@ export var yarnRender = function() {
 
   this.terminate = () => {
     try {
-      document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
-      document.getElementById(debugLabelIdToAttachTo).innerHTML = '';
+      let element = document.getElementById(htmIDtoAttachYarnTo);
+      element && (element.innerHTML = '');
+
+      element = document.getElementById(debugLabelIdToAttachTo);
+      element && (element.innerHTML = '');
+
       vnChoices = undefined;
-      
+
       emiter.removeAllListeners();
       this.finished = true;
     } catch(e) {
