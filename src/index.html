@@ -333,13 +333,16 @@
       <div class="settings-item">
         <label class="settings-label" for="theme">Markup</label>
 
-        <select id="theme" class="settings-value" data-bind="
-          options: app.ui.availableMarkupLanguages,
-          optionsText: 'name',
-          optionsValue: 'id',
-          value: app.settings.markupLanguage,
-          event: { change: app.setMarkupLanguage }">
-        </select>
+        <div class="settings-value markup">
+          <select id="theme" data-bind="
+            options: app.ui.availableMarkupLanguages,
+            optionsText: 'name',
+            optionsValue: 'id',
+            value: app.settings.markupLanguage,
+            event: { change: app.setMarkupLanguage }">
+          </select>
+          <button data-bind="click: app.convertMarkup">Convert</button>
+        </div>
       </div>
 
     <!-- Throttle delay -->

@@ -976,6 +976,12 @@ export var App = function(name, version) {
     }
   };
 
+  this.convertMarkup = function() {
+    self.nodes().forEach( node => {
+      node.body(self.richTextFormatter.convert(node.body()));
+    });
+  };
+
   this.updateSearch = function() {
     var search = self.$searchField.val().toLowerCase();
     var title = $('.search-title input').is(':checked');

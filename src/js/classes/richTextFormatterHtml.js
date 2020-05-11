@@ -86,6 +86,16 @@ export const HtmlRichTextFormatter = function(app) {
     app.editor.focus();
   };
 
+  this.convert = function (text) {
+    text = text.replace(/\[b\](.*?)\[\/b\]/gi, function(m) {
+      const content = m.match(/\[b\](.*?)\[\/b\]/i);
+      if (content.length)
+        return `<b>${content[1]}</b>`;
+    });
+
+    return text;
+  };
+
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
     let result = showRowNumbers
