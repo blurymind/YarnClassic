@@ -665,8 +665,8 @@ export var App = function(name, version) {
     });
 
     /// Enable autocompletion for node links (borked atm)
-    var langTools = ace.require('ace/ext/language_tools');
-    var nodeLinksCompleter = Utils.createAutocompleter(
+    const langTools = ace.require('ace/ext/language_tools');
+    const nodeLinksCompleter = Utils.createAutocompleter(
       ['string.llink', 'string.rlink'],
       self.getOtherNodeTitles(),
       'Node Link'
@@ -674,45 +674,19 @@ export var App = function(name, version) {
     langTools.setCompleters([nodeLinksCompleter]);
 
     // close tag autocompletion
+
     self.editor.getSession().on('change', function(evt) {
-      if (evt.action === 'insert') {
-        var autoCompleteButton = document.getElementById('toglAutocomplete');
-        if (autoCompleteButton.checked) {
-          setTimeout(() => {
-            switch (self.getTagBeforeCursor()) {
-            case '[[':
-              self.insertTextAtCursor(' answer: | ]] ');
-              self.moveEditCursor(-4);
-              break;
-            case '<<':
-              self.insertTextAtCursor(' >> ');
-              self.moveEditCursor(-3);
-              break;
-            case '[colo':
-              self.insertTextAtCursor('r=#][/color] ');
-              self.moveEditCursor(-10);
-              self.insertColorCode();
-              break;
-            case '[b':
-              self.insertTextAtCursor('][/b] ');
-              self.moveEditCursor(-5);
-              break;
-            case '[i':
-              self.insertTextAtCursor('][/i] ');
-              self.moveEditCursor(-5);
-              break;
-            case '[img':
-              self.insertTextAtCursor('][/img] ');
-              self.moveEditCursor(-7);
-              break;
-            case '[u':
-              self.insertTextAtCursor('][/u] ');
-              self.moveEditCursor(-5);
-              break;
+      const autoComplete = $('#toglAutocomplete').prop('checked');
+      if (evt.action === 'insert' && autoComplete) {
+        setTimeout(() => {
+          self.richTextFormatter.completableTags.forEach( tag => {
+            if (self.getTagBeforeCursor() === tag.Start) {
+              tag.Completion && self.insertTextAtCursor(tag.Completion);
+              tag.Offset && self.moveEditCursor(tag.Offset);
+              tag.Func && tag.Func();
             }
-          }, 200);
-          return;
-        }
+          });
+        }, 200);
       }
     });
 
@@ -957,41 +931,17 @@ export var App = function(name, version) {
 
   // TODO: move to editor class
   this.getTagBeforeCursor = function() {
-    var selectionRange = self.editor.getSelectionRange();
-    var currline = selectionRange.start.row;
-    var cursorPosition = selectionRange.end.column;
-    var curLineText = self.editor.session.getLine(currline);
+    const selectionRange = self.editor.getSelectionRange();
+    const curPosition = selectionRange.end.column;
+    const curLine = selectionRange.start.row;
+    const curLineText = self.editor.session.getLine(curLine);
 
-    var textBeforeCursor = curLineText.substring(0, cursorPosition);
+    const textBeforeCursor = curLineText.substring(0, curPosition);
     if (!textBeforeCursor) {
       return;
     }
-    var tagBeforeCursor =
-      textBeforeCursor.lastIndexOf('[') !== -1
-        ? textBeforeCursor.substring(
-          textBeforeCursor.lastIndexOf('['),
-          textBeforeCursor.length
-        )
-        : '';
 
-    if (
-      textBeforeCursor.substring(
-        textBeforeCursor.length - 2,
-        textBeforeCursor.length
-      ) === '[['
-    ) {
-      tagBeforeCursor = '[[';
-    }
-    if (
-      textBeforeCursor.substring(
-        textBeforeCursor.length - 2,
-        textBeforeCursor.length
-      ) === '<<'
-    ) {
-      tagBeforeCursor = '<<';
-    }
-
-    return tagBeforeCursor;
+    return self.richTextFormatter.identifyTag(textBeforeCursor);
   };
 
   this.saveNode = function(closeEditor = true) {

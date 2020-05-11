@@ -3,6 +3,16 @@ const bbcode = require('bbcode');
 export const BbcodeRichTextFormatter = function(app) {
   const self = this;
 
+  this.completableTags = Object.freeze([
+    { Start: '[[', Completion: ' answer: | ]] ', Offset: -4 },
+    { Start: '<<', Completion: ' >> ', Offset: -3 },
+    { Start: '[colo', Completion: 'r=#][/color] ', Offset: -10, Func: () => { app.insertColorCode(); } },
+    { Start: '[b', Completion: '][/b] ', Offset: -5 },
+    { Start: '[i', Completion: '][/i] ', Offset: -5 },
+    { Start: '[img', Completion: '][/img] ', Offset: -7 },
+    { Start: '[u', Completion: '][/u] ', Offset: -5 },
+  ]);
+
   this.getTagOpen = function(tag) {
     switch (tag) {
       case 'cmd': return '<<';
@@ -18,6 +28,18 @@ export const BbcodeRichTextFormatter = function(app) {
       case 'opt': return '|]]';
       default: return `[/${tag}]`
     };
+  };
+
+  this.identifyTag = function(text) {
+    let tagBeforeCursor = text.lastIndexOf('[') !== -1 ?
+      text.substring(text.lastIndexOf('['), text.length) : '';
+
+    if (text.substring(text.length - 2, text.length) === '[[')
+      tagBeforeCursor = '[[';
+    else if (text.substring(text.length - 2, text.length) === '<<')
+      tagBeforeCursor = '<<';
+
+    return tagBeforeCursor;
   };
 
   this.insertTag = function(tag) {
