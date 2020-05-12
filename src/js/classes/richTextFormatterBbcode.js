@@ -31,15 +31,15 @@ export const BbcodeRichTextFormatter = function(app) {
   };
 
   this.identifyTag = function(text) {
-    let tagBeforeCursor = text.lastIndexOf('[') !== -1 ?
+    let tag = text.lastIndexOf('[') !== -1 ?
       text.substring(text.lastIndexOf('['), text.length) : '';
 
     if (text.substring(text.length - 2, text.length) === '[[')
-      tagBeforeCursor = '[[';
+      tag = '[[';
     else if (text.substring(text.length - 2, text.length) === '<<')
-      tagBeforeCursor = '<<';
+      tag = '<<';
 
-    return tagBeforeCursor;
+    return tag;
   };
 
   this.insertTag = function(tag) {
