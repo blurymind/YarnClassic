@@ -887,7 +887,7 @@ export var App = function(name, version) {
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(self.editing().body(), true)
+      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(self.editing().body(), true);
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
       //edit mode

@@ -13,18 +13,18 @@ export const HtmlRichTextFormatter = function(app) {
 
   this.getTagOpen = function(tag) {
     switch (tag) {
-      case 'cmd': return '<<';
-      case 'opt': return '[[';
-      case 'color': return '<color=#>';
-      default: return `<${tag}>`
+    case 'cmd': return '<<';
+    case 'opt': return '[[';
+    case 'color': return '<color=#>';
+    default: return `<${tag}>`;
     };
   };
 
   this.getTagClose = function(tag) {
     switch (tag) {
-      case 'cmd': return '>>';
-      case 'opt': return '|]]';
-      default: return `</${tag}>`
+    case 'cmd': return '>>';
+    case 'opt': return '|]]';
+    default: return `</${tag}>`;
     };
   };
 
@@ -86,14 +86,27 @@ export const HtmlRichTextFormatter = function(app) {
     app.editor.focus();
   };
 
-  this.convert = function (text) {
-    text = text.replace(/\[b\](.*?)\[\/b\]/gi, function(m) {
-      const content = m.match(/\[b\](.*?)\[\/b\]/i);
-      if (content.length)
-        return `<b>${content[1]}</b>`;
-    });
+  this._convertTag = function(inPattern, outPattern, text) {
+    const globalRegex = new RegExp(inPattern, 'gi');
+    const localRegex = new RegExp(inPattern, 'i');
 
-    return text;
+    return text.replace(globalRegex, (m) => {
+      const match = m.match(localRegex);
+      const template = eval('`' + outPattern + '`');
+      return match.length ? template : null;
+    });
+  };
+
+  this.convert = function(text) {
+    let result = text;
+
+    result = self._convertTag('\\[b\\](.*?)\\[\\/b\\]', '<b>${match[1]}</b>', result);
+    result = self._convertTag('\\[u\\](.*?)\\[\\/u\\]', '<u>${match[1]}</u>', result);
+    result = self._convertTag('\\[i\\](.*?)\\[\\/i\\]', '<i>${match[1]}</i>', result);
+    result = self._convertTag('\\[img\\](.*?)\\[\\/img\\]', '<img>${match[1]}</img>', result);
+    result = self._convertTag('\\[color=#(.*?)\\](.*?)\\[\\/color\\]', '<color=#${match[1]}>${match[2]}</color>', result);
+
+    return result;
   };
 
   this.richTextToHtml = function(text, showRowNumbers = false) {
@@ -159,25 +172,25 @@ export const HtmlRichTextFormatter = function(app) {
     result = result.replace(/&lt;b&gt;.*&lt;\/b&gt;/gi, (m) => {
       const content = m.match(/&lt;b&gt;(.*)&lt;\/b&gt;/i);
       if (content.length){
-        return `<b>${content[1]}</b>`
+        return `<b>${content[1]}</b>`;
       }
-    })
+    });
 
     // <u></u>
     result = result.replace(/&lt;u&gt;.*&lt;\/u&gt;/gi, (m) => {
       const content = m.match(/&lt;u&gt;(.*)&lt;\/u&gt;/i);
       if (content.length){
-        return `<u>${content[1]}</u>`
+        return `<u>${content[1]}</u>`;
       }
-    })
+    });
 
     // <i></i>
     result = result.replace(/&lt;i&gt;.*&lt;\/i&gt;/gi, (m) => {
       const content = m.match(/&lt;i&gt;(.*)&lt;\/i&gt;/i);
       if (content.length){
-        return `<i>${content[1]}</i>`
+        return `<i>${content[1]}</i>`;
       }
-    })
+    });
 
     return result;
   };

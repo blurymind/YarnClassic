@@ -7,4 +7,4 @@ export const RichTextFormatter = function(app) {
   return type === 'html' ?
     new HtmlRichTextFormatter(app) :
     new BbcodeRichTextFormatter(app);
-}
+};

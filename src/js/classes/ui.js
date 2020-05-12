@@ -77,6 +77,34 @@ export const UI = function(app) {
       .transition({ y: '-100' }, 250);
   };
 
+  // confirmMarkupConversion
+  this.confirmMarkupConversion = function () {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Markup on all nodes will be modified. This can rarely result in broken texts.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, convert it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.value) {
+        app.convertMarkup();
+        Swal.fire(
+          'Converted!',
+          'The markup on the nodes has been converted.',
+          'success'
+        );
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire(
+          'Cancelled',
+          'The conversion has been cancelled.',
+          'error'
+        );
+      }
+    });
+  };
+
   // openNodeListMenu
   this.openNodeListMenu = function(action) {
     const searchText = action === 'link' ?
@@ -129,7 +157,4 @@ export const UI = function(app) {
       }
     });
   };
-
-
-
 };

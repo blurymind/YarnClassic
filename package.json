@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/YarnSpinnerTool/YarnEditor/issues"
   },
-  "version": "0.4.11",
+  "version": "0.4.12",
   "scripts": {
     "build": "npm run copy-version && webpack -p --progress --mode production --config webpack.config.js",
     "build-dev": "npm run copy-version && cross-env NODE_ENV=dev webpack -p --progress --config webpack.config.js",
@@ -41,6 +41,7 @@
     "nspell": "^2.1.2",
     "spectrum-colorpicker": "^1.8.0",
     "spoken": "^1.1.17",
+    "sweetalert2": "^9.10.13",
     "synonyms": "^1.0.1"
   },
   "devDependencies": {
