@@ -95,12 +95,6 @@ export const UI = function(app) {
           'The markup on the nodes has been converted.',
           'success'
         );
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire(
-          'Cancelled',
-          'The conversion has been cancelled.',
-          'error'
-        );
       }
     });
   };
