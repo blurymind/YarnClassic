@@ -81,7 +81,7 @@ export const UI = function(app) {
   this.confirmMarkupConversion = function () {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Markup on all nodes will be modified. This can rarely result in broken texts.',
+      text: 'Markup on all nodes will be modified. This can rarely result in broken texts. This operation can\'t be undone.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, convert it!',
