@@ -195,26 +195,20 @@ export var App = function(name, version) {
 
     // TODO: move to editor
     this.insertColorCode = function() {
-      const container = $('#colorPicker-container');
-      const picker = $('#colorPicker');
-
-      if (container.is(':visible')) {
+      if ($('#colorPicker-container').is(':visible')) {
         return;
       }
-
-      container.css({
+      // http://bgrins.github.io/spectrum/
+      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
+      $('#colorPicker').spectrum('toggle');
+      $('#colorPicker-container').css({
         left: self.input.mouse.x - 70,
         top: self.input.mouse.y - 50
       });
-
-      container.show();
-
-      picker.on('dragstop.spectrum', function(e, color) {
+      $('#colorPicker-container').show();
+      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
         self.applyPickerColorEditor(color);
       });
-
-      picker.spectrum.set && picker.spectrum('set', self.editor.getSelectedText());
-      picker.spectrum.toggle && picker.spectrum('toggle');
 
       self.togglePreviewMode(true);
     };
