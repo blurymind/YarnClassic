@@ -127,8 +127,6 @@ export const HtmlRichTextFormatter = function(app) {
     result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
 
-    console.log(result);
-
     /// <color=#...></color>  and  &lt;color=#...&gt;&lt;/color&gt;
     [
       /&lt;color=#(.*?)&gt;(.*?)&lt;\/color&gt;/,
