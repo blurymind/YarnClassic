@@ -167,17 +167,6 @@ export const HtmlRichTextFormatter = function(app) {
       }
     });
 
-
-    // newLines. Do this last, as we need the newline characters in previous regex tests
-    result = result.replace(/[\n\r]/g, function(row) {
-      let rowAppend = '<br/>';
-      rowCounter += 1;
-      if (showRowNumbers) {
-        rowAppend += '<font color="pink">' + rowCounter + '. </font>';
-      }
-      return rowAppend;
-    });
-
     // <b></b>
     result = result.replace(/&lt;b&gt;.*&lt;\/b&gt;/gi, (m) => {
       const content = m.match(/&lt;b&gt;(.*)&lt;\/b&gt;/i);
@@ -200,6 +189,16 @@ export const HtmlRichTextFormatter = function(app) {
       if (content.length){
         return `<i>${content[1]}</i>`;
       }
+    });
+
+    // newLines. Do this last, as we need the newline characters in previous regex tests
+    result = result.replace(/[\n\r]/g, function(row) {
+      let rowAppend = '<br/>';
+      rowCounter += 1;
+      if (showRowNumbers) {
+        rowAppend += '<font color="pink">' + rowCounter + '. </font>';
+      }
+      return rowAppend;
     });
 
     return result;
