@@ -177,11 +177,8 @@ export var App = function(name, version) {
     $(window).on('resize', self.workspace.updateArrows);
 
     this.guessPopUpHelper = function() {
-      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
+      if (/^\color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
         self.insertColorCode();
-        // return
-      } else if (self.getTagBeforeCursor().match(/\[img\]/)) {
-        // console.log("IMAGE");
       }
     };
 
@@ -198,31 +195,37 @@ export var App = function(name, version) {
 
     // TODO: move to editor
     this.insertColorCode = function() {
-      if ($('#colorPicker-container').is(':visible')) {
+      const container = $('#colorPicker-container');
+      const picker = $('#colorPicker');
+
+      if (container.is(':visible')) {
         return;
       }
 
-      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
-      $('#colorPicker').spectrum('toggle');
-      $('#colorPicker-container').css({
+      container.css({
         left: self.input.mouse.x - 70,
         top: self.input.mouse.y - 50
       });
-      $('#colorPicker-container').show();
-      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
+
+      container.show();
+
+      picker.on('dragstop.spectrum', function(e, color) {
         self.applyPickerColorEditor(color);
       });
+
+      picker.spectrum.set && picker.spectrum('set', self.editor.getSelectedText());
+      picker.spectrum.toggle && picker.spectrum('toggle');
 
       self.togglePreviewMode(true);
     };
 
     // TODO: move to editor
     this.applyPickerColorEditor = function(color) {
-      var selectRange = JSON.parse(
+      const selectRange = JSON.parse(
         JSON.stringify(self.editor.selection.getRange())
       );
       self.editor.selection.setRange(selectRange);
-      var colorCode = color.toHexString().replace('#', '');
+      const colorCode = color.toHexString().replace('#', '');
       self.editor.session.replace(selectRange, colorCode);
       self.editor.selection.setRange({
         start: self.editor.getCursorPosition(),
@@ -658,7 +661,9 @@ export var App = function(name, version) {
       change: function(color) {
         if ($('#colorPicker-container').is(':visible')) {
           self.applyPickerColorEditor(color);
-          $('#colorPicker').spectrum.set(color.toHexString());
+
+          if ($('#colorPicker').spectrum.set)
+            $('#colorPicker').spectrum.set(color.toHexString());
         }
       },
       clickoutFiresChange: true,

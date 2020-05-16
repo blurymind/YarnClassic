@@ -127,12 +127,22 @@ export const HtmlRichTextFormatter = function(app) {
     result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
 
-    // <color=#...></color>
-    result = result.replace(/&lt;color=#([A-Za-z0-9])+&gt;(.*?)&lt;\/color&gt;/gi, function(colorCode) {
-      const extractedCol = colorCode.match(/&lt;color=#([A-Za-z0-9]+)&gt;(.*?)&lt;\/color&gt;/i);
-      if (extractedCol && extractedCol.length > 2) {
-        return (`<font color=#${extractedCol[1]}>&#9751${extractedCol[2]}</font>`);
-      }
+    console.log(result);
+
+    /// <color=#...></color>  and  &lt;color=#...&gt;&lt;/color&gt;
+    [
+      /&lt;color=#(.*?)&gt;(.*?)&lt;\/color&gt;/,
+      /<color=#(.*?)>(.*?)<\/color>/
+    ].forEach( pattern => {
+      const globalRegex = new RegExp(pattern, 'gi');
+      const localRegex = new RegExp(pattern, 'i');
+
+      result = result.replace(globalRegex, function(colorCode) {
+        const matches = colorCode.match(localRegex);
+        if (matches && matches.length > 2) {
+          return (`<font color=#${matches[1]}>&#9751${matches[2]}</font>`);
+        }
+      });
     });
 
     // local images with path relative to the opened yarn file
