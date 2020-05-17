@@ -177,7 +177,7 @@ export var App = function(name, version) {
     $(window).on('resize', self.workspace.updateArrows);
 
     this.guessPopUpHelper = function() {
-      if (/^\color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
+      if (/color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
         self.insertColorCode();
       }
     };
@@ -235,11 +235,6 @@ export var App = function(name, version) {
       },
       false
     );
-    $(document).on('pointerup', function(e) {
-      if (self.editing() && e.button === 2) {
-        self.guessPopUpHelper();
-      }
-    });
 
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();

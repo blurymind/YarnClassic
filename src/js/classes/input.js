@@ -38,7 +38,7 @@ export const Input = function(app) {
   //
   // Keeps track of mouse/touch events
   this.trackMouseEvents = function() {
-    $('.nodes').on('pointerdown', e => {
+    $(document).on('pointerdown', e => {
       self.isDragging = true;
       self.mouse.x = e.pageX;
       self.mouse.y = e.pageY;
@@ -58,6 +58,9 @@ export const Input = function(app) {
           app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
           break;
         }
+      } else if (app.inEditor() && e.button === MouseButton.Right) {
+        app.guessPopUpHelper();
+        e.preventDefault();
       }
     });
 
@@ -109,10 +112,10 @@ export const Input = function(app) {
       if (event.altKey)
         return;
 
-      event.preventDefault();
-
-      if (app.inWorkspace())
+      if (app.inWorkspace()) {
         app.workspace.onZoom(event.pageX, event.pageY, event.deltaY);
+        event.preventDefault();
+      }
     });
 
     $(document).contextmenu(e => {
