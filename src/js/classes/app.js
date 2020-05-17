@@ -206,9 +206,6 @@ export var App = function(name, version) {
         top: self.input.mouse.y - 50
       });
       $('#colorPicker-container').show();
-      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
-        self.applyPickerColorEditor(color);
-      });
 
       self.togglePreviewMode(true);
     };
@@ -652,13 +649,8 @@ export var App = function(name, version) {
           '#ead1dc',
         ],
       ],
-      change: function(color) {
-        if ($('#colorPicker-container').is(':visible')) {
-          self.applyPickerColorEditor(color);
-
-          if ($('#colorPicker').spectrum.set)
-            $('#colorPicker').spectrum.set(color.toHexString());
-        }
+      move: function(color) {
+        self.applyPickerColorEditor(color);
       },
       clickoutFiresChange: true,
     });
