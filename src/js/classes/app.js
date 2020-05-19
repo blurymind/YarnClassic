@@ -207,6 +207,9 @@ export var App = function(name, version) {
       });
       $('#colorPicker-container').show();
 
+      const currentColor = $('#colorPicker').spectrum('get');
+      self.applyPickerColorEditor(currentColor);
+
       self.togglePreviewMode(true);
     };
 
