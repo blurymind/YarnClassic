@@ -659,12 +659,14 @@ export var App = function(name, version) {
     );
     langTools.setCompleters([nodeLinksCompleter]);
 
-    // close tag autocompletion
-
+    // autocompletion
+    let autoCompleteTimeout = undefined;
     self.editor.getSession().on('change', function(evt) {
       const autoComplete = $('#toglAutocomplete').prop('checked');
       if (evt.action === 'insert' && autoComplete) {
-        setTimeout(() => {
+        autoCompleteTimeout && clearTimeout (autoCompleteTimeout);
+        autoCompleteTimeout = setTimeout(() => {
+          autoCompleteTimeout = undefined;
           self.richTextFormatter.completableTags.forEach( tag => {
             if (self.getTagBeforeCursor() === tag.Start) {
               tag.Completion && self.insertTextAtCursor(tag.Completion);
@@ -882,6 +884,7 @@ export var App = function(name, version) {
       editorPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       self.editor.focus();
+      self.editor.resize();
       //close any pop up helpers tooltip class
       if ($('#colorPicker-container').is(':visible')) {
         $('#colorPicker-container').hide();
