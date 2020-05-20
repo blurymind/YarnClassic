@@ -41,6 +41,7 @@
     "nspell": "^2.1.2",
     "spectrum-colorpicker": "^1.8.0",
     "spoken": "^1.1.17",
+    "sweetalert2": "^9.10.13",
     "synonyms": "^1.0.1"
   },
   "devDependencies": {

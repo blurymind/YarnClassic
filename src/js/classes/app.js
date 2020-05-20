@@ -16,16 +16,13 @@ import { UI } from './ui';
 import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
+import { RichTextFormatter } from './richTextFormatter';
 
 // TODO: refactoring proposals
 //
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
-// Create:
-//   RichTextFormater interface
-//   RichTextFormaterBbcode implementation
-//   RichTextFormaterXml implementation
 // Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
@@ -43,12 +40,19 @@ export var App = function(name, version) {
     load_dictionary(self.settings.language().split('-')[0]);
   };
 
+  this.setMarkupLanguage = function(language, e) {
+    const markupLanguage = e ? e.target.value : language;
+    self.richTextFormatter = new RichTextFormatter(self);
+    self.mustRefreshNodes.notifySubscribers();
+  };
+
   // Ideally this dependencies should be injected by index.js
-  this.workspace = new Workspace(self);
   this.input = new Input(self);
   this.settings = new Settings(self);
+  this.workspace = new Workspace(self);
   this.ui = new UI(self);
   this.previewStory = new yarnRender();
+  this.richTextFormatter = new RichTextFormatter(self);
 
   this.data = data;
   this.name = ko.observable(name);
@@ -57,6 +61,7 @@ export var App = function(name, version) {
   this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
+  this.mustRefreshNodes = ko.observable();
   this.mustUpdateTags = true;
   this.nodeHistory = [];
   this.nodeFuture = [];
@@ -172,70 +177,12 @@ export var App = function(name, version) {
     $(window).on('resize', self.workspace.updateArrows);
 
     this.guessPopUpHelper = function() {
-      if (/^\[color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
+      if (/color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
         self.insertColorCode();
-        // return
-      } else if (self.getTagBeforeCursor().match(/\[img\]/)) {
-        // console.log("IMAGE");
       }
     };
 
-    this.insertBBcodeTags = function(tag) {
-      var tagClose = '[/' + tag.replace(/[\"#=]/gi, '') + ']';
-      if (tag === 'cmd') {
-        tag = '<<';
-        tagClose = '>>';
-      } else if (tag === 'opt') {
-        tag = '[[';
-        tagClose = '|]]';
-      } else {
-        tag = '[' + tag + ']';
-      }
-
-      var selectRange = JSON.parse(
-        JSON.stringify(self.editor.selection.getRange())
-      );
-      self.editor.session.insert(selectRange.start, tag);
-      self.editor.session.insert(
-        {
-          column: selectRange.end.column + tag.length,
-          row: selectRange.end.row,
-        },
-        tagClose
-      );
-
-      if (tag === '[color=#]') {
-        if (self.editor.getSelectedText().length === 0) {
-          self.moveEditCursor(-9);
-          self.insertColorCode();
-          return;
-        }
-        self.editor.selection.setRange({
-          start: {
-            row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1,
-          },
-          end: {
-            row: self.editor.selection.getRange().start.row,
-            column: self.editor.selection.getRange().start.column - 1,
-          },
-        });
-        self.insertColorCode();
-      } else if (self.editor.getSelectedText().length === 0) {
-        self.moveEditCursor(-tagClose.length);
-      } else {
-        self.editor.selection.setRange({
-          start: self.editor.selection.getRange().start,
-          end: {
-            row: self.editor.selection.getRange().end.row,
-            column:
-              self.editor.selection.getRange().end.column - tagClose.length,
-          },
-        });
-      }
-      self.editor.focus();
-    };
-
+    // TODO: move to editor
     this.insertEmoji = function() {
       this.emPicker.toggle();
       self.togglePreviewMode(true);
@@ -245,6 +192,52 @@ export var App = function(name, version) {
       });
       $('#emojiPicker-container').show();
     };
+
+    // TODO: move to editor
+    this.insertColorCode = function() {
+      if ($('#colorPicker-container').is(':visible')) {
+        return;
+      }
+      // http://bgrins.github.io/spectrum/
+      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
+      $('#colorPicker').spectrum('toggle');
+      $('#colorPicker-container').css({
+        left: self.input.mouse.x - 70,
+        top: self.input.mouse.y - 50
+      });
+      $('#colorPicker-container').show();
+
+      const currentColor = $('#colorPicker').spectrum('get');
+      self.applyPickerColorEditor(currentColor);
+
+      self.togglePreviewMode(true);
+    };
+
+    // TODO: move to editor
+    this.applyPickerColorEditor = function(color) {
+      const selectRange = JSON.parse(
+        JSON.stringify(self.editor.selection.getRange())
+      );
+      self.editor.selection.setRange(selectRange);
+      const colorCode = color.toHexString().replace('#', '');
+      self.editor.session.replace(selectRange, colorCode);
+      self.editor.selection.setRange({
+        start: self.editor.getCursorPosition(),
+        end: {
+          row: self.editor.getCursorPosition().row,
+          column: self.editor.getCursorPosition().column - colorCode.length,
+        },
+      });
+      self.togglePreviewMode(true);
+    };
+
+    document.addEventListener(
+      'contextmenu',
+      function(evt) {
+        if (self.editing()) evt.preventDefault();
+      },
+      false
+    );
 
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();
@@ -349,55 +342,6 @@ export var App = function(name, version) {
         })
         .catch(error => console.warn(error.message));
     };
-
-    this.insertColorCode = function() {
-      if ($('#colorPicker-container').is(':visible')) {
-        return;
-      }
-      // http://bgrins.github.io/spectrum/
-      $('#colorPicker').spectrum('set', self.editor.getSelectedText());
-      $('#colorPicker').spectrum('toggle');
-      $('#colorPicker-container').css({
-        left: self.input.mouse.x - 70,
-        top: self.input.mouse.y - 50
-      });
-      $('#colorPicker-container').show();
-      $('#colorPicker').on('dragstop.spectrum', function(e, color) {
-        self.applyPickerColorEditor(color);
-      });
-
-      self.togglePreviewMode(true);
-    };
-
-    this.applyPickerColorEditor = function(color) {
-      var selectRange = JSON.parse(
-        JSON.stringify(self.editor.selection.getRange())
-      );
-      self.editor.selection.setRange(selectRange);
-      var colorCode = color.toHexString().replace('#', '');
-      self.editor.session.replace(selectRange, colorCode);
-      self.editor.selection.setRange({
-        start: self.editor.getCursorPosition(),
-        end: {
-          row: self.editor.getCursorPosition().row,
-          column: self.editor.getCursorPosition().column - colorCode.length,
-        },
-      });
-      self.togglePreviewMode(true);
-    };
-
-    document.addEventListener(
-      'contextmenu',
-      function(evt) {
-        if (self.editing()) evt.preventDefault();
-      },
-      false
-    );
-    $(document).on('pointerup', function(e) {
-      if (self.editing() && e.button === 2) {
-        self.guessPopUpHelper();
-      }
-    });
 
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
@@ -703,64 +647,37 @@ export var App = function(name, version) {
           '#ead1dc',
         ],
       ],
-      change: function(color) {
-        if ($('#colorPicker-container').is(':visible')) {
-          self.applyPickerColorEditor(color);
-          $('#colorPicker').spectrum.set(color.toHexString());
-        }
+      move: function(color) {
+        self.applyPickerColorEditor(color);
       },
       clickoutFiresChange: true,
     });
 
     /// Enable autocompletion for node links (borked atm)
-    var langTools = ace.require('ace/ext/language_tools');
-    var nodeLinksCompleter = Utils.createAutocompleter(
+    const langTools = ace.require('ace/ext/language_tools');
+    const nodeLinksCompleter = Utils.createAutocompleter(
       ['string.llink', 'string.rlink'],
       self.getOtherNodeTitles(),
       'Node Link'
     );
     langTools.setCompleters([nodeLinksCompleter]);
 
-    // close tag autocompletion
+    // autocompletion
+    let autoCompleteTimeout = undefined;
     self.editor.getSession().on('change', function(evt) {
-      if (evt.action === 'insert') {
-        var autoCompleteButton = document.getElementById('toglAutocomplete');
-        if (autoCompleteButton.checked) {
-          setTimeout(() => {
-            switch (self.getTagBeforeCursor()) {
-            case '[[':
-              self.insertTextAtCursor(' answer: | ]] ');
-              self.moveEditCursor(-4);
-              break;
-            case '<<':
-              self.insertTextAtCursor(' >> ');
-              self.moveEditCursor(-3);
-              break;
-            case '[colo':
-              self.insertTextAtCursor('r=#][/color] ');
-              self.moveEditCursor(-10);
-              self.insertColorCode();
-              break;
-            case '[b':
-              self.insertTextAtCursor('][/b] ');
-              self.moveEditCursor(-5);
-              break;
-            case '[i':
-              self.insertTextAtCursor('][/i] ');
-              self.moveEditCursor(-5);
-              break;
-            case '[img':
-              self.insertTextAtCursor('][/img] ');
-              self.moveEditCursor(-7);
-              break;
-            case '[u':
-              self.insertTextAtCursor('][/u] ');
-              self.moveEditCursor(-5);
-              break;
+      const autoComplete = $('#toglAutocomplete').prop('checked');
+      if (evt.action === 'insert' && autoComplete) {
+        autoCompleteTimeout && clearTimeout (autoCompleteTimeout);
+        autoCompleteTimeout = setTimeout(() => {
+          autoCompleteTimeout = undefined;
+          self.richTextFormatter.completableTags.forEach( tag => {
+            if (self.getTagBeforeCursor() === tag.Start) {
+              tag.Completion && self.insertTextAtCursor(tag.Completion);
+              tag.Offset && self.moveEditCursor(tag.Offset);
+              tag.Func && tag.Func();
             }
-          }, 200);
-          return;
-        }
+          });
+        }, 200);
       }
     });
 
@@ -951,17 +868,17 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO: move to UI?
   this.togglePreviewMode = function(previewModeOverwrite) {
-    var editor = $('.editor')[0];
-    var editorPreviewer = document.getElementById('editor-preview');
+    const editor = $('.editor')[0];
+    const editorPreviewer = $('#editor-preview')[0];
+
     if (previewModeOverwrite) {
       self.togglePlayMode(false);
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self
-        .editing()
-        .textToHtml(self.editing().body(), true);
+      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(self.editing().body(), true);
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
       //edit mode
@@ -970,6 +887,7 @@ export var App = function(name, version) {
       editorPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       self.editor.focus();
+      self.editor.resize();
       //close any pop up helpers tooltip class
       if ($('#colorPicker-container').is(':visible')) {
         $('#colorPicker-container').hide();
@@ -980,6 +898,7 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO: move to editor class
   this.appendText = function(textToAppend) {
     self.editing().body(self.editing().body() + textToAppend);
     // scroll to end of line
@@ -988,54 +907,33 @@ export var App = function(name, version) {
     self.editor.gotoLine(row + 1, column);
   };
 
+  // TODO: move to editor class
   this.moveEditCursor = function(offset) {
     var position = self.editor.getCursorPosition();
     self.editor.gotoLine(position.row + 1, position.column + offset);
     self.editor.focus();
   };
 
+  // TODO: move to editor class
   this.insertTextAtCursor = function(textToInsert) {
     self.editor.session.replace(self.editor.selection.getRange(), '');
     self.editor.session.insert(self.editor.getCursorPosition(), textToInsert);
     self.editor.focus();
   };
 
+  // TODO: move to editor class
   this.getTagBeforeCursor = function() {
-    var selectionRange = self.editor.getSelectionRange();
-    var currline = selectionRange.start.row;
-    var cursorPosition = selectionRange.end.column;
-    var curLineText = self.editor.session.getLine(currline);
+    const selectionRange = self.editor.getSelectionRange();
+    const curPosition = selectionRange.end.column;
+    const curLine = selectionRange.start.row;
+    const curLineText = self.editor.session.getLine(curLine);
 
-    var textBeforeCursor = curLineText.substring(0, cursorPosition);
+    const textBeforeCursor = curLineText.substring(0, curPosition);
     if (!textBeforeCursor) {
       return;
     }
-    var tagBeforeCursor =
-      textBeforeCursor.lastIndexOf('[') !== -1
-        ? textBeforeCursor.substring(
-          textBeforeCursor.lastIndexOf('['),
-          textBeforeCursor.length
-        )
-        : '';
 
-    if (
-      textBeforeCursor.substring(
-        textBeforeCursor.length - 2,
-        textBeforeCursor.length
-      ) === '[['
-    ) {
-      tagBeforeCursor = '[[';
-    }
-    if (
-      textBeforeCursor.substring(
-        textBeforeCursor.length - 2,
-        textBeforeCursor.length
-      ) === '<<'
-    ) {
-      tagBeforeCursor = '<<';
-    }
-
-    return tagBeforeCursor;
+    return self.richTextFormatter.identifyTag(textBeforeCursor);
   };
 
   this.saveNode = function(closeEditor = true) {
@@ -1068,6 +966,12 @@ export var App = function(name, version) {
         });
       }
     }
+  };
+
+  this.convertMarkup = function() {
+    self.nodes().forEach( node => {
+      node.body(self.richTextFormatter.convert(node.body()));
+    });
   };
 
   this.updateSearch = function() {
