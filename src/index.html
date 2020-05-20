@@ -14,12 +14,13 @@
 
     <!-- search form -->
     <div class="app-search">
-      <div class="menu">
+      <form class="menu" autocomplete="off" onkeypress="return event.keyCode != 13;">
         <input
         id="nodeSearchInput"
-        type="search"
+        type="text"
         class="search-field"
         placeholder="Search"
+        autocomplete="off"
         oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
 
         <span>
@@ -40,7 +41,7 @@
         <div class="dropdown">
           <div id="openHelperMenu"></div>
         </div>
-      </div>
+      </form>
     </div>
 
     <!-- add node -->
@@ -179,7 +180,9 @@
             <div class="menu">
               <span class="title" onmouseenter="app.ui.openNodeListMenu('link')" onclick="app.ui.openNodeListMenu('link')">Add Link</span>
               <div class="dropdown">
-                <input class="search-field" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.ui.openNodeListMenu('link')"></input>
+                <form autocomplete="off" onkeypress="return event.keyCode != 13;">
+                  <input class="search-field" autocomplete="off" placeholder="search" type="text" id="linkHelperMenuFilter" oninput="app.ui.openNodeListMenu('link')"></input>
+                </form>
                 <div id="linkHelperMenu"></div>
               </div>
             </div>
