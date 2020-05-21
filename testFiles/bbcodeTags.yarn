@@ -1,0 +1,25 @@
+title: Start
+tags: 
+colorID: 0
+position: 150,211
+---
+[b]Bold[/b] text
+[u]Underlined[/u] text
+Text in [i]italics[/i] 
+Text in [color=#ff0000]red color[/color] and [color=#0000ff]blue color[/color]
+[color=#00ff00][b]Green and bold[/b][/color] text
+[b][i]bold and italics[/i][/b] 
+[b][u]bold and underlined[/u][/b] 
+[i][u]italics and underlined[/u][/i]
+[i][u][color=#e900ff]italics, underlined and pink[/color][/u][/i] 
+[img]image[/img]
+<<command>>
+[[This link brings you to a new node:|link]]
+===
+title: link
+tags: 
+colorID: 0
+position: 482,212
+---
+Empty Text
+===

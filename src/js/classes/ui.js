@@ -4,6 +4,12 @@ export const UI = function(app) {
   this.settingsDialogVisible = ko.observable(false);
   this.helpDialogVisible = ko.observable(false);
 
+  // Markup selector -----------------------------------------------------------
+  this.availableMarkupLanguages = [
+    { id: 'bbcode', name: 'Bbcode' },
+    { id: 'html', name: 'Html' }
+  ];
+
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
     { id: 'classic', name: 'Classic' },
@@ -97,6 +103,28 @@ export const UI = function(app) {
     evt.currentTarget.className += ' active';
   };
 
+
+  // confirmMarkupConversion
+  this.confirmMarkupConversion = function () {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Markup on all nodes will be modified. This can rarely result in broken texts. This operation can\'t be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, convert it!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.value) {
+        app.convertMarkup();
+        Swal.fire(
+          'Converted!',
+          'The markup on the nodes has been converted.',
+          'success'
+        );
+      }
+    });
+  };
 
   // openNodeListMenu
   this.openNodeListMenu = function(action) {

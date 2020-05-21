@@ -86,4 +86,9 @@ export const Settings = function(app) {
       storage.getItem('helpDialogVisited') === 'true' :
       false
     ).extend({ persist:'helpDialogVisited' });
+
+  // Markup language
+  this.markupLanguage = ko
+    .observable(storage.getItem('markupLanguage') || 'bbcode')
+    .extend({ persist:'markupLanguage' });
 };

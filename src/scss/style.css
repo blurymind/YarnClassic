@@ -512,6 +512,21 @@ kbd {
   flex: 50%;
 }
 
+.markup {
+  flex: 50%;
+  display: flex;
+}
+
+.markup #theme {
+  flex: 60%;
+}
+
+.markup button {
+  margin-left: 2px;
+  flex: 40%;
+}
+
+
 /* --- HELP --- */
 
 .shortcuts-row {
@@ -546,7 +561,6 @@ kbd {
   width: 200px;
   height: 200px;
 }
-
 /* --- NODE EDITOR --- */
 
 .node-editor {
