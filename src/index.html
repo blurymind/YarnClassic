@@ -6,8 +6,8 @@
   <title>Yarn</title>
 </head>
 <body>
-  <!-- Fancy Background -->
-  <div id="app-bg">&nbsp;</div>
+	<!-- Fancy Background -->
+	<div id="app-bg">&nbsp;</div>
 
   <!-- Container -->
   <div id="app">
@@ -16,12 +16,12 @@
     <div class="app-search">
       <form class="menu" autocomplete="off" onkeypress="return event.keyCode != 13;">
         <input
-          id="nodeSearchInput"
-        type="search"
-          class="search-field"
-          placeholder="Search"
+        id="nodeSearchInput"
+        type="text"
+        class="search-field"
+        placeholder="Search"
         autocomplete="off"
-          oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
+        oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
 
         <span>
           <span class="search-title styled-checkbox">
@@ -42,7 +42,7 @@
           <div id="openHelperMenu"></div>
         </div>
       </form>
-      </div>
+    </div>
 
     <!-- add node -->
     <div class="app-add-node" data-bind="click:app.newNode">
@@ -73,7 +73,6 @@
 
     <!-- main menu -->
     <div class="app-menu">
-
       <!-- File menu -->
       <div class="menu">
         <span class="title">File</span>
@@ -347,16 +346,16 @@
         <label class="settings-label" for="theme">Theme</label>
 
         <select id="theme" class="settings-value" data-bind="
-        options: app.ui.availableThemes,
-        optionsText: 'name',
-        optionsValue: 'id',
-        value: app.settings.theme,
-        event: { change: app.setTheme }">
-      </select>
-    </div>
+          options: app.ui.availableThemes,
+          optionsText: 'name',
+          optionsValue: 'id',
+          value: app.settings.theme,
+          event: { change: app.setTheme }">
+        </select>
+      </div>
 
-    <!-- Markup -->
-    <div class="settings-item">
+      <!-- Markup -->
+      <div class="settings-item">
         <label class="settings-label" for="theme">Markup</label>
 
         <div class="settings-value markup">
@@ -366,10 +365,10 @@
             optionsValue: 'id',
             value: app.settings.markupLanguage,
             event: { change: app.setMarkupLanguage }">
-      </select>
+          </select>
           <button data-bind="click: app.ui.confirmMarkupConversion">Convert</button>
         </div>
-    </div>
+      </div>
 
     <!-- Throttle delay -->
     <div class="settings-item">
@@ -476,8 +475,84 @@
     </div> <!-- About -->
 
     <div id="Syntax" class="tabcontent">
-      <h2>Syntax</h2>
-      </p>
+      <div class="syntax-row">
+        <div class="syntax-column">
+          <li>Lines of dialogue are just text. One line of dialogue per one line of text.</li>
+
+          <p><code>Like this one.</code></p>
+
+          <li>You can add a line ID to the end of a line, to uniquely identify it!</li>
+
+          <p><code>This line has an ID #line:a1b2c3</code></p>
+
+          <li>You can add options. These wait until the end of the node before they appear.</li>
+
+          <p>
+            <code>
+            // will run node West if selected<br>
+            [[Would you like to go west?|West]]<br>
+            <br>
+            // will run node East if selected<br>
+            [[Would you like to go east?|East]]<br>
+            </code>
+          </p>
+
+          <li>You can store information in variables:</li>
+
+          <p><code>&lt;&lt;set $knows_variables = true&gt;&gt;</code></p>
+
+          <li>You can then use this information in your scripts:</li>
+
+          <p><code>
+          &lt;&lt;if $knows_variables == true&gt;&gt;<br>
+          <span class='indent'/>Nice! 'elseif' can be used here, too!<br>
+          &lt;&lt;else&gt;&gt;<br>
+          <span class='indent'/>Dang!<br>
+          &lt;&lt;endif&gt;&gt;<br>
+          </code></p>
+
+          <li>You can use custom commands in your scripts, to tell your game what to do. It's up to your game to define them.</li>
+
+          <p><code>
+            &lt;&lt;walk_to Mae car&gt;&gt;<br>
+            &lt;&lt;fade_down&gt;&gt;<br>
+          </code></p>
+        </div> <!-- syntax-column -->
+
+        <div class="syntax-column">
+          <li>You can do maths with variables and values and store true/false, text, and numbers inside variables:</li>
+
+          <p><code>
+          &lt;&lt;if 1 + 2 / 4 * 3 % 2&gt;&gt;<br>
+          <span class='indent'/>&lt;&lt;set $character_name = "Bob"&gt;&gt;<br>
+          <span class='indent'/>&lt;&lt;set $gold_coints = 51&gt;&gt;<br>
+          <span class='indent'/>&lt;&lt;set $yarn_is_cool = true&gt;&gt;<br>
+          &lt;&lt;endif&gt;&gt;<br>
+          </code></p>
+
+          <li>You can use shortcuts:</li>
+
+          <p>
+          <code>-> Shortcut options let you offer choices in the middle of dialogue.<br>
+          <span class='indent'/>Indent the line after it, and it will only run if the user chose the option.<br>
+          <span class='indent'/>Shortcut options are presented right away, like lines.<br>
+          <span class='indent'/><code>-></code> You can put other options inside them, too!<br>
+          <span class='indent'/><span class='indent'/>Wow!<br>
+          </code>
+          </p>
+
+          <li>You can add a condition to the end of a shortcut:</li>
+
+          <p><code>-> This line will never run &lt;&lt;if $yarn_is_cool == false&gt;&gt;</code></p>
+
+          <li>You can jump straight to a node:</li>
+          <p><code>[[GameOver]]</code></p>
+
+          <p><li>You can embed expressions in lines, <code>{$character_name}.</code></li></p>
+
+          <p><li>You can pluralise <code>[plural {$num_words} one="a word" other="words"]</code>, depending on your locale.</li></p>
+        </div> <!-- syntax-column -->
+      </div>
     </div> <!-- Syntax -->
 
     <div id="Shortcuts" class="tabcontent">
@@ -531,7 +606,7 @@
         </div>
 
         <div class="shortcuts-column">
-          <h2>Reserved</h2>
+          <!-- <h2>Reserved</h2> -->
         </div>
       </div>
     </div> <!-- Shortcuts -->

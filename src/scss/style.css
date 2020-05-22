@@ -526,8 +526,24 @@ kbd {
   flex: 40%;
 }
 
-
 /* --- HELP --- */
+.syntax-row {
+  display: flex;
+}
+
+.syntax-column {
+  flex: 50%;
+  text-align: justify;
+  padding: 20px;
+  font-size: 1em;
+  line-height: 1.3em;
+}
+
+.syntax-column code {
+  color: magenta;
+  font-weight: bolder;
+  font-size: 0.8em;
+}
 
 .shortcuts-row {
   display: flex;
@@ -535,6 +551,10 @@ kbd {
 
 .shortcuts-column {
   flex: 33%;
+}
+
+.indent {
+  margin-left: 20px;
 }
 
 .shortcuts-item {
@@ -978,6 +998,12 @@ span.add-node:after {
     flex-direction: column;
   }
   .shortcuts-row {
+    flex-direction: column;
+  }
+  .syntax-row {
+    flex-direction: column;
+  }
+  .syntax-row {
     flex-direction: column;
   }
 }
