@@ -1,6 +1,20 @@
+// In some scenarios (i.e. Visual Studio Code extension webview) we don't access to localStorage.
+const getStorage = function() {
+  try {
+    return window.localStorage;
+  } catch (error) {
+    // Error here is caused by:
+    // Uncaught DOMException: Failed to read the 'localStorage' property from 'Window': Storage is disabled inside 'data:' URLs.
+    return { // TODO store these in VSCode preferences?
+      setItem: () => {},
+      getItem: () => {},
+    };
+  }
+};
+
 export const Settings = function(app) {
   const self = this;
-  const storage = window.localStorage;
+  const storage = getStorage();
 
   ko.extenders.persist = function (target, option) {
     target.subscribe(function (newValue) {
