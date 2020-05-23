@@ -1,5 +1,7 @@
 import '../scss/index.scss';
 
+import { Utils } from './classes/utils';
+
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 OfflinePluginRuntime.install();
 
@@ -12,7 +14,7 @@ import 'jquery-mousewheel';
 
 import ace from 'ace-builds/src-noconflict/ace';
 window.ace = ace;
-ace.config.set('basePath', 'public'); //needed to import yarn mode
+ace.config.set('basePath', Utils.getPublicPath()); //needed to import yarn mode
 window.define = ace.define;
 
 import 'ace-builds/src-min-noconflict/ext-language_tools';

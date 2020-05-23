@@ -7,8 +7,10 @@ var nspell = require('nspell');
 // You should configure these classes.
 var editor = 'editor'; // This should be the id of your editor element.
 
-var dicPath = 'public/dictionaries/en/index.dic';
-var affPath = 'public/dictionaries/en/index.aff';
+var utils = require('../classes/utils');
+
+var dicPath = utils.Utils.getPublicPath('dictionaries/en/index.dic');
+var affPath = utils.Utils.getPublicPath('dictionaries/en/index.aff');
 // var dicPath =
 //   "https://raw.githubusercontent.com/elastic/hunspell/master/dicts/en_US/en_US.dic";
 // var affPath =
@@ -28,8 +30,8 @@ var dictionary = null;
 
 function load_dictionary(dicLanguage) {
   console.info(`Loading ${dicLanguage} hunspell dictionary locally`);
-  dicPath = `public/dictionaries/${dicLanguage}/index.dic`;
-  affPath = `public/dictionaries/${dicLanguage}/index.aff`;
+  dicPath = utils.Utils.getPublicPath(`dictionaries/${dicLanguage}/index.dic`);
+  affPath = utils.Utils.getPublicPath(`dictionaries/${dicLanguage}/index.aff`);
 
   $.get(dicPath, function(data) {
     dicData = data;

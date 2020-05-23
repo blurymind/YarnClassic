@@ -31,7 +31,7 @@ export var App = function(name, version) {
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
     const theme = document.getElementById('theme-stylesheet');
-    theme.href = `./public/themes/${themeName}.css`;
+    theme.href = Utils.getPublicPath(`themes/${themeName}.css`);
   };
 
   this.setLanguage = function(language, e) {

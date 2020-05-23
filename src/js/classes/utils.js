@@ -134,5 +134,16 @@ export var Utils = {
     Date.now ||
     function() {
       return new Date().getTime();
+    },
+
+  // If we're in the context of the VSCode extension webview,
+  // we have to use a function that it puts on window to get the path to public assets
+  // since it requires that they be loaded with fully-qualified, special scheme
+  getPublicPath: function(path) {
+    if (window.getPublicVsCodeWebviewUri) {
+      return window.getPublicVsCodeWebviewUri(path);
+    } else {
+      return `public${path ? `/${path}` : ''}`;
     }
+  }
 };
