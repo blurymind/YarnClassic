@@ -157,7 +157,12 @@ export var App = function(name, version) {
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
 
-    self.newNode().title('Start');
+    // this is set in the VSCode extension YarnEditorPanel
+    // this is true when we're opening a file in the VSCode extension;
+    // adding that start node here was causing issues with arrows (because of race conditions)
+    if (!window.openingVsCodeFile) {
+      self.newNode().title('Start');
+    }
 
     self.settings.apply();
 
