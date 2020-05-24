@@ -413,7 +413,14 @@ export var data = {
   },
 
   trySaveCurrent: function() {
-    if (data.editingPath().length > 0 && data.editingType().length > 0) {
+    if (window.vsCodeApi) {
+      // we're in the VSCode extension, so we want to tell it to save the file
+      // the extension listens for this in YarnEditorProvider
+      window.vsCodeApi.postMessage({
+        command: 'save',
+        data: data.getSaveData(data.editingType())
+      });
+    } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
   },
