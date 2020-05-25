@@ -8,8 +8,8 @@ const getStorage = function() {
         // and it will set all of them when initializing the editor
       },
       setItem: (option, newValue) => {
-        // this message is picked up in YarnEditorWebviewPanel in the VSCode extension
-        // and is persisted to the settings there
+        // this message is picked up in YarnEditorMessageListener in the VSCode extension
+        // and is persisted to the VSCode workplace settings there
         window.vsCodeApi.postMessage(
           {
             command: 'changeSetting',
