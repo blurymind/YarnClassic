@@ -463,7 +463,7 @@ export var App = function(name, version) {
 
     self.nodeHistory.push(historyItem);
 
-    this.updateVsCodeExtensionDocument();
+    self.updateVsCodeExtensionDocument();
   };
 
   this.historyDirection = function(direction) {
@@ -496,7 +496,7 @@ export var App = function(name, version) {
       }
 
       self.nodeFuture.push(historyItem);
-      this.updateVsCodeExtensionDocument();
+      self.updateVsCodeExtensionDocument();
     } //redo undone actions
     else {
       if (action == 'created') {
@@ -506,7 +506,7 @@ export var App = function(name, version) {
       }
 
       self.nodeHistory.push(historyItem);
-      this.updateVsCodeExtensionDocument();
+      self.updateVsCodeExtensionDocument();
     }
   };
 
@@ -554,7 +554,7 @@ export var App = function(name, version) {
       self.workspace.removeNodesFromSelection(nodes[i]);
       nodes[i].remove();
     }
-    this.updateVsCodeExtensionDocument();
+    self.updateVsCodeExtensionDocument();
   };
 
   this.cloneNodeArray = function(nodeArray) {
@@ -990,7 +990,7 @@ export var App = function(name, version) {
         });
       }
 
-      this.updateVsCodeExtensionDocument();
+      self.updateVsCodeExtensionDocument();
     }
   };
 
