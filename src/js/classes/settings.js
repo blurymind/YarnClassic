@@ -1,26 +1,12 @@
 // Get the mechanism to use for storage.
 const getStorage = function() {
-  // we're in the context of the Visual Studio Code extension, send message there instead
+  // if `window.vsCodeApi` exists, we're in the context of the VSCode extension
+  // which handles all of the settings internally, so we don't need to do anything here
   if (window.vsCodeApi) {
     return {
-      getItem: () => {
-        // nothing here since settings are synced with VSCode
-        // and it will set all of them when initializing the editor
-      },
-      setItem: (option, newValue) => {
-        // this message is picked up in YarnEditorMessageListener in the VSCode extension
-        // and is persisted to the VSCode workplace settings there
-        window.vsCodeApi.postMessage(
-          {
-            command: 'changeSetting',
-            data: {
-              option,
-              newValue
-            }
-          }
-        );
-      }
-    };
+      getItem: () => {},
+      setItem: () => {}
+    }
   } else {
     return window.localStorage;
   }
