@@ -6,7 +6,7 @@ const getStorage = function() {
     return {
       getItem: () => {},
       setItem: () => {}
-    }
+    };
   } else {
     return window.localStorage;
   }

@@ -435,7 +435,7 @@ export var App = function(name, version) {
         data: data.getSaveData(data.editingType())
       });
     }
-  }
+  };
 
   this.recordNodeAction = function(action, node) {
     //we can't go forward in 'time' when
