@@ -423,11 +423,11 @@ export var App = function(name, version) {
     }
   };
 
-  // This should be called whenever we want to mark the document that the VSCcode
-  // extension has opened as changed. If we're not in the extension, this is a no-op.
-  // This should be called after every action that will result in a changed text document.
+  // This should be called whenever we want to mark the document that the VSCcode extension has opened as changed.
+  // If we're not in the extension working on an open file, this is a no-op.
+  // This should be called after every action that will result in a changed document.
   this.updateVsCodeExtensionDocument = function() {
-    if (window.vsCodeApi) {
+    if (window.vsCodeApi && window.openingVsCodeFile) {
       window.vsCodeApi.postMessage({
         command: 'documentEdit',
         
