@@ -1,14 +1,28 @@
-// In some scenarios (i.e. Visual Studio Code extension webview) we don't access to localStorage.
+// Get the mechanism to use for storage.
 const getStorage = function() {
-  try {
+  // we're in the context of the Visual Studio Code extension, send message there instead
+  if (window.vsCodeApi) {
+    return {
+      getItem: () => {
+        // nothing here since settings are synced with VSCode
+        // and it will set all of them when initializing the editor
+      },
+      setItem: (option, newValue) => {
+        // this message is picked up in YarnEditorWebviewPanel in the VSCode extension
+        // and is persisted to the settings there
+        window.vsCodeApi.postMessage(
+          {
+            command: 'changeSetting',
+            data: {
+              option,
+              newValue
+            }
+          }
+        )
+      }
+    }
+  } else {
     return window.localStorage;
-  } catch (error) {
-    // Error here is caused by:
-    // Uncaught DOMException: Failed to read the 'localStorage' property from 'Window': Storage is disabled inside 'data:' URLs.
-    return { // TODO store these in VSCode preferences?
-      setItem: () => {},
-      getItem: () => {},
-    };
   }
 };
 
