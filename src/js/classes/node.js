@@ -241,6 +241,9 @@ export let Node = function(options = {}) {
         }
 
         app.workspace.updateArrows();
+
+        // this will tell the VSCode extension that we've moved the node
+        app.updateVsCodeExtensionDocument();
       }
     });
 

@@ -423,6 +423,20 @@ export var App = function(name, version) {
     }
   };
 
+  // This should be called whenever we want to mark the document that the VSCcode
+  // extension has opened as changed. If we're not in the extension, this is a no-op.
+  // This should be called after every action that will result in a changed text document.
+  this.updateVsCodeExtensionDocument = function() {
+    if (window.vsCodeApi) {
+      window.vsCodeApi.postMessage({
+        command: 'documentEdit',
+        
+        // we just send the whole doc here every time...
+        data: data.getSaveData(data.editingType())
+      });
+    }
+  }
+
   this.recordNodeAction = function(action, node) {
     //we can't go forward in 'time' when
     //new actions have been made
@@ -448,6 +462,8 @@ export var App = function(name, version) {
     }
 
     self.nodeHistory.push(historyItem);
+
+    this.updateVsCodeExtensionDocument();
   };
 
   this.historyDirection = function(direction) {
@@ -480,6 +496,7 @@ export var App = function(name, version) {
       }
 
       self.nodeFuture.push(historyItem);
+      this.updateVsCodeExtensionDocument();
     } //redo undone actions
     else {
       if (action == 'created') {
@@ -489,6 +506,7 @@ export var App = function(name, version) {
       }
 
       self.nodeHistory.push(historyItem);
+      this.updateVsCodeExtensionDocument();
     }
   };
 
@@ -536,6 +554,7 @@ export var App = function(name, version) {
       self.workspace.removeNodesFromSelection(nodes[i]);
       nodes[i].remove();
     }
+    this.updateVsCodeExtensionDocument();
   };
 
   this.cloneNodeArray = function(nodeArray) {
@@ -970,6 +989,8 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
+
+      this.updateVsCodeExtensionDocument();
     }
   };
 
