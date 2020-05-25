@@ -18,9 +18,9 @@ const getStorage = function() {
               newValue
             }
           }
-        )
+        );
       }
-    }
+    };
   } else {
     return window.localStorage;
   }
