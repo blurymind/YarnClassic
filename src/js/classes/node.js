@@ -160,6 +160,8 @@ export let Node = function(options = {}) {
     if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
+
+    app.updateVsCodeExtensionDocument();
   };
 
   this.cycleColorUp = function() {
@@ -171,6 +173,8 @@ export let Node = function(options = {}) {
     if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
+
+    app.updateVsCodeExtensionDocument();
   };
 
   this.doCycleColorDown = function() {
