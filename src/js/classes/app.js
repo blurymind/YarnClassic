@@ -160,7 +160,7 @@ export var App = function(name, version) {
     // this is set in the VSCode extension YarnEditorPanel
     // this is true when we're opening a file in the VSCode extension;
     // adding that start node here was causing issues with arrows (because of race conditions)
-    if (!window.openingVsCodeFile) {
+    if (!window.editingVsCodeFile) {
       self.newNode().title('Start');
     }
 
@@ -427,12 +427,12 @@ export var App = function(name, version) {
   // If we're not in the extension working on an open file, this is a no-op.
   // This should be called after every action that will result in a changed document.
   this.updateVsCodeExtensionDocument = function() {
-    if (window.vsCodeApi && window.openingVsCodeFile) {
+    if (window.vsCodeApi && window.editingVsCodeFile) {
       window.vsCodeApi.postMessage({
-        command: 'documentEdit',
+        type: 'DocumentEdit',
         
         // we just send the whole doc here every time...
-        data: data.getSaveData(data.editingType())
+        payload: data.getSaveData(data.editingType())
       });
     }
   };

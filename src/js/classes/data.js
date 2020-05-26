@@ -401,7 +401,7 @@ export var data = {
   },
 
   save: function() {
-    if (window.openingVsCodeFile) {
+    if (window.editingVsCodeFile) {
       // if we're editing a file in the VSCode extension, it handles
       // saving the file on its end so we do nothing here
       return;
