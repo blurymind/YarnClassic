@@ -218,7 +218,10 @@ export var data = {
         app.nodes.push(node);
       });
     }
-    app.nodes.extend({ rateLimit: false });
+
+    // HACK to fix a KnockOut bug removing extenders
+    // app.nodes.extend({ rateLimit: false });
+    app.nodes['notifySubscribers'] = app.nodes._origNotifySubscribers;
 
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnLoadedData');
