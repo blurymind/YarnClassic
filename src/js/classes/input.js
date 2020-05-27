@@ -32,6 +32,7 @@ export const Input = function(app) {
   this.isDragging = false;
   this.isScreenTouched = false;
   this.isMiddleButtonDown = false;
+  this.isLeftButtonDown = false;
   this.isShiftDown = false;
 
   // trackMouseEvents
@@ -44,6 +45,7 @@ export const Input = function(app) {
       self.mouse.y = e.pageY;
 
       self.isMiddleButtonDown = (e.button === MouseButton.Middle);
+      this.isLeftButtonDown = (e.button === MouseButton.Left);
 
       if (app.inWorkspace()) {
         if (!e.altKey && !e.shiftKey)
@@ -97,6 +99,9 @@ export const Input = function(app) {
     $(document).on('pointerup touchend', e => {
       self.isScreenTouched = false;
       self.isDragging = false;
+
+      if (e.button === MouseButton.Left)
+        self.isLeftButtonDown = false;
 
       if (e.button === MouseButton.Middle)
         self.isMiddleButtonDown = false;
@@ -171,7 +176,11 @@ export const Input = function(app) {
           // alt+Spacebar cycles between nodes and edits the focused node
           app.editNode(app.nodes()[app.focusedNodeIdx]);
         }
-      }
+      } else if (e.keyCode === Key.Z) {
+        app.previewStory.changeTextScrollSpeed(200);
+        if (app.previewStory.vnSelectedChoice != -1)
+          app.previewStory.vnSelectChoice();
+      } 
     });
 
     // Workspace keyboard shortcuts (keydown)
@@ -306,7 +315,7 @@ export const Input = function(app) {
 
       switch (e.keyCode) {
       case Key.Z:
-        app.previewStory.changeTextScrollSpeed(200);
+        app.previewStory.changeTextScrollSpeed(10);
         if (app.previewStory.vnSelectedChoice != -1)
           app.previewStory.vnSelectChoice();
         break;
