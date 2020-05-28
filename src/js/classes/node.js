@@ -132,11 +132,29 @@ export let Node = function(options = {}) {
 
   this.x = function(inX) {
     if (inX != undefined) $(self.element).css({ x: Math.floor(inX) });
+
+    // if we don't have a style here, it means this node is in the
+    // process of being created and self.element doesn't exist yet
+    if (!self.style) {
+      return;
+    }
+
+    // m41 here corresponds to the fourth row and first column of the matrix transform
+    // this is the X value of the transform
     return Math.floor(new WebKitCSSMatrix(self.style.webkitTransform).m41);
   };
 
   this.y = function(inY) {
     if (inY != undefined) $(self.element).css({ y: Math.floor(inY) });
+
+    // if we don't have a style here, it means this node is in the
+    // process of being created and self.element doesn't exist yet
+    if (!self.style) {
+      return;
+    }
+
+    // m42 here corresponds to the fourth row and second column of the matrix transform
+    // this is the X value of the transform
     return Math.floor(new WebKitCSSMatrix(self.style.webkitTransform).m42);
   };
 
