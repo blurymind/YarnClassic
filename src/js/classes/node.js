@@ -178,6 +178,8 @@ export let Node = function(options = {}) {
     if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
+
+    app.updateVsCodeExtensionDocument();
   };
 
   this.cycleColorUp = function() {
@@ -189,6 +191,8 @@ export let Node = function(options = {}) {
     if (app.input.isShiftDown) app.matchConnectedColorID(self);
 
     if (self.selected) app.setSelectedColors(self);
+
+    app.updateVsCodeExtensionDocument();
   };
 
   this.doCycleColorDown = function() {
@@ -259,6 +263,9 @@ export let Node = function(options = {}) {
         }
 
         app.workspace.updateArrows();
+
+        // this will tell the VSCode extension that we've moved the node
+        app.updateVsCodeExtensionDocument();
       }
     });
 

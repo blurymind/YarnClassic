@@ -401,7 +401,11 @@ export var data = {
   },
 
   save: function() {
-    if (self.editingPath())
+    if (window.editingVsCodeFile) {
+      // if we're editing a file in the VSCode extension, it handles
+      // saving the file on its end so we do nothing here
+      return;
+    } else if (self.editingPath())
       self.trySaveCurrent();
     else
       self.trySave(FILETYPE.JSON);
@@ -413,14 +417,7 @@ export var data = {
   },
 
   trySaveCurrent: function() {
-    if (window.vsCodeApi) {
-      // We're in the VSCode extension, so we want to tell it to save the file.
-      // The extension listens for this in YarnEditorMessageListener
-      window.vsCodeApi.postMessage({
-        command: 'save',
-        data: data.getSaveData(data.editingType())
-      });
-    } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
+    if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
   },
