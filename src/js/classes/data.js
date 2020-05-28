@@ -405,7 +405,9 @@ export var data = {
       // if we're editing a file in the VSCode extension, it handles
       // saving the file on its end so we do nothing here
       return;
-    } else if (self.editingPath())
+    }
+    
+    if (self.editingPath())
       self.trySaveCurrent();
     else
       self.trySave(FILETYPE.JSON);
