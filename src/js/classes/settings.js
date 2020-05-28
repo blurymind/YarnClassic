@@ -44,6 +44,7 @@ export const Settings = function(app) {
     app.setTheme(self.theme());
     app.setLanguage(self.language());
     app.toggleNightMode();
+    app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
   };
 
