@@ -554,6 +554,11 @@ input[type='checkbox'] {
   background-color: rgb(255, 255, 172);
 }
 
+#edit-node-in-vscode {
+  float: right;
+  font-size: 125%;
+}
+
 /* SPECIAL CHECKBOX START */
 .styled-checkbox input {
   -webkit-transition-duration: 0.4s; /* Safari */

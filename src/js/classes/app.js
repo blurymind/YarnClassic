@@ -363,6 +363,27 @@ export var App = function(name, version) {
         );
       }
     };
+
+    // this is how the VSCode extension sends its messages back to the app
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+
+      // sent whenever the temporary file that's open gets changed
+      if (message.type === 'UpdateNode') {
+        self.nodes().forEach(node => {
+          if (
+            node
+              .title()
+              .trim()
+              .toLowerCase() === message.payload.nodeName.trim().toLowerCase()
+          ) {
+            node.body(message.payload.nodeText);
+            self.updateVsCodeExtensionDocument();
+          }
+        });
+      }
+    });
+
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnReady');
     event.document = document;
@@ -624,6 +645,27 @@ export var App = function(name, version) {
       },
     });
   };
+
+  // called by the "Edit in Visual Studio Code Text Editor" button
+  // this sends a message to the extension telling it to open the node in a text editor
+  this.editNodeInVisualStudioCodeEditor = function(node) {
+    if (window.vsCodeApi) {
+      // updating the document is actually a trick to force VSCode to think the open document is
+      // dirty so that if it's not "pinned" it won't close when the editor swaps
+      self.updateVsCodeExtensionDocument();
+
+      // tell VSCode extension to open our node in a new editor
+      window.vsCodeApi.postMessage({
+        type: "OpenNode",
+        payload: {
+          nodeName: node.title().trim().toLowerCase(),
+          nodeText: self.trimBodyLinks(node.body().trim())
+        }
+      });
+
+      return;
+    }
+  }
 
   this.editNode = function(node) {
     if (!node.active()) {
