@@ -21,7 +21,7 @@
         class="search-field"
         placeholder="Search"
         autocomplete="off"
-        oninput="app.ui.openNodeListMenu('open')" onclick="app.ui.openNodeListMenu('open')">
+        oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
 
         <span>
           <span class="search-title styled-checkbox">
@@ -247,7 +247,7 @@
 
       <div class="editor-container">
         <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
-        <div class="editor-play" id="editor-play" onpointermove="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
+        <div class="editor-play" id="editor-play" onpointerdown="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
           <p id="NVrichTextLabel"></p>
           <div id="commandDebugLabel"></div>
         </div>
