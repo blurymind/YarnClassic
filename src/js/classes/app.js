@@ -659,6 +659,13 @@ export var App = function(name, version) {
       return;
     }
 
+    // this is a setting that can only be set by the VSCode extension
+    // if it's true, when we go to edit a node we actually open it in VSCode's text editor
+    if (self.settings.alwaysOpenNodesInVisualStudioCodeEditor()) {
+      self.editNodeInVisualStudioCodeEditor(node);
+      return;
+    }
+
     // Make sure we save the node being currently edited before editing a new
     // one using the context menu
     if (self.editing() && self.editing() !== node)
