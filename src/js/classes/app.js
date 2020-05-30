@@ -456,13 +456,13 @@ export var App = function(name, version) {
   this.usingVisualStudioCodeExtension = function() {
     // this is put on window by the extension
     return !!window.vsCodeApi;
-  }
+  };
 
   // returns `true` if we're opening a file in the VSCode extension
   // (as opposed to running the full editor)
   this.editingVisualStudioCodeFile = function() {
     return window.editingVsCodeFile === true;
-  }
+  };
 
   // This should be called whenever we want to mark the document that the VSCcode extension has opened as changed.
   // If we're not in the extension working on an open file, this is a no-op.
