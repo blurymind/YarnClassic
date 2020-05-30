@@ -263,9 +263,6 @@ export let Node = function(options = {}) {
         }
 
         app.workspace.updateArrows();
-
-        // this will tell the VSCode extension that we've moved the node
-        app.updateVsCodeExtensionDocument();
       }
     });
 
@@ -291,6 +288,9 @@ export let Node = function(options = {}) {
     $(self.element).on('pointerup touchend', function(e) {
       dragging = false;
       groupDragging = false;
+
+      // this will tell the VSCode extension that we've moved the node
+      app.updateVsCodeExtensionDocument();
     });
   };
 
