@@ -160,7 +160,7 @@ export var App = function(name, version) {
     // this is set in the VSCode extension YarnEditorPanel
     // this is true when we're opening a file in the VSCode extension;
     // adding that start node here was causing issues with arrows (because of race conditions)
-    if (!window.editingVsCodeFile) {
+    if (!self.editingVisualStudioCodeFile()) {
       self.newNode().title('Start');
     }
 
@@ -452,11 +452,23 @@ export var App = function(name, version) {
     }
   };
 
+  // returns `true` is we're in the VSCode extension
+  this.usingVisualStudioCodeExtension = function() {
+    // this is put on window by the extension
+    return !!window.vsCodeApi;
+  }
+
+  // returns `true` if we're opening a file in the VSCode extension
+  // (as opposed to running the full editor)
+  this.editingVisualStudioCodeFile = function() {
+    return window.editingVsCodeFile === true;
+  }
+
   // This should be called whenever we want to mark the document that the VSCcode extension has opened as changed.
   // If we're not in the extension working on an open file, this is a no-op.
   // This should be called after every action that will result in a changed document.
   this.updateVsCodeExtensionDocument = function() {
-    if (window.vsCodeApi && window.editingVsCodeFile) {
+    if (self.usingVisualStudioCodeExtension() && self.editingVisualStudioCodeFile()) {
       window.vsCodeApi.postMessage({
         type: 'DocumentEdit',
         
@@ -763,7 +775,7 @@ export var App = function(name, version) {
   // called by the "Edit in Visual Studio Code Text Editor" button
   // this sends a message to the extension telling it to open the node in a text editor
   this.editNodeInVisualStudioCodeEditor = function(node) {
-    if (window.vsCodeApi) {
+    if (self.usingVisualStudioCodeExtension()) {
       // updating the document is actually a trick to force VSCode to think the open document is
       // dirty so that if it's not "pinned" it won't close when the editor swaps
       self.updateVsCodeExtensionDocument();
@@ -777,6 +789,8 @@ export var App = function(name, version) {
           body: self.trimBodyLinks(node.body().trim())
         }
       });
+    } else {
+      console.error('Tried to open node in Visual Studio Code text editor but we\'re not in the Visual Studio Code extension');
     }
   };
 

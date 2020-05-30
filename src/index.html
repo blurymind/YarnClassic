@@ -176,7 +176,7 @@
 
           <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
           
-          <!-- ko if:vsCodeApi != null -->
+          <!-- ko if:app.usingVisualStudioCodeExtension() -->
           <button class="bbcode-button" id="edit-node-in-vscode" onclick="app.editNodeInVisualStudioCodeEditor(app.editing())">🛠️ Edit in Visual Studio Code Text Editor</button>
           <!-- /ko -->
 
