@@ -369,26 +369,26 @@ export var App = function(name, version) {
       const message = event.data;
 
       switch (message.type) {
-        // sent whenever the temporary file that's open gets changed
-        case 'UpdateNode':
-          // find the node that was being edited... we check originalNodeTitle here
-          // since it's possible that the user changed the node's title in the editor
-          self.nodes().forEach(node => {
-            if (
-              node.title().trim() ===
-              message.payload.originalNodeTitle.trim()
-            ) {
-              node.title(message.payload.title);
-              node.tags(message.payload.tags);
-              node.body(message.payload.body);
+      // sent whenever the temporary file that's open gets changed
+      case 'UpdateNode':
+        // find the node that was being edited... we check originalNodeTitle here
+        // since it's possible that the user changed the node's title in the editor
+        self.nodes().forEach(node => {
+          if (
+            node.title().trim() ===
+            message.payload.originalNodeTitle.trim()
+          ) {
+            node.title(message.payload.title);
+            node.tags(message.payload.tags);
+            node.body(message.payload.body);
 
-              // re-send the document back to the extension so it updates its underlying text document
-              self.updateVsCodeExtensionDocument();
-            }
-          });
-          break;
-        default:
-          break;
+            // re-send the document back to the extension so it updates its underlying text document
+            self.updateVsCodeExtensionDocument();
+          }
+        });
+        break;
+      default:
+        break;
       }
     });
 
@@ -770,7 +770,7 @@ export var App = function(name, version) {
 
       // tell VSCode extension to open our node in a new editor
       window.vsCodeApi.postMessage({
-        type: "OpenNode",
+        type: 'OpenNode',
         payload: {
           title: node.title().trim(),
           tags: node.tags().trim(),
@@ -778,7 +778,7 @@ export var App = function(name, version) {
         }
       });
     }
-  }
+  };
 
   this.chooseRelativePathImage = function(imagePath) {
     self.insertTextAtCursor(imagePath);
