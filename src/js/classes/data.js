@@ -404,10 +404,10 @@ export var data = {
   },
 
   save: function() {
-    if (self.editingPath())
-      self.trySaveCurrent();
+    if (data.editingPath())
+      data.trySaveCurrent();
     else
-      self.trySave(FILETYPE.JSON);
+      data.trySave(FILETYPE.JSON);
   },
 
   trySave: function(type) {
