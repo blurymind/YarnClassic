@@ -368,19 +368,27 @@ export var App = function(name, version) {
     window.addEventListener('message', (event) => {
       const message = event.data;
 
-      // sent whenever the temporary file that's open gets changed
-      if (message.type === 'UpdateNode') {
-        self.nodes().forEach(node => {
-          if (
-            node
-              .title()
-              .trim()
-              .toLowerCase() === message.payload.nodeName.trim().toLowerCase()
-          ) {
-            node.body(message.payload.nodeText);
-            self.updateVsCodeExtensionDocument();
-          }
-        });
+      switch (message.type) {
+        // sent whenever the temporary file that's open gets changed
+        case 'UpdateNode':
+          // find the node that was being edited... we check originalNodeTitle here
+          // since it's possible that the user changed the node's title in the editor
+          self.nodes().forEach(node => {
+            if (
+              node.title().trim() ===
+              message.payload.originalNodeTitle.trim()
+            ) {
+              node.title(message.payload.title);
+              node.tags(message.payload.tags);
+              node.body(message.payload.body);
+
+              // re-send the document back to the extension so it updates its underlying text document
+              self.updateVsCodeExtensionDocument();
+            }
+          });
+          break;
+        default:
+          break;
       }
     });
 
@@ -646,27 +654,6 @@ export var App = function(name, version) {
     });
   };
 
-  // called by the "Edit in Visual Studio Code Text Editor" button
-  // this sends a message to the extension telling it to open the node in a text editor
-  this.editNodeInVisualStudioCodeEditor = function(node) {
-    if (window.vsCodeApi) {
-      // updating the document is actually a trick to force VSCode to think the open document is
-      // dirty so that if it's not "pinned" it won't close when the editor swaps
-      self.updateVsCodeExtensionDocument();
-
-      // tell VSCode extension to open our node in a new editor
-      window.vsCodeApi.postMessage({
-        type: "OpenNode",
-        payload: {
-          nodeName: node.title().trim().toLowerCase(),
-          nodeText: self.trimBodyLinks(node.body().trim())
-        }
-      });
-
-      return;
-    }
-  }
-
   this.editNode = function(node) {
     if (!node.active()) {
       return;
@@ -765,6 +752,26 @@ export var App = function(name, version) {
     self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
   };
+
+  // called by the "Edit in Visual Studio Code Text Editor" button
+  // this sends a message to the extension telling it to open the node in a text editor
+  this.editNodeInVisualStudioCodeEditor = function(node) {
+    if (window.vsCodeApi) {
+      // updating the document is actually a trick to force VSCode to think the open document is
+      // dirty so that if it's not "pinned" it won't close when the editor swaps
+      self.updateVsCodeExtensionDocument();
+
+      // tell VSCode extension to open our node in a new editor
+      window.vsCodeApi.postMessage({
+        type: "OpenNode",
+        payload: {
+          title: node.title().trim(),
+          tags: node.tags().trim(),
+          body: self.trimBodyLinks(node.body().trim())
+        }
+      });
+    }
+  }
 
   this.chooseRelativePathImage = function(imagePath) {
     self.insertTextAtCursor(imagePath);
