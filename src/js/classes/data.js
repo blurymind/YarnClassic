@@ -4,7 +4,7 @@ const saveAs = require('file-saver');
 import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 
-export var data = {
+export const data = {
   editingPath: ko.observable(null),
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
@@ -222,6 +222,8 @@ export var data = {
     // HACK to fix a KnockOut bug removing extenders
     // app.nodes.extend({ rateLimit: false });
     app.nodes['notifySubscribers'] = app.nodes._origNotifySubscribers;
+
+    app.updateNodeLinks();
 
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnLoadedData');

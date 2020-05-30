@@ -104,13 +104,6 @@ export var App = function(name, version) {
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     if (navigator.platform.indexOf('Linux') != -1) osName = 'Linux';
     self.isElectron = navigator.userAgent.toLowerCase().includes('electron');
-    window.addEventListener('yarnLoadedData', e => {
-      $('.arrows')
-        .css({ opacity: 0 })
-        .transition({ opacity: 1 }, 500);
-
-      self.updateNodeLinks();
-    });
 
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (
