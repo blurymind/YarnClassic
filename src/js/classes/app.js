@@ -58,7 +58,6 @@ export var App = function(name, version) {
   this.name = ko.observable(name);
   this.version = ko.observable(version);
   this.editing = ko.observable(null);
-  this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
   this.mustRefreshNodes = ko.observable();
@@ -511,18 +510,55 @@ export var App = function(name, version) {
       });
 
       self.nodes.push(node);
-      self.workspace.addNodesToSelection(node);
+      self.workspace.selectNodes(node);
       self.recordNodeAction('created', node);
     });
 
     self.updateNodeLinks();
   };
 
-  this.deleteSelectedNodes = function() {
-    var nodes = self.workspace.getSelectedNodes();
-    for (var i in nodes) {
-      self.workspace.removeNodesFromSelection(nodes[i]);
-      nodes[i].remove();
+  this.confirmDeleteNodes = function(toDelete) {
+    const node = Array.isArray(toDelete) ? undefined : toDelete;
+    const selected = Array.isArray(toDelete) ?
+      [...toDelete] :
+      node && node.selected ?
+        [...self.workspace.getSelectedNodes()] :
+        [toDelete];
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `${selected.length} ${selected.length === 1 ? 'node' : 'nodes'} will be deleted.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.value) {
+        self.deleteNodes(selected);
+      }
+    });
+  };
+
+  this.deleteNodes = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    let i = list.length;
+    while (i--) {
+      const node = list[i];
+      node.remove(() => {
+        self.deleteNode(node);
+      });
+    }
+    self.workspace.deselectNodes(list);
+    self.updateNodeLinks();
+    self.workspace.updateArrows();
+  };
+
+  this.deleteNode = function(node) {
+    const index = self.nodes.indexOf(node);
+    if (index >= 0) {
+      self.recordNodeAction('removed', node);
+      self.nodes.splice(index, 1);
     }
   };
 
@@ -561,18 +597,6 @@ export var App = function(name, version) {
     self.recordNodeAction('created', node);
 
     return node;
-  };
-
-  this.removeNode = function(node) {
-    if (node.selected) {
-      self.deleteSelectedNodes();
-    }
-    var index = self.nodes.indexOf(node);
-    if (index >= 0) {
-      self.recordNodeAction('removed', node);
-      self.nodes.splice(index, 1);
-    }
-    self.updateNodeLinks();
   };
 
   this.searchTextInEditor = function(show = true) {

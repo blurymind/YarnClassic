@@ -148,7 +148,7 @@
           <div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>
           <div class="icon colorUp" data-bind="click: node.cycleColorUp"></div>
           <!--<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>-->
-          <div class="icon delete" data-bind="click: node.tryRemove"></div>
+          <div class="icon delete" data-bind="click: () => app.confirmDeleteNodes(node)"></div>
           <!--<div class="resize" data-bind="click:node.toggleExpand"></div>-->
         </div>
       </div>
@@ -270,24 +270,6 @@
     </div>
 
   </div>
-</div>
-<!-- /ko -->
-<!-- ko if:app.deleting() != null -->
-<div class="node-delete" data-bind="click: function() { app.deleting(null); }">
-
-  <div class="form" data-bind="preventBubble: 'click'">
-    <!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length > 1)) -->
-    <div>Remove all selected</div>
-    <!-- /ko -->
-    <!-- ko ifnot: (app.deleting().selected) -->
-    <div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
-    <!-- /ko -->
-    <!-- ko if: (app.deleting().selected && (app.getSelectedNodes().length == 1)) -->
-    <div>Remove <span data-bind="text: app.deleting().title"></span>?</div>
-    <!-- /ko -->
-    <div class="icon close" data-bind="click:app.deleting().remove;"></div>
-  </div>
-
 </div>
 <!-- /ko -->
 
