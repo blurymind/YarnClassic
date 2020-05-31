@@ -358,6 +358,15 @@ export var App = function(name, version) {
     window.parent.dispatchEvent(event);
   };
 
+  this.limitNodesUpdate = function (limit = false) {
+    if (limit){
+      self.nodes.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 } });
+    }
+    else {
+      self.nodes.extend({ rateLimit: { method: 'notifyAtFixedRate', timeout: 0 } });
+    }
+  };
+
   this.getNodesConnectedTo = function(toNode) {
     var connectedNodes = [];
     var nodes = self.nodes();
@@ -542,16 +551,24 @@ export var App = function(name, version) {
 
   this.deleteNodes = function(nodes) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
-    let i = list.length;
-    while (i--) {
-      const node = list[i];
-      node.remove(() => {
-        self.deleteNode(node);
+    const promises = [];
+
+    for (let i = list.length-1; i >= 0; --i)
+      promises.push( list[i].remove() );
+
+    Promise.all(promises)
+      .then( () => {
+        self.limitNodesUpdate(true);
+        {
+          for (let i = list.length-1; i >= 0; --i)
+            self.deleteNode(list[i]);
+
+          self.updateNodeLinks();
+          self.workspace.deselectNodes(list);
+          self.workspace.updateArrows();
+        }
+        self.limitNodesUpdate(false);
       });
-    }
-    self.workspace.deselectNodes(list);
-    self.updateNodeLinks();
-    self.workspace.updateArrows();
   };
 
   this.deleteNode = function(node) {

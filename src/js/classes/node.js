@@ -176,15 +176,15 @@ export let Node = function(options = {}) {
     if (self.colorID() > 8) self.colorID(0);
   };
 
-  this.remove = function(callback) {
-    $(self.element).transition(
-      { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
-      250,
-      'easeInQuad',
-      () => {
-        callback && callback();
-      }
-    );
+  this.remove = async function() {
+    return new Promise( (resolve, reject) => {
+      $(self.element).transition(
+        { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
+        250,
+        'easeInQuad',
+        resolve
+      );
+    });
   };
 
   this.drag = function() {
