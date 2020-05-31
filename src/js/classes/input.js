@@ -1,3 +1,5 @@
+import { FILETYPE } from './utils';
+
 export const Input = function(app) {
   const self = this;
 
@@ -180,7 +182,7 @@ export const Input = function(app) {
         app.previewStory.changeTextScrollSpeed(200);
         if (app.previewStory.vnSelectedChoice != -1)
           app.previewStory.vnSelectChoice();
-      } 
+      }
     });
 
     // Workspace keyboard shortcuts (keydown)

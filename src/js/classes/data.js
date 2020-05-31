@@ -4,7 +4,7 @@ const saveAs = require('file-saver');
 import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 
-export var data = {
+export const data = {
   editingPath: ko.observable(null),
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
@@ -223,6 +223,8 @@ export var data = {
     // app.nodes.extend({ rateLimit: false });
     app.nodes['notifySubscribers'] = app.nodes._origNotifySubscribers;
 
+    app.updateNodeLinks();
+
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnLoadedData');
     event.document = document;
@@ -409,11 +411,11 @@ export var data = {
       // saving the file on its end so we do nothing here
       return;
     }
-    
-    if (self.editingPath())
-      self.trySaveCurrent();
+
+    if (data.editingPath())
+      data.trySaveCurrent();
     else
-      self.trySave(FILETYPE.JSON);
+      data.trySave(FILETYPE.JSON);
   },
 
   trySave: function(type) {
