@@ -200,8 +200,7 @@ export const data = {
         for (i = 0; i < content.length; i++) objects.push(content[i]);
     }
 
-    app.limitNodesUpdate(true);
-    {
+    app.limitNodesUpdate( () => {
       if (clearNodes)
         app.nodes.removeAll();
 
@@ -217,8 +216,7 @@ export const data = {
 
         app.nodes.push(node);
       });
-    }
-    app.limitNodesUpdate(false);
+    });
 
     app.updateNodeLinks();
 
