@@ -79,18 +79,14 @@ export var App = function(name, version) {
   // inEditor
   //
   // Indicates if we are in the editor view
-  this.inEditor = () => self.editing();
+  this.inEditor = () =>
+    self.editing() && !self.ui.isDialogOpen();
 
   // inWorkspace
   //
   // Indicates if we are in the workspace view
   this.inWorkspace = () =>
-    !self.editing() && !self.ui.settingsDialogVisible();
-
-  // inSettingsDialog
-  //
-  // Indicates if we are in the settings dialog
-  this.inSettingsDialog = () => self.ui.settingsDialogVisible();
+    !self.editing() && !self.ui.isDialogOpen();
 
   // run
   //
@@ -531,19 +527,21 @@ export var App = function(name, version) {
         [...self.workspace.getSelectedNodes()] :
         [toDelete];
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `${selected.length} ${selected.length === 1 ? 'node' : 'nodes'} will be deleted.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete!',
-      cancelButtonText: 'No, cancel!',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.value) {
-        self.deleteNodes(selected);
-      }
-    });
+    if (selected.length) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `${selected.length} ${selected.length === 1 ? 'node' : 'nodes'} will be deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+          self.deleteNodes(selected);
+        }
+      });
+    }
   };
 
   this.deleteNodes = function(nodes) {
