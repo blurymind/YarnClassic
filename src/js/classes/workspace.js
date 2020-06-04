@@ -279,12 +279,12 @@ export const Workspace = function(app) {
       const marqueeOverNode = Utils.rectanglesOverlap(marqueeCoords, nodeCoords);
 
       if (marqueeOverNode && !alreadySelected) {
-        self.addNodesToSelection(node);
+        self.selectNodes(node);
         self.marqueeSelection.push(node);
       }
 
       if (!marqueeOverNode && alreadySelected) {
-        self.removeNodesFromSelection(node);
+        self.deselectNodes(node);
         self.marqueeSelection.splice(index, 1);
       }
     });
@@ -462,20 +462,20 @@ export const Workspace = function(app) {
   //
   // Select all nodes on the workspace
   this.selectAll = function() {
-    self.addNodesToSelection(app.nodes());
+    self.selectNodes(app.nodes());
   };
 
   // deselectAll
   //
   // Deselect all nodes on the workspace
   this.deselectAll = function() {
-    self.removeNodesFromSelection(app.nodes());
+    self.deselectNodes(app.nodes());
   };
 
-  // addNodesToSelection
+  // selectNodes
   //
   // Adds nodes to the list of selected nodes
-  this.addNodesToSelection = function(nodes) {
+  this.selectNodes = function(nodes) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
     for(let node of list) {
       if (!self.selectedNodes.includes(node)){
@@ -485,10 +485,10 @@ export const Workspace = function(app) {
     }
   };
 
-  // removeNodesFromSelection
+  // deselectNodes
   //
   // Removes nodes from the list of selected nodes
-  this.removeNodesFromSelection = function(nodes) {
+  this.deselectNodes = function(nodes) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
     for(let node of list) {
       const index = self.selectedNodes.indexOf(node);

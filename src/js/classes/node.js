@@ -113,8 +113,8 @@ export let Node = function(options = {}) {
 
     $(self.element).on('click', function(e) {
       if (e.ctrlKey) {
-        if (self.selected) app.workspace.removeNodesFromSelection(self);
-        else app.workspace.addNodesToSelection(self);
+        if (self.selected) app.workspace.deselectNodes(self);
+        else app.workspace.selectNodes(self);
       }
     });
   };
@@ -142,13 +142,6 @@ export let Node = function(options = {}) {
 
   this.resetDoubleClick = function() {
     self.canDoubleClick = true;
-  };
-
-  this.tryRemove = function() {
-    if (self.active()) app.deleting(this);
-
-    setTimeout(self.resetDoubleClick, 500);
-    self.canDoubleClick = false;
   };
 
   this.cycleColorDown = function() {
@@ -183,17 +176,15 @@ export let Node = function(options = {}) {
     if (self.colorID() > 8) self.colorID(0);
   };
 
-  this.remove = function() {
-    $(self.element).transition(
-      { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
-      250,
-      'easeInQuad',
-      function() {
-        app.removeNode(self);
-        app.workspace.updateArrows();
-      }
-    );
-    app.deleting(null);
+  this.remove = async function() {
+    return new Promise( (resolve, reject) => {
+      $(self.element).transition(
+        { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
+        250,
+        'easeInQuad',
+        resolve
+      );
+    });
   };
 
   this.drag = function() {
