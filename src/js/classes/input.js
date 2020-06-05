@@ -296,7 +296,7 @@ export const Input = function(app) {
 
     // Settings dialog shortcuts
     $(document).on('keydown', function(e) {
-      if (!app.inSettingsDialog())
+      if (!app.ui.settingsDialogVisible())
         return;
 
       switch (e.keyCode) {

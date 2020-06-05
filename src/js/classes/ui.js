@@ -77,6 +77,12 @@ export const UI = function(app) {
       .transition({ y: '-100' }, 250);
   };
 
+  // isDialogOpen
+  this.isDialogOpen = function () {
+    return self.settingsDialogVisible() ||
+      $('.swal2-popup').length > 0;
+  };
+
   // confirmMarkupConversion
   this.confirmMarkupConversion = function () {
     Swal.fire({
