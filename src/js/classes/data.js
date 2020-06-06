@@ -200,8 +200,7 @@ export const data = {
         for (i = 0; i < content.length; i++) objects.push(content[i]);
     }
 
-    app.nodes.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 } });
-    {
+    app.limitNodesUpdate( () => {
       if (clearNodes)
         app.nodes.removeAll();
 
@@ -217,11 +216,7 @@ export const data = {
 
         app.nodes.push(node);
       });
-    }
-
-    // HACK to fix a KnockOut bug removing extenders
-    // app.nodes.extend({ rateLimit: false });
-    app.nodes['notifySubscribers'] = app.nodes._origNotifySubscribers;
+    });
 
     app.updateNodeLinks();
 

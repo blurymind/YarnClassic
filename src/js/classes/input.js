@@ -210,19 +210,21 @@ export const Input = function(app) {
         case Key.O: app.data.tryOpenFile(); break; // ctrl+o
         case Key.S: app.data.save(); break; // ctrl+s
         case Key.X: // ctrl+x
-          app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
-          app.deleteSelectedNodes();
+          const selected = app.workspace.getSelectedNodes();
+          app.nodeClipboard = app.cloneNodeArray(selected);
+          app.deleteNodes(selected);
           break;
         case Key.Y: app.historyDirection('redo'); break; // ctrl+y
         case Key.Z: app.historyDirection('undo'); break; // ctrl+z
         }
       }
       else {
-        if (e.keyCode === Key.Delete || e.key === 'Delete')
-          app.deleteSelectedNodes();
-
+        // Delete
+        if (e.keyCode === Key.Delete || e.key === 'Delete') {
+          app.confirmDeleteNodes(app.workspace.getSelectedNodes());
+        }
         // Arrows
-        if (!app.$searchField.is(':focus') && !e.ctrlKey && !e.metaKey) {
+        else if (!app.$searchField.is(':focus') && !e.ctrlKey && !e.metaKey) {
           if (e.keyCode === Key.A || e.keyCode === Key.Left) // a or left arrow
             app.workspace.onPanLeft();
           else if (e.keyCode === Key.D || e.keyCode === Key.Right) // d or right arrow
@@ -294,7 +296,7 @@ export const Input = function(app) {
 
     // Settings dialog shortcuts
     $(document).on('keydown', function(e) {
-      if (!app.inSettingsDialog())
+      if (!app.ui.settingsDialogVisible())
         return;
 
       switch (e.keyCode) {

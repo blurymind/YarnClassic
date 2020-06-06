@@ -58,7 +58,6 @@ export var App = function(name, version) {
   this.name = ko.observable(name);
   this.version = ko.observable(version);
   this.editing = ko.observable(null);
-  this.deleting = ko.observable(null);
   this.nodes = ko.observableArray([]);
   this.tags = ko.observableArray([]);
   this.mustRefreshNodes = ko.observable();
@@ -80,18 +79,14 @@ export var App = function(name, version) {
   // inEditor
   //
   // Indicates if we are in the editor view
-  this.inEditor = () => self.editing();
+  this.inEditor = () =>
+    self.editing() && !self.ui.isDialogOpen();
 
   // inWorkspace
   //
   // Indicates if we are in the workspace view
   this.inWorkspace = () =>
-    !self.editing() && !self.ui.settingsDialogVisible();
-
-  // inSettingsDialog
-  //
-  // Indicates if we are in the settings dialog
-  this.inSettingsDialog = () => self.ui.settingsDialogVisible();
+    !self.editing() && !self.ui.isDialogOpen();
 
   // run
   //
@@ -393,6 +388,12 @@ export var App = function(name, version) {
     window.parent.dispatchEvent(event);
   };
 
+  this.limitNodesUpdate = function ( fn ) {
+    self.nodes.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 } });
+    fn();
+    self.nodes.limit( callback => () => callback() );
+  };
+
   this.getNodesConnectedTo = function(toNode) {
     var connectedNodes = [];
     var nodes = self.nodes();
@@ -575,18 +576,63 @@ export var App = function(name, version) {
       });
 
       self.nodes.push(node);
-      self.workspace.addNodesToSelection(node);
+      self.workspace.selectNodes(node);
       self.recordNodeAction('created', node);
     });
 
     self.updateNodeLinks();
   };
 
-  this.deleteSelectedNodes = function() {
-    var nodes = self.workspace.getSelectedNodes();
-    for (var i in nodes) {
-      self.workspace.removeNodesFromSelection(nodes[i]);
-      nodes[i].remove();
+  this.confirmDeleteNodes = function(toDelete) {
+    const node = Array.isArray(toDelete) ? undefined : toDelete;
+    const selected = Array.isArray(toDelete) ?
+      [...toDelete] :
+      node && node.selected ?
+        [...self.workspace.getSelectedNodes()] :
+        [toDelete];
+
+    if (selected.length) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `${selected.length} ${selected.length === 1 ? 'node' : 'nodes'} will be deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+          self.deleteNodes(selected);
+        }
+      });
+    }
+  };
+
+  this.deleteNodes = function(nodes) {
+    const list = Array.isArray(nodes) ? nodes : [nodes];
+    const promises = [];
+
+    for (let i = list.length-1; i >= 0; --i)
+      promises.push( list[i].remove() );
+
+    Promise.all(promises)
+      .then( () => {
+        self.limitNodesUpdate( () => {
+          for (let i = list.length-1; i >= 0; --i)
+            self.deleteNode(list[i]);
+
+          self.updateNodeLinks();
+          self.workspace.deselectNodes(list);
+          self.workspace.updateArrows();
+        });
+      });
+  };
+
+  this.deleteNode = function(node) {
+    const index = self.nodes.indexOf(node);
+    if (index >= 0) {
+      self.recordNodeAction('removed', node);
+      self.nodes.splice(index, 1);
     }
     self.updateVsCodeExtensionDocument();
   };
@@ -626,18 +672,6 @@ export var App = function(name, version) {
     self.recordNodeAction('created', node);
 
     return node;
-  };
-
-  this.removeNode = function(node) {
-    if (node.selected) {
-      self.deleteSelectedNodes();
-    }
-    var index = self.nodes.indexOf(node);
-    if (index >= 0) {
-      self.recordNodeAction('removed', node);
-      self.nodes.splice(index, 1);
-    }
-    self.updateNodeLinks();
   };
 
   this.searchTextInEditor = function(show = true) {
