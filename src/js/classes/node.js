@@ -172,7 +172,7 @@ export let Node = function(options = {}) {
 
     if (self.selected) app.setSelectedColors(self);
 
-    app.updateVsCodeExtensionDocument();
+    app.setYarnDocumentIsDirty();
   };
 
   this.cycleColorUp = function() {
@@ -185,7 +185,7 @@ export let Node = function(options = {}) {
 
     if (self.selected) app.setSelectedColors(self);
 
-    app.updateVsCodeExtensionDocument();
+    app.setYarnDocumentIsDirty();
   };
 
   this.doCycleColorDown = function() {
@@ -281,7 +281,7 @@ export let Node = function(options = {}) {
       groupDragging = false;
 
       // this will tell the VSCode extension that we've moved the node
-      app.updateVsCodeExtensionDocument();
+      app.setYarnDocumentIsDirty();
     });
   };
 

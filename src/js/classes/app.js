@@ -371,7 +371,7 @@ export var App = function(name, version) {
             node.body(message.payload.body);
 
             // re-send the document back to the extension so it updates its underlying text document
-            self.updateVsCodeExtensionDocument();
+            self.setYarnDocumentIsDirty();
           }
         });
         break;
@@ -458,10 +458,9 @@ export var App = function(name, version) {
     return window.editingVsCodeFile === true;
   };
 
-  // This should be called whenever we want to mark the document that the VSCcode extension has opened as changed.
-  // If we're not in the extension working on an open file, this is a no-op.
-  // This should be called after every action that will result in a changed document.
-  this.updateVsCodeExtensionDocument = function() {
+  // This should be called whenever we want to mark the document as changed.
+  this.setYarnDocumentIsDirty = function() {
+    // If we're in the VSCode extension, send it an update
     if (self.usingVisualStudioCodeExtension() && self.editingVisualStudioCodeFile()) {
       window.vsCodeApi.postMessage({
         type: 'DocumentEdit',
@@ -498,7 +497,7 @@ export var App = function(name, version) {
 
     self.nodeHistory.push(historyItem);
 
-    self.updateVsCodeExtensionDocument();
+    self.setYarnDocumentIsDirty();
   };
 
   this.historyDirection = function(direction) {
@@ -531,7 +530,7 @@ export var App = function(name, version) {
       }
 
       self.nodeFuture.push(historyItem);
-      self.updateVsCodeExtensionDocument();
+      self.setYarnDocumentIsDirty();
     } //redo undone actions
     else {
       if (action == 'created') {
@@ -541,7 +540,7 @@ export var App = function(name, version) {
       }
 
       self.nodeHistory.push(historyItem);
-      self.updateVsCodeExtensionDocument();
+      self.setYarnDocumentIsDirty();
     }
   };
 
@@ -634,7 +633,7 @@ export var App = function(name, version) {
       self.recordNodeAction('removed', node);
       self.nodes.splice(index, 1);
     }
-    self.updateVsCodeExtensionDocument();
+    self.setYarnDocumentIsDirty();
   };
 
   this.cloneNodeArray = function(nodeArray) {
@@ -805,7 +804,7 @@ export var App = function(name, version) {
     if (self.usingVisualStudioCodeExtension()) {
       // updating the document is actually a trick to force VSCode to think the open document is
       // dirty so that if it's not "pinned" it won't close when the editor swaps
-      self.updateVsCodeExtensionDocument();
+      self.setYarnDocumentIsDirty();
 
       // tell VSCode extension to open our node in a new editor
       window.vsCodeApi.postMessage({
@@ -1087,7 +1086,7 @@ export var App = function(name, version) {
         });
       }
 
-      self.updateVsCodeExtensionDocument();
+      self.setYarnDocumentIsDirty();
     }
   };
 
