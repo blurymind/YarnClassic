@@ -76,6 +76,8 @@ input[type='checkbox'] {
 
 #app {
   position: absolute;
+  top: 0px;
+  left: 0px;
   width: 100%;
   height: 100%;
   cursor: default;
@@ -550,6 +552,11 @@ input[type='checkbox'] {
 .node-editor .form .bbcode-toolbar .bbcode-button:active {
   color: purple;
   background-color: rgb(255, 255, 172);
+}
+
+#edit-node-in-vscode {
+  float: right;
+  font-size: 125%;
 }
 
 /* SPECIAL CHECKBOX START */

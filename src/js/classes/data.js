@@ -401,6 +401,12 @@ export const data = {
   },
 
   save: function() {
+    if (app.editingVisualStudioCodeFile()) {
+      // if we're editing a file in the VSCode extension, it handles
+      // saving the file on its end so we do nothing here
+      return;
+    }
+
     if (data.editingPath())
       data.trySaveCurrent();
     else

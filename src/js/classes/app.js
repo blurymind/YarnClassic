@@ -31,7 +31,7 @@ export var App = function(name, version) {
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
     const theme = document.getElementById('theme-stylesheet');
-    theme.href = `./public/themes/${themeName}.css`;
+    theme.href = Utils.getPublicPath(`themes/${themeName}.css`);
   };
 
   this.setLanguage = function(language, e) {
@@ -145,7 +145,12 @@ export var App = function(name, version) {
     $('#app').show();
     ko.applyBindings(self, $('#app')[0]);
 
-    self.newNode().title('Start');
+    // this is set in the VSCode extension YarnEditorPanel
+    // this is true when we're opening a file in the VSCode extension;
+    // adding that start node here was causing issues with arrows (because of race conditions)
+    if (!self.editingVisualStudioCodeFile()) {
+      self.newNode().title('Start');
+    }
 
     self.settings.apply();
 
@@ -346,6 +351,35 @@ export var App = function(name, version) {
         );
       }
     };
+
+    // this is how the VSCode extension sends its messages back to the app
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+
+      switch (message.type) {
+      // sent whenever the temporary file that's open gets changed
+      case 'UpdateNode':
+        // find the node that was being edited... we check originalNodeTitle here
+        // since it's possible that the user changed the node's title in the editor
+        self.nodes().forEach(node => {
+          if (
+            node.title().trim() ===
+            message.payload.originalNodeTitle.trim()
+          ) {
+            node.title(message.payload.title);
+            node.tags(message.payload.tags);
+            node.body(message.payload.body);
+
+            // re-send the document back to the extension so it updates its underlying text document
+            self.setYarnDocumentIsDirty();
+          }
+        });
+        break;
+      default:
+        break;
+      }
+    });
+
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnReady');
     event.document = document;
@@ -412,6 +446,31 @@ export var App = function(name, version) {
     }
   };
 
+  // returns `true` is we're in the VSCode extension
+  this.usingVisualStudioCodeExtension = function() {
+    // this is put on window by the extension
+    return !!window.vsCodeApi;
+  };
+
+  // returns `true` if we're opening a file in the VSCode extension
+  // (as opposed to running the full editor)
+  this.editingVisualStudioCodeFile = function() {
+    return window.editingVsCodeFile === true;
+  };
+
+  // This should be called whenever we want to mark the document as changed.
+  this.setYarnDocumentIsDirty = function() {
+    // If we're in the VSCode extension, send it an update
+    if (self.usingVisualStudioCodeExtension() && self.editingVisualStudioCodeFile()) {
+      window.vsCodeApi.postMessage({
+        type: 'DocumentEdit',
+        
+        // we just send the whole doc here every time...
+        payload: data.getSaveData(data.editingType())
+      });
+    }
+  };
+
   this.recordNodeAction = function(action, node) {
     //we can't go forward in 'time' when
     //new actions have been made
@@ -437,6 +496,8 @@ export var App = function(name, version) {
     }
 
     self.nodeHistory.push(historyItem);
+
+    self.setYarnDocumentIsDirty();
   };
 
   this.historyDirection = function(direction) {
@@ -469,6 +530,7 @@ export var App = function(name, version) {
       }
 
       self.nodeFuture.push(historyItem);
+      self.setYarnDocumentIsDirty();
     } //redo undone actions
     else {
       if (action == 'created') {
@@ -478,6 +540,7 @@ export var App = function(name, version) {
       }
 
       self.nodeHistory.push(historyItem);
+      self.setYarnDocumentIsDirty();
     }
   };
 
@@ -570,6 +633,7 @@ export var App = function(name, version) {
       self.recordNodeAction('removed', node);
       self.nodes.splice(index, 1);
     }
+    self.setYarnDocumentIsDirty();
   };
 
   this.cloneNodeArray = function(nodeArray) {
@@ -630,6 +694,13 @@ export var App = function(name, version) {
 
   this.editNode = function(node) {
     if (!node.active()) {
+      return;
+    }
+
+    // this is a setting that can only be set by the VSCode extension
+    // if it's true, when we go to edit a node we actually open it in VSCode's text editor
+    if (self.settings.alwaysOpenNodesInVisualStudioCodeEditor()) {
+      self.editNodeInVisualStudioCodeEditor(node);
       return;
     }
 
@@ -725,6 +796,28 @@ export var App = function(name, version) {
     self.toggleSpellCheck();
     self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
+  };
+
+  // called by the "Edit in Visual Studio Code Text Editor" button
+  // this sends a message to the extension telling it to open the node in a text editor
+  this.editNodeInVisualStudioCodeEditor = function(node) {
+    if (self.usingVisualStudioCodeExtension()) {
+      // updating the document is actually a trick to force VSCode to think the open document is
+      // dirty so that if it's not "pinned" it won't close when the editor swaps
+      self.setYarnDocumentIsDirty();
+
+      // tell VSCode extension to open our node in a new editor
+      window.vsCodeApi.postMessage({
+        type: 'OpenNode',
+        payload: {
+          title: node.title().trim(),
+          tags: node.tags().trim(),
+          body: self.trimBodyLinks(node.body().trim())
+        }
+      });
+    } else {
+      console.error('Tried to open node in Visual Studio Code text editor but we\'re not in the Visual Studio Code extension');
+    }
   };
 
   this.chooseRelativePathImage = function(imagePath) {
@@ -992,6 +1085,8 @@ export var App = function(name, version) {
           self.editing(null);
         });
       }
+
+      self.setYarnDocumentIsDirty();
     }
   };
 

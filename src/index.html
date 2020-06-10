@@ -175,6 +175,10 @@
           </span>
 
           <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
+          
+          <!-- ko if:app.usingVisualStudioCodeExtension() -->
+          <button class="bbcode-button" id="edit-node-in-vscode" onclick="app.editNodeInVisualStudioCodeEditor(app.editing())">🛠️ Edit in Visual Studio Code Text Editor</button>
+          <!-- /ko -->
 
           <div class="add-link" style="position: absolute;">
             <div class="menu">

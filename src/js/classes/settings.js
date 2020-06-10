@@ -1,6 +1,20 @@
+// Get the mechanism to use for storage.
+const getStorage = function() {
+  // if `window.vsCodeApi` exists, we're in the context of the VSCode extension
+  // which handles all of the settings internally, so we don't need to do anything here
+  if (window.vsCodeApi) {
+    return {
+      getItem: () => {},
+      setItem: () => {}
+    };
+  } else {
+    return window.localStorage;
+  }
+};
+
 export const Settings = function(app) {
   const self = this;
-  const storage = window.localStorage;
+  const storage = getStorage();
 
   ko.extenders.persist = function (target, option) {
     target.subscribe(function (newValue) {
@@ -16,6 +30,7 @@ export const Settings = function(app) {
     app.setTheme(self.theme());
     app.setLanguage(self.language());
     app.toggleNightMode();
+    app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
   };
 
@@ -84,4 +99,12 @@ export const Settings = function(app) {
   this.markupLanguage = ko
     .observable(storage.getItem('markupLanguage') || 'bbcode')
     .extend({ persist:'markupLanguage' });
+
+  // Always open nodes in Visual Studio Code Editor
+  // We don't actually show this in the settings menu; it can only be set by the VSCode extension's settings
+  this.alwaysOpenNodesInVisualStudioCodeEditor = ko
+    .observable(storage.getItem('alwaysOpenNodesInVisualStudioCodeEditor') !== null ?
+      storage.getItem('alwaysOpenNodesInVisualStudioCodeEditor') === 'true' :
+      false
+    ).extend({ persist:'alwaysOpenNodesInVisualStudioCodeEditor' });
 };
