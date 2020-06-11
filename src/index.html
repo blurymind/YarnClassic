@@ -124,6 +124,16 @@
             &nbsp;
             Send file
           </span>
+          <span id="gistTrySave" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
+            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            &nbsp;
+            Open gist
+          </span>
+          <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
+            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            &nbsp;
+            Save gist
+          </span>
           <span class="item" data-bind="click:app.ui.openSettingsDialog">
             <img style="margin:0; padding:0" width="20px" src="./public/images/settings.png"/>
             &nbsp;
@@ -346,6 +356,30 @@
         data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
       </div>
     </div> <!-- settgins-item -->
+
+    <!-- Gist token -->
+    <label class="settings-label" for="throttle-threshold">Github Gist Save</label>
+    <div class="settings-item">
+      <label class="settings-label" for="throttle-threshold">Token</label>
+      <div class="slidecontainer settings-value">
+        <input
+        type="password"
+        class="settings-value"
+        data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
+      </div>
+      <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">Generate</button>
+    </div> <!-- settgins-item -->
+
+    <div class="settings-item">
+      <label class="settings-label" for="throttle-threshold">gist.github.com/you/</label>
+      <div class="slidecontainer settings-value">
+        <input
+        type="input"
+        class="settings-value"
+        data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
+      </div>
+    </div> <!-- settgins-item -->
+
 
   </div> <!-- settgins-column -->
   <div class="settings-column">

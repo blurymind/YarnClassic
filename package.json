@@ -30,6 +30,7 @@
     "bbcode": "^0.1.5",
     "bondage": "^2.0.1",
     "file-saver": "^2.0.2",
+    "gists": "^2.0.0",
     "jquery": "^3.4.1",
     "jquery-contextmenu": "^2.8.0",
     "jquery-mousewheel": "^3.1.13",

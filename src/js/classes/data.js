@@ -346,7 +346,7 @@ export const data = {
 
   saveFileDialog: function(dialog, type, content) {
     var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    saveAs(blob, data.editingName().replace(/\.[^/.]+$/, '') + '.' + type);
+    saveAs(blob, (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type);
   },
 
   insertImageFileName: function() {
@@ -360,7 +360,7 @@ export const data = {
     data.openFileDialog($('#open-file'), data.openFile);
   },
 
-  tryShareFilePwa: function (format) {
+  promptFileNameAndFormat: function () {
     const editingType = data.editingType();
     if (data.editingName() === 'NewFile') {
       var fileNameAsk = prompt('Please enter your name:', 'NewFile');
@@ -369,9 +369,15 @@ export const data = {
       }
     }
     const editingName =
-      data.editingName().replace(/\.[^/.]+$/, '') + '.' + editingType;
+      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
     const yarnData = data.getSaveData(editingType);
+    return {
+      editingName, yarnData
+    };
+  },
 
+  tryShareFilePwa: function (format) {
+    const { editingName, yarnData } = data.promptFileNameAndFormat();
     const parts = [
       new Blob([yarnData], {type: 'text/plain'}),
     ];
@@ -390,6 +396,41 @@ export const data = {
     } else {
       alert('Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...');
     }
+  },
+
+  trySaveGist: function(gists) {
+    const { editingName, yarnData } = data.promptFileNameAndFormat();
+
+    gists.edit(gists.file, {
+      files: { [editingName]: { content: yarnData } }
+    });
+  },
+
+  tryOpenGist: function(gists) {
+    gists.get(gists.file).then(gist=>{
+      const gistFiles = gist.body.files;
+      const inputOptions = {};
+      Object.keys(gistFiles).forEach(key => {
+        inputOptions[key] = key;
+      });
+      Swal.fire({
+        title: 'Select gist file',
+        input: 'select',
+        inputOptions,
+        inputPlaceholder: 'Select a file from the gist',
+        showCancelButton: true,
+      }).then((result) => {
+        if (result.value) {
+          const content = gistFiles[result.value].content;
+          const type = data.getFileType(result.value);
+          data.loadData(content, type, true);
+
+          document.title = `Gist: ${result.value} / ${gists.file}`;
+          app.refreshWindowTitle(document.title);
+          data.editingName(result.value);
+        }
+      });
+    });
   },
 
   tryOpenFolder: function() {

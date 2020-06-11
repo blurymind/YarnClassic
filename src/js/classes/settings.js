@@ -32,6 +32,7 @@ export const Settings = function(app) {
     app.toggleNightMode();
     app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
+    app.setGistCredentials({token:self.gistToken(), file: self.gistFile()});
   };
 
   // Theme
@@ -48,6 +49,14 @@ export const Settings = function(app) {
   this.redrawThrottle = ko
     .observable(parseInt(storage.getItem('redrawThrottle') || '50'))
     .extend({ persist:'redrawThrottle' });
+
+  this.gistToken= ko
+    .observable(storage.getItem('gistToken'))
+    .extend({ persist:'gistToken' });
+
+  this.gistFile = ko
+    .observable(storage.getItem('gistFile'))
+    .extend({ persist:'gistFile' });
 
   // Spellcheck enabled
   this.spellcheckEnabled = ko

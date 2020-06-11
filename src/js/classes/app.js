@@ -46,6 +46,14 @@ export var App = function(name, version) {
     self.mustRefreshNodes.notifySubscribers();
   };
 
+  this.setGistCredentials = function(gist, e) {
+    const {token, file} = gist;
+    const Gists = require('gists');
+    const gists = new Gists({ token });
+    self.gists = gists;
+    self.gists.file = file;
+  };
+
   // Ideally this dependencies should be injected by index.js
   this.input = new Input(self);
   this.settings = new Settings(self);
