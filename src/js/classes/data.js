@@ -360,49 +360,65 @@ export const data = {
     data.openFileDialog($('#open-file'), data.openFile);
   },
 
-  promptFileNameAndFormat: function () {
-    const editingType = data.editingType();
-    if (data.editingName() === 'NewFile') {
-      var fileNameAsk = prompt('Please enter your name:', 'NewFile');
-      if (fileNameAsk !== null || fileNameAsk !== '') {
-        data.editingName(fileNameAsk);
+  promptFileNameAndFormat: function (cb, suggestions = null) {
+    Swal.fire({
+      title: 'Please enter file name',
+      html: `<input id="swal-input1" list="select" name="select">
+      <datalist class="form-control" id="select">    
+        ${suggestions && suggestions.map(suggestion => `<option value="${suggestion}" />`)}
+      </datalist>`,
+      inputValue: data.editingName(),
+      showCancelButton: true,
+      preConfirm: () => document.getElementById('swal-input1').value
+    }).then(({value}) =>{
+      console.log(value);
+      if (value && value !== '') {
+        data.editingName(value);
       }
-    }
-    const editingName =
-      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
-    const yarnData = data.getSaveData(editingType);
-    return {
-      editingName, yarnData
-    };
+      const editingType = data.editingType();
+      const editingName =
+        (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
+      const yarnData = data.getSaveData(editingType);
+      cb({
+        editingName, yarnData
+      });
+    });
   },
 
   tryShareFilePwa: function (format) {
-    const { editingName, yarnData } = data.promptFileNameAndFormat();
-    const parts = [
-      new Blob([yarnData], {type: 'text/plain'}),
-    ];
-    const file = new File(parts, editingName, {});
-
-    if (navigator.canShare && navigator.canShare({
-      files: [file]
-    })) {
-      navigator.share({
-        title: editingName,
-        text: yarnData,
-        file: [file],
-      })
-        .then(() => console.log('Successful share'))
-        .catch((error) => console.log('Error sharing', error));
-    } else {
-      alert('Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...');
-    }
+    data.promptFileNameAndFormat(({ editingName, yarnData })=>{
+      const parts = [
+        new Blob([yarnData], {type: 'text/plain'}),
+      ];
+      const file = new File(parts, editingName, {});
+  
+      if (navigator.canShare && navigator.canShare({
+        files: [file]
+      })) {
+        navigator.share({
+          title: editingName,
+          text: yarnData,
+          file: [file],
+        })
+          .then(() => console.log('Successful share'))
+          .catch((error) => console.log('Error sharing', error));
+      } else {
+        alert('Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...');
+      }
+    });
   },
 
   trySaveGist: function(gists) {
-    const { editingName, yarnData } = data.promptFileNameAndFormat();
+    // 
+    gists.get(gists.file).then(gist=>{
 
-    gists.edit(gists.file, {
-      files: { [editingName]: { content: yarnData } }
+      const gistFiles = Object.keys(gist.body.files);
+      console.log(gistFiles);
+      data.promptFileNameAndFormat(({ editingName, yarnData })=>{
+        gists.edit(gists.file, {
+          files: { [editingName]: { content: yarnData } }
+        });
+      }, gistFiles);
     });
   },
 
@@ -419,15 +435,15 @@ export const data = {
         inputOptions,
         inputPlaceholder: 'Select a file from the gist',
         showCancelButton: true,
-      }).then((result) => {
-        if (result.value) {
-          const content = gistFiles[result.value].content;
-          const type = data.getFileType(result.value);
+      }).then(({value}) => {
+        if (value) {
+          const content = gistFiles[value].content;
+          const type = data.getFileType(value);
           data.loadData(content, type, true);
 
-          document.title = `Gist: ${result.value} / ${gists.file}`;
+          document.title = `Gist: ${value} / ${gists.file}`;
           app.refreshWindowTitle(document.title);
-          data.editingName(result.value);
+          data.editingName(value);
         }
       });
     });
