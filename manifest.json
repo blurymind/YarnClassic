@@ -30,7 +30,7 @@
   "short_name": "Yarn",
   "orientation": "portrait",
   "display": "fullscreen",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "dir": "auto",
   "description": "Yarn Story Editor",
   "background_color": "#3367D6",
