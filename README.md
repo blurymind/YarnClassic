@@ -141,13 +141,8 @@ Test drive your Yarn files here ^
 
 Node connections work similar to Twine.
 
-![Screenshot](http://infiniteammo.com/Yarn/node-connections.jpg)
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/nodes.png)
 
-# Shortcut Options
-
-Shortcut options are a new method of creating dialogue branches that does not require creating new nodes.
-
-![Screenshot](http://infiniteammo.com/Yarn/shortcut-options.jpg)
 
 # How to Import Twine Files
 
@@ -169,4 +164,4 @@ https://github.com/YarnSpinnerTool/YarnSpinner
 
 Yarn logo/icon created by @Mr_Alistair.
 
-![Icon](http://infiniteammo.com/Yarn/yarn-icon.png)
+![Icon](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/src/public/icon.png)
