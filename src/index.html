@@ -120,17 +120,17 @@
             Save As Xml
           </span>
           <span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
-            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            <img style="margin:0; padding:0" width="20px" src="./public/images/exp-data.png" alt="Share Icon" />
             &nbsp;
             Send file
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
-            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            <img style="margin:0; padding:0" width="20px" src="./public/images/octocat.png" alt="Octo Icon" />
             &nbsp;
             Open gist
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
-            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            <img style="margin:0; padding:0" width="20px" src="./public/images/github.png" alt="Git Icon" />
             &nbsp;
             Save gist
           </span>
@@ -368,7 +368,7 @@
         class="settings-value"
         data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
       </div>
-      <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">Generate</button>
+      <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">New</button>
     </div> <!-- settgins-item -->
 
     <div class="settings-item">
@@ -379,6 +379,7 @@
         class="settings-value"
         data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
       </div>
+      <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
     </div> <!-- settgins-item -->
 
 

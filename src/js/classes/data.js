@@ -363,15 +363,17 @@ export const data = {
   promptFileNameAndFormat: function (cb, suggestions = null) {
     Swal.fire({
       title: 'Please enter file name',
-      html: `<input id="swal-input1" list="select" name="select">
-      <datalist class="form-control" id="select">    
-        ${suggestions && suggestions.map(suggestion => `<option value="${suggestion}" />`)}
+      html: `<input id="swal-input1" list="select-file-name" name="select">
+      <datalist class="form-control" id="select-file-name">    
+        ${suggestions && suggestions.map(suggestion => `<option value="${suggestion}" />`).join('')}
       </datalist>`,
-      inputValue: data.editingName(),
+      onOpen: () => {
+        if (data.editingName() !== 'NewFile')
+          document.getElementById('swal-input1').value = data.editingName();
+      },
       showCancelButton: true,
       preConfirm: () => document.getElementById('swal-input1').value
     }).then(({value}) =>{
-      console.log(value);
       if (value && value !== '') {
         data.editingName(value);
       }
@@ -409,12 +411,10 @@ export const data = {
   },
 
   trySaveGist: function(gists) {
-    // 
-    gists.get(gists.file).then(gist=>{
-
+    gists.get(gists.file).then(gist => {
       const gistFiles = Object.keys(gist.body.files);
       console.log(gistFiles);
-      data.promptFileNameAndFormat(({ editingName, yarnData })=>{
+      data.promptFileNameAndFormat(({ editingName, yarnData }) => {
         gists.edit(gists.file, {
           files: { [editingName]: { content: yarnData } }
         });
