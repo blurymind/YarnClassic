@@ -19,6 +19,9 @@ alt="Yarn web app"  height="480" border="10" /></a>
 <a href="https://yarnspinnertool.github.io/YarnEditor"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnMobile.jpeg"
 alt="Yarn web app"  height="480" border="10" /></a>
 
+#  💻 Install it on your desktop
+ Grab Win64, Linux and MacOS electron builds at https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
+
 # 🚧 Roadmap
 You can see planned features, vote for features or see how you can contribute at the roadmap here:
 https://trello.com/b/ZXhhOzDl/yarn-roadmap
@@ -29,8 +32,6 @@ There are a few game engines that have YarnEditor bundled with their IDE. That m
 - Gdevelop : A full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
 https://github.com/4ian/GDevelop
 
-- Ct.js : A desktop game editor that makes learning programming fun and game development easy by its visual editors and well-documented code library.
-https://github.com/ct-js/ct-js
 
 # 🧠 Yarn runtimes
 The runtime is a library that allows your game engine to parse the files that yarn creates. There are a couple of popular ones that you can use. If you have created a runtime, you are working on one or want to get one included with your game engine, these can be of some use to you
@@ -43,26 +44,37 @@ https://github.com/hylyh/bondage.js
 
 # 🐬 Features 🦄
 
-### BBcode styling in editor, Spellchecking, Autocompletion, and more!
+### BBcode and HTML-ish markup styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
-- preview of bbcode tag effects and goto in trimmed nodes
-- optional spell checking
+- preview of bbcode/html tag effects and goto in trimmed nodes
 - optional word guessing and autocompletion
 - optional preview bbcode in editor mode
 - a color picker (using spectrum.js) to set font color in bbcode
 - emoji picker to insert emojis
-- new context menu
-- misspelled word suggestions in the new context menu - if you have selected a misspelled word
-- similar word suggestions in the new context menu (thesaurus)
 - nodelink suggestions as you type in the right places
 - Night mode - Toggling it will invert all the light colors which the editor currently uses
 - A context menu command to visit other nodes via their links in the editor and even create new ones
 - Button to go back to the previous edited node. If there is no previous - save and close the current one
 ![yarn-0 3 5-newfeatures](https://user-images.githubusercontent.com/6495061/50045609-b646e900-008d-11e9-9f17-2ac6b01908f6.gif)
 
-# Electron Builds
+### Language, writing and debugging tools built right into it
+- Ability to playtest yarn stories you are working on - straight inside yarn
+- Spellchecking of words (supported for different languages too)
+- misspelled word suggestions in the new context menu - if you have selected a misspelled word
+- Similar word suggestion for highlighted words (supported for english only)
+- Transcribe text - ability to "talk" to yarn without using hands :o (multi-language supported)
+- Yarn can also talk to you - tell you what is written (multi-language supported)
 
-Win64 and MacOS: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
+### Load and Save your yarns from your computer, github gists or anything you can send it to on your tablet/phone
+- A variety of export formats supported - yarn, json yarn, twee, twee2, xml
+- When used from a mobile device, yarn can send its data to any other app, including to google drive
+- Ability to store and load all your yarns using a github gist - private or public, doesn't matter ;)
+
+### Customization!
+- Support for different themes (you can make your own too)
+
+# Electron Builds
+Win64, Linux and MacOS builds available at: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
 
 # ⚙️ Compile and run web app on localhost:
 Make sure you have nodejs installed. Then from the root folder
@@ -103,25 +115,25 @@ npm run build-linux
 
 # 😮 Examples
 
-Games built with Unity and Yarn.
+Games built using Yarn.
+
+Night in the woods: https://store.steampowered.com/app/481510/Night_in_the_Woods/
+
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/nitw.jpg)
 
 Lost Constellation: http://finji.itch.io/lost-constellation
 
-![Screenshot](http://infiniteammo.com/Yarn/lost-constellation.jpg)
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/lostC.png)
 
-Knights and Bikes: https://www.kickstarter.com/projects/foamsword/knights-and-bikes
+Knights and Bikes: https://store.steampowered.com/app/592480/Knights_And_Bikes/
 
-![Screenshot](http://infiniteammo.com/Yarn/knights-and-bikes.jpg)
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/kab.jpeg)
 
-Sunflower (Demo): http://infiniteammo.com/Sunflower
+Far From Noise by George Batchelor (@georgebatch): https://store.steampowered.com/app/706130/Far_from_Noise/
 
-![Screenshot](http://infiniteammo.com/Yarn/sunflower.jpg)
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/ffn.jpg)
 
-Far From Noise by George Batchelor (@georgebatch): http://www.georgebatchelor.com/#!far-from-noise/c1ceg
-
-![Screenshot](http://infiniteammo.com/Yarn/far-from-noise.png)
-
-YarnTest: http://infiniteammo.com/YarnTest/
+YarnTest: http://hayley.zone/bondage.js/
 
 Test drive your Yarn files here ^
 
