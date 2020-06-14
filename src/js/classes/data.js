@@ -418,6 +418,11 @@ export const data = {
         gists.edit(gists.file, {
           files: { [editingName]: { content: yarnData } }
         });
+        Swal.fire(
+          'Saved!',
+          `The Yarn has been saved to gitst ${gists.file}`,
+          'success'
+        );
       }, gistFiles);
     });
   },
