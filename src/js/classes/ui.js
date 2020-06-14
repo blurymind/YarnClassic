@@ -75,6 +75,8 @@ export const UI = function(app) {
     $('.settings-dialog .form')
       .css({ y: '0' })
       .transition({ y: '-100' }, 250);
+    
+    setTimeout(() => app.settings.apply(), 100);
   };
 
   // isDialogOpen
