@@ -140,7 +140,7 @@ Test drive your Yarn files here ^
 # How to Connect Nodes
 
 Node connections work similar to Twine.
-
+[[ask question|question]] leads to "question" node.
 ![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/nodes.png)
 
 
