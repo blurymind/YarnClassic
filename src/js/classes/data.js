@@ -377,14 +377,14 @@ export const data = {
     }).then(({value}) =>{
       if (value && value !== '') {
         data.editingName(value);
+        const editingType = data.editingType();
+        const editingName =
+          (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
+        const yarnData = data.getSaveData(editingType);
+        cb({
+          editingName, yarnData
+        });
       }
-      const editingType = data.editingType();
-      const editingName =
-        (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
-      const yarnData = data.getSaveData(editingType);
-      cb({
-        editingName, yarnData
-      });
     });
   },
 
