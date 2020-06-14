@@ -529,7 +529,10 @@ export const Workspace = function(app) {
   //
   // Moves the viewport to focus the specified node
   this.warpToNode = function(node) {
-    node && self.warpToXY(node.x(), node.y());
+    node && self.warpToXY(
+      node.x() || node.createX,
+      node.y() || node.createY
+    );
   };
 
   // warpToXY
