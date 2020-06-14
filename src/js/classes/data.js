@@ -438,6 +438,9 @@ export const data = {
         title: 'Select gist file',
         input: 'select',
         inputOptions,
+        inputAttributes: {
+          autocomplete: 'off'
+        },
         inputPlaceholder: 'Select a file from the gist',
         showCancelButton: true,
       }).then(({value}) => {
