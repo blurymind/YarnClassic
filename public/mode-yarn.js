@@ -87,6 +87,21 @@ define("ace/mode/yarn", [
       app.insertTextAtCursor(app.clipboard);
     }
   };
+  const triggerCopy = function() {
+    if (app.electron) {
+      document.execCommand('copy');
+      app.clipboard = app.editor.getSelectedText();
+    } else {
+      navigator.clipboard.readText()
+        .then(text => {
+          app.clipboard = text;
+        })
+        .catch(err => {
+          app.clipboard = app.editor.getSelectedText();
+          console.log('No clipboard access', err, 'using local instead');
+        });
+    }
+  };
   /// set context menu
   $.contextMenu({
     selector: ".node-editor .form .editor",
@@ -108,7 +123,7 @@ define("ace/mode/yarn", [
             name: "Cut",
             icon: "cut",
             callback: () => {
-              app.clipboard = app.editor.getSelectedText();
+              triggerCopy();
               app.insertTextAtCursor("");
             }
           },
@@ -116,8 +131,7 @@ define("ace/mode/yarn", [
             name: "Copy",
             icon: "copy",
             callback: () => {
-              document.execCommand("copy");
-              app.clipboard = app.editor.getSelectedText();
+              triggerCopy();
             }
           },
           paste: {
