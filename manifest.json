@@ -34,13 +34,5 @@
   "dir": "auto",
   "description": "Yarn Story Editor",
   "background_color": "#3367D6",
-  "theme_color": "#3367D6",
-  "share_target": {
-    "action": "/share",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  "theme_color": "#3367D6"
 }
