@@ -81,10 +81,19 @@ define("ace/mode/yarn", [
 
   const triggerPaste = function() {
     if (app.electron) {
-      const text = app.electron.clipboard.readText();
-      app.clipboard = text;
+      // const text = app.electron.clipboard.readText();
+      // app.clipboard = text;
       document.execCommand('paste');
     } else {
+      if (navigator.clipboard)
+        navigator.clipboard.readText()
+          .then(text => {
+            app.clipboard = text;
+          })
+          .catch(err => {
+            app.clipboard = app.editor.getSelectedText();
+            console.log('No clipboard access', err, 'using local instead');
+          });
       // execCommand("paste") will not work on web browsers, due to security
       app.insertTextAtCursor(app.clipboard);
     }
@@ -95,14 +104,10 @@ define("ace/mode/yarn", [
       // document.execCommand('copy');
       app.clipboard = app.editor.getSelectedText();
     } else {
-      navigator.clipboard.readText()
-        .then(text => {
-          app.clipboard = text;
-        })
-        .catch(err => {
-          app.clipboard = app.editor.getSelectedText();
-          console.log('No clipboard access', err, 'using local instead');
-        });
+      const selectedText = app.editor.getSelectedText();
+      if (selectedText.length > 0) {
+        app.clipboard = selectedText;
+      }
     }
   };
   /// set context menu
