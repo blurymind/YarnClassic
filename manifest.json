@@ -36,12 +36,25 @@
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "url_template": "index.html?oldapi=true&title={title}&text={text}&url={url}",
-    "action": "index.html",
+    "action": "/",
+    "enctype": "multipart/form-data",
+    "method": "POST",
     "params": {
       "title": "title",
       "text": "text",
-      "url": "url"
+      "url": "url",
+      "files": [
+        {
+          "name": "externalMedia",
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "video/quicktime",
+            "video/mp4"
+          ]
+        }
+      ]
     }
   }
 }
