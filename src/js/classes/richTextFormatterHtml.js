@@ -71,6 +71,14 @@ export const HtmlRichTextFormatter = function(app) {
         });
       }
       app.insertColorCode();
+    } if (tag === 'img') {
+      navigator.clipboard.readText()
+        .then(text => {
+          if (app.data.pathType.img.test(text)) {
+            app.moveEditCursor(-7);
+            app.insertTextAtCursor(` src="${text}"`);
+          }
+        });
     } else if (app.editor.getSelectedText().length === 0) {
       app.moveEditCursor(-tagClose.length);
     } else {

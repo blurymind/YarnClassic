@@ -889,6 +889,13 @@ span.add-node:after {
   color: gray;
 }
 
+/*-- ----------------------------HTML previews------------------------------- */
+.editor-preview img {
+  max-height: 200px;
+}
+.editor-preview img:hover {
+  max-height: unset;
+}
 /*-- ----------------------------Narrow overrides---------------------------- */
 @media screen and (max-width: 900px) {
   .settings-row {
