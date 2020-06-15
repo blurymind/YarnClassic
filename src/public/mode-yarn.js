@@ -85,8 +85,18 @@ define("ace/mode/yarn", [
       app.clipboard = text;
       document.execCommand('paste');
     } else {
+      if (navigator.clipboard) {
+        navigator.clipboard.readText()
+          .then(text => {
+            app.clipboard = text;
+          })
+          .catch(err => {
+            app.clipboard = app.editor.getSelectedText();
+            console.log('No clipboard access', err, 'using local instead');
+          });
+      }
       // execCommand("paste") will not work on web browsers, due to security
-      app.insertTextAtCursor(app.clipboard);
+      setTimeout(()=>app.insertTextAtCursor(app.clipboard),100);
     }
   };
   const triggerCopy = function() {
@@ -95,14 +105,15 @@ define("ace/mode/yarn", [
       // document.execCommand('copy');
       app.clipboard = app.editor.getSelectedText();
     } else {
-      navigator.clipboard.readText()
-        .then(text => {
-          app.clipboard = text;
-        })
-        .catch(err => {
-          app.clipboard = app.editor.getSelectedText();
-          console.log('No clipboard access', err, 'using local instead');
+      const selectedText = app.editor.getSelectedText();
+      app.clipboard = selectedText;
+      if(navigator.clipboard && selectedText.length > 0) {
+        navigator.clipboard.writeText(selectedText).then(() => {
+          /* clipboard successfully set */
+          app.clipboard = selectedText;
+          console.log("clipboard:", app.clipboard);
         });
+      }
     }
   };
   /// set context menu
@@ -126,8 +137,10 @@ define("ace/mode/yarn", [
             name: "Cut",
             icon: "cut",
             callback: () => {
-              triggerCopy();
-              app.insertTextAtCursor("");
+              if (app.clipboard.length > 0) {
+                triggerCopy();
+                app.insertTextAtCursor("");
+              }
             }
           },
           copy: {
