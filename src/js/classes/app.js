@@ -1058,7 +1058,7 @@ export var App = function(name, version) {
 
     const textBeforeCursor = curLineText.substring(0, curPosition);
     if (!textBeforeCursor) {
-      return;
+      return '';
     }
 
     return self.richTextFormatter.identifyTag(textBeforeCursor);
