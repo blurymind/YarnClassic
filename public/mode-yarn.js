@@ -81,7 +81,9 @@ define("ace/mode/yarn", [
 
   const triggerPaste = function() {
     if (app.electron) {
-      document.execCommand("paste");
+      const text = app.electron.clipboard.readText();
+      app.clipboard = text;
+      document.execCommand('paste');
     } else {
       // execCommand("paste") will not work on web browsers, due to security
       app.insertTextAtCursor(app.clipboard);
@@ -89,7 +91,8 @@ define("ace/mode/yarn", [
   };
   const triggerCopy = function() {
     if (app.electron) {
-      document.execCommand('copy');
+      app.electron.clipboard.writeText(app.editor.getSelectedText());
+      // document.execCommand('copy');
       app.clipboard = app.editor.getSelectedText();
     } else {
       navigator.clipboard.readText()
