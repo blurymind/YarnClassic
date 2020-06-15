@@ -81,8 +81,8 @@ define("ace/mode/yarn", [
 
   const triggerPaste = function() {
     if (app.electron) {
-      // const text = app.electron.clipboard.readText();
-      // app.clipboard = text;
+      const text = app.electron.clipboard.readText();
+      app.clipboard = text;
       document.execCommand('paste');
     } else {
       if (navigator.clipboard)
@@ -131,8 +131,10 @@ define("ace/mode/yarn", [
             name: "Cut",
             icon: "cut",
             callback: () => {
-              triggerCopy();
-              app.insertTextAtCursor("");
+              if (app.clipboard.length > 0) {
+                triggerCopy();
+                app.insertTextAtCursor("");
+              }
             }
           },
           copy: {
