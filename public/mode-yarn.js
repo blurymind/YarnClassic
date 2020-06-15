@@ -105,6 +105,8 @@ define("ace/mode/yarn", [
       app.clipboard = app.editor.getSelectedText();
     } else {
       const selectedText = app.editor.getSelectedText();
+      console.log(selectedText, "write");
+      app.clipboard = selectedText;
       if(navigator.clipboard && selectedText.length > 0)
         navigator.clipboard.writeText(selectedText).then(() => {
           /* clipboard successfully set */
@@ -112,8 +114,7 @@ define("ace/mode/yarn", [
           console.log("cliboard:", app.clipboard);
         }, function() {
           /* clipboard write failed */
-        });
-    }
+      })
   };
   /// set context menu
   $.contextMenu({
