@@ -85,15 +85,15 @@ define("ace/mode/yarn", [
       app.clipboard = text;
       document.execCommand('paste');
     } else {
-      if (navigator.clipboard)
-        navigator.clipboard.readText()
-          .then(text => {
-            app.clipboard = text;
-          })
-          .catch(err => {
-            app.clipboard = app.editor.getSelectedText();
-            console.log('No clipboard access', err, 'using local instead');
-          });
+      // if (navigator.clipboard)
+      //   navigator.clipboard.readText()
+      //     .then(text => {
+      //       app.clipboard = text;
+      //     })
+      //     .catch(err => {
+      //       app.clipboard = app.editor.getSelectedText();
+      //       console.log('No clipboard access', err, 'using local instead');
+      //     });
       // execCommand("paste") will not work on web browsers, due to security
       app.insertTextAtCursor(app.clipboard);
     }
