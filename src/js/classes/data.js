@@ -10,7 +10,7 @@ export const data = {
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
   pathType: {
-    img: /([a-zA-Z0-9\s_\\.\-\(\):])+(.jpg|.svg|.webm|.gif|.png|.jpeg|\?format=jpg.*)$/
+    img: /([a-zA-Z0-9\s_\\.\-\(\):])+[.|format=](jpg|svg|webm|gif|png|jpeg)/g
   },
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
