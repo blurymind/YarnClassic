@@ -36,8 +36,8 @@
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "/share-target/",
-    "method": "GET",
+    "url_template": "index.html?oldapi=true&title={title}&text={text}&url={url}",
+    "action": "index.html",
     "params": {
       "title": "title",
       "text": "text",
