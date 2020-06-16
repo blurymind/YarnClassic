@@ -79,43 +79,6 @@ define("ace/mode/yarn", [
 
   exports.Mode = Mode;
 
-  const triggerPaste = function() {
-    if (app.electron) {
-      const text = app.electron.clipboard.readText();
-      app.clipboard = text;
-      document.execCommand('paste');
-    } else {
-      if (navigator.clipboard) {
-        navigator.clipboard.readText()
-          .then(text => {
-            app.clipboard = text;
-          })
-          .catch(err => {
-            app.clipboard = app.editor.getSelectedText();
-            console.log('No clipboard access', err, 'using local instead');
-          });
-      }
-      // execCommand("paste") will not work on web browsers, due to security
-      setTimeout(()=>app.insertTextAtCursor(app.clipboard),100);
-    }
-  };
-  const triggerCopy = function() {
-    if (app.electron) {
-      app.electron.clipboard.writeText(app.editor.getSelectedText());
-      // document.execCommand('copy');
-      app.clipboard = app.editor.getSelectedText();
-    } else {
-      const selectedText = app.editor.getSelectedText();
-      app.clipboard = selectedText;
-      if(navigator.clipboard && selectedText.length > 0) {
-        navigator.clipboard.writeText(selectedText).then(() => {
-          /* clipboard successfully set */
-          app.clipboard = selectedText;
-          console.log("clipboard:", app.clipboard);
-        });
-      }
-    }
-  };
   /// set context menu
   $.contextMenu({
     selector: ".node-editor .form .editor",
@@ -138,7 +101,7 @@ define("ace/mode/yarn", [
             icon: "cut",
             callback: () => {
               if (app.clipboard.length > 0) {
-                triggerCopy();
+                app.data.triggerCopyClipboard();
                 app.insertTextAtCursor("");
               }
             }
@@ -147,13 +110,13 @@ define("ace/mode/yarn", [
             name: "Copy",
             icon: "copy",
             callback: () => {
-              triggerCopy();
+              app.data.triggerCopyClipboard();
             }
           },
           paste: {
             name: "Paste",
             icon: "paste",
-            callback: () => triggerPaste()
+            callback: () => app.data.triggerPasteClipboard()
           },
           sep1: "---------"
         };
@@ -194,7 +157,7 @@ define("ace/mode/yarn", [
           paste: {
             name: "Paste",
             icon: "paste",
-            callback: () => triggerPaste()
+            callback: () => app.data.triggerPasteClipboard()
           }
         };
       }
