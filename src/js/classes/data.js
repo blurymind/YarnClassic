@@ -498,4 +498,40 @@ export const data = {
     }
     return fs.lstatSync(filePath).isFile();
   },
+  triggerPasteClipboard: function() {
+    if (app.electron) {
+      const text = app.electron.clipboard.readText();
+      app.clipboard = text;
+      document.execCommand('paste');
+    } else {
+      if (navigator.clipboard) {
+        navigator.clipboard.readText()
+          .then(text => {
+            app.clipboard = text;
+          })
+          .catch(err => {
+            app.clipboard = app.editor.getSelectedText();
+            console.log('No clipboard access', err, 'using local instead');
+          });
+      }
+      // execCommand("paste") will not work on web browsers, due to security
+      setTimeout(()=>app.insertTextAtCursor(app.clipboard),100);
+    }
+  },
+  triggerCopyClipboard: function() {
+    if (app.electron) {
+      app.electron.clipboard.writeText(app.editor.getSelectedText());
+      // document.execCommand('copy');
+      app.clipboard = app.editor.getSelectedText();
+    } else {
+      const selectedText = app.editor.getSelectedText();
+      app.clipboard = selectedText;
+      if(navigator.clipboard && selectedText.length > 0) {
+        navigator.clipboard.writeText(selectedText).then(() => {
+          /* clipboard successfully set */
+          app.clipboard = selectedText;
+        });
+      }
+    }
+  }
 };

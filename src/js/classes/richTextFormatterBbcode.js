@@ -74,13 +74,10 @@ export const BbcodeRichTextFormatter = function(app) {
       }
       app.insertColorCode();
     } if (tag === 'img') {
-      navigator.clipboard.readText()
-        .then(text => {
-          if (app.editor.getSelectedText().length === 0) {
-            app.moveEditCursor(-6);
-            app.insertTextAtCursor(text);
-          }
-        });
+      if (app.editor.getSelectedText().length === 0) {
+        app.moveEditCursor(-6);
+        app.data.triggerPasteClipboard();
+      }
     } else if (app.editor.getSelectedText().length === 0) {
       app.moveEditCursor(-tagClose.length);
     } else {
