@@ -74,7 +74,7 @@ export const HtmlRichTextFormatter = function(app) {
     } if (tag === 'img') {
       navigator.clipboard.readText()
         .then(text => {
-          if (app.editor.getSelectedText().length === 0 && app.data.pathType.img.test(text)) {
+          if (app.editor.getSelectedText().length === 0) {
             app.moveEditCursor(-7);
             app.insertTextAtCursor(` src="${text}"`);
           }

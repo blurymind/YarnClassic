@@ -895,6 +895,7 @@ span.add-node:after {
 }
 .editor-preview img:hover {
   max-height: unset;
+  max-width: 90vw;
 }
 /*-- ----------------------------Narrow overrides---------------------------- */
 @media screen and (max-width: 900px) {
