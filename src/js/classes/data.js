@@ -412,50 +412,68 @@ export const data = {
   },
 
   trySaveGist: function(gists) {
-    gists.get(gists.file).then(gist => {
-      const gistFiles = Object.keys(gist.body.files);
-      console.log(gistFiles);
-      data.promptFileNameAndFormat(({ editingName, yarnData }) => {
-        gists.edit(gists.file, {
-          files: { [editingName]: { content: yarnData } }
-        });
-        Swal.fire(
-          'Saved!',
-          `The Yarn has been saved to gitst ${gists.file}`,
-          'success'
-        );
-      }, gistFiles);
-    });
+    if (gists && gists.file && gists.file.length > 0) {
+      gists.get(gists.file).then(gist => {
+        const gistFiles = Object.keys(gist.body.files);
+        console.log(gistFiles);
+        data.promptFileNameAndFormat(({ editingName, yarnData }) => {
+          gists.edit(gists.file, {
+            files: { [editingName]: { content: yarnData } }
+          });
+          Swal.fire(
+            'Saved!',
+            `The Yarn has been saved to gitst ${gists.file}`,
+            'success'
+          );
+        }, gistFiles);
+      });
+    } else {
+      Swal.fire(
+        'Not configured',
+        'Your github settings are not configured',
+        'warning'
+      );
+      app.ui.openSettingsDialog();
+    }
   },
 
   tryOpenGist: function(gists) {
-    gists.get(gists.file).then(gist=>{
-      const gistFiles = gist.body.files;
-      const inputOptions = {};
-      Object.keys(gistFiles).forEach(key => {
-        inputOptions[key] = key;
+    if (gists && gists.file && gists.file.length > 0) {
+      gists.get(gists.file).then(gist=>{
+        const gistFiles = gist.body.files;
+        const inputOptions = {};
+        Object.keys(gistFiles).forEach(key => {
+          inputOptions[key] = key;
+        });
+        Swal.fire({
+          title: 'Select gist file',
+          input: 'select',
+          inputOptions,
+          inputAttributes: {
+            autocomplete: 'off'
+          },
+          inputPlaceholder: 'Select a file from the gist',
+          showCancelButton: true,
+        }).then(({value}) => {
+          if (value) {
+            const content = gistFiles[value].content;
+            const type = data.getFileType(value);
+            data.loadData(content, type, true);
+  
+            document.title = `Gist: ${value} / ${gists.file}`;
+            app.refreshWindowTitle(document.title);
+            data.editingName(value);
+          }
+        });
       });
-      Swal.fire({
-        title: 'Select gist file',
-        input: 'select',
-        inputOptions,
-        inputAttributes: {
-          autocomplete: 'off'
-        },
-        inputPlaceholder: 'Select a file from the gist',
-        showCancelButton: true,
-      }).then(({value}) => {
-        if (value) {
-          const content = gistFiles[value].content;
-          const type = data.getFileType(value);
-          data.loadData(content, type, true);
-
-          document.title = `Gist: ${value} / ${gists.file}`;
-          app.refreshWindowTitle(document.title);
-          data.editingName(value);
-        }
-      });
-    });
+    } else {
+      Swal.fire(
+        'Not configured',
+        'Your github settings are not configured',
+        'warning'
+      );
+      app.ui.openSettingsDialog();
+    }
   },
 
   tryOpenFolder: function() {
