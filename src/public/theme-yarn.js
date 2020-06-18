@@ -12,7 +12,7 @@ background: #fff;\
 color: #000;\
 }\
 .ace-yarn .ace_comment {\
-color: #44fe66;\
+color: #00c171;\
 font-style: italic;\
 }\
 .ace-yarn .ace_variable.ace_language  {\
