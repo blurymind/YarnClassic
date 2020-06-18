@@ -844,6 +844,7 @@ input:focus + span + .dropdown {
   text-transform: uppercase;
   opacity: 0.4;
   line-height: 1.2em;
+  z-index: -999;
 }
 
 .app-info span {
