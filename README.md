@@ -117,6 +117,10 @@ npm run build-linux
 
 Games built using Yarn.
 
+A short hike: https://store.steampowered.com/app/1055540/A_Short_Hike/
+
+![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/ash.png)
+
 Night in the woods: https://store.steampowered.com/app/481510/Night_in_the_Woods/
 
 ![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/nitw.jpg)
