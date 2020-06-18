@@ -19,7 +19,7 @@ define("ace/mode/yarn", [
       start: [
         {
           token: "comment",
-          regex: "[^:]//.+$"
+          regex: "^\\/\\/.*$"
         },
         {
           token: "paren.lcomm",
