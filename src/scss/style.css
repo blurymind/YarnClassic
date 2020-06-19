@@ -849,6 +849,13 @@ input:focus + span + .dropdown {
   z-index: -999;
 }
 
+#addPwa {
+  position: absolute;
+  left: 15px;
+  bottom: 60px;
+  color: #6b3877;
+}
+
 .app-info span {
   display: block;
 }
