@@ -537,6 +537,8 @@ input[type='checkbox'] {
   text-align: center;
   border-radius: 12px;
   background-color: white;
+  height: 24px;
+  overflow: hidden;
   color: black;
   border: 2px solid #e7e7e7;
   -webkit-transition-duration: 0.4s; /* Safari */
@@ -980,6 +982,6 @@ span.add-node:after {
     display: none;
   }
   .ace_scroller {
-    left: 27px !important;
+    left: 23px !important;
   }
 }
