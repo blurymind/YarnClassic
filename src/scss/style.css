@@ -967,4 +967,19 @@ span.add-node:after {
     bottom: 60px;
 
   }
+
+  .ace_gutter {
+    width: 26px !important;
+  }
+  .ace_gutter-cell {
+    padding-left: 0px !important;
+    right: unset;
+    font-size: small;
+  }
+  .ace_mobile-button {
+    display: none;
+  }
+  .ace_scroller {
+    left: 27px !important;
+  }
 }
