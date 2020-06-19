@@ -427,15 +427,22 @@ input[type='checkbox'] {
   margin-bottom: 5px;
   margin-right: 5px;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   text-align: left;
 }
 
 .settings-label {
-  flex: 50%;
+  padding-right: 2px;
 }
 
 .settings-value {
-  flex: 50%;
+  flex: 1;
+}
+
+.settings-value >input{
+  width: -webkit-fill-available;
+  margin-right: 2px;
 }
 
 .markup {
@@ -974,7 +981,11 @@ span.add-node:after {
 
   .app-add-node {
     bottom: 60px;
+  }
 
+  .settings-item,
+  .settings-form {
+    padding: 1px;
   }
 
   .ace_gutter {

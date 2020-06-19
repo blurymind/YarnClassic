@@ -359,13 +359,13 @@
     </div> <!-- settgins-item -->
 
     <!-- Gist token -->
-    <label class="settings-label" for="throttle-threshold">Github Gist Save</label>
+    <label class="settings-label" for="throttle-threshold">Github Gist Settings</label>
     <div class="settings-item">
       <label class="settings-label" for="throttle-threshold">Token</label>
       <div class="slidecontainer settings-value">
         <input
         type="password"
-        class="settings-value"
+        placeholder=" Github token (enable gists)"
         data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
       </div>
       <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">New</button>
@@ -377,6 +377,7 @@
         <input
         type="input"
         class="settings-value"
+        placeholder=" Enter gist id"
         data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
       </div>
       <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
@@ -392,7 +393,6 @@
       <input
       id="spellcheck"
       type="checkbox"
-      class="settings-value"
       data-bind="checked: app.settings.spellcheckEnabled">
     </div>
 
@@ -402,7 +402,6 @@
       <input
       id="completeWords"
       type="checkbox"
-      class="settings-value"
       data-bind="checked: app.settings.completeWordsEnabled"
       >
     </div>
@@ -413,7 +412,6 @@
       <input
       id="completeTags"
       type="checkbox"
-      class="settings-value"
       data-bind="checked: app.settings.completeTagsEnabled"
       >
     </div>
@@ -424,7 +422,6 @@
       <input
       id="autocreation"
       type="checkbox"
-      class="settings-value"
       checked="true"
       data-bind="checked: app.settings.createNodesEnabled"
       >
@@ -436,7 +433,6 @@
       <input
       id="nightMode"
       type="checkbox"
-      class="settings-value"
       checked="true"
       data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
       >
