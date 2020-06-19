@@ -233,13 +233,16 @@ export let Node = function(options = {}) {
         let movedX = x - self.x();
         let movedY = y - self.y();
 
-        self.x(x);
-        self.y(y);
+
+        const nodes = app.workspace.getSelectedNodes();
+        // Prevent yarn from moving a node when you scroll its contents on a touch screen
+        if(e.originalEvent.type === 'mousemove' || (nodes.includes(self) && e.originalEvent.type === 'touchmove')){
+          self.x(x);
+          self.y(y);
+        }
 
         if (groupDragging) {
-          let nodes = [];
           if (self.selected) {
-            nodes = app.workspace.getSelectedNodes();
             nodes.splice(nodes.indexOf(self), 1);
           } else {
             nodes = app.getNodesConnectedTo(self);
@@ -258,7 +261,7 @@ export let Node = function(options = {}) {
     });
 
     $(self.element).on('pointerdown', function(e) {
-      if (!dragging && self.active() && e.button ===0) {
+      if (!dragging && self.active() && e.button === 0 ) {
         dragging = true;
 
         if (app.input.isShiftDown || self.selected) {
@@ -276,6 +279,9 @@ export let Node = function(options = {}) {
       e.stopPropagation();
     });
 
+    $(self.element).on('touchend', function(e) {
+      app.workspace.selectNodes(self);
+    });
     $(self.element).on('pointerup touchend', function(e) {
       dragging = false;
       groupDragging = false;
