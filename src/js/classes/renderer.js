@@ -310,7 +310,7 @@ export var yarnRender = function() {
         document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         '<br/><font color=\'fuchsia\'>🐙Player chose: >' + choice + '</font>';
       } else {
-        document.getElementById(debugLabelIdToAttachTo).innerHTML += `<p class="story-playtest-bubble story-playtest-answer">${bbcode.parse(choice)}</p>`;
+        document.getElementById(debugLabelIdToAttachTo).innerHTML += `<p class="story-playtest-bubble story-playtest-answer answer-post">${bbcode.parse(choice)}</p>`;
       }
     });
     emiter.on('commandCall', function(call) {
