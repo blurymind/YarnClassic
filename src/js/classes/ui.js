@@ -15,6 +15,12 @@ export const UI = function(app) {
     { id: 'blueprint', name: 'Blueprint' }
   ];
 
+  // Playtest selector -----------------------------------------------------------
+  this.availablePlaytestStyles = [
+    { id: 'npc', name: 'Npc bubble' },
+    { id: 'chat', name: 'Chat messages' }
+  ];
+
   // Language selector --------------------------------------------------------
   this.availableLanguages = [
     { name: 'Afrikaans', id: 'af-ZA' },

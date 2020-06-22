@@ -262,7 +262,7 @@
       <div class="editor-container">
         <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
         <div class="editor-play" id="editor-play" onpointerdown="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
-          <p id="NVrichTextLabel"></p>
+          <p class="story-playtest-answer" id="NVrichTextLabel"></p>
           <div id="commandDebugLabel"></div>
         </div>
         <div class="editor" id="editor"
@@ -342,6 +342,20 @@
             event: { change: app.setMarkupLanguage }">
           </select>
           <button data-bind="click: app.ui.confirmMarkupConversion">Convert</button>
+        </div>
+      </div>
+
+      <!-- Story playtesting style -->
+      <div class="settings-item">
+        <label class="settings-label" for="theme">Playtesting style</label>
+        <div class="settings-value markup">
+          <select id="theme" data-bind="
+            options: app.ui.availablePlaytestStyles,
+            optionsText: 'name',
+            optionsValue: 'id',
+            value: app.settings.playtestStyle,
+            event: { change: app.setPlaytestStyle }">
+          </select>
         </div>
       </div>
 

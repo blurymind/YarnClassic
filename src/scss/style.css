@@ -639,24 +639,69 @@ input[type='checkbox'] {
   position: absolute;
 }
 
+.editor-play {
+  overflow-y: hidden !important;
+}
+
 #commandDebugLabel {
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 80%;
   width: 100%;
   resize: none;
   font: normal arial, calibri;
 }
-#NVrichTextLabel {
-  color: white;
+.story-playtest-answer,
+.story-playtest-bubble {
+  color: #000000;
   width: 90%;
+  border-radius: 24px;
+  padding: 10px;
+  margin: 7px;
+  background: #7df1c1;
+  font: large arial, calibri;
+  white-space: break-spaces;
+}
+
+.story-playtest-answer {
+  background: #dedede !important;
+  opacity: 0.7;
+}
+
+.story-animated-dots {
+  display: flex;
+}
+.story-animated-dots p {
+  animation-name: jumping-dots;
+  animation-duration: 0.7s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.story-animated-dots p:nth-child(2){
+  animation-delay: 0.2s;
+}
+.story-animated-dots p:nth-child(3){
+  animation-delay: 0.4s;
+}
+ @keyframes jumping-dots{
+   20%{
+     transform: translateY(0px);
+   }
+   40%{
+    transform: translateY(2px);
+  }
+  60%{
+    transform: translateY(3px);
+  }
+  80%{
+    transform: translateY(2px);
+  }
+ }
+
+#NVrichTextLabel {
   position: fixed;
   bottom: 10px;
   padding: 10px;
-  border-radius: 25px;
-  border: 3px solid #73ad21;
-  background: rgba(1, 1, 1, 0.5);
-  font: x-large arial, calibri;
-  white-space: break-spaces;
 }
 
 /* --- EDITOR HIGHLIGHTING --- */
@@ -840,7 +885,7 @@ input:focus + span + .dropdown {
 }
 
 .storyPreviewChoiceButton {
-  color: #f5ff6f;
+  color: #290018;
   font-size: 1.2em;
 }
 

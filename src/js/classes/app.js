@@ -46,6 +46,11 @@ export var App = function(name, version) {
     self.mustRefreshNodes.notifySubscribers();
   };
 
+  this.setPlaytestStyle = function(style, e) {
+    const playtestStyle = e ? e.target.value : style;
+    self.playtestStyle = playtestStyle;
+  };
+
   this.setGistCredentials = function(gist, e) {
     const {token, file} = gist;
     const Gists = require('gists');
@@ -975,7 +980,8 @@ export var App = function(name, version) {
           .trim(),
         'NVrichTextLabel',
         false,
-        'commandDebugLabel'
+        'commandDebugLabel',
+        self.playtestStyle
       );
     } else {
       //edit mode

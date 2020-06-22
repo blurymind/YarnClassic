@@ -109,6 +109,11 @@ export const Settings = function(app) {
     .observable(storage.getItem('markupLanguage') || 'bbcode')
     .extend({ persist:'markupLanguage' });
 
+  // Markup language
+  this.playtestStyle = ko
+    .observable(storage.getItem('playtestStyle') || 'chat')
+    .extend({ persist:'playtestStyle' });
+
   // Always open nodes in Visual Studio Code Editor
   // We don't actually show this in the settings menu; it can only be set by the VSCode extension's settings
   this.alwaysOpenNodesInVisualStudioCodeEditor = ko

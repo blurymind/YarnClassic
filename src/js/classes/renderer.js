@@ -18,6 +18,7 @@ export var yarnRender = function() {
   this.commandPassed = commandPassed;
   let finished = true;
   this.finished = finished;
+  this.scrollTextStyle = false;
 
   this.visitedChapters = []; // to keep track of all visited start chapters
   this.self = this;
@@ -88,6 +89,7 @@ export var yarnRender = function() {
       btn.className = 'storyPreviewChoiceButton';
       vnChoices.appendChild(btn);
     });
+    emiter.emit('choiceUpdated', this.vnSelectedChoice);
     self.updateVNHud();
   };
 
@@ -109,6 +111,7 @@ export var yarnRender = function() {
       if (vnResult.constructor.name === 'TextResult') {
         vnText = vnResult.text;
         vnTextScrollIdx = 0;
+        emiter.emit('textResult', vnText);
         this.changeTextScrollSpeed(220);
         return;
       }
@@ -183,6 +186,7 @@ export var yarnRender = function() {
     }
     if (vnResult.constructor.name === 'TextResult') {
       vnText += '\n' + vnResult.text;
+      emiter.emit('textResult', vnResult.text);
       // this.changeTextScrollSpeed(111);
     }
     if (vnResult.constructor.name === 'OptionsResult') {
@@ -234,8 +238,13 @@ export var yarnRender = function() {
         vnTextResult = vnText.substring(0, vnTextScrollIdx);
       }
     }
-    document.getElementById(htmIDtoAttachYarnTo).innerHTML = bbcode.parse(vnTextResult) + '<br>';
+    if (this.scrollTextStyle){
+      document.getElementById(htmIDtoAttachYarnTo).innerHTML = bbcode.parse(vnTextResult) + '<br>';
+    }  
     if (vnChoices !== undefined) {
+      if (!this.scrollTextStyle){
+        document.getElementById(htmIDtoAttachYarnTo).innerHTML = '';
+      }
       document.getElementById(htmIDtoAttachYarnTo).appendChild(vnChoices);
     }
   };
@@ -262,7 +271,8 @@ export var yarnRender = function() {
     startChapter,
     htmlIdToAttachTo,
     resourcesPath,
-    debugLabelId
+    debugLabelId,
+    playtestStyle
   ) => {
     const randomColour = ['#f5ff6f', '#44fe66', '#e00ec0', '#e93ecf', '#0ec0e0', '#3ecfe9', '#e4dbcb', '#978e7e', '#666', '#2f919a', 'deeppink', 'black', '#97E1E9', '#576574', '#6EA5E0', '#9EDE74', '#FFE374', '#F7A666', '#C47862'];
     const randomAscii = ['__̴ı̴̴̡̡̡ ̡͌l̡̡̡ ̡͌l̡*̡̡ ̴̡ı̴̴̡ ̡̡͡| ̲▫̲͡ ̲̲͡▫̲̲͡͡ ̲|̡̡̡ ̡, ̴̡ı̴̡̡ ̡͌l̡̡̡̡.___', '°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸', '(===||:::::::::::::::>',
@@ -281,6 +291,7 @@ export var yarnRender = function() {
     this.startChapter = startChapter;
     this.resourcesPath = resourcesPath;
     this.finished = false;
+    this.scrollTextStyle = playtestStyle === 'npc';
     document.getElementById(debugLabelIdToAttachTo).innerHTML =
       '<br/><font color=\'red\'>🚥Press/Hold Z or 📱Double-click/Tap to advance</font><br/>';
     emiter.on('startedNode', function(nodeData) {
@@ -295,13 +306,34 @@ export var yarnRender = function() {
           '<br/><font color=\'deeppink\'>&ensp;&ensp;&ensp;Tags: ' + nodeData.tags + '</font>';
     });
     emiter.on('choiceMade', function(choice) {
-      document.getElementById(debugLabelIdToAttachTo).innerHTML +=
+      if (this.scrollTextStyle) {
+        document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         '<br/><font color=\'fuchsia\'>🐙Player chose: >' + choice + '</font>';
+      } else {
+        document.getElementById(debugLabelIdToAttachTo).innerHTML += `<p class="story-playtest-bubble story-playtest-answer">${bbcode.parse(choice)}</p>`;
+      }
     });
     emiter.on('commandCall', function(call) {
       document.getElementById(debugLabelIdToAttachTo).innerHTML +=
         `<br/><font color='green'>🐣Command call:</font> <font color='red'>&lt;&lt;${call}&gt;&gt;</font>`;
     });
+    if (!this.scrollTextStyle){
+      emiter.on('textResult', function(text) {
+        document.getElementById(debugLabelIdToAttachTo).innerHTML += `<p class="story-playtest-bubble">${bbcode.parse(text)}</p>`;
+        document.getElementById(htmIDtoAttachYarnTo).innerHTML = '<span class="story-animated-dots"><p>.</p><p>.</p><p>.</p></span>';
+        //story-playtest-bubble
+        document.getElementById(htmIDtoAttachYarnTo).className = 'story-playtest-bubble';
+        document.getElementById(debugLabelIdToAttachTo).scrollTo({
+          top: document.getElementById(debugLabelIdToAttachTo).scrollHeight,
+          left: 0,
+          behavior: 'smooth'
+        });
+      });
+      emiter.on('choiceUpdated', function(choiceIndex) {
+        document.getElementById(htmIDtoAttachYarnTo).className = 'story-playtest-answer';
+
+      });
+    }
     emiter.on('finished', function() {
       finished = true;
       emiter.removeAllListeners();
