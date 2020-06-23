@@ -958,9 +958,12 @@ span.add-node:after {
 }
 
 /*-- ----------------------------HTML previews------------------------------- */
+.story-playtest-bubble > img,
 .editor-preview img {
   max-height: 200px;
+  border-radius: 7px;
 }
+.story-playtest-bubble > img:hover,
 .editor-preview img:hover {
   max-height: unset;
   max-width: 90%;
