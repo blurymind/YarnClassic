@@ -1011,6 +1011,10 @@ span.add-node:after {
     top: 40px !important;
   }
 
+  .menu:hover .dropdown {
+    max-height: 45vh;
+  }
+
   .tooltip {
     top: 15% !important;
     left: 15% !important;

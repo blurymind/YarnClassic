@@ -182,9 +182,8 @@
           <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command">🎮</button>
           <span class="hide-when-narrow">
             <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link">❔</button>
+            <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
           </span>
-
-          <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
           
           <!-- ko if:app.usingVisualStudioCodeExtension() -->
           <button class="bbcode-button" id="edit-node-in-vscode" onclick="app.editNodeInVisualStudioCodeEditor(app.editing())">🛠️ Edit in Visual Studio Code Text Editor</button>
@@ -249,7 +248,7 @@
           </input>
           <label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
         </span>
-        <button class="bbcode-button" onclick="app.speakText()" title="Hear text">🔊</button>
+        <button class="bbcode-button hide-when-narrow" onclick="app.speakText()" title="Hear text">🔊</button>
         <button id="storyPlayButton" class="bbcode-button" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
 
         <span class="show-when-narrow">
