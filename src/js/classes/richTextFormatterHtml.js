@@ -80,7 +80,7 @@ export const HtmlRichTextFormatter = function(app) {
           }
         });
     } else if (app.editor.getSelectedText().length === 0) {
-      app.moveEditCursor(-tagClose.length);
+      if (!app.isEditorInPreviewMode) app.moveEditCursor(-tagClose.length);
     } else {
       app.editor.selection.setRange({
         start: app.editor.selection.getRange().start,

@@ -88,6 +88,7 @@ export var App = function(name, version) {
   this.speachInstance = null;
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
+  this.isEditorInPreviewMode = false;
 
   // inEditor
   //
@@ -213,10 +214,12 @@ export var App = function(name, version) {
       });
       $('#colorPicker-container').show();
 
-      const currentColor = $('#colorPicker').spectrum('get');
-      self.applyPickerColorEditor(currentColor);
 
       self.togglePreviewMode(true);
+      setTimeout(() => {
+        const currentColor = $('#colorPicker').spectrum('get');
+        self.applyPickerColorEditor(currentColor);
+      }, 100);
     };
 
     // TODO: move to editor
@@ -1007,6 +1010,7 @@ export var App = function(name, version) {
     const editor = $('.editor')[0];
     const editorPreviewer = $('#editor-preview')[0];
 
+    self.isEditorInPreviewMode = previewModeOverwrite;
     if (previewModeOverwrite) {
       self.togglePlayMode(false);
       //preview mode
