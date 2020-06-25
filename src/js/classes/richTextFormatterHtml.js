@@ -123,14 +123,6 @@ export const HtmlRichTextFormatter = function(app) {
       ? '<font color="pink">' + rowCounter + '. </font>' + text // TODO: style this
       : text;
 
-    /// [[text|link]]
-    result = result.replace(/\[\[[^\[]+\]\]/gi, function(goto) {
-      const extractedGoto = goto.match(/\[\[(.*)\]\]/i);
-      if (extractedGoto.length > 1) {
-        return '<font color="tomato">(go:' + extractedGoto[1] + ')</font>'; // TODO: style this
-      }
-    });
-
     /// <<command>>
     result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
