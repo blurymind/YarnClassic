@@ -77,6 +77,7 @@ export const BbcodeRichTextFormatter = function(app) {
       if (app.editor.getSelectedText().length === 0) {
         app.moveEditCursor(-6);
         app.data.triggerPasteClipboard();
+        setTimeout(() => app.moveEditCursor(6), 300);
       }
     } else if (app.editor.getSelectedText().length === 0) {
       if (!app.isEditorInPreviewMode) app.moveEditCursor(-tagClose.length);
