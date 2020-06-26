@@ -998,6 +998,13 @@ span.add-node:after {
     border-bottom: 0px !important;
   }
 
+  .settings-form {
+    left: 5% !important;
+    top: 5% !important;
+    width: 90% !important;
+    height: 90% !important;
+  }
+
   .context-menu-visible > .context-menu-list {
     left: 0px !important;
     top: 40px !important;
