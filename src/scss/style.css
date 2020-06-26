@@ -791,14 +791,6 @@ input[type='checkbox'] {
 }
 
 /*-- Menu -------------------------------------------------------------- */
-
-.app-menu .dropdown {
-  max-height: 0px;
-  transition: max-height 0.5s;
-  overflow: hidden;
-  float: left;
-}
-
 .menu:hover .dropdown {
   max-height: 500px;
 }
@@ -810,7 +802,7 @@ input:focus + span + .dropdown {
 
 .menu .dropdown {
   clear: left;
-  overflow: hidden;
+  overflow: auto;
   max-height: 0px;
   transition: max-height 0.5s;
 }
@@ -1011,8 +1003,12 @@ span.add-node:after {
     top: 40px !important;
   }
 
-  .menu:hover .dropdown {
+  .menu:hover .dropdown .shrink-when-narrow{
     max-height: 45vh;
+  }
+
+  #linkHelperMenuFilter {
+    min-height: 25px;
   }
 
   .tooltip {
