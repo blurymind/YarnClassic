@@ -32,7 +32,7 @@ export const Settings = function(app) {
     app.toggleNightMode();
     app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
-    app.setGistCredentials({token:self.gistToken(), file: self.gistFile().split('/').pop()});
+    app.setGistCredentials({token:self.gistToken(), file: self.gistFile() !== null ? self.gistFile().split('/').pop() : null});
   };
 
   // Theme
