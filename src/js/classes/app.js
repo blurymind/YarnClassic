@@ -812,6 +812,10 @@ export var App = function(name, version) {
     self.toggleSpellCheck();
     self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
+
+    if (self.$searchField.val().length > 0 && $('.search-body input').is(':checked')){
+      self.editor.findAll(self.$searchField.val());
+    }
   };
 
   // called by the "Edit in Visual Studio Code Text Editor" button
