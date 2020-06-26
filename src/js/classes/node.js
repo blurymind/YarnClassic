@@ -250,8 +250,10 @@ export let Node = function(options = {}) {
 
           if (nodes.length > 0) {
             for (let i in nodes) {
-              nodes[i].x(nodes[i].x() + movedX);
-              nodes[i].y(nodes[i].y() + movedY);
+              if (nodes[i].active()) {
+                nodes[i].x(nodes[i].x() + movedX);
+                nodes[i].y(nodes[i].y() + movedY);
+              }
             }
           }
         }
