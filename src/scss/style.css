@@ -792,11 +792,11 @@ input[type='checkbox'] {
 
 /*-- Menu -------------------------------------------------------------- */
 .menu:hover .dropdown {
-  max-height: 500px;
+  max-height: 600px;
 }
 
 input:focus + span + .dropdown {
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
