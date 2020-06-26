@@ -150,9 +150,11 @@
     <div class="nodes">
       <div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
         <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
-          <div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
-          <div class="body" data-bind="html: node.clippedBody"></div>
-          <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }">
+          <div class="title-container" data-bind="css: { active: node.active() && node.active().title === true}">
+            <div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
+          </div>
+          <div class="body" data-bind="html: node.clippedBody, css: { active: node.active() && node.active().body === true}"></div>
+          <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }, css: { active: node.active() && node.active().tags === true}">
             <span data-bind="text: tag.text, css: tag.style"></span>
           </div>
           <div class="icon colorDown" data-bind="click: node.cycleColorDown"></div>

@@ -384,6 +384,18 @@ input[type='checkbox'] {
   opacity: 0;
 }
 
+.title-container.active>div,
+.title-container.active>div:hover {
+  text-decoration: underline;
+  text-decoration-color: rgb(255, 0, 98);
+}
+.tags.active,
+.body.active:hover,
+.body.active,
+.body.active:hover {
+  border: 1px solid rgb(255, 0, 98) !important;
+}
+
 /* --- SETTINGS --- */
 .settings-dialog {
   position: absolute;

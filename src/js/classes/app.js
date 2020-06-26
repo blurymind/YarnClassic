@@ -1148,7 +1148,7 @@ export var App = function(name, version) {
             .indexOf(search) >= 0;
 
         if (matchTitle || matchBody || matchTags) {
-          node.active(true);
+          node.active({ title: matchTitle, body: matchBody, tags: matchTags});
           element.clearQueue();
           element.transition({ opacity: on }, 500);
         } else {
