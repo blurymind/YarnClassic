@@ -1,17 +1,41 @@
 
 console.log("sw scripts")
-self.addEventListener('fetch', event => {
-  alert("eh")
-  if (event.request.method !== 'POST') {
-    event.respondWith(fetch(event.request));
-    return;
-  }
+const shareTargetHandler = async ({event}) => {
+  const formData = await event.request.formData();
+  const cache = await caches.open('images');
 
-  event.respondWith((async () => {
-    const formData = await event.request.formData();
-    alert("yay");
-    const link = formData.get('link') || '';
-    const responseUrl = await saveBookmark(link);
-    return Response.redirect('/', 303);
-  })());
-});
+  await cache.put(
+    // TODO: Come up with a more meaningful cache key.
+    `/images/${Date.now()}`,
+    // TODO: Get more meaningful metadata and use it
+    // to construct the response.
+    new Response(formData.get('image'))
+  );
+
+  // After the POST succeeds, redirect to the main page.
+  return Response.redirect('/', 303);
+};
+
+module.exports = {
+  // Set a few params to make for fewer generated files.
+  mode: 'development',
+  inlineWorkboxRuntime: true,
+  sourcemap: false,
+  skipWaiting: true,
+  globDirectory: '.',
+  globPatterns: ['index.js', 'manifest.json', '*.{html,css}'],
+  swDest: 'service-worker.js',
+  runtimeCaching: [{
+    // Create a 'fake' route to handle the incoming POST.
+    urlPattern: '/share-target',
+    method: 'POST',
+    handler: shareTargetHandler,
+  }, {
+    // Create a route to serve the cached images.
+    urlPattern: new RegExp('/images/\\d+'),
+    handler: 'CacheOnly',
+    options: {
+      cacheName: 'images',
+    },
+  }],
+};
