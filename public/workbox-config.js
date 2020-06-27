@@ -22,7 +22,7 @@ module.exports = {
   skipWaiting: true,
   globDirectory: '.',
   globPatterns: ['index.js', 'manifest.json', '*.{html,css}'],
-  swDest: '../service-worker.js',
+  swDest: 'service-worker.js',
   runtimeCaching: [{
     // Create a 'fake' route to handle the incoming POST.
     urlPattern: '/share-target',
