@@ -1022,8 +1022,8 @@ span.add-node:after {
     top: 40px !important;
   }
 
-  .menu:hover .dropdown .shrink-when-narrow{
-    max-height: 45vh;
+  .menu:hover .dropdown.shrink-when-narrow {
+    max-height: 45vh !important;
   }
 
   #linkHelperMenuFilter {
