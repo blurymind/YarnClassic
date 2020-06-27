@@ -133,6 +133,17 @@ const config = {
           sizes: [32], // you can also use the specifications pattern
         },
       ],
+      share_target: {
+        action: 'share-target',
+        enctype: 'multipart/form-data',
+        method: 'POST',
+        params: {
+          files: [{
+            name: 'image',
+            accept: ['image/*']
+          }]
+        }
+      },
     }),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, './src/index.html'),
