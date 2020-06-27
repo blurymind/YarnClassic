@@ -36,7 +36,8 @@
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "/",
+    "url_template": "index.html?oldapi=true&title={title}&text={text}&url={url}",
+    "action": "index.html",
     "enctype": "multipart/form-data",
     "method": "POST",
     "params": {
