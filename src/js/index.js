@@ -2,9 +2,6 @@ import '../scss/index.scss';
 
 import { Utils } from './classes/utils';
 
-import * as OfflinePluginRuntime from 'offline-plugin/runtime';
-OfflinePluginRuntime.install();
-
 import ko from 'knockout';
 window.ko = ko;
 
@@ -32,6 +29,18 @@ window.Swal = Swal;
 
 import { App } from './classes/app.js';
 import { version } from '../public/version.json';
+
+// Register PWA service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(registration => {
+      // registration.pushManager.subscribe({userVisibleOnly: true});
+      console.log('SW registered: ', registration);
+    }).catch(registrationError => {
+      console.log('SW registration failed: ', registrationError);
+    });
+  });
+}
 
 window.app = new App('Yarn', version);
 window.app.run();

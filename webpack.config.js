@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
-const OfflinePlugin = require('offline-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
 
@@ -130,7 +130,7 @@ const config = {
         },
         {
           src: path.resolve('src/public/icon.ico'),
-          sizes: [32, 192], // you can also use the specifications pattern
+          sizes: [32], // you can also use the specifications pattern
         },
       ],
     }),
@@ -143,10 +143,10 @@ const config = {
         useShortDoctype: true,
       },
     }),
-    new OfflinePlugin({
-      // responseStrategy: 'network-first',
-      autoUpdate: true,
-    }),
+    new WorkboxPlugin.GenerateSW({
+      swDest: path.resolve(__dirname, 'dist', 'sw.js'),
+      exclude: [/\.map$/, /_redirects/],
+    })
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
