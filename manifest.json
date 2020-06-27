@@ -36,7 +36,7 @@
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "YarnEditor/index.html?action=share_target",
+    "action": "YarnEditor/index.html?action=share-target",
     "enctype": "multipart/form-data",
     "method": "POST",
     "params": {
