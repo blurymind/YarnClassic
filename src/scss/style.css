@@ -1026,6 +1026,11 @@ span.add-node:after {
     max-height: 45vh !important;
   }
 
+  .menu,
+  .app-search {
+    opacity: 0.85;
+  }
+
   #linkHelperMenuFilter {
     min-height: 35px;
   }
