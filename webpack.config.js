@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
-const WorkboxPlugin = require('workbox-webpack-plugin');
+// const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
 
@@ -143,6 +143,7 @@ const config = {
         //   }]
         // }
         action: '/YarnEditor/',
+        enctype: 'multipart/form-data',
         method: 'GET',
         params: {
           title: 'title',
@@ -160,10 +161,10 @@ const config = {
         useShortDoctype: true,
       },
     }),
-    new WorkboxPlugin.GenerateSW({
-      swDest: path.resolve(__dirname, 'dist', 'sw.js'),
-      exclude: [/\.map$/, /_redirects/],
-    })
+    // new WorkboxPlugin.GenerateSW({
+    //   swDest: path.resolve(__dirname, 'dist', 'sw.js'),
+    //   exclude: [/\.map$/, /_redirects/],
+    // })
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
