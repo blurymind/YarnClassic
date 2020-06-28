@@ -112,10 +112,9 @@ const config = {
     new CssUrlRelativePlugin(),
     new WebpackPwaManifest({
       filename: 'manifest.json',
-      start_url: 'index.html',
+      // start_url: 'YarnEditor/.',
       inject: true,
       fingerprints: false,
-      dir: 'auto',
       name: 'Yarn Story Editor',
       short_name: 'Yarn',
       description: 'Yarn Story Editor',
@@ -134,14 +133,21 @@ const config = {
         },
       ],
       share_target: {
-        action: 'share-target',
-        enctype: 'multipart/form-data',
-        method: 'POST',
+        // action: 'share-target',
+        // enctype: 'multipart/form-data',
+        // method: 'POST', //github.io does not allow post
+        // params: {
+        //   files: [{
+        //     name: 'image',
+        //     accept: ['image/*']
+        //   }]
+        // }
+        action: '/YarnEditor/',
+        method: 'GET',
         params: {
-          files: [{
-            name: 'image',
-            accept: ['image/*']
-          }]
+          title: 'title',
+          text: 'text',
+          url: 'url',
         }
       },
     }),
