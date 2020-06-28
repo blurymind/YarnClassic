@@ -124,6 +124,14 @@ export var App = function(name, version) {
 
     if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
 
+    window.addEventListener('DOMContentLoaded', e => {
+      // e.preventDefault();
+      const parsedUrl = new URL(window.location);
+      // searchParams.get() will properly handle decoding the values.
+      // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
+      if (parsedUrl.searchParams.get('text')) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
+      // alert('URL shared: ' + parsedUrl.searchParams.get('url'));
+    });
     // PWA install promotion banner on start
     // window.addEventListener('beforeinstallprompt', function(event) {
     //   event.prompt();
