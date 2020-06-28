@@ -160,13 +160,18 @@ const config = {
         useShortDoctype: true,
       },
     }),
-    new WorkboxPlugin.GenerateSW({
+    // new WorkboxPlugin.GenerateSW({
+    //   swDest: path.resolve(__dirname, 'dist', 'sw.js'),
+    //   exclude: [/\.map$/, /_redirects/],
+    //   runtimeCaching: [{
+    //     urlPattern: /https:\/\/yarnspinnertool\.github\.io\/YarnEditor\//,
+    //     handler: 'NetworkFirst' //CacheFirst
+    //   }],
+    // }),
+    new WorkboxPlugin.InjectManifest({
       swDest: path.resolve(__dirname, 'dist', 'sw.js'),
       exclude: [/\.map$/, /_redirects/],
-      runtimeCaching: [{
-        urlPattern: /https:\/\/yarnspinnertool\.github\.io\/YarnEditor\//,
-        handler: 'NetworkFirst' //CacheFirst
-      }],
+      swSrc : path.resolve(__dirname, 'src', 'sw-src.js'),
     })
   ],
   devServer: {
