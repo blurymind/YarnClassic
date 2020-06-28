@@ -17,12 +17,12 @@ const shareTargetHandler = async ({event}) => {
 
 module.exports = {
   // Set a few params to make for fewer generated files.
-  mode: 'development',
+  // mode: 'development',
   inlineWorkboxRuntime: true,
   sourcemap: false,
   skipWaiting: true,
-  globDirectory: '.',
-  globPatterns: ['index.js', 'manifest.json', '*.{html,css}'],
+  globDirectory: 'src',
+  globPatterns: ['index.js', 'manifest.json', '*.{html,css,js,json,ico,png,scss}'],
   swDest: 'dist/sw.js',
   runtimeCaching: [{
     // Create a 'fake' route to handle the incoming POST.

@@ -6,6 +6,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
+// const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
 
@@ -108,6 +110,48 @@ const config = {
       include: 'initial',
     }),
     new CssUrlRelativePlugin(),
+    new WebpackPwaManifest({
+      filename: 'manifest.json',
+      // start_url: 'YarnEditor/.',
+      inject: true,
+      fingerprints: false,
+      name: 'Yarn Story Editor',
+      short_name: 'Yarn',
+      description: 'Yarn Story Editor',
+      background_color: '#3367D6',
+      theme_color: '#3367D6',
+      display: 'fullscreen',
+      crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+      icons: [
+        {
+          src: path.resolve('src/public/icon.png'),
+          sizes: [96, 128, 192, 512], // multiple sizes, 192 needed by pwa
+        },
+        {
+          src: path.resolve('src/public/icon.ico'),
+          sizes: [32], // you can also use the specifications pattern
+        },
+      ],
+      share_target: {
+        // action: 'share-target',
+        // enctype: 'multipart/form-data',
+        // method: 'POST', //github.io does not allow post
+        // params: {
+        //   files: [{
+        //     name: 'image',
+        //     accept: ['image/*']
+        //   }]
+        // }
+        action: '/YarnEditor/',
+        enctype: 'multipart/form-data',
+        method: 'GET',
+        params: {
+          title: 'title',
+          text: 'text',
+          url: 'url',
+        }
+      },
+    }),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, './src/index.html'),
       favicon: path.resolve('src/public/icon.ico'),
@@ -117,6 +161,10 @@ const config = {
         useShortDoctype: true,
       },
     }),
+    // new WorkboxPlugin.GenerateSW({
+    //   swDest: path.resolve(__dirname, 'dist', 'sw.js'),
+    //   exclude: [/\.map$/, /_redirects/],
+    // })
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
