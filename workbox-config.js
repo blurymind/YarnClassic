@@ -17,7 +17,7 @@ const shareTargetHandler = async ({event}) => {
 
 module.exports = {
   // Set a few params to make for fewer generated files.
-  // mode: 'development',
+  mode: 'development',
   inlineWorkboxRuntime: true,
   sourcemap: false,
   skipWaiting: true,

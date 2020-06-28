@@ -129,8 +129,9 @@ export var App = function(name, version) {
       const parsedUrl = new URL(window.location);
       // searchParams.get() will properly handle decoding the values.
       // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
-      if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
+      // if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
       // alert('URL shared: ' + parsedUrl.searchParams.get('url'));
+      console.log(self.settings);
     });
     // PWA install promotion banner on start
     // window.addEventListener('beforeinstallprompt', function(event) {
