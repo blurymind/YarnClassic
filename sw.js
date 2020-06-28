@@ -1767,27 +1767,6 @@ class CacheOnly {
 }
 
 /*
-  Copyright 2019 Google LLC
-
-  Use of this source code is governed by an MIT-style
-  license that can be found in the LICENSE file or at
-  https://opensource.org/licenses/MIT.
-*/
-/**
- * Force a service worker to activate immediately, instead of
- * [waiting](https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle#waiting)
- * for existing clients to close.
- *
- * @memberof module:workbox-core
- */
-
-function skipWaiting() {
-  // We need to explicitly call `self.skipWaiting()` here because we're
-  // shadowing `skipWaiting` with this local function.
-  self.addEventListener('install', () => self.skipWaiting());
-}
-
-/*
   Copyright 2018 Google LLC
 
   Use of this source code is governed by an MIT-style
@@ -1954,6 +1933,357 @@ const wrappedFetch = async ({
 const fetchWrapper = {
   fetch: wrappedFetch
 };
+
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+const cacheOkAndOpaquePlugin = {
+  /**
+   * Returns a valid response (to allow caching) if the status is 200 (OK) or
+   * 0 (opaque).
+   *
+   * @param {Object} options
+   * @param {Response} options.response
+   * @return {Response|null}
+   *
+   * @private
+   */
+  cacheWillUpdate: async ({
+    response
+  }) => {
+    if (response.status === 200 || response.status === 0) {
+      return response;
+    }
+
+    return null;
+  }
+};
+
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+/**
+ * An implementation of a
+ * [network first]{@link https://developers.google.com/web/fundamentals/instant-and-offline/offline-cookbook/#network-falling-back-to-cache}
+ * request strategy.
+ *
+ * By default, this strategy will cache responses with a 200 status code as
+ * well as [opaque responses]{@link https://developers.google.com/web/tools/workbox/guides/handle-third-party-requests}.
+ * Opaque responses are are cross-origin requests where the response doesn't
+ * support [CORS]{@link https://enable-cors.org/}.
+ *
+ * If the network request fails, and there is no cache match, this will throw
+ * a `WorkboxError` exception.
+ *
+ * @memberof module:workbox-strategies
+ */
+
+class NetworkFirst {
+  /**
+   * @param {Object} options
+   * @param {string} options.cacheName Cache name to store and retrieve
+   * requests. Defaults to cache names provided by
+   * [workbox-core]{@link module:workbox-core.cacheNames}.
+   * @param {Array<Object>} options.plugins [Plugins]{@link https://developers.google.com/web/tools/workbox/guides/using-plugins}
+   * to use in conjunction with this caching strategy.
+   * @param {Object} options.fetchOptions Values passed along to the
+   * [`init`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters)
+   * of all fetch() requests made by this strategy.
+   * @param {Object} options.matchOptions [`CacheQueryOptions`](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions)
+   * @param {number} options.networkTimeoutSeconds If set, any network requests
+   * that fail to respond within the timeout will fallback to the cache.
+   *
+   * This option can be used to combat
+   * "[lie-fi]{@link https://developers.google.com/web/fundamentals/performance/poor-connectivity/#lie-fi}"
+   * scenarios.
+   */
+  constructor(options = {}) {
+    this._cacheName = cacheNames.getRuntimeName(options.cacheName);
+
+    if (options.plugins) {
+      const isUsingCacheWillUpdate = options.plugins.some(plugin => !!plugin.cacheWillUpdate);
+      this._plugins = isUsingCacheWillUpdate ? options.plugins : [cacheOkAndOpaquePlugin, ...options.plugins];
+    } else {
+      // No plugins passed in, use the default plugin.
+      this._plugins = [cacheOkAndOpaquePlugin];
+    }
+
+    this._networkTimeoutSeconds = options.networkTimeoutSeconds || 0;
+
+    {
+      if (this._networkTimeoutSeconds) {
+        finalAssertExports.isType(this._networkTimeoutSeconds, 'number', {
+          moduleName: 'workbox-strategies',
+          className: 'NetworkFirst',
+          funcName: 'constructor',
+          paramName: 'networkTimeoutSeconds'
+        });
+      }
+    }
+
+    this._fetchOptions = options.fetchOptions;
+    this._matchOptions = options.matchOptions;
+  }
+  /**
+   * This method will perform a request strategy and follows an API that
+   * will work with the
+   * [Workbox Router]{@link module:workbox-routing.Router}.
+   *
+   * @param {Object} options
+   * @param {Request|string} options.request A request to run this strategy for.
+   * @param {Event} [options.event] The event that triggered the request.
+   * @return {Promise<Response>}
+   */
+
+
+  async handle({
+    event,
+    request
+  }) {
+    const logs = [];
+
+    if (typeof request === 'string') {
+      request = new Request(request);
+    }
+
+    {
+      finalAssertExports.isInstance(request, Request, {
+        moduleName: 'workbox-strategies',
+        className: 'NetworkFirst',
+        funcName: 'handle',
+        paramName: 'makeRequest'
+      });
+    }
+
+    const promises = [];
+    let timeoutId;
+
+    if (this._networkTimeoutSeconds) {
+      const {
+        id,
+        promise
+      } = this._getTimeoutPromise({
+        request,
+        event,
+        logs
+      });
+
+      timeoutId = id;
+      promises.push(promise);
+    }
+
+    const networkPromise = this._getNetworkPromise({
+      timeoutId,
+      request,
+      event,
+      logs
+    });
+
+    promises.push(networkPromise); // Promise.race() will resolve as soon as the first promise resolves.
+
+    let response = await Promise.race(promises); // If Promise.race() resolved with null, it might be due to a network
+    // timeout + a cache miss. If that were to happen, we'd rather wait until
+    // the networkPromise resolves instead of returning null.
+    // Note that it's fine to await an already-resolved promise, so we don't
+    // have to check to see if it's still "in flight".
+
+    if (!response) {
+      response = await networkPromise;
+    }
+
+    {
+      logger.groupCollapsed(messages$1.strategyStart('NetworkFirst', request));
+
+      for (const log of logs) {
+        logger.log(log);
+      }
+
+      messages$1.printFinalResponse(response);
+      logger.groupEnd();
+    }
+
+    if (!response) {
+      throw new WorkboxError('no-response', {
+        url: request.url
+      });
+    }
+
+    return response;
+  }
+  /**
+   * @param {Object} options
+   * @param {Request} options.request
+   * @param {Array} options.logs A reference to the logs array
+   * @param {Event} [options.event]
+   * @return {Promise<Response>}
+   *
+   * @private
+   */
+
+
+  _getTimeoutPromise({
+    request,
+    logs,
+    event
+  }) {
+    let timeoutId;
+    const timeoutPromise = new Promise(resolve => {
+      const onNetworkTimeout = async () => {
+        {
+          logs.push(`Timing out the network response at ` + `${this._networkTimeoutSeconds} seconds.`);
+        }
+
+        resolve(await this._respondFromCache({
+          request,
+          event
+        }));
+      };
+
+      timeoutId = setTimeout(onNetworkTimeout, this._networkTimeoutSeconds * 1000);
+    });
+    return {
+      promise: timeoutPromise,
+      id: timeoutId
+    };
+  }
+  /**
+   * @param {Object} options
+   * @param {number|undefined} options.timeoutId
+   * @param {Request} options.request
+   * @param {Array} options.logs A reference to the logs Array.
+   * @param {Event} [options.event]
+   * @return {Promise<Response>}
+   *
+   * @private
+   */
+
+
+  async _getNetworkPromise({
+    timeoutId,
+    request,
+    logs,
+    event
+  }) {
+    let error;
+    let response;
+
+    try {
+      response = await fetchWrapper.fetch({
+        request,
+        event,
+        fetchOptions: this._fetchOptions,
+        plugins: this._plugins
+      });
+    } catch (err) {
+      error = err;
+    }
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    {
+      if (response) {
+        logs.push(`Got response from network.`);
+      } else {
+        logs.push(`Unable to get a response from the network. Will respond ` + `with a cached response.`);
+      }
+    }
+
+    if (error || !response) {
+      response = await this._respondFromCache({
+        request,
+        event
+      });
+
+      {
+        if (response) {
+          logs.push(`Found a cached response in the '${this._cacheName}'` + ` cache.`);
+        } else {
+          logs.push(`No response found in the '${this._cacheName}' cache.`);
+        }
+      }
+    } else {
+      // Keep the service worker alive while we put the request in the cache
+      const responseClone = response.clone();
+      const cachePut = cacheWrapper.put({
+        cacheName: this._cacheName,
+        request,
+        response: responseClone,
+        event,
+        plugins: this._plugins
+      });
+
+      if (event) {
+        try {
+          // The event has been responded to so we can keep the SW alive to
+          // respond to the request
+          event.waitUntil(cachePut);
+        } catch (err) {
+          {
+            logger.warn(`Unable to ensure service worker stays alive when ` + `updating cache for '${getFriendlyURL(request.url)}'.`);
+          }
+        }
+      }
+    }
+
+    return response;
+  }
+  /**
+   * Used if the network timeouts or fails to make the request.
+   *
+   * @param {Object} options
+   * @param {Request} request The request to match in the cache
+   * @param {Event} [options.event]
+   * @return {Promise<Object>}
+   *
+   * @private
+   */
+
+
+  _respondFromCache({
+    event,
+    request
+  }) {
+    return cacheWrapper.match({
+      cacheName: this._cacheName,
+      request,
+      event,
+      matchOptions: this._matchOptions,
+      plugins: this._plugins
+    });
+  }
+
+}
+
+/*
+  Copyright 2019 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+/**
+ * Force a service worker to activate immediately, instead of
+ * [waiting](https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle#waiting)
+ * for existing clients to close.
+ *
+ * @memberof module:workbox-core
+ */
+
+function skipWaiting() {
+  // We need to explicitly call `self.skipWaiting()` here because we're
+  // shadowing `skipWaiting` with this local function.
+  self.addEventListener('install', () => self.skipWaiting());
+}
 
 /*
   Copyright 2019 Google LLC
@@ -3044,7 +3374,160 @@ skipWaiting();
 
 precacheAndRoute([{
   "url": "manifest.json",
-  "revision": "0600e44f5ae46eee66d6d55492213264"
+  "revision": "75c684a5198dfe33c7487fcb1227c4d6"
+}, {
+  "url": "index.html",
+  "revision": "43c1b5bbe071e196268874e37d29d967"
+}, {
+  "url": "js/classes/app.js",
+  "revision": "13633486838bacf51f34f88f4330c22c"
+}, {
+  "url": "js/classes/data.js",
+  "revision": "a5f43d3f54ae645853e39711a06b2bfd"
+}, {
+  "url": "js/classes/input.js",
+  "revision": "acdb27bae5b7ecb0a4b09f043b809d33"
+}, {
+  "url": "js/classes/node.js",
+  "revision": "f460411c3175399a0a51c43b2699b7ca"
+}, {
+  "url": "js/classes/renderer.js",
+  "revision": "3b9a9449c1e3f4ed7a653b5179c2be72"
+}, {
+  "url": "js/classes/richTextFormatter.js",
+  "revision": "25867cfb8cc6bf3ee69f080c3d47d47e"
+}, {
+  "url": "js/classes/richTextFormatterBbcode.js",
+  "revision": "74f86155a31d4ddea62bb0800e3df6dc"
+}, {
+  "url": "js/classes/richTextFormatterHtml.js",
+  "revision": "f565597db805348c7dc3161779082dfc"
+}, {
+  "url": "js/classes/settings.js",
+  "revision": "6f4ec17add38a26222db1c7df506b6d1"
+}, {
+  "url": "js/classes/ui.js",
+  "revision": "ee8dd71ca54c45885ba4d346c127528d"
+}, {
+  "url": "js/classes/utils.js",
+  "revision": "da739557f60152cdab992f61c2c6f515"
+}, {
+  "url": "js/classes/workspace.js",
+  "revision": "f273232d5ca3a85eb684ce45cb392dbe"
+}, {
+  "url": "js/index.js",
+  "revision": "56b4156ca54a3b2c2be1fc620244f5a8"
+}, {
+  "url": "js/libs/knockout.ace.js",
+  "revision": "cc1326d9e6176bb6e5b2a69e7e66edd8"
+}, {
+  "url": "js/libs/spellcheck_ace.js",
+  "revision": "93820d997bd915a3f1d311cd1379cc29"
+}, {
+  "url": "public/dictionaries/en/index.aff",
+  "revision": "ff0059b0644df7008c9f635f77da7601"
+}, {
+  "url": "public/dictionaries/en/index.dic",
+  "revision": "2f6e098411997f3d1217865bb468947f"
+}, {
+  "url": "public/droid-sans-mono.ttf",
+  "revision": "a267c0b23e4794a4d9f2092027ab0fc7"
+}, {
+  "url": "public/icon.ico",
+  "revision": "0158a98eda5da93408305a8f817bd61e"
+}, {
+  "url": "public/icon.png",
+  "revision": "73d45685f29fa05223dbb6cf7fb57097"
+}, {
+  "url": "public/images/append.png",
+  "revision": "f6d9b17fab77f5116fcb9367bb730da4"
+}, {
+  "url": "public/images/dropbox.ico",
+  "revision": "51e2de798b41db26b6a0ec187959d394"
+}, {
+  "url": "public/images/exp-data.png",
+  "revision": "3f259048a63c7510c24191f8f75a3a61"
+}, {
+  "url": "public/images/github.png",
+  "revision": "665125bd6068ffdbbe1b24ed10dfb5e3"
+}, {
+  "url": "public/images/icons.png",
+  "revision": "4207a97346300aecc34f2e8ba8d1d3d3"
+}, {
+  "url": "public/images/octocat.png",
+  "revision": "ad821a254e7d9825608ab2dca943a8c5"
+}, {
+  "url": "public/images/open.png",
+  "revision": "2fb289a60caf8b144cf79e3a6303538e"
+}, {
+  "url": "public/images/pixel.png",
+  "revision": "85f678b520893f6007833e0ae0a1f106"
+}, {
+  "url": "public/images/settings.png",
+  "revision": "b219cce95da1546e5a67b0b2b7172831"
+}, {
+  "url": "public/images/sort.png",
+  "revision": "ce7bbb86723161b4a009b50262f4b926"
+}, {
+  "url": "public/images/twine-favicon-152.png",
+  "revision": "83e847f2aeb1d4f8f7f05cbb6be593c8"
+}, {
+  "url": "public/images/undo-redo.png",
+  "revision": "7270caeb2954001e5e664969bb396998"
+}, {
+  "url": "public/images/xml.png",
+  "revision": "1d9125c9fff6c12cae0797f710b5e24c"
+}, {
+  "url": "public/images/zooms.png",
+  "revision": "e38ef1d5f375d28f0f07ad7ee7dde609"
+}, {
+  "url": "public/mode-yarn.js",
+  "revision": "e20980af69280ee37603e4c6bb8ee7d6"
+}, {
+  "url": "public/templates/node.html",
+  "revision": "df3a64e933f73f88115992eedc6c80a6"
+}, {
+  "url": "public/theme-yarn.js",
+  "revision": "2fe43fbb7c796eddba021471ef0262ea"
+}, {
+  "url": "public/themes/blueprint.css",
+  "revision": "5dcacd2686408d6d659f8850ae85fb73"
+}, {
+  "url": "public/themes/classic.css",
+  "revision": "87d3fd85e2954b1a2f64c9f5b2efcec3"
+}, {
+  "url": "public/version.json",
+  "revision": "164329cf36e817393d9bc9f1bb29764c"
+}, {
+  "url": "scss/font/context-menu-icons.eot",
+  "revision": "cc26e986ac53238679cef6af5cbc5104"
+}, {
+  "url": "scss/font/context-menu-icons.ttf",
+  "revision": "66fe7d78e602880e529daf66c8cb85d3"
+}, {
+  "url": "scss/font/context-menu-icons.woff",
+  "revision": "4568f559933f6b3db786835cf61387b1"
+}, {
+  "url": "scss/font/context-menu-icons.woff2",
+  "revision": "3124260e1569c74431e23dd130111455"
+}, {
+  "url": "scss/index.scss",
+  "revision": "92794db4c8c38963c68915e2f5dfc796"
+}, {
+  "url": "scss/jquery.contextMenu.css",
+  "revision": "e7110810a4f6b4cdd3b1bd94589cd135"
+}, {
+  "url": "scss/normalize.css",
+  "revision": "f54ee73ac4013e166a57781b01a08f10"
+}, {
+  "url": "scss/spectrum.css",
+  "revision": "c4570cb2ee0a64de0fb186a50b5679ea"
+}, {
+  "url": "scss/style.css",
+  "revision": "4c93f2c4ce723e28857a9081d1e9330b"
+}, {
+  "url": "sw.js",
+  "revision": "4ab3691ce50d878411f92c3730bb1b4c"
 }], {});
 registerRoute("/share-target", async ({
   event
@@ -3063,3 +3546,4 @@ registerRoute(/\/images\/\d+/, new CacheOnly({
   "cacheName": "images",
   plugins: []
 }), 'GET');
+registerRoute(/https:\/\/yarnspinnertool\.github\.io\/YarnEditor\//, new NetworkFirst(), 'GET');
