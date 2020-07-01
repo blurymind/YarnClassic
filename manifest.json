@@ -30,12 +30,12 @@
   "short_name": "Yarn",
   "orientation": "portrait",
   "display": "fullscreen",
-  "start_url": "/YarnEditor/index.html",
+  "start_url": "/",
   "description": "Yarn Story Editor",
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "/YarnEditor/index.html?share-target=/",
+    "action": "share-target",
     "method": "GET",
     "params": {
       "title": "title",
