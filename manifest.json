@@ -30,7 +30,7 @@
   "short_name": "Yarn",
   "orientation": "portrait",
   "display": "fullscreen",
-  "start_url": "/?utm_source=installed",
+  "start_url": "/YarnEditor/index.html?utm_source=installed",
   "description": "Yarn Story Editor",
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
