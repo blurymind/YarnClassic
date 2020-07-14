@@ -786,7 +786,8 @@ export var App = function(name, version) {
       self.getOtherNodeTitles(),
       'Node Link'
     );
-    langTools.setCompleters([nodeLinksCompleter]);
+    // console.log(langTools);
+    langTools.setCompleters([nodeLinksCompleter, langTools.keyWordCompleter, langTools.textCompleter, langTools.snippetCompleter]);
 
     // autocompletion
     let autoCompleteTimeout = undefined;
