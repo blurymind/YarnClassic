@@ -127,10 +127,13 @@ export var App = function(name, version) {
     window.addEventListener('DOMContentLoaded', e => {
       // e.preventDefault();
       const parsedUrl = new URL(window.location);
+      const sharedText = parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
+      if (sharedText !== null) {
+        alert('URL shared: ' + sharedText + '\n' + window.location);
+      }
       // searchParams.get() will properly handle decoding the values.
       // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
       // if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
-      // alert('URL shared: ' + parsedUrl.searchParams.get('url'));
       console.log(self.settings);
     });
     // PWA install promotion banner on start
