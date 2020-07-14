@@ -15,6 +15,37 @@ export const data = {
       ? path.join(path.dirname(filePath), addSubPath)
       : path.dirname(filePath);
   },
+  setNewFile:function() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Any unsaved ${data.editingName()} progress will be lost!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'New file',
+      cancelButtonText: 'No, cancel!',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.value) {
+        data.editingPath(null);
+        data.editingName('NewFile');
+        data.editingType('json');
+        data.editingFolder(null);
+        app.workspace.selectedNodes = [];
+        app.editing(null);
+        app.nodes([app.newNode(true).title('Start')]);
+        app.tags([]);
+        app.updateNodeLinks();
+        app.workspace.warpToNodeByIdx(0);
+    
+        // Callback for embedding in other webapps
+        var event = new CustomEvent('yarnLoadedData');
+        event.document = document;
+        event.data = data;
+        event.app = app;
+        window.parent.dispatchEvent(event);
+      }
+    });
+  },
   readFile: function(file, filename, clearNodes) {
     // Read approach that works for webapps
     var reader = new FileReader();

@@ -2,6 +2,9 @@
   font-family: yarnFont;
   src: url('../public/droid-sans-mono.ttf');
 }
+:root{
+  --menu-dropdown-max-height: 700px;
+}
 /* --- ROOT CSS --- */
 body {
   overflow: hidden;
@@ -804,11 +807,11 @@ input[type='checkbox'] {
 
 /*-- Menu -------------------------------------------------------------- */
 .menu:hover .dropdown {
-  max-height: 600px;
+  max-height: var(--menu-dropdown-max-height);
 }
 
 input:focus + span + .dropdown {
-  max-height: 600px;
+  max-height: var(--menu-dropdown-max-height);
   overflow-y: auto;
 }
 
