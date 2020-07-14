@@ -79,7 +79,14 @@ export const data = {
     data.readFile(file, filename, true);
     app.refreshWindowTitle(filename);
   },
-
+  openFiles: function(file, filename) {
+    const files = document.getElementById('open-file').files;
+    Object.entries(files).forEach(([key, value]) => {
+      if (key === '0') data.openFile(value, value.name);
+      else data.appendFile(value, value.name);
+    });
+    
+  },
   openFolder: function(e, foldername) {
     editingFolder = foldername;
     alert(
@@ -389,7 +396,7 @@ export const data = {
 
   tryOpenFile: function() /// Refactor to send signal to the main process
   {
-    data.openFileDialog($('#open-file'), data.openFile);
+    data.openFileDialog($('#open-file'), data.openFiles);
   },
 
   promptFileNameAndFormat: function (cb, suggestions = null) {
