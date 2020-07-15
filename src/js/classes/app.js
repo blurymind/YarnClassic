@@ -129,13 +129,13 @@ export var App = function(name, version) {
       return null;
     });
     window.addEventListener('DOMContentLoaded', e => {
-      // e.preventDefault();
+      this.data.loadAppStateFromLocalStorage();
       
       const parsedUrl = new URL(window.location);
       const sharedText = parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
       if (sharedText !== null) {
-        alert('URL shared: ' + sharedText + '\n' + window.location);
-        this.data.loadAppStateFromLocalStorage();
+        self.insertTextAtCursor(sharedText);
+        // setTimeout(() => self.insertTextAtCursor(sharedText), 100);
       }
       // searchParams.get() will properly handle decoding the values.
       // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
@@ -1077,6 +1077,7 @@ export var App = function(name, version) {
 
   // TODO: move to editor class
   this.insertTextAtCursor = function(textToInsert) {
+    if (!self.editing()) return;
     self.editor.session.replace(self.editor.selection.getRange(), '');
     self.editor.session.insert(self.editor.getCursorPosition(), textToInsert);
     self.editor.focus();
@@ -1444,6 +1445,7 @@ export var App = function(name, version) {
     $('.editor-counter .line-count').html(lines.length);
     $('.editor-counter .row-index').html(cursor.row);
     $('.editor-counter .column-index').html(cursor.column);
+    data.saveAppStateToLocalStorage();
   };
 
   this.getUniqueTitle = function(desiredTitle) {

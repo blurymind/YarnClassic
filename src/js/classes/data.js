@@ -49,13 +49,14 @@ export const data = {
       editing: app.editing() ? data.getNodeAsObject(app.editing()): null,
       nodes: data.getNodesAsObjects(),
       tags: app.tags(),
+      editorSelection: app.editor ? app.editor.selection.getRange(): null,
     }));
   },
   loadAppStateFromLocalStorage: function() {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, editingName, editingType, editingFolder, editing, nodes, tags} = appState;
+      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
@@ -65,6 +66,7 @@ export const data = {
       app.tags(tags);
       app.updateNodeLinks();
       if (editing) app.editNode(data.getNodeFromObject(editing));
+      if (editorSelection) app.editor.selection.setRange(editorSelection);
     }
   },
   readFile: function(file, filename, clearNodes) {
