@@ -45,6 +45,12 @@
           "accept": [
             "image/*"
           ]
+        },
+        {
+          "name": "text",
+          "accept": [
+            "text/*"
+          ]
         }
       ]
     }
