@@ -15,6 +15,7 @@ const getStorage = function() {
 export const Settings = function(app) {
   const self = this;
   const storage = getStorage();
+  this.storage = storage;
 
   ko.extenders.persist = function (target, option) {
     target.subscribe(function (newValue) {

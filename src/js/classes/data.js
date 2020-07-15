@@ -35,16 +35,37 @@ export const data = {
         app.nodes([app.newNode(true).title('Start')]);
         app.tags([]);
         app.updateNodeLinks();
-        app.workspace.warpToNodeByIdx(0);
-    
-        // Callback for embedding in other webapps
-        var event = new CustomEvent('yarnLoadedData');
-        event.document = document;
-        event.data = data;
-        event.app = app;
-        window.parent.dispatchEvent(event);
+        app.workspace.warpToNodeByIdx(0);    
       }
     });
+  },
+  saveAppStateToLocalStorage: function() {
+    const storage = app.settings.storage;
+    storage.setItem('appState',JSON.stringify({
+      editingPath: data.editingPath(),
+      editingName: data.editingName(),
+      editingType: data.editingType(),
+      editingFolder: data.editingFolder(),
+      editing: app.editing() ? data.getNodeAsObject(app.editing()): null,
+      nodes: data.getNodesAsObjects(),
+      tags: app.tags(),
+    }));
+  },
+  loadAppStateFromLocalStorage: function() {
+    const storage = app.settings.storage;
+    const appState = JSON.parse(storage.getItem('appState'));
+    if (appState) {
+      const {editingPath, editingName, editingType, editingFolder, editing, nodes, tags} = appState;
+      data.editingPath(editingPath);
+      data.editingName(editingName);
+      data.editingType(editingType);
+      data.editingFolder(editingFolder);
+      app.nodes([]);
+      data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
+      app.tags(tags);
+      app.updateNodeLinks();
+      if (editing) app.editNode(data.getNodeFromObject(editing));
+    }
   },
   readFile: function(file, filename, clearNodes) {
     // Read approach that works for webapps
@@ -242,18 +263,7 @@ export const data = {
       if (clearNodes)
         app.nodes.removeAll();
 
-      objects.forEach( (object, i) => {
-        let node = new Node({
-          title: object.title,
-          body: object.body,
-          tags: object.tags,
-          colorID: object.colorID,
-          x: parseInt(object.position.x),
-          y: parseInt(object.position.y),
-        });
-
-        app.nodes.push(node);
-      });
+      data.getNodesFromObjects(objects).forEach(node => app.nodes.push(node));
     });
 
     app.updateNodeLinks();
@@ -266,21 +276,46 @@ export const data = {
     event.app = app;
     window.parent.dispatchEvent(event);
   },
-
-  getSaveData: function(type) {
-    var output = '';
-    var content = [];
-    var nodes = app.nodes();
+  getNodeFromObject: function(object){
+    return new Node({
+      title: object.title,
+      body: object.body,
+      tags: object.tags,
+      colorID: object.colorID,
+      x: parseInt(object.position.x),
+      y: parseInt(object.position.y),
+    });
+  },
+  getNodeAsObject: function(node){
+    return {
+      title: node.title(),
+      tags: node.tags(),
+      body: node.body(),
+      position: { x: node.x(), y: node.y() },
+      colorID: node.colorID(),
+    };
+  },
+  getNodesFromObjects: function (objects){
+    const appNodes = [];
+    if (!objects) return [];
+    objects.forEach(object => {
+      appNodes.push(data.getNodeFromObject(object));
+    });
+    return appNodes;
+  },
+  
+  getNodesAsObjects: function() {
+    const nodesObjects = [];
+    const nodes = app.nodes();
 
     for (var i = 0; i < nodes.length; i++) {
-      content.push({
-        title: nodes[i].title(),
-        tags: nodes[i].tags(),
-        body: nodes[i].body(),
-        position: { x: nodes[i].x(), y: nodes[i].y() },
-        colorID: nodes[i].colorID(),
-      });
+      nodesObjects.push(data.getNodeAsObject(nodes[i]));
     }
+    return nodesObjects;
+  },
+  getSaveData: function(type) {
+    var output = '';
+    var content = data.getNodesAsObjects();
 
     if (type == FILETYPE.JSON) {
       output = JSON.stringify(content, null, '\t');

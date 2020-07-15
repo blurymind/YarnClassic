@@ -124,12 +124,18 @@ export var App = function(name, version) {
 
     if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
 
+    window.addEventListener('beforeunload', e => {
+      this.data.saveAppStateToLocalStorage();
+      return null;
+    });
     window.addEventListener('DOMContentLoaded', e => {
       // e.preventDefault();
+      
       const parsedUrl = new URL(window.location);
       const sharedText = parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
       if (sharedText !== null) {
         alert('URL shared: ' + sharedText + '\n' + window.location);
+        this.data.loadAppStateFromLocalStorage();
       }
       // searchParams.get() will properly handle decoding the values.
       // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
