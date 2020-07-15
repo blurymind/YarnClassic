@@ -65,8 +65,10 @@ export const data = {
       data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
       app.updateNodeLinks();
-      if (editing) app.editNode(data.getNodeFromObject(editing));
-      if (editorSelection) app.editor.selection.setRange(editorSelection);
+      if (editing) {
+        app.editNode(data.getNodeFromObject(editing));
+        if (editorSelection) app.editor.selection.setRange(editorSelection);
+      }
     }
   },
   readFile: function(file, filename, clearNodes) {
