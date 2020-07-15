@@ -30,26 +30,22 @@
   "short_name": "Yarn",
   "orientation": "portrait",
   "display": "fullscreen",
-  "start_url": "/YarnEditor/",
+  "start_url": ".",
   "description": "Yarn Story Editor",
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "/YarnEditor/_share-target",
-    "enctype": "multipart/form-data",
-    "method": "POST",
+    "action": "/YarnEditor/",
+    "method": "GET",
     "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
       "files": [
         {
           "name": "image",
           "accept": [
             "image/*"
-          ]
-        },
-        {
-          "name": "text",
-          "accept": [
-            "text/*"
           ]
         }
       ]
