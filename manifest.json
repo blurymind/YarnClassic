@@ -35,12 +35,18 @@
   "background_color": "#3367D6",
   "theme_color": "#3367D6",
   "share_target": {
-    "action": "/YarnEditor/",
-    "method": "GET",
+    "action": "/YarnEditor/_share-target",
+    "enctype": "multipart/form-data",
+    "method": "POST",
     "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
+      "files": [
+        {
+          "name": "image",
+          "accept": [
+            "image/*"
+          ]
+        }
+      ]
     }
   }
 }
