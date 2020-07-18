@@ -51,7 +51,7 @@ export const data = {
       tags: app.tags(),
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
       transform: app.workspace.transform,
-      scale: app.workspace.scale * 4
+      scale: app.workspace.scale
     }));
   },
   loadAppStateFromLocalStorage: function() {
@@ -68,7 +68,7 @@ export const data = {
       app.tags(tags);
       app.updateNodeLinks();
       app.workspace.setTranslation(transform.x, transform.y);
-      app.workspace.setZoom(scale);
+      app.workspace.setZoom(scale * 4);
       if (editing) {
         app.editNode(data.getNodeFromObject(editing));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
