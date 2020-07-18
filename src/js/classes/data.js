@@ -9,6 +9,8 @@ export const data = {
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
+  isDocumentDirty: ko.observable(false),
+  lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
@@ -41,6 +43,8 @@ export const data = {
   },
   saveAppStateToLocalStorage: function() {
     const storage = app.settings.storage;
+    data.isDocumentDirty(true);
+    app.refreshWindowTitle();
     storage.setItem('appState',JSON.stringify({
       editingPath: data.editingPath(),
       editingName: data.editingName(),
@@ -51,14 +55,15 @@ export const data = {
       tags: app.tags(),
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
       transform: app.workspace.transform,
-      scale: app.workspace.scale
+      scale: app.workspace.scale,
+      documentTitle: document.title,
     }));
   },
   loadAppStateFromLocalStorage: function() {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale} = appState;
+      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale, documentTitle} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
@@ -73,6 +78,7 @@ export const data = {
         app.editNode(data.getNodeFromObject(editing));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
+      document.title = documentTitle;
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -104,9 +110,11 @@ export const data = {
       }
     }
     data.editingName(filename.replace(/^.*[\\\/]/, ''));
-    document.title = file.path ? file.path : data.editingName();
     data.readFile(file, filename, true);
-    app.refreshWindowTitle(filename);
+    data.isDocumentDirty(false);
+    data.editingPath(file.path);
+    data.lastStorageHost('LOCAL');
+    app.refreshWindowTitle();
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
@@ -506,6 +514,7 @@ export const data = {
             `The Yarn has been saved to gitst ${gists.file}`,
             'success'
           );
+          data.lastStorageHost('GIST');
         }, gistFiles);
       });
     } else {
@@ -540,9 +549,9 @@ export const data = {
             const content = gistFiles[value].content;
             const type = data.getFileType(value);
             data.loadData(content, type, true);
-  
-            document.title = `Gist: ${value} / ${gists.file}`;
-            app.refreshWindowTitle(document.title);
+            data.isDocumentDirty(false);
+            data.lastStorageHost('GIST');
+            app.refreshWindowTitle();
             data.editingName(value);
           }
         });

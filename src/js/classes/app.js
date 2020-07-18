@@ -471,13 +471,15 @@ export var App = function(name, version) {
     }
   };
 
-  this.refreshWindowTitle = function(editingPath) {
-    let title = 'Yarn - [' + editingPath + '] ';
-    if (!self.isElectron) {
-      document.title = title;
-    } else {
-      // self.gui.setTitle(title);
+  this.refreshWindowTitle = function() {
+    let title = '';
+    if (data.lastStorageHost() === 'LOCAL') {
+      title = 'Yarn - [' + (data.editingPath() || data.editingName()) + '] ' + (data.isDocumentDirty() ? '*' : '');
+    } else if (data.lastStorageHost() === 'GIST'){
+      title = 'Gist - [' + (data.editingPath() || data.editingName()) + '] ' + (data.isDocumentDirty() ? '*' : '');
     }
+    document.title = title;
+    window.title = title;
   };
 
   // returns `true` is we're in the VSCode extension
