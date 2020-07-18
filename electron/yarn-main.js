@@ -17,5 +17,5 @@ editorFrameEl.src = "app/index.html";
 
 // Called on load yarn data.
 window.addEventListener("yarnLoadedData", e => {
-  yarnWindow.setTitle(e.data.editingPath());
+  // yarnWindow.setTitle(e.data.editingPath());
 });

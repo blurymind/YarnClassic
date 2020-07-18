@@ -19,7 +19,7 @@ export const data = {
   },
   setNewFile:function() {
     Swal.fire({
-      title: 'Are you sure?',
+      title: '📔 Start a New file?',
       text: `Any unsaved ${data.editingName()} progress will be lost!`,
       icon: 'warning',
       showCancelButton: true,
@@ -37,7 +37,9 @@ export const data = {
         app.nodes([app.newNode(true).title('Start')]);
         app.tags([]);
         app.updateNodeLinks();
-        app.workspace.warpToNodeByIdx(0);    
+        app.workspace.warpToNodeByIdx(0);
+        data.isDocumentDirty(true);
+        app.refreshWindowTitle();
       }
     });
   },
@@ -56,18 +58,19 @@ export const data = {
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
       transform: app.workspace.transform,
       scale: app.workspace.scale,
-      documentTitle: document.title,
+      lastStorageHost: data.lastStorageHost()
     }));
   },
   loadAppStateFromLocalStorage: function() {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale, documentTitle} = appState;
+      const {editingPath, lastStorageHost, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
       data.editingFolder(editingFolder);
+      data.lastStorageHost(lastStorageHost);
       app.nodes([]);
       data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
@@ -78,7 +81,8 @@ export const data = {
         app.editNode(data.getNodeFromObject(editing));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
-      document.title = documentTitle;
+      data.isDocumentDirty(true);
+      app.refreshWindowTitle();
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -389,6 +393,8 @@ export const data = {
       output += '</nodes>\n';
     }
 
+    data.isDocumentDirty(false);
+    app.refreshWindowTitle();
     return output;
   },
 
@@ -452,7 +458,7 @@ export const data = {
 
   promptFileNameAndFormat: function (cb, suggestions = null) {
     Swal.fire({
-      title: 'Please enter file name',
+      title: '💾 Save file - enter file name',
       html: `<input id="swal-input1" list="select-file-name" name="select">
       <datalist class="form-control" id="select-file-name">    
         ${suggestions && suggestions.map(suggestion => `<option value="${suggestion}" />`).join('')}
@@ -515,6 +521,8 @@ export const data = {
             'success'
           );
           data.lastStorageHost('GIST');
+          data.isDocumentDirty(false);
+          app.refreshWindowTitle();
         }, gistFiles);
       });
     } else {
@@ -532,17 +540,19 @@ export const data = {
       gists.get(gists.file).then(gist=>{
         const gistFiles = gist.body.files;
         const inputOptions = {};
+        
         Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
         });
+        console.log(gistFiles,inputOptions)
         Swal.fire({
-          title: 'Select gist file',
+          title: '🐙 Open file from a gist',
           input: 'select',
           inputOptions,
           inputAttributes: {
             autocomplete: 'off'
           },
-          inputPlaceholder: 'Select a file from the gist',
+          inputPlaceholder: data.editingName() ||'Select a file from the gist',
           showCancelButton: true,
         }).then(({value}) => {
           if (value) {
@@ -551,8 +561,9 @@ export const data = {
             data.loadData(content, type, true);
             data.isDocumentDirty(false);
             data.lastStorageHost('GIST');
-            app.refreshWindowTitle();
+            data.editingPath(null);
             data.editingName(value);
+            app.refreshWindowTitle();
           }
         });
       });
@@ -593,7 +604,19 @@ export const data = {
   },
 
   trySaveCurrent: function() {
-    if (data.editingPath().length > 0 && data.editingType().length > 0) {
+    if (data.lastStorageHost() === 'GIST') {
+      const gists = app.gists;
+      gists.get(gists.file).then(gist => {
+        const yarnData = data.getSaveData(data.editingType());
+        console.log(data.editingName());
+        gists.edit(gists.file, {
+          files: { [data.editingName()]: { content: yarnData } }
+        });
+        data.lastStorageHost('GIST');
+        data.isDocumentDirty(false);
+        app.refreshWindowTitle();
+      });
+    } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
   },

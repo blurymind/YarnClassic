@@ -208,7 +208,7 @@ export const Input = function(app) {
           break;
         case Key.D: app.workspace.deselectAll(); break; // ctrl+d
         case Key.O: app.data.tryOpenFile(); break; // ctrl+o
-        case Key.S: app.data.save(); break; // ctrl+s
+        case Key.S: app.data.trySaveCurrent(); break; // ctrl+s
         case Key.X: // ctrl+x
           const selected = app.workspace.getSelectedNodes();
           app.nodeClipboard = app.cloneNodeArray(selected);
