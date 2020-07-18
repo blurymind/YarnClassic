@@ -50,13 +50,15 @@ export const data = {
       nodes: data.getNodesAsObjects(),
       tags: app.tags(),
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
+      transform: app.workspace.transform,
+      scale: app.workspace.scale * 4
     }));
   },
   loadAppStateFromLocalStorage: function() {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags} = appState;
+      const {editingPath, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
@@ -65,6 +67,8 @@ export const data = {
       data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
       app.updateNodeLinks();
+      app.workspace.setTranslation(transform.x, transform.y);
+      app.workspace.setZoom(scale);
       if (editing) {
         app.editNode(data.getNodeFromObject(editing));
         if (editorSelection) app.editor.selection.setRange(editorSelection);

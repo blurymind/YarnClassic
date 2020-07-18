@@ -194,6 +194,7 @@ export const Workspace = function(app) {
   //
   // Trigger when the mouse ends dragging over the workspace
   this.onDragEnd = function() {
+    app.data.saveAppStateToLocalStorage();
   };
 
 
