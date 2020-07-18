@@ -38,6 +38,7 @@ export const data = {
         app.tags([]);
         app.updateNodeLinks();
         app.workspace.warpToNodeByIdx(0);
+        data.lastStorageHost('LOCAL');
         data.isDocumentDirty(true);
         app.refreshWindowTitle();
       }
@@ -459,7 +460,7 @@ export const data = {
   promptFileNameAndFormat: function (cb, suggestions = null) {
     Swal.fire({
       title: '💾 Save file - enter file name',
-      html: `<input id="swal-input1" list="select-file-name" name="select">
+      html: `<input id="swal-input1" list="select-file-name" name="select" placeholder="${data.editingName()}">
       <datalist class="form-control" id="select-file-name">    
         ${suggestions && suggestions.map(suggestion => `<option value="${suggestion}" />`).join('')}
       </datalist>`,
@@ -540,11 +541,9 @@ export const data = {
       gists.get(gists.file).then(gist=>{
         const gistFiles = gist.body.files;
         const inputOptions = {};
-        
         Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
         });
-        console.log(gistFiles,inputOptions)
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -552,7 +551,7 @@ export const data = {
           inputAttributes: {
             autocomplete: 'off'
           },
-          inputPlaceholder: data.editingName() ||'Select a file from the gist',
+          inputPlaceholder: 'Select a file from the gist',
           showCancelButton: true,
         }).then(({value}) => {
           if (value) {
