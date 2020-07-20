@@ -341,7 +341,7 @@ export const data = {
     if (type == FILETYPE.JSON) {
       output = JSON.stringify(content, null, '\t');
     } else if (type == FILETYPE.YARN) {
-      for (i = 0; i < content.length; i++) {
+      for (let i = 0; i < content.length; i++) {
         output += 'title: ' + content[i].title + '\n';
         output += 'tags: ' + content[i].tags + '\n';
         output += 'colorID: ' + content[i].colorID + '\n';
@@ -360,14 +360,14 @@ export const data = {
         output += '===\n';
       }
     } else if (type == FILETYPE.TWEE) {
-      for (i = 0; i < content.length; i++) {
+      for (let i = 0; i < content.length; i++) {
         var tags = '';
         if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
         output += ':: ' + content[i].title + tags + '\n';
         output += content[i].body + '\n\n';
       }
     } else if (type == FILETYPE.TWEE2) {
-      for (i = 0; i < content.length; i++) {
+      for (let i = 0; i < content.length; i++) {
         var tags = '';
         if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
         var position =
@@ -377,7 +377,7 @@ export const data = {
       }
     } else if (type == FILETYPE.XML) {
       output += '<nodes>\n';
-      for (i = 0; i < content.length; i++) {
+      for (let i = 0; i < content.length; i++) {
         output += '\t<node>\n';
         output += '\t\t<title>' + content[i].title + '</title>\n';
         output += '\t\t<tags>' + content[i].tags + '</tags>\n';
