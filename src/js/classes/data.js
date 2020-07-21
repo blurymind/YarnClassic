@@ -277,7 +277,7 @@ export const data = {
       content = Utils.xmlToObject(xml);
 
       if (content != undefined)
-        for (i = 0; i < content.length; i++) objects.push(content[i]);
+        for (let i = 0; i < content.length; i++) objects.push(content[i]);
     }
 
     app.limitNodesUpdate( () => {

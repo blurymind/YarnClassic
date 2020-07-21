@@ -376,8 +376,7 @@ export var App = function(name, version) {
     };
     document.body.ondrop = e => {
       e.preventDefault();
-      var i;
-      for (i = 0; i < e.dataTransfer.files.length; i++) {
+      for (var i = 0; i < e.dataTransfer.files.length; i++) {
         data.appendFile(
           e.dataTransfer.files[i],
           e.dataTransfer.files[i].name,
