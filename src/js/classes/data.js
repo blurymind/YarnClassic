@@ -53,7 +53,7 @@ export const data = {
       editingName: data.editingName(),
       editingType: data.editingType(),
       editingFolder: data.editingFolder(),
-      editing: app.editing() ? data.getNodeAsObject(app.editing()): null,
+      editingTitle: app.editing() ? app.editing().title(): null,
       nodes: data.getNodesAsObjects(),
       tags: app.tags(),
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
@@ -66,7 +66,7 @@ export const data = {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, lastStorageHost, editingName, editingType, editingFolder, editing, editorSelection, nodes, tags, transform, scale} = appState;
+      const {editingPath, lastStorageHost, editingName, editingType, editingFolder, editingTitle, editorSelection, nodes, tags, transform, scale} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
@@ -78,8 +78,8 @@ export const data = {
       app.updateNodeLinks();
       app.workspace.setTranslation(transform.x, transform.y);
       app.workspace.setZoom(scale * 4);
-      if (editing) {
-        app.editNode(data.getNodeFromObject(editing));
+      if (editingTitle) {
+        app.editNode(app.nodes().find(node=>node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
       data.isDocumentDirty(true);
