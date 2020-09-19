@@ -9,6 +9,7 @@ export const HtmlRichTextFormatter = function(app) {
     { Start: '<img', Completion: '></img> ', Offset: -7 },
     { Start: '<i', Completion: '></i> ', Offset: -5 },
     { Start: '<u', Completion: '></u> ', Offset: -5 },
+    { Start: '<url', Completion: '></url> ', Offset: -7 },
   ]);
 
   this.getTagOpen = function(tag) {
@@ -113,6 +114,7 @@ export const HtmlRichTextFormatter = function(app) {
     result = self._convertTag('\\[i\\](.*?)\\[\\/i\\]', '<i>${match[1]}</i>', result);
     result = self._convertTag('\\[img\\](.*?)\\[\\/img\\]', '<img>${match[1]}</img>', result);
     result = self._convertTag('\\[color=#(.*?)\\](.*?)\\[\\/color\\]', '<color=#${match[1]}>${match[2]}</color>', result);
+    result = self._convertTag('\\[url\\](.*?)\\[\\/url\\]', '<url>${match[1]}</url>', result);
 
     return result;
   };
@@ -199,6 +201,29 @@ export const HtmlRichTextFormatter = function(app) {
       return rowAppend;
     });
 
+    
+    /// create tweet previews :3
+    if (showRowNumbers) {
+      const tweets = [];
+      result = result.replace(/https:\/\/twitter.com\/.*\/status\/[0-9a-z\?=]+/gi, function(id) {
+        const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
+        if (extractedtweetId.length > 1) {
+          tweets.push(extractedtweetId[1]);
+          return `<a class="tweet" id="${extractedtweetId[1]}"></a>`;
+        }
+      });
+      setTimeout(() => {
+        const tweetItems = document.querySelectorAll(".tweet");
+        tweets.forEach((tweetPost, index)=>{
+          twttr.widgets.createTweet(tweetPost, tweetItems[index], {
+            align: "left",
+            follow: false,
+          });
+        })
+      }, 500)
+    };
+
+    /// finaly return the html result
     return result;
   };
 };
