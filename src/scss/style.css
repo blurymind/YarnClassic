@@ -654,6 +654,11 @@ input[type='checkbox'] {
   position: absolute;
 }
 
+#editor-preview {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 .editor-play {
   overflow-y: hidden !important;
 }

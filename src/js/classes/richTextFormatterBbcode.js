@@ -181,7 +181,7 @@ export const BbcodeRichTextFormatter = function(app) {
     /// create tweet previews :3
     if (showRowNumbers) {
       const tweets = [];
-      result = result.replace(/https:\/\/twitter.com\/.*\/status\/[0-9a-z\?=]+/gi, function(id) {
+      result = result.replace(/(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi, function(id) {
         const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
         if (extractedtweetId.length > 1) {
           tweets.push(extractedtweetId[1]);
