@@ -1025,6 +1025,10 @@ span.add-node:after {
     height: 90% !important;
   }
 
+  .bbcode-button {
+    border: 1px solid #e7e7e7 !important;
+  }
+
   .context-menu-visible > .context-menu-list {
     left: 0px !important;
     top: 40px !important;

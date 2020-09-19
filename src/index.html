@@ -81,69 +81,69 @@
         <div class="dropdown">
           <span class="item" data-bind="click: app.data.setNewFile">
             <img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             New
           </span>
           <span class="item" data-bind="click: app.data.tryOpenFile">
             <img style="margin:0; padding:0" width="20px" src="./public/images/open.png"/>
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Open
           </span>
           <span class="item" data-bind="click: app.data.tryAppend">
             <img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Append
           </span>
           <!-- ko if:data.editingPath() != null -->
           <span class="item" data-bind="click: app.data.trySaveCurrent">
             <img style="margin:0; padding:0" width="20px" src="./public/images/pixel.png"/>
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save
           </span>
           <!-- /ko -->
           <span class="item" data-bind="click: function() { app.data.trySave('json');}">
             <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save As Json
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('yarn'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save As Yarn
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('twee'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save As Twee
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save As Twee2
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('xml'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/xml.png" alt="Twine Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save As Xml
           </span>
           <span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
             <img style="margin:0; padding:0" width="20px" src="./public/images/exp-data.png" alt="Share Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Send file
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
             <img style="margin:0; padding:0" width="20px" src="./public/images/octocat.png" alt="Octo Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Open gist
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
             <img style="margin:0; padding:0" width="20px" src="./public/images/github.png" alt="Git Icon" />
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Save gist
           </span>
           <span class="item" data-bind="click:app.ui.openSettingsDialog">
             <img style="margin:0; padding:0" width="20px" src="./public/images/settings.png"/>
-            &nbsp;
+            <span class="hide-when-narrow">&nbsp;</span>
             Settings
           </span>
         </div>
@@ -182,7 +182,7 @@
 
         <div class="bbcode-toolbar">
           <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
-          &nbsp;
+          <span class="hide-when-narrow">&nbsp;</span>
           <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold"><b>B</b></button>
           <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined"><u>U</u></button>
           <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic"><i>I</i></button>
@@ -210,7 +210,7 @@
             </div>
           </div>
 
-          &nbsp;
+          <span class="hide-when-narrow">&nbsp;</span>
 
           <span class="styled-checkbox hide-when-narrow">
             <input
@@ -222,15 +222,15 @@
           </span>
           <span class="editor-counter">
             <span class="hide-when-narrow">
-              &nbsp;
+              <span class="hide-when-narrow">&nbsp;</span>
               Length: <span class="character-count">0</span>
-              &nbsp;
+              <span class="hide-when-narrow">&nbsp;</span>
               Lines: <span class="line-count">0</span>
-              &nbsp;
+              <span class="hide-when-narrow">&nbsp;</span>
               <span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
-              &nbsp;
+              <span class="hide-when-narrow">&nbsp;</span>
               Line: <span class="row-index">0</span>
-              &nbsp;
+              <span class="hide-when-narrow">&nbsp;</span>
               Col: <span class="column-index">0</span>
             </span>
           </span>
@@ -261,7 +261,6 @@
         <button id="storyPlayButton" class="bbcode-button" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
 
         <span class="show-when-narrow">
-          |
           <button class="bbcode-button" onclick="app.editor.undo()" title="Undo">↶</button>
           <button class="bbcode-button" onclick="app.editor.redo()" title="Redo">↷</button>
         </span>
