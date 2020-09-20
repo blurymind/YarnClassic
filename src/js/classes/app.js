@@ -950,8 +950,8 @@ export var App = function(name, version) {
 
   this.toggleNightMode = function() {
     const cssOverwrite = self.settings.nightModeEnabled() ?
-      { filter: 'invert(100%) hue-rotate(180deg)' } :
-      { filter: 'invert(0%) hue-rotate(0deg)' };
+      { filter: 'invert(100%)' } :
+      { filter: 'invert(0%)' };
 
     $('#app').css(cssOverwrite);
     $('#app-bg').css(cssOverwrite);
