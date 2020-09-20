@@ -122,7 +122,7 @@ export const HtmlRichTextFormatter = function(app) {
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
     let result = showRowNumbers
-    ? '<div>' + '<font color="pink">' + rowCounter + '. </font>' + text + '</div>'// TODO: style this
+    ? '<div>' + '<font color="pink">' + rowCounter + '. </font><font>' + text + '</font></div>'// TODO: style this
     : text;
 
     /// <<command>>
@@ -193,10 +193,10 @@ export const HtmlRichTextFormatter = function(app) {
 
     // newLines. Do this last, as we need the newline characters in previous regex tests
     result = result.replace(/[\n\r]/g, function(row) {
-      let rowAppend = '<br/>';
+      let rowAppend = '</font><br/>';
       rowCounter += 1;
       if (showRowNumbers) {
-        rowAppend += '</div><div><font color="pink">' + rowCounter + '. </font>';
+        rowAppend += '</div><div><font color="pink">' + rowCounter + '. </font><font>';
       }
       return rowAppend;
     });
@@ -209,7 +209,7 @@ export const HtmlRichTextFormatter = function(app) {
         const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
         if (extractedtweetId.length > 1) {
           tweets.push(extractedtweetId[1]);
-          return `<a class="tweet" id="${extractedtweetId[1]}"></a><br/>`;
+          return `<a class="tweet" id="${extractedtweetId[1]}"></a>`;
         }
       });
       setTimeout(() => {
