@@ -122,7 +122,7 @@ export const BbcodeRichTextFormatter = function(app) {
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
     let result = showRowNumbers
-      ? '<font color="pink">' + rowCounter + '. </font>' + text // TODO: style this
+      ? '<div>' + '<font color="pink">' + rowCounter + '. </font>' + text + '</div>'// TODO: style this
       : text;
 
     /// Commands in preview mode
@@ -170,7 +170,7 @@ export const BbcodeRichTextFormatter = function(app) {
       let rowAppend = '<br/>';
       rowCounter += 1;
       if (showRowNumbers) {
-        rowAppend += '<font color="pink">' + rowCounter + '. </font>';
+        rowAppend += '</div><div><font color="pink">' + rowCounter + '. </font>';
       }
       return rowAppend;
     });
@@ -185,14 +185,14 @@ export const BbcodeRichTextFormatter = function(app) {
         const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
         if (extractedtweetId.length > 1) {
           tweets.push(extractedtweetId[1]);
-          return `<a class="tweet" id="${extractedtweetId[1]}"></a>`;
+          return `<a class="tweet" id="${extractedtweetId[1]}"></a><br/>`;
         }
       });
       setTimeout(() => {
         const tweetItems = document.querySelectorAll(".tweet");
         tweets.forEach((tweetPost, index)=>{
           twttr.widgets.createTweet(tweetPost, tweetItems[index], {
-            align: "left",
+            align: "center",
             follow: false,
           });
         })
