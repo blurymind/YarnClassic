@@ -854,6 +854,7 @@ input:focus + span + .dropdown {
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
   z-index: 10000;
   background-color: white;
+  max-width: 40%;
 }
 
 .tooltip {
