@@ -247,6 +247,15 @@
             ></input>
             <label for="toglAutocompleteWords" title="auto-completion">💬</label>
           </span>
+          <span class="styled-checkbox hide-when-narrow">
+            <input
+            id="toglAutocompleteClosingCharacters"
+            type="checkbox"
+            data-bind="checked: app.settings.completeClosingCharacters"
+            onclick="app.toggleClosingCharactersCompletion()"
+            ></input>
+            <label for="toglAutocompleteClosingCharacters" title="Auto closing characters">()</label>
+          </span>
           <button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
           <span class="styled-checkbox hide-when-narrow">
             <input
@@ -436,6 +445,16 @@
       id="completeTags"
       type="checkbox"
       data-bind="checked: app.settings.completeTagsEnabled"
+      >
+    </div>
+
+    <!-- Auto closingCharacters -->
+    <div class="settings-item">
+      <label class="settings-label" for="completeClosingCharacters">() Complete closing characters</label>
+      <input
+      id="completeClosingCharacters"
+      type="checkbox"
+      data-bind="checked: app.settings.completeClosingCharacters"
       >
     </div>
 

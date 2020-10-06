@@ -973,11 +973,20 @@ export var App = function(name, version) {
   };
 
   this.toggleWordCompletion = function() {
+    self.updateEditorOptions();
+  };
+
+  this.toggleClosingCharactersCompletion = function() {
+    self.updateEditorOptions();
+  };
+
+  this.updateEditorOptions = function() {
     self.editor.setOptions({
       enableBasicAutocompletion: app.settings.completeWordsEnabled(),
-      enableLiveAutocompletion: app.settings.completeWordsEnabled()
+      enableLiveAutocompletion: app.settings.completeWordsEnabled(),
+      behavioursEnabled: app.settings.completeClosingCharacters(),
     });
-  };
+  }
 
   this.advanceStoryPlayMode = function(speed = 5) {
     if (!self.previewStory.finished) {
