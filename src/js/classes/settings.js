@@ -84,6 +84,13 @@ export const Settings = function(app) {
       true
     ).extend({ persist:'completeWordsEnabled' });
 
+  // Autocomplete closing characters
+  this.completeClosingCharacters = ko
+    .observable(storage.getItem('completeClosingCharacters') !== null ?
+      storage.getItem('completeClosingCharacters') === 'true' :
+      true
+    ).extend({ persist:'completeClosingCharacters' });
+
   // Night mode
   this.nightModeEnabled = ko
     .observable(storage.getItem('nightModeEnabled') !== null ?
