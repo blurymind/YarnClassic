@@ -458,15 +458,19 @@ export var App = function(name, version) {
 
   this.validateTitle = function() {
     var enteredValue = document.getElementById('editorTitle').value;
+    var editorTitle = $('#editorTitle');
     if (
       self.getOtherNodeTitles().includes(enteredValue) ||
       self.titleExistsTwice(enteredValue)
     ) {
-      $('#editorTitle').css({ color: 'red' });
-      $('#editorTitle').attr('title', 'Another node has the same title');
+      editorTitle.css({ color: 'red' });
+      editorTitle.attr('title', 'Another node has the same title');
+    } else if (!RegExp('^[a-z0-9]+$', 'i').test(enteredValue)) {
+      editorTitle.css({ color: 'red' });
+      editorTitle.attr('title', 'Only upper or lower case letters and numbers are allowed in a node title.');
     } else {
-      $('#editorTitle').css({ color: '#666' });
-      $('#editorTitle').attr('title', '');
+      editorTitle.css({ color: '#666' });
+      editorTitle.removeAttr('title');
     }
   };
 
