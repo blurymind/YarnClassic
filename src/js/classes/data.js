@@ -11,6 +11,7 @@ export const data = {
   editingFolder: ko.observable(null),
   isDocumentDirty: ko.observable(false),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
+  yarnBasket: ko.observable(null),
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
@@ -39,6 +40,7 @@ export const data = {
         app.updateNodeLinks();
         app.workspace.warpToNodeByIdx(0);
         data.lastStorageHost('LOCAL');
+        data.yarnBasket(null);
         data.isDocumentDirty(true);
         app.refreshWindowTitle();
       }
@@ -59,19 +61,21 @@ export const data = {
       editorSelection: app.editor ? app.editor.selection.getRange(): null,
       transform: app.workspace.transform,
       scale: app.workspace.scale,
-      lastStorageHost: data.lastStorageHost()
+      lastStorageHost: data.lastStorageHost(),
+      yarnBasket: data.yarnBasket()
     }));
   },
   loadAppStateFromLocalStorage: function() {
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
-      const {editingPath, lastStorageHost, editingName, editingType, editingFolder, editingTitle, editorSelection, nodes, tags, transform, scale} = appState;
+      const {editingPath, lastStorageHost, yarnBasket, editingName, editingType, editingFolder, editingTitle, editorSelection, nodes, tags, transform, scale} = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
       data.editingFolder(editingFolder);
       data.lastStorageHost(lastStorageHost);
+      data.yarnBasket(yarnBasket)
       app.nodes([]);
       data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
@@ -510,11 +514,25 @@ export const data = {
   trySaveGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
       gists.get(gists.file).then(gist => {
-        const gistFiles = Object.keys(gist.body.files);
+        const gistFiles = "index.yarns" in gist.body.files ? Object.keys(JSON.parse(gist.body.files["index.yarns"].content).basket) : Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
+
+          // Timestamp yarns in the basket
+          const timestampedBasket = {};
+          if ("index.yarns" in gist.body.files && data.yarnBasket()) {
+            const timeStamped = {...data.yarnBasket()}
+            Object.keys(timeStamped.basket).forEach(key =>{
+              timeStamped.basket[key].lastSaved = Date.now();
+            })
+            console.log("basket", timeStamped)
+            timestampedBasket["index.yarns"] = {};
+            timestampedBasket["index.yarns"].content = JSON.stringify(timeStamped)
+            console.log(timestampedBasket)
+          }
+          console.log({ [editingName]: { content: yarnData }, ...timestampedBasket })
           gists.edit(gists.file, {
-            files: { [editingName]: { content: yarnData } }
+            files: { [editingName]: { content: yarnData }, ...timestampedBasket }
           });
           Swal.fire(
             'Saved!',
@@ -541,9 +559,21 @@ export const data = {
       gists.get(gists.file).then(gist=>{
         const gistFiles = gist.body.files;
         const inputOptions = {};
-        Object.keys(gistFiles).forEach(key => {
-          inputOptions[key] = key;
-        });
+        let yarns = null;
+        if ("index.yarns" in gistFiles) {
+          const content = gistFiles["index.yarns"].content;
+          yarns = JSON.parse(content);
+          console.log("Has a collection!", JSON.parse(content))
+          
+          Object.keys(yarns.basket).forEach(key => {
+            inputOptions[key] = key;
+          });
+          
+        } else {
+          Object.keys(gistFiles).forEach(key => {
+            inputOptions[key] = key;
+          });
+        }
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -562,6 +592,7 @@ export const data = {
             data.lastStorageHost('GIST');
             data.editingPath(null);
             data.editingName(value);
+            if (yarns) data.yarnBasket(yarns);
             app.refreshWindowTitle();
           }
         });
