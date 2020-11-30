@@ -50,17 +50,16 @@ export const Input = function(app) {
       this.isLeftButtonDown = (e.button === MouseButton.Left);
 
       if (app.inWorkspace()) {
-        if (!e.altKey && !e.shiftKey)
-          app.workspace.deselectAll();
+        if (self.isDragging) {
+          switch (e.button) {
+          case MouseButton.Left:
+            app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
+            break;
 
-        switch (e.button) {
-        case MouseButton.Left:
-          app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
-          break;
-
-        case MouseButton.Middle:
-          app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
-          break;
+          case MouseButton.Middle:
+            app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
+            break;
+          }
         }
       } else if (app.inEditor() && e.button === MouseButton.Right) {
         app.guessPopUpHelper();
