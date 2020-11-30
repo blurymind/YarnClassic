@@ -479,6 +479,17 @@
       data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
       >
     </div>
+
+    <!-- Snap to Grid -->
+    <div class="settings-item">
+      <label class="settings-label" for="snapGrid">⊞ Snap to Grid</label>
+      <input
+      id="snapGrid"
+      type="checkbox"
+      checked="true"
+      data-bind="checked: app.settings.snapGridEnabled"
+      >
+    </div>
   </div> <!-- settgins-column -->
 </div> <!-- settgins-row -->
 </div> <!-- settgins-form -->

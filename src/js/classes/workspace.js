@@ -96,9 +96,16 @@ export const Workspace = function(app) {
   //
   // Converts "page" coordinates to "workspace" coordinates
   this.toWorkspaceCoordinates = (x, y) => {
-    return {
-      x: (x - app.workspace.transform.x) / self.scale,
-      y: (y - app.workspace.transform.y) / self.scale
+    if (app.settings.snapGridEnabled()) {
+      return {
+        x: self.stepify((x - app.workspace.transform.x) / self.scale, app.gridSize),
+        y: self.stepify((y - app.workspace.transform.y) / self.scale, app.gridSize)
+      };
+    } else {
+      return {
+        x: (x - app.workspace.transform.x) / self.scale,
+        y: (y - app.workspace.transform.y) / self.scale
+      }
     };
   };
 
@@ -574,6 +581,7 @@ export const Workspace = function(app) {
         }),
 
       referenceNode = selectedNodes.shift();
+      if (app.settings.snapGridEnabled()) { referenceNode.moveTo(self.stepify(referenceNode.x(), app.gridSize), self.stepify(referenceNode.y(), app.gridSize)) }
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');
@@ -581,7 +589,7 @@ export const Workspace = function(app) {
     }
 
     selectedNodes.forEach((node, i) => {
-      const y = referenceNode.y() + SPACING * (i + 1);
+      const y = (app.settings.snapGridEnabled()) ? referenceNode.y() + (node.height * (i + 1)) + (app.gridSize * (i + 1)) : referenceNode.y() + SPACING * (i + 1);
       node.moveTo(referenceNode.x(), y);
     });
   };
@@ -604,6 +612,7 @@ export const Workspace = function(app) {
         }),
 
       referenceNode = selectedNodes.shift();
+      if (app.settings.snapGridEnabled()) { referenceNode.moveTo(self.stepify(referenceNode.x(), app.gridSize), self.stepify(referenceNode.y(), app.gridSize)) }
 
     if (!selectedNodes.length) {
       alert('Select nodes to align');
@@ -611,7 +620,7 @@ export const Workspace = function(app) {
     }
 
     selectedNodes.forEach((node, i) => {
-      const x = referenceNode.x() + SPACING * (i + 1);
+      const x = (app.settings.snapGridEnabled()) ? referenceNode.x() + (node.width * (i + 1)) + (app.gridSize * (i + 1)) : referenceNode.x() + SPACING * (i + 1);
       node.moveTo(x, referenceNode.y());
     });
   };
@@ -620,12 +629,15 @@ export const Workspace = function(app) {
   //
   // Arranges selected nodes in an spiral shape
   this.arrangeSpiral = function() {
-    self.getSelectedNodes().forEach( (node, i) => {
+    const selectedNodes = self.getSelectedNodes();
+    selectedNodes.forEach( (node, i) => {
       node.moveTo(
-        Math.cos(i * 0.5) * (600 + i * 30),
-        Math.sin(i * 0.5) * (600 + i * 30)
+        (app.settings.snapGridEnabled()) ? self.stepify(Math.cos(i * 0.5) * (600 + i * 30), app.gridSize) : Math.cos(i * 0.5) * (600 + i * 30),
+        (app.settings.snapGridEnabled()) ? self.stepify(Math.sin(i * 0.5) * (600 + i * 30), app.gridSize) : Math.cos(i * 0.5) * (600 + i * 30)
       );
     });
+
+    self.warpToXY(0, 0);
   };
 
   // sortAlphabetical
@@ -658,11 +670,15 @@ export const Workspace = function(app) {
         currentY = 0;
 
       node.moveTo(
-        selectedNodes[0].x() + currentX * horizontalSpacing,
-        selectedNodes[0].y() + currentY * verticalSpacing
+        (app.settings.snapGridEnabled()) ? self.stepify(selectedNodes[0].x(), app.gridSize) + (currentX * node.width) + (currentX * app.gridSize) : selectedNodes[0].x() + currentX * horizontalSpacing,
+        (app.settings.snapGridEnabled()) ? self.stepify(selectedNodes[0].y(), app.gridSize) + (currentY * node.height) + (currentY * app.gridSize) : selectedNodes[0].y() + currentY * verticalSpacing
       );
     });
 
     self.warpToNode(selectedNodes[0]);
   };
+
+  this.stepify = function(num, step_value) {
+    return Math.round(num / step_value) * step_value;
+  }
 };

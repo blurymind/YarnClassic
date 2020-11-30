@@ -272,8 +272,8 @@ export let Node = function(options = {}) {
 
         const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
 
-        offset.x = x - self.x();
-        offset.y = y - self.y();
+        offset.x = (app.settings.snapGridEnabled()) ? app.workspace.stepify(x - self.x(), app.gridSize) : x - self.x();
+        offset.y = (app.settings.snapGridEnabled()) ? app.workspace.stepify(y - self.y(), app.gridSize) : y - self.y();
       }
     });
 

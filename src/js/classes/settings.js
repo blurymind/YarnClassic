@@ -98,6 +98,13 @@ export const Settings = function(app) {
       false
     ).extend({ persist:'nightModeEnabled' });
 
+  // Snap to grid
+  this.snapGridEnabled = ko
+  .observable(storage.getItem('snapGridEnabled') !== null ?
+    storage.getItem('snapGridEnabled') === 'true' :
+    false
+  ).extend({ persist:'snapGridEnabled' });
+
   // Autocreate nodes
   this.createNodesEnabled = ko
     .observable(storage.getItem('createNodesEnabled') !== null ?

@@ -89,6 +89,7 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
+  this.gridSize = 40;
 
   // inEditor
   //
