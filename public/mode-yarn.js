@@ -177,6 +177,7 @@ define('ace/mode/yarn', [
   /// Enable autocompletion via word guessing
   app.editor.setOptions({
     enableBasicAutocompletion: app.settings.completeWordsEnabled(),
-    enableLiveAutocompletion: app.settings.completeWordsEnabled()
+    enableLiveAutocompletion: app.settings.completeWordsEnabled(),
+    behavioursEnabled: app.settings.completeClosingCharacters(),
   });
 });
