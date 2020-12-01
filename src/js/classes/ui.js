@@ -12,7 +12,8 @@ export const UI = function(app) {
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
     { id: 'classic', name: 'Classic' },
-    { id: 'blueprint', name: 'Blueprint' }
+    { id: 'blueprint', name: 'Blueprint' },
+    { id: 'dracula', name: 'Dracula' }
   ];
 
   // Playtest selector -----------------------------------------------------------

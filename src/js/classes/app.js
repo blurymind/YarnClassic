@@ -30,8 +30,9 @@ export var App = function(name, version) {
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
-    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
     setTimeout(self.initGrid, 35);
+    setTimeout(self.workspace.updateArrows, 35);
+    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
   };
 
   this.setLanguage = function(language, e) {

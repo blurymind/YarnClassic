@@ -442,7 +442,7 @@ export const Workspace = function(app) {
 
     // self.context.clearRect(0, 0, self.canvas.width, self.canvas.height);
     self.context.lineWidth = lineWidth;
-    self.context.strokeStyle = self.context.fillStyle = 'rgba(0, 0, 0, 1)';
+    self.context.strokeStyle = self.context.fillStyle = $('.arrows').css('color');
 
     for (let node of nodes) {
       node.halfWidth = $(node.element).width() / 2;
