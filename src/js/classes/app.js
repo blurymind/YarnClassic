@@ -32,6 +32,7 @@ export var App = function(name, version) {
     let themeName = e ? e.target.value : name;
     const theme = document.getElementById('theme-stylesheet');
     theme.href = Utils.getPublicPath(`themes/${themeName}.css`);
+    self.workspace.updateArrows();
   };
 
   this.setLanguage = function(language, e) {
