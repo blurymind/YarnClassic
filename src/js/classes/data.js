@@ -531,6 +531,8 @@ export const data = {
             console.log(timestampedBasket)
           }
           console.log({ [editingName]: { content: yarnData }, ...timestampedBasket })
+          // TODO - should also try to save all files in basket that are loaded in basket contents (tryLoadGist)
+          // basket data is loaded in memory and written from memory
           gists.edit(gists.file, {
             files: { [editingName]: { content: yarnData }, ...timestampedBasket }
           });
