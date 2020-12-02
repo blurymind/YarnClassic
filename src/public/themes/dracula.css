@@ -56,6 +56,24 @@
   color: #f8f8f2;
 }
 
+.menu .dropdown .item:nth-child(1) img {
+  filter: invert(1);
+}
+.menu .dropdown .item:nth-child(2) img {
+  filter: invert(1);
+}
+.menu .dropdown .item:nth-child(3) img {
+  filter: invert(1);
+}
+.menu .dropdown .item:nth-child(9) img {
+  filter: invert(1);
+}
+.menu .dropdown .item:nth-child(11) img {
+  filter: invert(1);
+}
+.menu .dropdown .item:nth-child(12) img {
+  filter: invert(1);
+}
 
 /*-- Search ------------------------------------------------------------------ */
 .app-search {
@@ -261,6 +279,22 @@ input#nodeSearchInput::-moz-placeholder {
     padding: unset;
     width: 170px;
   }
+
+  .app-add-node {
+    opacity: 0.5 !important;
+  }
+
+  .app-sort {
+    opacity: 0.5 !important;
+  }
+
+  .app-zoom {
+    opacity: 0.5 !important;
+  }
+
+  .app-undo-redo {
+    opacity: 0.5 !important;
+  }
 }
 
 /* --------------------------- Canvas Buttons --------------------*/
@@ -280,6 +314,7 @@ span.add-node:after {
   font-weight: bolder;
   font-size: xx-large;
   color: #282a36;
+  background-color: transparent;
   content: '+';
 }
 .app-add-node:hover {
@@ -296,6 +331,8 @@ span.add-node:after {
 .app-sort span {
   margin: 3px;
   padding: 5px;
+  background-color: transparent;
+  transition: filter 0.2s;
 }
 
 .app-sort, .app-sort:hover {
@@ -305,10 +342,19 @@ span.add-node:after {
   border-radius: 5px;
 }
 
+.app-sort span:hover {
+  filter: invert(1);
+}
+
 .app-zoom span {
   margin: 3px;
   padding: 5px;
-  opacity: 0.25;
+  background-color: transparent;
+  transition: filter 0.2s;
+}
+
+.app-zoom span:hover {
+  filter: invert(1);
 }
 
 .app-zoom, .app-zoom:hover {
@@ -321,6 +367,7 @@ span.add-node:after {
 .app-undo-redo span {
   margin: 3px;
   padding: 5px;
+  background-color: transparent;
 }
 
 .app-undo-redo, .app-undo-redo:hover {
@@ -328,6 +375,11 @@ span.add-node:after {
   opacity: 1;
   background: #44475a;
   border-radius: 5px;
+  transition: filter 0.2s;
+}
+
+.app-undo-redo span:hover {
+  filter: invert(1);
 }
 
 .app-undo-redo span:nth-child(2) {
@@ -417,8 +469,8 @@ input[type='checkbox'] {
 }
 
 .ace-yarn .ace_gutter {
-  background: #282a36;
-  color: #6272a4;
+  background: #282a36 !important;
+  color: #6272a4 !important;
 }
 
 .node-editor .form input[type='text'] {
@@ -585,6 +637,32 @@ div#colorPicker-container {
   opacity: 1;
 }
 
+.sp-container.sp-light.sp-flat.sp-buttons-disabled.sp-palette-buttons-disabled.sp-initial-disabled {
+  background: #282a36;
+  border:none;
+  box-shadow: 0px 2px 10px 1px #191A21;
+}
+
+.sp-palette-container {
+  border-right: 1px solid #191A21;
+}
+
+.sp-picker-container {
+  border-left: 1px solid #191A21;
+}
+
+input.sp-input {
+  background: #191A21 !important;
+}
+
+.sp-palette .sp-thumb-el {
+  border: 1px solid #191A21 !important;
+}
+
+.sp-palette .sp-thumb-el:hover, .sp-palette .sp-thumb-el.sp-thumb-active {
+  border: 1px solid #ffb86c !important;
+}
+
 /* --------------------------- Other -----------------------------*/
 .arrows {
   color: #bd93f9;
@@ -703,4 +781,21 @@ div#colorPicker-container {
 .swal2-cancel.swal2-styled {
   color: #191A21;
   font-weight: bold;
+}
+
+.swal2-content option {
+  background: #282a36;
+  color: #f8f8f2;
+}
+
+.swal2-content option:disabled {
+  background: #282a36;
+  color: #6272a4;
+}
+
+#swal-input1 {
+  background: #191A21;
+  color: #f8f8f2;
+  box-shadow: none;
+  border: 2px solid #191A21;
 }
