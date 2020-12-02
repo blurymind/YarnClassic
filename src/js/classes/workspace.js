@@ -9,6 +9,10 @@ export const Workspace = function(app) {
 
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
+  this.gridCanvas = $('#grid-canvas')[0];
+  this.gridContext = self.gridCanvas.getContext('2d');
+
+  this.gridEnabled = true;
 
   this.updateArrowsThrottle = 50;
   this.updateArrowsInterval = undefined;
@@ -88,6 +92,7 @@ export const Workspace = function(app) {
             self.stopUpdatingArrows();
           }
           self.updateArrows();
+          self.updateGrid();
         }
       );
   };
@@ -96,9 +101,16 @@ export const Workspace = function(app) {
   //
   // Converts "page" coordinates to "workspace" coordinates
   this.toWorkspaceCoordinates = (x, y) => {
-    return {
-      x: (x - app.workspace.transform.x) / self.scale,
-      y: (y - app.workspace.transform.y) / self.scale
+    if (app.settings.snapGridEnabled()) {
+      return {
+        x: self.stepify((x - self.transform.x) / self.scale, app.settings.gridSize()),
+        y: self.stepify((y - self.transform.y) / self.scale, app.settings.gridSize())
+      };
+    } else {
+      return {
+        x: (x - self.transform.x) / self.scale,
+        y: (y - self.transform.y) / self.scale
+      }
     };
   };
 
@@ -318,6 +330,61 @@ export const Workspace = function(app) {
 
     self.offset = offset;
   };
+
+  this.updateGrid = function() {
+    const offset = $('.nodes-holder').offset();
+    const gridSize = app.settings.gridSize();
+    self.gridContext.clearRect(0, 0, self.gridCanvas.width, self.gridCanvas.height);
+    if (app.settings.snapGridEnabled()) {
+      const width = $(window).width();
+      const height = $(window).height();
+
+      const xOffset = (offset.left) % (gridSize * self.scale);
+      const yOffset = (offset.top) % (gridSize * self.scale);
+
+      self.gridContext.beginPath();
+      self.gridContext.lineWidth = 0.5;
+      for (var x = xOffset; x < width; x += gridSize * self.scale) {
+        self.gridContext.moveTo(x, 0);
+        self.gridContext.lineTo(x, height);
+      }
+
+      for (var y = yOffset; y < height; y += gridSize * self.scale) {
+        self.gridContext.moveTo(0, y);
+        self.gridContext.lineTo(width, y);
+      }
+
+      self.gridContext.stroke();
+      self.gridContext.closePath();
+
+      if (app.settings.theme() === "blueprint") {
+        self.gridContext.beginPath();
+        self.gridContext.lineWidth = 0.25;
+
+        const maxCrossDivisions = 16;
+        const maxGridSize = 200;
+        const crossDivisions = Math.round(Math.min(1, gridSize / maxGridSize) * maxCrossDivisions);
+        const divisionsScaled = Math.max(1, Math.round(self.scale * crossDivisions));
+        const divisionWidth = ((gridSize * self.scale) / divisionsScaled);
+
+        const xCrossOffset = (offset.left) % (divisionWidth);
+        const yCrossOffset = (offset.top) % (divisionWidth);
+
+        for (var x = xCrossOffset; x < width; x += divisionWidth) {
+          self.gridContext.moveTo(x, 0);
+          self.gridContext.lineTo(x, height);
+        }
+  
+        for (var y = yCrossOffset; y < height; y += divisionWidth) {
+          self.gridContext.moveTo(0, y);
+          self.gridContext.lineTo(width, y);
+        }
+  
+        self.gridContext.stroke();
+        self.gridContext.closePath();
+      }
+    }
+  }
 
   // startUpdatingArrows
   //
@@ -561,27 +628,32 @@ export const Workspace = function(app) {
   // Align selected nodes relative to a node with the lowest y-value
   this.alignY = function() {
     const SPACING = 210;
+    const gridSize = app.settings.gridSize();
 
     const selectedNodes = app
-        .nodes()
-        .filter((el) => {
-          return el.selected;
-        })
-        .sort((a, b) => {
-          if (a.y() > b.y()) return 1;
-          if (a.y() < b.y()) return -1;
-          return 0;
-        }),
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.y() > b.y()) return 1;
+        if (a.y() < b.y()) return -1;
+        return 0;
+      });
 
-      referenceNode = selectedNodes.shift();
-
-    if (!selectedNodes.length) {
+    if (selectedNodes.length < 2) {
       alert('Select nodes to align');
       return;
     }
 
+    const referenceNode = selectedNodes.shift();
+    if (app.settings.snapGridEnabled()) { referenceNode.moveTo(self.stepify(referenceNode.x(), app.settings.gridSize()), self.stepify(referenceNode.y(), app.settings.gridSize())) }
+
+    const nodeEnd = referenceNode.y() + referenceNode.height;
+    const betweenSpacing = (gridSize - (nodeEnd % gridSize)) + gridSize;
+
     selectedNodes.forEach((node, i) => {
-      const y = referenceNode.y() + SPACING * (i + 1);
+      const y = (app.settings.snapGridEnabled()) ? referenceNode.y() + (node.height * (i + 1)) + (betweenSpacing * (i + 1)) : referenceNode.y() + SPACING * (i + 1);
       node.moveTo(referenceNode.x(), y);
     });
   };
@@ -591,27 +663,32 @@ export const Workspace = function(app) {
   // Align selected nodes relative to a node with the lowest x-value
   this.alignX = function() {
     const SPACING = 210;
+    const gridSize = app.settings.gridSize();
 
     const selectedNodes = app
-        .nodes()
-        .filter((el) => {
-          return el.selected;
-        })
-        .sort((a, b) => {
-          if (a.x() > b.x()) return 1;
-          if (a.x() < b.x()) return -1;
-          return 0;
-        }),
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.x() > b.x()) return 1;
+        if (a.x() < b.x()) return -1;
+        return 0;
+      });
 
-      referenceNode = selectedNodes.shift();
-
-    if (!selectedNodes.length) {
+    if (selectedNodes.length < 2) {
       alert('Select nodes to align');
       return;
     }
+    
+    const referenceNode = selectedNodes.shift();
+    if (app.settings.snapGridEnabled()) { referenceNode.moveTo(self.stepify(referenceNode.x(), gridSize), self.stepify(referenceNode.y(), gridSize)) }
+
+    const nodeEnd = referenceNode.x() + referenceNode.width;
+    const betweenSpacing = (gridSize - (nodeEnd % gridSize)) + gridSize;
 
     selectedNodes.forEach((node, i) => {
-      const x = referenceNode.x() + SPACING * (i + 1);
+      const x = (app.settings.snapGridEnabled()) ? referenceNode.x() + (node.width * (i + 1)) + (betweenSpacing * (i + 1)) : referenceNode.x() + SPACING * (i + 1);
       node.moveTo(x, referenceNode.y());
     });
   };
@@ -620,12 +697,21 @@ export const Workspace = function(app) {
   //
   // Arranges selected nodes in an spiral shape
   this.arrangeSpiral = function() {
-    self.getSelectedNodes().forEach( (node, i) => {
+    const selectedNodes = self.getSelectedNodes();
+
+    if (selectedNodes.length < 2) {
+      alert('Select nodes to align');
+      return;
+    }
+
+    selectedNodes.forEach( (node, i) => {
       node.moveTo(
-        Math.cos(i * 0.5) * (600 + i * 30),
-        Math.sin(i * 0.5) * (600 + i * 30)
+        (app.settings.snapGridEnabled()) ? self.stepify(Math.cos(i * 0.5) * (600 + i * 30), app.settings.gridSize()) : Math.cos(i * 0.5) * (600 + i * 30),
+        (app.settings.snapGridEnabled()) ? self.stepify(Math.sin(i * 0.5) * (600 + i * 30), app.settings.gridSize()) : Math.cos(i * 0.5) * (600 + i * 30)
       );
     });
+
+    self.warpToXY(0, 0);
   };
 
   // sortAlphabetical
@@ -636,8 +722,10 @@ export const Workspace = function(app) {
       return a.title().localeCompare(b.title());
     });
 
-    if (!selectedNodes.length)
+    if (selectedNodes.length < 2) {
+      alert('Select nodes to align');
       return;
+    }
 
     let arrayWidth = Math.round(selectedNodes.length / 2);
     let currentX = 0;
@@ -645,6 +733,10 @@ export const Workspace = function(app) {
 
     const horizontalSpacing = $(selectedNodes[0].element).width() + 30;
     const verticalSpacing = $(selectedNodes[0].element).height() + 30;
+
+    const gridSize = app.settings.gridSize();
+
+    if (app.settings.snapGridEnabled()) { selectedNodes[0].moveTo(self.stepify(selectedNodes[0].x(), gridSize), self.stepify(selectedNodes[0], gridSize)) }
 
     selectedNodes.forEach((node, i) => {
       if (i % arrayWidth) {
@@ -657,12 +749,21 @@ export const Workspace = function(app) {
       if (i === 1)
         currentY = 0;
 
+      const nodeEndX = selectedNodes[0].x() + selectedNodes[0].width;
+      const betweenSpacingX = (gridSize - (nodeEndX % gridSize)) + gridSize;
+      const nodeEndY = selectedNodes[0].y() + selectedNodes[0].height;
+      const betweenSpacingY = (gridSize - (nodeEndY % gridSize)) + gridSize;
+
       node.moveTo(
-        selectedNodes[0].x() + currentX * horizontalSpacing,
-        selectedNodes[0].y() + currentY * verticalSpacing
+        (app.settings.snapGridEnabled()) ? selectedNodes[0].x() + (currentX * node.width) + (currentX * betweenSpacingX) : selectedNodes[0].x() + currentX * horizontalSpacing,
+        (app.settings.snapGridEnabled()) ? selectedNodes[0].y() + (currentY * node.height) + (currentY * betweenSpacingY) : selectedNodes[0].y() + currentY * verticalSpacing
       );
     });
 
     self.warpToNode(selectedNodes[0]);
   };
+
+  this.stepify = function(num, step_value) {
+    return Math.round(num / step_value) * step_value;
+  }
 };

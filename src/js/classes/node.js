@@ -272,8 +272,8 @@ export let Node = function(options = {}) {
 
         const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
 
-        offset.x = x - self.x();
-        offset.y = y - self.y();
+        offset.x = (app.settings.snapGridEnabled()) ? app.workspace.stepify(x - self.x(), app.settings.gridSize()) : x - self.x();
+        offset.y = (app.settings.snapGridEnabled()) ? app.workspace.stepify(y - self.y(), app.settings.gridSize()) : y - self.y();
       }
     });
 
@@ -284,7 +284,7 @@ export let Node = function(options = {}) {
     $(self.element).on('touchend', function(e) {
       app.workspace.selectNodes(self);
     });
-    $(self.element).on('pointerup touchend', function(e) {
+    $('.nodes').on('pointerup touchend', function(e) {
       dragging = false;
       groupDragging = false;
 
