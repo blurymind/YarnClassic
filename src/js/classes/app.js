@@ -30,8 +30,8 @@ export var App = function(name, version) {
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
-    const theme = document.getElementById('theme-stylesheet');
-    theme.href = Utils.getPublicPath(`themes/${themeName}.css`);
+    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
+    setTimeout(self.initGrid, 35);
   };
 
   this.setLanguage = function(language, e) {
@@ -89,7 +89,6 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
-  this.gridSize = 40;
 
   // inEditor
   //
@@ -141,7 +140,7 @@ export var App = function(name, version) {
       // searchParams.get() will properly handle decoding the values.
       // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
       // if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
-      console.log(self.settings);
+      //console.log(self.settings);
     });
     // PWA install promotion banner on start
     // window.addEventListener('beforeinstallprompt', function(event) {
@@ -201,6 +200,8 @@ export var App = function(name, version) {
     if (osName === 'mobile') self.workspace.setZoom(3);
 
     $(window).on('resize', self.workspace.updateArrows);
+    $(window).on('resize', self.initGrid);
+    self.initGrid();
 
     this.guessPopUpHelper = function() {
       if (/color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
@@ -964,6 +965,21 @@ export var App = function(name, version) {
     $('.node .body').css(cssOverwrite);
     $('.node-editor .form .editor-container .editor-preview').css(cssOverwrite);
   };
+
+  this.initGrid = function() {
+    if (self.settings.snapGridEnabled()) {
+      var width = $(window).width();
+      var height = $(window).height();
+      $('#grid-canvas').attr('width', width);
+      $('#grid-canvas').attr('height', height);
+      $('#gridSize').attr('disabled', false);
+      self.workspace.gridContext.strokeStyle = self.workspace.gridContext.fillStyle = $('.grid-canvas').css('color');
+    } else {
+      $('#gridSize').attr('disabled', true);
+    }
+
+    app.workspace.updateGrid();
+  }
 
   this.toggleShowCounter = function() {
     if (self.settings.editorStatsEnabled()) {

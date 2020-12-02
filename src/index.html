@@ -150,6 +150,9 @@
       </div> <!-- file menu -->
     </div> <!-- app-menu -->
 
+    <!-- grid bg for snap to grid functionality -->
+    <canvas id="grid-canvas" class="grid-canvas"></canvas>
+
     <!-- arrow bg canvas for linked nodes -->
     <canvas class="arrows"></canvas>
 
@@ -482,12 +485,25 @@
 
     <!-- Snap to Grid -->
     <div class="settings-item">
-      <label class="settings-label" for="snapGrid">⊞ Snap to Grid</label>
+      <label class="settings-label" for="snapGrid">⊞ Snap to grid</label>
       <input
       id="snapGrid"
       type="checkbox"
       checked="true"
-      data-bind="checked: app.settings.snapGridEnabled"
+      data-bind="checked: app.settings.snapGridEnabled, event: { change: app.initGrid }"
+      >
+    </div>
+
+    <!-- Grid Size -->
+    <div class="settings-item">
+      <label class="settings-label" for="gridSize">Grid size</label>
+      <input
+      id="gridSize"
+      type="number"
+      min="0"
+      step="1"
+      placeholder="20 - 200 (Default: 40)"
+      data-bind="value: app.settings.gridSize, event: { change: app.settings.validateGridSize }"
       >
     </div>
   </div> <!-- settgins-column -->

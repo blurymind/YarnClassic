@@ -36,6 +36,18 @@ export const Settings = function(app) {
     app.setGistCredentials({token:self.gistToken(), file: self.gistFile() !== null ? self.gistFile().split('/').pop() : null});
   };
 
+  this.validateGridSize = function() {
+    if (self.gridSize() < 20) {
+      self.gridSize(20);
+    }
+
+    if (self.gridSize() > 200) {
+      self.gridSize(200);
+    }
+    self.gridSize(parseInt(self.gridSize()))
+    app.initGrid();
+  }
+
   // Theme
   this.theme = ko
     .observable(storage.getItem('theme') || 'classic')
@@ -104,6 +116,11 @@ export const Settings = function(app) {
     storage.getItem('snapGridEnabled') === 'true' :
     false
   ).extend({ persist:'snapGridEnabled' });
+
+  // Grid size
+  this.gridSize = ko
+  .observable(parseInt(storage.getItem('gridSize') || '40')
+  ).extend({ persist:'gridSize' });
 
   // Autocreate nodes
   this.createNodesEnabled = ko
