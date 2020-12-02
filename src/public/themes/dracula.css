@@ -799,3 +799,7 @@ input.sp-input {
   box-shadow: none;
   border: 2px solid #191A21;
 }
+
+.grid-canvas {
+  color: #191A21;
+}
