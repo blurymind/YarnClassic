@@ -76,17 +76,17 @@
         <span class="title">File</span>
         <div class="dropdown">
           <span class="item" data-bind="click: app.data.setNewFile">
-            <i class="fas fa-file-medical fa-lg menu-icon"></i>
+            <i class="fas fa-file-medical fa-lg fa-fw menu-icon menu-icon-new-file"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             New
           </span>
           <span class="item" data-bind="click: app.data.tryOpenFile">
-            <i class="fas fa-folder-open fa-lg menu-icon"></i>
+            <i class="fas fa-folder-open fa-lg fa-fw menu-icon menu-icon-open-file"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Open
           </span>
           <span class="item" data-bind="click: app.data.tryAppend">
-            <i class="fas fa-plus-square fa-lg menu-icon"></i>
+            <i class="fas fa-plus-square fa-lg fa-fw menu-icon menu-icon-append"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Append
           </span>
@@ -97,7 +97,7 @@
           </span>
           <!-- /ko -->
           <span class="item" data-bind="click: function() { app.data.trySave('json');}">
-            <i class="fab fa-js-square fa-lg menu-icon"></i>
+            <i class="fab fa-js-square fa-lg fa-fw menu-icon menu-icon-json"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save As Json
           </span>
@@ -117,27 +117,27 @@
             Save As Twee2
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('xml'); }">
-            <i class="fas fa-file-excel fa-lg menu-icon"></i>
+            <i class="fas fa-file-excel fa-lg fa-fw menu-icon menu-icon-xml"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save As Xml
           </span>
           <span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
-            <i class="fas fa-share-square fa-lg menu-icon"></i>
+            <i class="fas fa-share-square fa-lg fa-fw menu-icon menu-icon-share"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Send file
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
-            <i class="fas fa-code-branch fa-lg menu-icon"></i>
+            <i class="fas fa-code-branch fa-lg fa-fw menu-icon menu-icon-open-gist"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Open gist
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
-            <i class="fab fa-github fa-lg menu-icon"></i>
+            <i class="fab fa-github fa-lg fa-fw menu-icon menu-icon-save-gist"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save gist
           </span>
           <span class="item" data-bind="click:app.ui.openSettingsDialog">
-            <i class="fas fa-cog fa-lg menu-icon"></i>
+            <i class="fas fa-cog fa-lg fa-fw menu-icon menu-icon-settings"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Settings
           </span>
@@ -251,15 +251,15 @@
         <div class="bbcode-toolbar editor-counter">
           <span class="editor-counter">
             <span class="hide-when-narrow">&nbsp;</span>
-            Length: <span class="character-count">0</span>
+            Characters: <span class="character-count">0</span>
             <span class="hide-when-narrow">&nbsp;</span>
             Lines: <span class="line-count">0</span>
             <span class="hide-when-narrow">&nbsp;</span>
-            <span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
+            <span class="find-text" onclick="app.showRandomQuote()"><i class="fas fa-coffee"></i></span>
             <span class="hide-when-narrow">&nbsp;</span>
-            Line: <span class="row-index">0</span>
+            Row Index: <span class="row-index">0</span>
             <span class="hide-when-narrow">&nbsp;</span>
-            Col: <span class="column-index">0</span>
+            Col Index: <span class="column-index">0</span>
           </span>
         </div>
         <div class="bbcode-toolbar toggle-toolbar">

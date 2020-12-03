@@ -87,23 +87,6 @@ input[type='checkbox'] {
   display: none;
 }
 
-.icon {
-  border-radius: 4px;
-  width: 32px;
-  height: 32px;
-  background: #eee url('../public/images/icons.png') no-repeat;
-  background-blend-mode: difference;
-  overflow: hidden;
-  opacity: 0.5;
-  cursor: pointer;
-  transition: opacity 0.25s, background 0.25s;
-}
-
-.icon:hover {
-  opacity: 1;
-  background-color: #fff;
-}
-
 /* --- ZOOM --- */
 
 .app-zoom {
@@ -140,6 +123,7 @@ input[type='checkbox'] {
   cursor: pointer;
   opacity: 0.2;
   text-align: center;
+  transition: opacity 0.2s;
 }
 
 .app-add-node span {
@@ -154,6 +138,7 @@ input[type='checkbox'] {
 
 .app-add-node:hover {
   opacity: 0.6;
+  transition: opacity 0.2s;
 }
 
 
@@ -164,10 +149,12 @@ input[type='checkbox'] {
   padding: 5px 5px 5px 5px;
   z-index: 10000;
   opacity: 0.2;
+  transition: opacity 0.2s;
 }
 
 .app-button:hover {
   opacity: 0.6;
+  transition: opacity 0.2s;
 }
 
 .app-button:hover span {
@@ -568,7 +555,6 @@ input[type='checkbox'] {
 
 .node-editor .form .bbcode-toolbar .bbcode-button:active {
   color: purple;
-  background-color: rgb(255, 255, 172);
 }
 
 #edit-node-in-vscode {
@@ -578,6 +564,10 @@ input[type='checkbox'] {
 
 .title-error {
   color: red;
+}
+
+.menu:hover .title {
+  width: 100%;
 }
 
 /* SPECIAL CHECKBOX START */
@@ -825,6 +815,12 @@ input:focus + span + .dropdown {
   overflow: auto;
   max-height: 0px;
   transition: max-height 0.5s;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.menu .dropdown::-webkit-scrollbar {
+  display: none;
 }
 
 .menu .dropdown .item {
