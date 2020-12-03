@@ -124,10 +124,6 @@ const config = {
       crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
       icons: [
         {
-          src: path.resolve('src/public/icon.png'),
-          sizes: [96, 128, 192, 512], // multiple sizes, 192 needed by pwa
-        },
-        {
           src: path.resolve('src/public/icon.ico'),
           sizes: [32], // you can also use the specifications pattern
         },

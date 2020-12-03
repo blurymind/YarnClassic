@@ -33,7 +33,6 @@
   color: #f8f8f2;
   background-color: #343746;
   box-shadow: 0 0 5px #191A21;
-  overflow: hidden;
 }
 
 .menu .dropdown .item:hover {
@@ -56,23 +55,48 @@
   color: #f8f8f2;
 }
 
-.menu .dropdown .item:nth-child(1) img {
-  filter: invert(1);
+.menu-icon {
+  color: #f8f8f2;
 }
-.menu .dropdown .item:nth-child(2) img {
-  filter: invert(1);
+
+.menu-icon-new-file {
+  color: #f8f8f2;
 }
-.menu .dropdown .item:nth-child(3) img {
-  filter: invert(1);
+
+.menu-icon-open-file {
+  color: #ffb86c;
 }
-.menu .dropdown .item:nth-child(9) img {
-  filter: invert(1);
+
+.menu-icon-append {
+  color: #50fa7b;
 }
-.menu .dropdown .item:nth-child(11) img {
-  filter: invert(1);
+
+.menu-icon-json {
+  color: #f1fa8c;
 }
-.menu .dropdown .item:nth-child(12) img {
-  filter: invert(1);
+
+.menu-icon-xml {
+  color: #f8f8f2;
+}
+
+.menu-icon-share {
+  color: #f8f8f2;
+}
+
+.menu-icon-open-gist {
+  color: #bd93f9;
+}
+
+.menu-icon-save-gist {
+  color: #bd93f9;
+}
+
+.menu-icon-settings {
+  color: #f8f8f2;
+}
+
+.item img {
+  width: 24px;
 }
 
 /*-- Search ------------------------------------------------------------------ */
@@ -214,6 +238,15 @@ input#nodeSearchInput::-moz-placeholder {
   background-color: #8be9fd;
   color: #191A21;
 }
+
+.node .edit,
+.node .delete,
+.node .colorUp,
+.node .colorDown {
+  background: #282a36;
+  color: #f8f8f2;
+}
+
 .title-style-1 {
   background-color: #343746;
   color: #f8f8f2;
@@ -298,98 +331,89 @@ input#nodeSearchInput::-moz-placeholder {
 }
 
 /* --------------------------- Canvas Buttons --------------------*/
+
+/* --- ZOOM --- */
+
+.app-zoom {
+  bottom: 5px;
+  right: 5px;
+}
+
+/* --- SORT --- */
+
+.app-sort {
+  bottom: 60px;
+  right: 5px;
+}
+
+
+/* --- UNDO REDO --- */
+.app-undo-redo {
+  bottom: 115px;
+  right: 5px;
+}
+
+/*-- New node button ------------------------------------------------------- */
 .app-add-node {
-  opacity: 1;
-  background: #44475a;
-  line-height: 2em;
+  background: #191A21;
   border-radius: 5px;
-  height: 38px;
-  width: 45px;
-  padding-left: 28px;
-  right: 95px;
-  box-shadow: none;
-  transition: background 0.2s;
+  opacity: 0.2;
 }
-span.add-node:after {
-  font-weight: bolder;
-  font-size: xx-large;
-  color: #282a36;
-  background-color: transparent;
-  content: '+';
+
+.app-add-node span {
+  margin: auto;
+  width: 22px;
+  height: 22px;
+  color: #f8f8f2;
 }
-.app-add-node:hover {
-  box-shadow: none;
-  cursor: pointer;
-  opacity: 1;
-  background: #50fa7b;
-  transition: background 0.2s;
-}
+
 .app-add-node:active {
+  background: transparent;
+}
+
+.app-add-node:hover {
+  opacity: 0.6;
+}
+
+
+.app-button {
+  background: #191A21;
+  border-radius: 5px;
+  opacity: 0.2;
+}
+
+.app-button:hover {
+  opacity: 0.6;
+}
+
+.app-button:hover span {
   opacity: 0.5;
 }
 
-.app-sort span {
-  margin: 3px;
-  padding: 5px;
-  background-color: transparent;
-  transition: filter 0.2s;
-}
-
-.app-sort, .app-sort:hover {
-  box-shadow: none;
+.app-button span {
+  width: 22px;
+  height: 22px;
+  margin: 8px;
+  float: left;
   opacity: 1;
-  background: #44475a;
-  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  color: #f8f8f2;
 }
 
-.app-sort span:hover {
-  filter: invert(1);
-}
-
-.app-zoom span {
-  margin: 3px;
-  padding: 5px;
-  background-color: transparent;
-  transition: filter 0.2s;
-}
-
-.app-zoom span:hover {
-  filter: invert(1);
-}
-
-.app-zoom, .app-zoom:hover {
-  box-shadow: none;
+.app-button span:hover {
   opacity: 1;
-  background: #44475a;
-  border-radius: 5px;
-}
-
-.app-undo-redo span {
-  margin: 3px;
-  padding: 5px;
-  background-color: transparent;
-}
-
-.app-undo-redo, .app-undo-redo:hover {
-  box-shadow: none;
-  opacity: 1;
-  background: #44475a;
-  border-radius: 5px;
-  transition: filter 0.2s;
-}
-
-.app-undo-redo span:hover {
-  filter: invert(1);
-}
-
-.app-undo-redo span:nth-child(2) {
-  background-position: -32px 0px;
+  transition: opacity 0.25s;
 }
 
 /* --------------------------- Settings --------------------*/
 .settings-form {
   background: #282a36;
   color: #f8f8f2;
+}
+
+.settings-icon {
+  color: #ff79c6;
 }
 
 .settings-value {
@@ -535,25 +559,43 @@ input[type="text"] {
   color: #f8f8f2;
   background: #44475a;
   border: none;
+  height: 22px;
+  line-height: 22px;
+}
+
+.node-editor .form .bbcode-toolbar .editor-counter {
+  color: #6272a4;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button:hover {
   background: #6272a4;
 }
 
+.node-editor .form .bbcode-toolbar .bbcode-button:active {
+  color: #bd93f9;
+}
+
 .styled-checkbox label {
   background: #44475a !important;
   color: #f8f8f2 !important;
+  border: 2px solid transparent;
 }
 
 .styled-checkbox  label:hover {
   background: #6272a4 !important;
   color: #f8f8f2 !important;
+  border: 2px solid transparent;
 }
 
 .styled-checkbox input:checked + label {
   background: #bd93f9	 !important;
   color: #282a36 !important;
+  border: 2px solid transparent;
+}
+
+.styled-checkbox input:checked + label.transcribe-button {
+  background-color: #ff5555 !important;
+  border: 2px solid transparent;
 }
 
 @media only screen and (max-width: 600px) {
@@ -684,24 +726,6 @@ input.sp-input {
 /* --------------------------- Other -----------------------------*/
 .arrows {
   color: #bd93f9;
-}
-
-.icon {
-  border-radius: 4px;
-  width: 32px;
-  height: 32px;
-  background-blend-mode: normal;
-  background-color: transparent;
-  filter: invert(0.5);
-  overflow: hidden;
-  opacity: 0.2;
-  cursor: pointer;
-  transition: opacity 0.25s, background 0.25s;
-}
-.icon:hover {
-  background-blend-mode: normal;
-  background-color: transparent;
-  opacity: 0.5 !important;
 }
 
 .node .colorUp,
