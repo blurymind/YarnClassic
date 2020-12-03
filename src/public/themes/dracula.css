@@ -458,6 +458,20 @@ input[type='checkbox'] {
   background: #21222C;
 }
 
+#gridSize {
+  background: #21222C;
+  color: #f8f8f2;
+  border: 0;
+  padding: 4px;
+}
+
+#gridSize:disabled {
+  background: #21222C;
+  color: #44475a;
+  border: 0;
+  padding: 4px;
+}
+
 /* --------------------------- Editor -----------------------------*/
 .node-editor .form {
   background: #21222C;
