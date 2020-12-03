@@ -626,7 +626,36 @@ export const Workspace = function(app) {
   // alignY
   //
   // Align selected nodes relative to a node with the lowest y-value
-  this.alignY = function() {
+  this.alignV = function() {
+    if (app.input.isCtrlDown) {
+      self.reduceAlignV();
+      return;
+    }
+
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.y() > b.y()) return 1;
+        if (a.y() < b.y()) return -1;
+        return 0;
+      });
+
+    if (selectedNodes.length < 2) {
+      alert('Select nodes to align');
+      return;
+    }
+
+    const referenceNode = selectedNodes.shift();
+
+    selectedNodes.forEach((node, i) => {
+      node.moveTo(referenceNode.x(), node.y());
+    });
+  };
+
+  this.reduceAlignV = function() {
     const SPACING = 210;
     const gridSize = app.settings.gridSize();
 
@@ -658,10 +687,39 @@ export const Workspace = function(app) {
     });
   };
 
-  // alignX
+  // alignH
   //
   // Align selected nodes relative to a node with the lowest x-value
-  this.alignX = function() {
+  this.alignH = function() {
+    if (app.input.isCtrlDown) {
+      self.reduceAlignH();
+      return;
+    }
+
+    const selectedNodes = app
+      .nodes()
+      .filter((el) => {
+        return el.selected;
+      })
+      .sort((a, b) => {
+        if (a.x() > b.x()) return 1;
+        if (a.x() < b.x()) return -1;
+        return 0;
+      });
+
+    if (selectedNodes.length < 2) {
+      alert('Select nodes to align');
+      return;
+    }
+    
+    const referenceNode = selectedNodes.shift();
+
+    selectedNodes.forEach((node, i) => {
+      node.moveTo(node.x(), referenceNode.y());
+    });
+  };
+
+  this.reduceAlignH = function() {
     const SPACING = 210;
     const gridSize = app.settings.gridSize();
 

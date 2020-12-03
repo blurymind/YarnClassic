@@ -59,8 +59,8 @@
 
     <!-- align controls -->
     <div class="app-sort">
-      <span data-bind="click: app.workspace.alignX" title="Arrange H"></span>
-      <span data-bind="click: app.workspace.alignY" title="Arrange V"></span>
+      <span data-bind="click: app.workspace.alignH, event: { dblclick: app.workspace.reduceAlignH }" title="Arrange H"></span>
+      <span data-bind="click: app.workspace.alignV, event: { dblclick: app.workspace.reduceAlignV }" title="Arrange V"></span>
       <span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
       <span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
     </div>

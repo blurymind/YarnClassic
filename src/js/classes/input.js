@@ -36,6 +36,7 @@ export const Input = function(app) {
   this.isMiddleButtonDown = false;
   this.isLeftButtonDown = false;
   this.isShiftDown = false;
+  this.isCtrlDown = false;
 
   // trackMouseEvents
   //
@@ -146,6 +147,7 @@ export const Input = function(app) {
   this.trackKeyboardEvents = function() {
     $(document).on('keyup keydown', e => {
       self.isShiftDown = e.shiftKey;
+      self.isCtrlDown = e.ctrlKey;
     });
 
     // Workspace/Editor keyboard shortcuts
