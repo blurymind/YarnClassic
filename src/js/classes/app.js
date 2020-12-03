@@ -30,8 +30,9 @@ export var App = function(name, version) {
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
-    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
     setTimeout(self.initGrid, 35);
+    setTimeout(self.workspace.updateArrows, 35);
+    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
   };
 
   this.setLanguage = function(language, e) {
@@ -465,14 +466,14 @@ export var App = function(name, version) {
       self.getOtherNodeTitles().includes(enteredValue) ||
       self.titleExistsTwice(enteredValue)
     ) {
-      editorTitle.css({ color: 'red' });
+      editorTitle.attr('class', 'title title-error');
       editorTitle.attr('title', 'Another node has the same title');
     } else if (!RegExp('^[a-z0-9]+$', 'i').test(enteredValue)) {
-      editorTitle.css({ color: 'red' });
+      editorTitle.attr('class', 'title title-error');
       editorTitle.attr('title', 'Only upper or lower case letters and numbers are allowed in a node title.');
     } else {
-      editorTitle.css({ color: '#666' });
       editorTitle.removeAttr('title');
+      editorTitle.removeClass('title-error');
     }
   };
 
