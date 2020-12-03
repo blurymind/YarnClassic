@@ -59,6 +59,9 @@
   color: #555;
 }
 
+.menu-icon {
+  color: cornflowerblue;
+}
 
 /*-- Search ------------------------------------------------------------------ */
 .app-search {
@@ -111,7 +114,6 @@
 }
 
 .node {
-  border: none;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   border-bottom-left-radius: 12px;
@@ -130,9 +132,6 @@
 .node.selected .body {
   background-color: orange;
   color: black;
-}
-.node:hover {
-  border: none
 }
 .node .title {
   width: 100%;

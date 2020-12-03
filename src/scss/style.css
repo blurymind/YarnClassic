@@ -107,123 +107,86 @@ input[type='checkbox'] {
 /* --- ZOOM --- */
 
 .app-zoom {
-  position: absolute;
   bottom: 5px;
   right: 5px;
-
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 5px 5px 5px 5px;
-  z-index: 10000;
-  opacity: 0.2;
-}
-
-.app-zoom:hover {
-  opacity: 0.6;
-}
-
-.app-zoom span {
-  width: 22px;
-  height: 22px;
-  margin: 8px;
-  float: left;
-  background: #fff url('../public/images/zooms.png') no-repeat;
-  display: inline;
-  opacity: 0.15;
-  cursor: pointer;
-  transition: opacity 0.25s;
-}
-
-.app-zoom span:nth-child(2) {
-  background-position: -32px 0px;
-}
-.app-zoom span:nth-child(3) {
-  background-position: -64px 0px;
-}
-.app-zoom span:nth-child(4) {
-  background-position: -96px 0px;
-}
-.app-zoom span:hover {
-  opacity: 0.5;
 }
 
 /* --- SORT --- */
 
 .app-sort {
-  position: absolute;
   bottom: 60px;
   right: 5px;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 5px 5px 5px 5px;
-  z-index: 10000;
-  opacity: 0.2;
 }
 
-.app-sort:hover {
-  opacity: 0.6;
-}
-
-.app-sort span {
-  width: 22px;
-  height: 22px;
-  margin: 8px;
-  background: #fff url('../public/images/sort.png') no-repeat;
-  float: left;
-  display: inline;
-  opacity: 0.25;
-  cursor: pointer;
-  transition: opacity 0.25s;
-}
-
-.app-sort span:nth-child(2) {
-  background-position: -32px 0px;
-}
-.app-sort span:nth-child(3) {
-  background-position: -64px 0px;
-}
-.app-sort span:nth-child(4) {
-  background-position: -96px 0px;
-}
-.app-sort span:hover {
-  opacity: 0.5;
-}
 
 /* --- UNDO REDO --- */
 .app-undo-redo {
-  position: absolute;
   bottom: 115px;
   right: 5px;
+}
+
+/*-- New node button ------------------------------------------------------- */
+.app-add-node {
+  position: absolute;
+  bottom: 115px;
+  right: 98px;
+  width: 60px;
+  height: 38px;
   background: #fff;
   border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  line-height: 40px;
+  z-index: 10000;
+  cursor: pointer;
+  opacity: 0.2;
+  text-align: center;
+}
+
+.app-add-node span {
+  margin: auto;
+  width: 22px;
+  height: 22px;
+}
+
+.app-add-node:active {
+  background: transparent;
+}
+
+.app-add-node:hover {
+  opacity: 0.6;
+}
+
+
+.app-button {
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
   padding: 5px 5px 5px 5px;
   z-index: 10000;
   opacity: 0.2;
 }
 
-.app-undo-redo:hover {
+.app-button:hover {
   opacity: 0.6;
 }
 
-.app-undo-redo span {
+.app-button:hover span {
+  opacity: 0.5;
+}
+
+.app-button span {
   width: 22px;
   height: 22px;
   margin: 8px;
-  background: #fff url('../public/images/undo-redo.png') no-repeat;
   float: left;
-  opacity: 0.25;
+  opacity: 1;
   cursor: pointer;
-  transition: opacity 0.25s;
+  text-align: center;
 }
 
-.app-undo-redo span:nth-child(2) {
-  background-position: -38px 0px;
-}
-.app-undo-redo span:hover {
-  opacity: 0.5;
+.app-button span:hover {
+  opacity: 1;
+  transition: opacity 0.25s;
 }
 
 /* --- NODE WINDOW CSS --- */
@@ -264,18 +227,8 @@ input[type='checkbox'] {
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-top: 1px solid #fff;
   cursor: pointer;
   transition: border 0.25s;
-}
-
-.node.selected {
-  border: 1px solid #49eff1;
-}
-
-.node:hover {
-  border: 1px solid #49eff1;
 }
 
 .node .title {
@@ -343,34 +296,47 @@ input[type='checkbox'] {
 .node .colorUp,
 .node .colorDown {
   position: absolute;
-  right: 40px;
-  top: 4px;
+  top: 6px;
+  bottom: 164px;
+  line-height: 30px;
   opacity: 0;
   transition: opacity 0.125s;
+  background: white;
+  border-radius: 5px;
+  text-align: center;
+  height: 30px;
+  width: 28px;
 }
 
 .node .delete {
-  right: 4px;
-  background-position: -32px 0px;
+  right: 6px;
 }
 
 .node .colorUp {
-  width: 16px;
-  right: 40px;
-  background-position: -112px 0px;
+  right: 39px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .node .colorDown {
-  width: 16px;
-  right: 56px;
-  background-position: -96px 0px;
+  right: 67px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .node:hover .edit,
 .node:hover .delete,
 .node:hover .colorUp,
 .node:hover .colorDown {
+  opacity: 0.5;
+}
+
+.node .delete:hover,
+.node .colorUp:hover,
+.node .colorDown:hover,
+.node .edit:hover {
   opacity: 1;
+  transition: opacity 0.2s;
 }
 
 .node .resize {
@@ -977,37 +943,6 @@ input:focus + span + .dropdown {
   color: black;
 }
 
-/*-- New node button ------------------------------------------------------- */
-.app-add-node {
-  position: absolute;
-  bottom: 115px;
-  right: 110px;
-  width: 35px;
-  height: 40px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding-top: 11px;
-  padding-left: 17px;
-  z-index: 10000;
-  opacity: 0.2;
-}
-
-span.add-node:after {
-  font-weight: bolder;
-  font-size: xx-large;
-  color: lightgray;
-  content: '+';
-}
-
-.app-add-node:hover {
-  opacity: 0.6;
-}
-
-.add-node:active {
-  color: gray;
-}
-
 /*-- ----------------------------HTML previews------------------------------- */
 .story-playtest-bubble > img,
 .editor-preview img {
@@ -1056,7 +991,7 @@ span.add-node:after {
   }
 
   .editor-counter {
-    padding: 5px 0;
+    padding: 10px 0;
     white-space: nowrap;
   }
 

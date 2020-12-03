@@ -1029,7 +1029,7 @@ export var App = function(name, version) {
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button disabled';
+      $(storyPreviewPlayButton).addClass('disabled');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
       });
@@ -1049,7 +1049,7 @@ export var App = function(name, version) {
       self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button';
+      $(storyPreviewPlayButton).removeClass('disabled');
       self.previewStory.terminate();
       setTimeout(() => {
         if (
