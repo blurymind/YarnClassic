@@ -60,8 +60,8 @@ export const UI = function(app) {
 
     // Line Style selector -----------------------------------------------------------
     this.availableLineStyles = [
-      { id: 'bezier', name: 'Bezier Curves' },
-      { id: 'straight', name: 'Straight Lines' }
+      { id: 'straight', name: 'Straight Lines' },
+      { id: 'bezier', name: 'Bezier Curves' }
     ];
 
   // openSettingsDialog

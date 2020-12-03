@@ -448,8 +448,8 @@ export const Workspace = function(app) {
       node.halfWidth = $(node.element).width() / 2;
       node.halfHeight = $(node.element).height() / 2;
 
-      if (app.settings.lineStyle() === "straight") {
-        if (node.linkedTo().length) {
+      if (node.linkedTo().length) {
+        if (app.settings.lineStyle() === "straight") {
           const fromX = (node.x() + node.halfWidth) * scale + offset.left;
           const fromY = (node.y() + node.halfHeight) * scale + offset.top;
   
@@ -495,9 +495,7 @@ export const Workspace = function(app) {
               y3: to.y - normal.y * arrowWidth - normal.x * arrowHeight
             });
           }
-        }
-      } else {
-        if (node.linkedTo().length) {
+        } else {
           for (let linked of node.linkedTo()) {
             const fromMidX = (node.x() + node.halfWidth) * scale + offset.left;
             const fromMidY = (node.y() + node.halfHeight) * scale + offset.top;

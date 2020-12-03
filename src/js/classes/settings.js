@@ -148,7 +148,7 @@ export const Settings = function(app) {
 
   // Line Style
   this.lineStyle = ko
-  .observable(storage.getItem('lineStyle') || 'Bezier')
+  .observable(storage.getItem('lineStyle') || 'straight')
   .extend({ persist:'lineStyle' });
 
   // Always open nodes in Visual Studio Code Editor
