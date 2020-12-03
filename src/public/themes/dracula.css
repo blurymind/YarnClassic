@@ -475,13 +475,17 @@ input[type='checkbox'] {
 
 .node-editor .form input[type='text'] {
   background: #282a36;
-  color: #f8f8f2 !important;
+  color: #f8f8f2;
   border: 0;
   padding-left: 10px;
 }
 
 #editor-preview {
   color: #6272a4 !important;
+}
+
+.title-error {
+  color: #ff5555 !important;
 }
 
 .ace-yarn .ace_marker-layer .ace_active-line {

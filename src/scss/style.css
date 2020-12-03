@@ -591,6 +591,10 @@ input[type='checkbox'] {
   font-size: 125%;
 }
 
+.title-error {
+  color: red;
+}
+
 /* SPECIAL CHECKBOX START */
 .styled-checkbox input {
   -webkit-transition-duration: 0.4s; /* Safari */
