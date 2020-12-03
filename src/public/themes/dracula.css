@@ -419,11 +419,13 @@ input#nodeSearchInput::-moz-placeholder {
 .settings-value {
   background: #21222C;
   color: #f8f8f2;
+  border: 1px solid transparent;
 }
 
 .markup #theme {
   background: #21222C;
   color: #f8f8f2;
+  border: 1px solid transparent;
 }
 
 .markup button {
