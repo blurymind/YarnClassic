@@ -431,7 +431,7 @@ export const Workspace = function(app) {
     const scale = self.scale;
     const lineWidth = 3 * scale;
     const arrowWidth = 8 * scale;
-    const arrowHeight = 6 * scale;
+    const arrowHeight = 8 * scale;
     const arrowLength = 10;
 
     const linePoints = [];
@@ -448,51 +448,132 @@ export const Workspace = function(app) {
       node.halfWidth = $(node.element).width() / 2;
       node.halfHeight = $(node.element).height() / 2;
 
-      if (node.linkedTo().length) {
-        const fromX = (node.x() + node.halfWidth) * scale + offset.left;
-        const fromY = (node.y() + node.halfHeight) * scale + offset.top;
-
-        for (let linked of node.linkedTo()) {
-          const toX = (linked.x() + linked.halfWidth) * scale + offset.left;
-          const toY = (linked.y() + linked.halfHeight) * scale + offset.top;
-
-          // Get the normalized direction from -> to
-          const distance = Math.sqrt(
-            (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
-          );
-
-          const normal = {
-            x: (toX - fromX) / distance,
-            y: (toY - fromY) / distance,
-          };
-
-          const dist = (
-            110 + (
-              160 * (
-                1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
+      if (app.settings.lineStyle() === "straight") {
+        if (node.linkedTo().length) {
+          const fromX = (node.x() + node.halfWidth) * scale + offset.left;
+          const fromY = (node.y() + node.halfHeight) * scale + offset.top;
+  
+          for (let linked of node.linkedTo()) {
+            const toX = (linked.x() + linked.halfWidth) * scale + offset.left;
+            const toY = (linked.y() + linked.halfHeight) * scale + offset.top;
+  
+            // Get the normalized direction from -> to
+            const distance = Math.sqrt(
+              (fromX - toX) * (fromX - toX) + (fromY - toY) * (fromY - toY)
+            );
+  
+            const normal = {
+              x: (toX - fromX) / distance,
+              y: (toY - fromY) / distance,
+            };
+  
+            const dist = (
+              110 + (
+                160 * (
+                  1 - Math.max(Math.abs(normal.x), Math.abs(normal.y))
+                )
               )
-            )
-          ) * scale;
+            ) * scale;
+  
+            const from = {
+              x: fromX + normal.x * dist,
+              y: fromY + normal.y * dist,
+            };
+  
+            const to = {
+              x: toX - normal.x * dist,
+              y: toY - normal.y * dist,
+            };
+  
+            linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
+            arrowPoints.push({
+              x1: to.x + normal.x * arrowLength,
+              y1: to.y + normal.y * arrowLength,
+              x2: to.x - normal.x * arrowWidth - normal.y * arrowHeight,
+              y2: to.y - normal.y * arrowWidth + normal.x * arrowHeight,
+              x3: to.x - normal.x * arrowWidth + normal.y * arrowHeight,
+              y3: to.y - normal.y * arrowWidth - normal.x * arrowHeight
+            });
+          }
+        }
+      } else {
+        if (node.linkedTo().length) {
+          for (let linked of node.linkedTo()) {
+            const fromMidX = (node.x() + node.halfWidth) * scale + offset.left;
+            const fromMidY = (node.y() + node.halfHeight) * scale + offset.top;
+            const toMidX = (linked.x() + linked.halfWidth) * scale + offset.left;
+            const toMidY = (linked.y() + linked.halfHeight) * scale + offset.top;
 
-          const from = {
-            x: fromX + normal.x * dist,
-            y: fromY + normal.y * dist,
-          };
+            const direction = (360 - (Math.atan2(toMidY - fromMidY, toMidX - fromMidX) * 180 / Math.PI)) % 360;
 
-          const to = {
-            x: toX - normal.x * dist,
-            y: toY - normal.y * dist,
-          };
+            let fromX, fromY, toX, toY;
 
-          linePoints.push({x1: from.x, y1: from.y, x2: to.x, y2: to.y});
-          arrowPoints.push({
-            x1: to.x + normal.x * arrowLength,
-            y1: to.y + normal.y * arrowLength,
-            x2: to.x - normal.x * arrowWidth - normal.y * arrowHeight,
-            y2: to.y - normal.y * arrowWidth + normal.x * arrowHeight,
-            x3: to.x - normal.x * arrowWidth + normal.y * arrowHeight,
-            y3: to.y - normal.y * arrowWidth - normal.x * arrowHeight
-          });
+            var horizontal = false;
+
+            if (direction <= 45 || direction >= 315) {
+              horizontal = true;
+              fromX = (node.x() + node.width) * scale + offset.left;
+              fromY = (node.y() + node.halfHeight) * scale + offset.top;
+              toX = (linked.x()) * scale + offset.left - arrowWidth;
+              toY = (linked.y() + linked.halfHeight) * scale + offset.top;
+
+              arrowPoints.push({
+                x1: toX + arrowWidth,
+                y1: toY,
+                x2: toX - arrowWidth,
+                y2: toY - arrowHeight,
+                x3: toX - arrowWidth,
+                y3: toY + arrowHeight
+              });
+            } else if (direction > 45 && direction < 135) {
+              horizontal = false;
+              fromX = (node.x() + node.halfWidth) * scale + offset.left;
+              fromY = (node.y()) * scale + offset.top;
+              toX = (linked.x() + linked.halfWidth) * scale + offset.left;
+              toY = (linked.y() + node.height) * scale + offset.top + arrowHeight;
+
+              arrowPoints.push({
+                x1: toX,
+                y1: toY - arrowHeight,
+                x2: toX - arrowWidth,
+                y2: toY + arrowHeight,
+                x3: toX + arrowWidth,
+                y3: toY + arrowHeight
+              });
+            } else if (direction >= 135 && direction <= 225) {
+              horizontal = true;
+              fromX = (node.x()) * scale + offset.left;
+              fromY = (node.y() + node.halfHeight) * scale + offset.top;
+              toX = (linked.x() + linked.width) * scale + offset.left + arrowWidth;
+              toY = (linked.y() + linked.halfHeight) * scale + offset.top;
+
+              arrowPoints.push({
+                x1: toX - arrowWidth,
+                y1: toY,
+                x2: toX + arrowWidth,
+                y2: toY - arrowHeight,
+                x3: toX + arrowWidth,
+                y3: toY + arrowHeight
+              });
+            } else if (direction > 225 && direction < 315) {
+              horizontal = false;
+              fromX = (node.x() + node.halfWidth) * scale + offset.left;
+              fromY = (node.y() + node.height) * scale + offset.top;
+              toX = (linked.x() + linked.halfWidth) * scale + offset.left;
+              toY = (linked.y()) * scale + offset.top - arrowHeight;
+
+              arrowPoints.push({
+                x1: toX,
+                y1: toY + arrowHeight,
+                x2: toX - arrowWidth,
+                y2: toY - arrowHeight,
+                x3: toX + arrowWidth,
+                y3: toY - arrowHeight
+              });
+            }
+
+            linePoints.push({x1: fromX, y1: fromY, x2: toX, y2: toY, drawHorizontal: horizontal});
+          }
         }
       }
     }
@@ -501,7 +582,15 @@ export const Workspace = function(app) {
     self.context.beginPath();
     for (let line of linePoints) {
       self.context.moveTo(line.x1, line.y1);
-      self.context.lineTo(line.x2, line.y2);
+      if (app.settings.lineStyle() === "straight") {
+        self.context.lineTo(line.x2, line.y2);
+      } else {
+        if (line.drawHorizontal === true) {
+          self.context.bezierCurveTo(line.x2, line.y1, line.x1, line.y2, line.x2, line.y2);
+        } else {
+          self.context.bezierCurveTo(line.x1, line.y2, line.x2, line.y1, line.x2, line.y2);
+        }
+      }
     }
     self.context.stroke();
 
