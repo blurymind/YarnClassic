@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <link rel="manifest" href="./manifest.json" >
+  <link rel="manifest" href="./manifest.json">
   <title>Yarn</title>
 </head>
+
 <body>
-	<!-- Fancy Background -->
-	<div id="app-bg">&nbsp;</div>
+  <!-- Fancy Background -->
+  <div id="app-bg">&nbsp;</div>
 
   <!-- Container -->
   <div id="app">
@@ -15,17 +17,11 @@
     <!-- search form -->
     <div class="app-search">
       <form class="menu" autocomplete="off" onkeypress="return event.keyCode != 13;">
-        <input
-        id="nodeSearchInput"
-        type="text"
-        class="search-field"
-        placeholder="Search"
-        autocomplete="off"
-        oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
+        <input id="nodeSearchInput" type="text" class="search-field" placeholder="Search" autocomplete="off" oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
 
         <span>
           <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-        
+
           <span class="search-title styled-checkbox">
             <input type="checkbox" checked="checked" id="search-title" />
             <label for="search-title">Title</label>
@@ -62,7 +58,7 @@
       <span data-bind="click: app.workspace.alignH, event: { dblclick: app.workspace.reduceAlignH }" title="Arrange H"></span>
       <span data-bind="click: app.workspace.alignV, event: { dblclick: app.workspace.reduceAlignV }" title="Arrange V"></span>
       <span data-bind="click: app.workspace.arrangeSpiral" title="Arrange Spiral"></span>
-      <span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically" ></span>
+      <span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically"></span>
     </div>
 
     <!-- zoom controls -->
@@ -80,29 +76,28 @@
         <span class="title">File</span>
         <div class="dropdown">
           <span class="item" data-bind="click: app.data.setNewFile">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
+            <i class="fas fa-file-medical fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             New
           </span>
           <span class="item" data-bind="click: app.data.tryOpenFile">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/open.png"/>
+            <i class="fas fa-folder-open fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Open
           </span>
           <span class="item" data-bind="click: app.data.tryAppend">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/append.png"/>
+            <i class="fas fa-plus-square fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Append
           </span>
           <!-- ko if:data.editingPath() != null -->
           <span class="item" data-bind="click: app.data.trySaveCurrent">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/pixel.png"/>
             <span class="hide-when-narrow">&nbsp;</span>
             Save
           </span>
           <!-- /ko -->
           <span class="item" data-bind="click: function() { app.data.trySave('json');}">
-            <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
+            <i class="fab fa-js-square fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save As Json
           </span>
@@ -122,27 +117,27 @@
             Save As Twee2
           </span>
           <span class="item" data-bind="click: function() { app.data.trySave('xml'); }">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/xml.png" alt="Twine Icon" />
+            <i class="fas fa-file-excel fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save As Xml
           </span>
           <span id="pwaTryShare" class="item" data-bind="click: function() { app.data.tryShareFilePwa('yarn');}">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/exp-data.png" alt="Share Icon" />
+            <i class="fas fa-share-square fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Send file
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/octocat.png" alt="Octo Icon" />
+            <i class="fas fa-code-branch fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Open gist
           </span>
           <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/github.png" alt="Git Icon" />
+            <i class="fab fa-github fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Save gist
           </span>
           <span class="item" data-bind="click:app.ui.openSettingsDialog">
-            <img style="margin:0; padding:0" width="20px" src="./public/images/settings.png"/>
+            <i class="fas fa-cog fa-lg menu-icon"></i>
             <span class="hide-when-narrow">&nbsp;</span>
             Settings
           </span>
@@ -159,7 +154,7 @@
     <!-- foreach loop  of the nodes -->
     <div class="nodes">
       <div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
-        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}" >
+        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}">
           <div class="title-container" data-bind="css: { active: node.active() && node.active().title === true}">
             <div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
           </div>
@@ -184,22 +179,37 @@
         <input type="text" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
         <div class="bbcode-toolbar">
-          <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">&#8617</button>
+          <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)"><i class="fas fa-arrow-left fa-lg fa-fw"></i></button>
           <span class="hide-when-narrow">&nbsp;</span>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold"><b>B</b></button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined"><u>U</u></button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic"><i>I</i></button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('color')">🌈</button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('img')" title="Image">🦄</button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command">🎮</button>
-          <span class="hide-when-narrow">
-            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link">❔</button>
-            <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji">😉</button>
-          </span>
-          
+          <i class="fas fa-grip-lines-vertical hide-when-narrow bbcode-button-separator"></i>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold"><i class="fas fa-bold fa-lg fa-fw"></i></button>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic"><i><i class="fa fa-italic fa-lg fa-fw"></i></i></button>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined"><u><i class="fas fa-underline fa-lg fa-fw"></i></u></button>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <i class="fas fa-grip-lines-vertical hide-when-narrow bbcode-button-separator"></i>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command"><i class="fas fa-angle-double-left fa-lg fa-fw"></i></button>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link"><i class="fas fa-question fa-lg fa-fw"></i></button>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <i class="fas fa-grip-lines-vertical hide-when-narrow bbcode-button-separator"></i>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('img')" title="Image"><i class="fas fa-image fa-lg fa-fw"></i></button>
+          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('color')" title="Color Picker"><i class="fas fa-palette fa-lg fa-fw"></i></button>
+          <button class="bbcode-button" onclick="app.insertEmoji()" title="Emoji"><i class="far fa-grin-beam-sweat fa-lg fa-fw"></i></button>
+
           <!-- ko if:app.usingVisualStudioCodeExtension() -->
           <button class="bbcode-button" id="edit-node-in-vscode" onclick="app.editNodeInVisualStudioCodeEditor(app.editing())">🛠️ Edit in Visual Studio Code Text Editor</button>
           <!-- /ko -->
+
+          <span class="show-when-narrow">
+            <button class="bbcode-button" onclick="app.editor.undo()" title="Undo"><i class="fas fa-undo fa-lg fa-fw"></i></button>
+            <button class="bbcode-button" onclick="app.editor.redo()" title="Redo"><i class="fas fa-redo fa-lg fa-fw"></i></button>
+          </span>
+
+          <button id="storyPlayButton" class="bbcode-button bbcode-button-right" onclick="app.togglePlayMode(true)" title="Preview"><i class="fas fa-play-circle fa-lg fa-fw"></i></button>
+          <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><i class="fas fa-search fa-lg fa-fw"></i></button>
+          <button class="bbcode-button bbcode-button-right" onclick="app.speakText()" title="Hear text"><i class="fas fa-volume-up fa-lg fa-fw"></i></button>
 
           <div class="add-link" style="position: absolute;">
             <div class="menu">
@@ -212,318 +222,241 @@
               </div>
             </div>
           </div>
+        </div>
 
+        <div class="tooltip" id="colorPicker-container" hidden>
+          <input type='text' id="colorPicker" data-bind="preventBubble: 'click', preventBubble: 'mousedown'" />
+        </div>
+
+        <div class="tooltip" id="emojiPicker-container">
+          <div id="emojiPickerDom"></div>
+        </div>
+
+        <div class="editor-container">
+          <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)"></div>
+          <div class="editor-play" id="editor-play" onpointerdown="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
+            <p class="story-playtest-answer" id="NVrichTextLabel"></p>
+            <div id="commandDebugLabel"></div>
+          </div>
+          <div class="editor" id="editor" data-bind="
+                ace: app.editing().body,
+                aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                behavioursEnabled: true,
+              }">
+          </div>
+        </div>
+
+        <div class="bbcode-toolbar toggle-toolbar">
           <span class="hide-when-narrow">&nbsp;</span>
-
-          <span class="styled-checkbox hide-when-narrow">
-            <input
-            id="toglShowCounter"
-            type="checkbox"
-            data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"
-            ></input>
-            <label for="toglShowCounter" title="Show line counter">&#9779</label>
+          <span class="styled-checkbox">
+            <input id="toglShowCounter" type="checkbox" data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"></input>
+            <label for="toglShowCounter" title="Show line counter"><i class="fas fa-paragraph fa-lg fa-fw"></i></label>
           </span>
-          <span class="editor-counter">
-            <span class="hide-when-narrow">
-              <span class="hide-when-narrow">&nbsp;</span>
-              Length: <span class="character-count">0</span>
-              <span class="hide-when-narrow">&nbsp;</span>
-              Lines: <span class="line-count">0</span>
-              <span class="hide-when-narrow">&nbsp;</span>
-              <span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
-              <span class="hide-when-narrow">&nbsp;</span>
-              Line: <span class="row-index">0</span>
-              <span class="hide-when-narrow">&nbsp;</span>
-              Col: <span class="column-index">0</span>
-            </span>
+          <span class="styled-checkbox">
+            <input id="toglAutocompleteWords" type="checkbox" data-bind="checked: app.settings.completeWordsEnabled" onclick="app.toggleWordCompletion()"></input>
+            <label for="toglAutocompleteWords" title="auto-completion"><i class="fas fa-comment-dots fa-lg fa-fw"></i></label>
           </span>
           <span class="styled-checkbox">
             <input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
-            <label for="toglAutocomplete" title="Auto Close tags">🔮</label>
+            <label for="toglAutocomplete" title="Auto Close tags"><i class="fas fa-tag fa-lg fa-fw"></i></label>
           </span>
-          <span class="styled-checkbox hide-when-narrow">
-            <input
-            id="toglAutocompleteWords"
-            type="checkbox"
-            data-bind="checked: app.settings.completeWordsEnabled"
-            onclick="app.toggleWordCompletion()"
-            ></input>
-            <label for="toglAutocompleteWords" title="auto-completion">💬</label>
+          <span class="styled-checkbox">
+            <input id="toglAutocompleteClosingCharacters" type="checkbox" data-bind="checked: app.settings.completeClosingCharacters" onclick="app.toggleClosingCharactersCompletion()"></input>
+            <label for="toglAutocompleteClosingCharacters" title="Auto closing characters"><i class="fas fa-code fa-lg fa-fw"></i></label>
           </span>
-          <span class="styled-checkbox hide-when-narrow">
-            <input
-            id="toglAutocompleteClosingCharacters"
-            type="checkbox"
-            data-bind="checked: app.settings.completeClosingCharacters"
-            onclick="app.toggleClosingCharactersCompletion()"
-            ></input>
-            <label for="toglAutocompleteClosingCharacters" title="Auto closing characters">()</label>
+          <span class="styled-checkbox">
+            <input class="styled-checkbox" type="checkbox" id="toglTranscribing" data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"></input>
+            <label for="toglTranscribing" title="Transcribe" class="transcribe-button"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span><i class="fas fa-microphone fa-lg fa-fw"></i></label>
           </span>
-          <button class="bbcode-button" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)">🔎</button>
-          <span class="styled-checkbox hide-when-narrow">
-            <input
-            class="styled-checkbox"
-            type="checkbox"
-            id="toglTranscribing"
-            data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }">
-          </input>
-          <label for="toglTranscribing" title="Transcribe"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>🎤</label>
-        </span>
-        <button class="bbcode-button hide-when-narrow" onclick="app.speakText()" title="Hear text">🔊</button>
-        <button id="storyPlayButton" class="bbcode-button" onclick="app.togglePlayMode(true)" title="Preview">▶️</button>
-
-        <span class="show-when-narrow">
-          <button class="bbcode-button" onclick="app.editor.undo()" title="Undo">↶</button>
-          <button class="bbcode-button" onclick="app.editor.redo()" title="Redo">↷</button>
-        </span>
-      </div>
-
-      <div class="editor-container">
-        <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)" ></div>
-        <div class="editor-play" id="editor-play" onpointerdown="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
-          <p class="story-playtest-answer" id="NVrichTextLabel"></p>
-          <div id="commandDebugLabel"></div>
         </div>
-        <div class="editor" id="editor"
-        data-bind="
-        ace: app.editing().body,
-        aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
-        behavioursEnabled: true,
-       }"
-        >
+        <div class="bbcode-toolbar editor-counter">
+          <span class="editor-counter">
+            <span class="hide-when-narrow">&nbsp;</span>
+            Length: <span class="character-count">0</span>
+            <span class="hide-when-narrow">&nbsp;</span>
+            Lines: <span class="line-count">0</span>
+            <span class="hide-when-narrow">&nbsp;</span>
+            <span class="find-text" onclick="app.showRandomQuote()">&#9749</span>
+            <span class="hide-when-narrow">&nbsp;</span>
+            Line: <span class="row-index">0</span>
+            <span class="hide-when-narrow">&nbsp;</span>
+            Col: <span class="column-index">0</span>
+          </span>
+        </div>
       </div>
     </div>
+    <!-- /ko -->
 
-    <div class="tooltip" id="colorPicker-container" hidden>
-      <input type='text' id="colorPicker" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"/>
+    <!-- app info -->
+    <div class="app-info">
+      <span class="app-title" data-bind="text:app.name"></span>
+      <span class="app-version" data-bind="text:app.version"></span>
+      <span class="file-name" data-bind="text:data.editingName"></span>
     </div>
+    <div class="title" id="addPwa">🍰Add to Homescreen📲</div>
 
-    <div class="tooltip" id="emojiPicker-container">
-      <div id="emojiPickerDom"></div>
-    </div>
+    <!-- marquee -->
+    <div id="marquee"></div>
 
+    <!-- ko if:app.ui.settingsDialogVisible() === true -->
+    <div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
+      <div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+        <h3>Settings</h3>
+        <div class="settings-row">
+          <div class="settings-column">
+            <!-- Language -->
+            <div class="settings-item">
+              <label class="settings-label" for="language">Story language</label>
+              <select id="language" class="settings-value" data-bind="
+                options: app.ui.availableLanguages,
+                optionsText: 'name',
+                optionsValue: 'id',
+                value: app.settings.language,
+                event: { change: app.setLanguage }">
+              </select>
+            </div>
+
+            <!-- Theme -->
+            <div class="settings-item">
+              <label class="settings-label" for="theme">Theme</label>
+
+              <select id="theme" class="settings-value" data-bind="
+                options: app.ui.availableThemes,
+                optionsText: 'name',
+                optionsValue: 'id',
+                value: app.settings.theme,
+                event: { change: app.setTheme }">
+              </select>
+            </div>
+
+            <!-- Markup -->
+            <div class="settings-item">
+              <label class="settings-label" for="theme">Markup</label>
+
+              <div class="settings-value markup">
+                <select id="theme" data-bind="
+                  options: app.ui.availableMarkupLanguages,
+                  optionsText: 'name',
+                  optionsValue: 'id',
+                  value: app.settings.markupLanguage,
+                  event: { change: app.setMarkupLanguage }">
+                </select>
+                <button data-bind="click: app.ui.confirmMarkupConversion">Convert</button>
+              </div>
+            </div>
+
+            <!-- Story playtesting style -->
+            <div class="settings-item">
+              <label class="settings-label" for="theme">Playtesting style</label>
+              <div class="settings-value markup">
+                <select id="theme" data-bind="
+                  options: app.ui.availablePlaytestStyles,
+                  optionsText: 'name',
+                  optionsValue: 'id',
+                  value: app.settings.playtestStyle,
+                  event: { change: app.setPlaytestStyle }">
+                </select>
+              </div>
+            </div>
+
+            <!-- Throttle delay -->
+            <div class="settings-item">
+              <label class="settings-label" for="throttle-threshold">Redraw delay</label>
+              <div class="slidecontainer settings-value">
+                <input type="range" class="slider settings-value" min="16" max="250" data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
+              </div>
+            </div> <!-- settgins-item -->
+
+            <!-- Gist token -->
+            <label class="settings-label" for="throttle-threshold">Github Gist Settings</label>
+            <div class="settings-item">
+              <label class="settings-label" for="throttle-threshold">Token</label>
+              <div class="slidecontainer settings-value">
+                <input type="password" placeholder=" Github token (enable gists)" data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
+              </div>
+              <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">New</button>
+            </div> <!-- settgins-item -->
+
+            <div class="settings-item">
+              <label class="settings-label" for="throttle-threshold">Gist id</label>
+              <div class="slidecontainer settings-value">
+                <input type="input" class="settings-value" placeholder="gist.github.com/you/(gist id)" data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
+              </div>
+              <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
+            </div> <!-- settgins-item -->
+
+
+          </div> <!-- settgins-column -->
+          <div class="settings-column">
+
+            <!-- Spellcheck -->
+            <div class="settings-item">
+              <label class="settings-label" for="spellcheck"><i class="fas fa-spell-check settings-icon"></i> Spell check</label>
+              <input id="spellcheck" type="checkbox" data-bind="checked: app.settings.spellcheckEnabled">
+            </div>
+
+            <!-- AutocompleteWords -->
+            <div class="settings-item">
+              <label class="settings-label" for="completeWords"><i class="fas fa-comment-dots settings-icon"></i> Complete words</label>
+              <input id="completeWords" type="checkbox" data-bind="checked: app.settings.completeWordsEnabled">
+            </div>
+
+            <!-- AutocloseTags -->
+            <div class="settings-item">
+              <label class="settings-label" for="completeTags"><i class="fas fa-tag settings-icon"></i> Complete tags</label>
+              <input id="completeTags" type="checkbox" data-bind="checked: app.settings.completeTagsEnabled">
+            </div>
+
+            <!-- Auto closingCharacters -->
+            <div class="settings-item">
+              <label class="settings-label" for="completeClosingCharacters"><i class="fas fa-code settings-icon"></i> Complete closing characters</label>
+              <input id="completeClosingCharacters" type="checkbox" data-bind="checked: app.settings.completeClosingCharacters">
+            </div>
+
+            <!-- AutocreateNodes -->
+            <div class="settings-item">
+              <label class="settings-label" for="autocreation"><i class="fas fa-plus-circle settings-icon"></i> Autocreate nodes</label>
+              <input id="autocreation" type="checkbox" checked="true" data-bind="checked: app.settings.createNodesEnabled">
+            </div>
+
+            <!-- Night mode -->
+            <div class="settings-item">
+              <label class="settings-label" for="nightMode"><i class="fas fa-moon settings-icon"></i> Night mode</label>
+              <input id="nightMode" type="checkbox" checked="true" data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }">
+            </div>
+
+            <!-- Snap to Grid -->
+            <div class="settings-item">
+              <label class="settings-label" for="snapGrid"><i class="fas fa-border-all settings-icon"></i> Snap to grid</label>
+              <input id="snapGrid" type="checkbox" checked="true" data-bind="checked: app.settings.snapGridEnabled, event: { change: app.initGrid }">
+            </div>
+
+            <!-- Grid Size -->
+            <div class="settings-item">
+              <label class="settings-label" for="gridSize"><i class="fas fa-sort-numeric-up settings-icon"></i> Grid size</label>
+              <input id="gridSize" type="number" min="0" step="1" placeholder="20 - 200 (Default: 40)" data-bind="value: app.settings.gridSize, event: { change: app.settings.validateGridSize }">
+            </div>
+          </div> <!-- settgins-column -->
+        </div> <!-- settgins-row -->
+      </div> <!-- settgins-form -->
+    </div> <!-- settgins-dialog -->
+    <!-- /ko -->
   </div>
-</div>
-<!-- /ko -->
 
-<!-- app info -->
-<div class="app-info">
-  <span class="app-title" data-bind="text:app.name"></span>
-  <span class="app-version" data-bind="text:app.version"></span>
-  <span class="file-name" data-bind="text:data.editingName"></span>
-</div>
-<div class="title" id="addPwa">🍰Add to Homescreen📲</div>
+  <!-- Hidden fields, file dialogs, and elements -->
+  <div class="hidden">
+    <input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp" />
+    <input type="file" id="open-file" multiple="true" accept=".yarn,.txt,.xml,.json,.twee,.tw2" />
+    <input type="file" id="open-folder" webkitdirectory directory />
+    <input type="file" id="save-file" nwsaveas="filename.txt" />
+  </div>
 
-<!-- marquee -->
-<div id="marquee"></div>
-
-<!-- ko if:app.ui.settingsDialogVisible() === true -->
-<div id="settings-dialog" class="settings-dialog" data-bind="mousedown: app.ui.closeSettingsDialog">
-  <div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
-    <h3>Settings</h3>
-    <div class="settings-row">
-      <div class="settings-column">
-        <!-- Language -->
-        <div class="settings-item">
-          <label class="settings-label" for="language">Story language</label>
-          <select id="language" class="settings-value" data-bind="
-          options: app.ui.availableLanguages,
-          optionsText: 'name',
-          optionsValue: 'id',
-          value: app.settings.language,
-          event: { change: app.setLanguage }">
-        </select>
-      </div>
-
-      <!-- Theme -->
-      <div class="settings-item">
-        <label class="settings-label" for="theme">Theme</label>
-
-        <select id="theme" class="settings-value" data-bind="
-          options: app.ui.availableThemes,
-          optionsText: 'name',
-          optionsValue: 'id',
-          value: app.settings.theme,
-          event: { change: app.setTheme }">
-        </select>
-      </div>
-
-      <!-- Markup -->
-      <div class="settings-item">
-        <label class="settings-label" for="theme">Markup</label>
-
-        <div class="settings-value markup">
-          <select id="theme" data-bind="
-            options: app.ui.availableMarkupLanguages,
-            optionsText: 'name',
-            optionsValue: 'id',
-            value: app.settings.markupLanguage,
-            event: { change: app.setMarkupLanguage }">
-          </select>
-          <button data-bind="click: app.ui.confirmMarkupConversion">Convert</button>
-        </div>
-      </div>
-
-      <!-- Story playtesting style -->
-      <div class="settings-item">
-        <label class="settings-label" for="theme">Playtesting style</label>
-        <div class="settings-value markup">
-          <select id="theme" data-bind="
-            options: app.ui.availablePlaytestStyles,
-            optionsText: 'name',
-            optionsValue: 'id',
-            value: app.settings.playtestStyle,
-            event: { change: app.setPlaytestStyle }">
-          </select>
-        </div>
-      </div>
-
-    <!-- Throttle delay -->
-    <div class="settings-item">
-      <label class="settings-label" for="throttle-threshold">Redraw delay</label>
-      <div class="slidecontainer settings-value">
-        <input
-        type="range"
-        class="slider settings-value"
-        min="16"
-        max="250"
-        data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
-      </div>
-    </div> <!-- settgins-item -->
-
-    <!-- Gist token -->
-    <label class="settings-label" for="throttle-threshold">Github Gist Settings</label>
-    <div class="settings-item">
-      <label class="settings-label" for="throttle-threshold">Token</label>
-      <div class="slidecontainer settings-value">
-        <input
-        type="password"
-        placeholder=" Github token (enable gists)"
-        data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
-      </div>
-      <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new','_blank','resizable=yes') }">New</button>
-    </div> <!-- settgins-item -->
-
-    <div class="settings-item">
-      <label class="settings-label" for="throttle-threshold">Gist id</label>
-      <div class="slidecontainer settings-value">
-        <input
-        type="input"
-        class="settings-value"
-        placeholder="gist.github.com/you/(gist id)"
-        data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
-      </div>
-      <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
-    </div> <!-- settgins-item -->
-
-
-  </div> <!-- settgins-column -->
-  <div class="settings-column">
-
-    <!-- Spellcheck -->
-    <div class="settings-item">
-      <label class="settings-label" for="spellcheck">✔ Spell check</label>
-      <input
-      id="spellcheck"
-      type="checkbox"
-      data-bind="checked: app.settings.spellcheckEnabled">
-    </div>
-
-    <!-- AutocompleteWords -->
-    <div class="settings-item">
-      <label class="settings-label" for="completeWords">💬 Complete words</label>
-      <input
-      id="completeWords"
-      type="checkbox"
-      data-bind="checked: app.settings.completeWordsEnabled"
-      >
-    </div>
-
-    <!-- AutocloseTags -->
-    <div class="settings-item">
-      <label class="settings-label" for="completeTags">🔮 Complete tags</label>
-      <input
-      id="completeTags"
-      type="checkbox"
-      data-bind="checked: app.settings.completeTagsEnabled"
-      >
-    </div>
-
-    <!-- Auto closingCharacters -->
-    <div class="settings-item">
-      <label class="settings-label" for="completeClosingCharacters">() Complete closing characters</label>
-      <input
-      id="completeClosingCharacters"
-      type="checkbox"
-      data-bind="checked: app.settings.completeClosingCharacters"
-      >
-    </div>
-
-    <!-- AutocreateNodes -->
-    <div class="settings-item">
-      <label class="settings-label" for="autocreation">➕ Autocreate nodes</label>
-      <input
-      id="autocreation"
-      type="checkbox"
-      checked="true"
-      data-bind="checked: app.settings.createNodesEnabled"
-      >
-    </div>
-
-    <!-- Night mode -->
-    <div class="settings-item">
-      <label class="settings-label" for="nightMode">&#9728 Night mode</label>
-      <input
-      id="nightMode"
-      type="checkbox"
-      checked="true"
-      data-bind="checked: app.settings.nightModeEnabled, event: { change: app.toggleNightMode }"
-      >
-    </div>
-
-    <!-- Snap to Grid -->
-    <div class="settings-item">
-      <label class="settings-label" for="snapGrid">⊞ Snap to grid</label>
-      <input
-      id="snapGrid"
-      type="checkbox"
-      checked="true"
-      data-bind="checked: app.settings.snapGridEnabled, event: { change: app.initGrid }"
-      >
-    </div>
-
-    <!-- Grid Size -->
-    <div class="settings-item">
-      <label class="settings-label" for="gridSize">Grid size</label>
-      <input
-      id="gridSize"
-      type="number"
-      min="0"
-      step="1"
-      placeholder="20 - 200 (Default: 40)"
-      data-bind="value: app.settings.gridSize, event: { change: app.settings.validateGridSize }"
-      >
-    </div>
-  </div> <!-- settgins-column -->
-</div> <!-- settgins-row -->
-</div> <!-- settgins-form -->
-</div> <!-- settgins-dialog -->
-<!-- /ko -->
-</div>
-
-<!-- Hidden fields, file dialogs, and elements -->
-<div class="hidden">
-  <input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp"/>
-  <input type="file" id="open-file" multiple="true" accept=".yarn,.txt,.xml,.json,.twee,.tw2"/>
-  <input type="file" id="open-folder" webkitdirectory directory/>
-  <input type="file" id="save-file" nwsaveas="filename.txt" />
-</div>
-
-<!-- templates container (they get loaded into this) -->
-<div class="templates">
-</div>
-<link id="theme-stylesheet" rel="stylesheet" href="./public/themes/classic.css" >
+  <!-- templates container (they get loaded into this) -->
+  <div class="templates">
+  </div>
+  <link id="theme-stylesheet" rel="stylesheet" href="./public/themes/classic.css">
 </body>
+
 </html>

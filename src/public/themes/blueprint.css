@@ -160,6 +160,11 @@
   background-color: #E0D6C5;
   color: #8D8374;
 }
+
+.settings-icon {
+  color: cornflowerblue;
+}
+
 .tag-style-1 {
   border: 1px solid red;
   background-color: red !important;

@@ -455,6 +455,10 @@ input[type='checkbox'] {
   text-align: left;
 }
 
+.settings-icon {
+  color: grey;
+}
+
 .settings-label {
   padding-right: 2px;
 }
@@ -529,9 +533,12 @@ input[type='checkbox'] {
   width: 90%;
   height: 90%;
   padding: 15px;
+  padding-bottom: 10px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
+  display: flex;
+  flex-flow: column;
   overflow: hidden;
 }
 
@@ -558,7 +565,10 @@ input[type='checkbox'] {
   float: left;
   width: 100%;
   font-size: 0.8em;
-  overflow: auto;
+}
+
+.node-editor .form .toggle-toolbar {
+  padding-top: 10px;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button {
@@ -567,7 +577,6 @@ input[type='checkbox'] {
   text-align: center;
   border-radius: 12px;
   background-color: white;
-  height: 24px;
   overflow: hidden;
   color: black;
   border: 2px solid #e7e7e7;
@@ -575,6 +584,16 @@ input[type='checkbox'] {
   transition-duration: 0.4s;
   text-decoration: none;
   display: inline-block;
+}
+
+.bbcode-button-separator {
+  color: grey;
+  opacity: 0.2;
+}
+
+.bbcode-button-right {
+  float: right;
+  margin: 0 2px;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button:hover {
@@ -604,20 +623,23 @@ input[type='checkbox'] {
   display: none;
 }
 .styled-checkbox label {
-  padding-right: 4px;
-  padding-left: 4px;
+  padding: 2px 6px;
   color: grey;
   border-radius: 12px;
-  border: 2px solid rgba(0, 0, 0, 0);
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  border: 2px solid #e7e7e7;
 }
 .styled-checkbox input:checked + label {
-  padding-right: 5px;
-  padding-left: 5px;
+  padding: 2px 6px;
   color: black;
-  background-color: rgb(255, 248, 143);
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0, 0, 0, 0);
+  background-color: #DAEFF1;
+  border: 2px solid #B0D9CD;
+}
+
+.styled-checkbox input:checked + label.transcribe-button {
+  padding: 2px 6px;
+  color: black;
+  background-color: #EFC7C7;
+  border: 2px solid #DC8484;
 }
 /* SPECIAL CHECKBOX END */
 
@@ -643,7 +665,7 @@ input[type='checkbox'] {
 .node-editor .form .editor-container {
   margin-top: 2px;
   width: 100%;
-  height: calc(100% - 85px);
+  height: 100%;
   float: left;
   overflow: hidden;
   position: relative;
@@ -951,6 +973,10 @@ input:focus + span + .dropdown {
   content: 'Version ';
 }
 
+.menu-icon {
+  color: black;
+}
+
 /*-- New node button ------------------------------------------------------- */
 .app-add-node {
   position: absolute;
@@ -1021,6 +1047,17 @@ span.add-node:after {
     padding: 2px 2px 5px 2px;
     line-height: 0em;
     border-radius: 4px;
+    display: flex !important;
+    flex-flow: column !important;
+  }
+
+  .toggle-toolbar {
+    padding: 5px 0;
+  }
+
+  .editor-counter {
+    padding: 5px 0;
+    white-space: nowrap;
   }
 
   .node-editor .form input[type='text'] {
