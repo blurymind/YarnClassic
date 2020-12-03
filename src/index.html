@@ -506,6 +506,18 @@
       data-bind="value: app.settings.gridSize, event: { change: app.settings.validateGridSize }"
       >
     </div>
+
+    <!-- Linked Node Line Style -->
+    <div class="settings-item">
+      <label class="settings-label" for="line-style">Line link style</label>
+      <select id="line-style" class="settings-value" data-bind="
+        options: app.ui.availableLineStyles,
+        optionsText: 'name',
+        optionsValue: 'id',
+        value: app.settings.lineStyle,
+        event: { change: app.workspace.updateArrows }">
+      </select>
+    </div>
   </div> <!-- settgins-column -->
 </div> <!-- settgins-row -->
 </div> <!-- settgins-form -->

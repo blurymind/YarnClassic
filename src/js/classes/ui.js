@@ -57,6 +57,12 @@ export const UI = function(app) {
     { name: 'Lingua latīna', id: 'la' }
   ];
 
+    // Line Style selector -----------------------------------------------------------
+    this.availableLineStyles = [
+      { id: 'bezier', name: 'Bezier Curves' },
+      { id: 'straight', name: 'Straight Lines' }
+    ];
+
   // openSettingsDialog
   this.openSettingsDialog = function() {
     self.settingsDialogVisible(true);
