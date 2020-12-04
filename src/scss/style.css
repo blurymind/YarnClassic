@@ -583,8 +583,18 @@ input[type='checkbox'] {
   opacity: 0.2;
 }
 
+.float-right {
+  float: right;
+}
+
 .bbcode-button-right {
   float: right;
+  margin: 0 2px;
+}
+
+.bbcode-button-separator-float-right {
+  float: right;
+  padding: 5px 0;
   margin: 0 2px;
 }
 
