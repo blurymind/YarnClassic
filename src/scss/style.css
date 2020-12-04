@@ -486,7 +486,7 @@ input[type='checkbox'] {
   width: 90%;
   height: 90%;
   padding: 15px;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
   background: #fff;
   border-radius: 4px;
   box-shadow: 0px 1px 1px #000;
@@ -521,7 +521,10 @@ input[type='checkbox'] {
 }
 
 .node-editor .form .toggle-toolbar {
-  padding-top: 10px;
+  padding-top: 5px;
+  float: left;
+  width: 100%;
+  font-size: 0.8em;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button {
@@ -599,10 +602,12 @@ input[type='checkbox'] {
 }
 /* SPECIAL CHECKBOX END */
 
-.node-editor .form .bbcode-toolbar .editor-counter {
+.node-editor .form .editor-counter {
   right: 20px;
   width: 100%;
-  color: #666;
+  float: left;
+  width: 100%;
+  font-size: 0.8em;
 }
 
 .node-editor .form .editor {
@@ -983,11 +988,11 @@ input:focus + span + .dropdown {
   }
 
   .toggle-toolbar {
-    padding: 5px 0;
+    padding: 0;
+    font-size: 0.6em !important;
   }
 
   .editor-counter {
-    padding: 10px 0;
     white-space: nowrap;
   }
 
@@ -1008,6 +1013,7 @@ input:focus + span + .dropdown {
 
   .bbcode-button {
     border: 1px solid #e7e7e7 !important;
+    font-size: 0.8em;
   }
 
   .context-menu-visible > .context-menu-list {

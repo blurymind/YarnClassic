@@ -984,11 +984,11 @@ export var App = function(name, version) {
 
   this.toggleShowCounter = function() {
     if (self.settings.editorStatsEnabled()) {
-      $('.node-editor .form .bbcode-toolbar .editor-counter').css({
+      $('.node-editor .form .editor-counter').css({
         display: 'initial',
       });
     } else {
-      $('.node-editor .form .bbcode-toolbar .editor-counter').css({
+      $('.node-editor .form .editor-counter').css({
         display: 'none',
       });
     }
