@@ -248,21 +248,19 @@
           </div>
         </div>
 
-        <div class="bbcode-toolbar editor-counter">
-          <span class="editor-counter">
-            <span class="hide-when-narrow">&nbsp;</span>
-            Characters: <span class="character-count">0</span>
-            <span class="hide-when-narrow">&nbsp;</span>
-            Lines: <span class="line-count">0</span>
-            <span class="hide-when-narrow">&nbsp;</span>
-            <span class="find-text" onclick="app.showRandomQuote()"><i class="fas fa-coffee"></i></span>
-            <span class="hide-when-narrow">&nbsp;</span>
-            Row Index: <span class="row-index">0</span>
-            <span class="hide-when-narrow">&nbsp;</span>
-            Col Index: <span class="column-index">0</span>
-          </span>
+        <div class="editor-counter">
+          <span class="hide-when-narrow">&nbsp;</span>
+          Characters: <span class="character-count">0</span>
+          <span class="hide-when-narrow">&nbsp;</span>
+          Lines: <span class="line-count">0</span>
+          <span class="hide-when-narrow">&nbsp;</span>
+          <span class="find-text" onclick="app.showRandomQuote()"><i class="fas fa-coffee"></i></span>
+          <span class="hide-when-narrow">&nbsp;</span>
+          Row Index: <span class="row-index">0</span>
+          <span class="hide-when-narrow">&nbsp;</span>
+          Col Index: <span class="column-index">0</span>
         </div>
-        <div class="bbcode-toolbar toggle-toolbar">
+        <div class="toggle-toolbar">
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="styled-checkbox">
             <input id="toglShowCounter" type="checkbox" data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"></input>
