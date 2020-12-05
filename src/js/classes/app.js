@@ -90,6 +90,7 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
+  this.editorPreviousScrollPosition = 0;
 
   // inEditor
   //
@@ -825,6 +826,30 @@ export var App = function(name, version) {
       }
     });
 
+    /// Hide bbcode-toolbar on scroll down for narrow displays
+    self.editor.getSession().on('changeScrollTop', function() {
+      let position = self.editor.getFirstVisibleRow();
+      if ($(window).width() > 600 || position === self.editorPreviousScrollPosition) {
+        return;
+      }
+      if (position >= self.editorPreviousScrollPosition && position !== 0) {
+        $('.bbcode-toolbar').addClass('hidden');
+        $('#editorTags').addClass('hidden');
+      } else {
+        $('.bbcode-toolbar').removeClass('hidden');
+        $('#editorTags').removeClass('hidden');
+      }
+      self.editorPreviousScrollPosition = position;
+    });
+
+    /// Recover editor toolbars from hidden state if window is resized
+    $(window).on('resize', function() {
+      if ($(window).width() > 600) {
+        $('.bbcode-toolbar').removeClass('hidden');
+        $('#editorTags').removeClass('hidden');
+      }
+    });
+
     /// init emoji picker
     this.emPicker = new EmojiPicker(
       document.getElementById('emojiPickerDom'),
@@ -835,8 +860,11 @@ export var App = function(name, version) {
       }
     );
 
+    /// init spell check
+    enable_spellcheck();
+
     self.toggleTranscribing();
-    self.toggleNightMode();
+    self.toggleInvertColors();
     self.toggleShowCounter();
     self.toggleWordCompletion();
     self.toggleSpellCheck();
@@ -949,14 +977,17 @@ export var App = function(name, version) {
   };
 
   this.toggleSpellCheck = function() {
-    if (self.settings.spellcheckEnabled())
+    // Timeout so spellcheck can toggle after the spelling check settings are updated
+    setTimeout(function() {
+      if (self.settings.spellcheckEnabled())
       enable_spellcheck();
     else
       disable_spellcheck();
+    }, 50);
   };
 
-  this.toggleNightMode = function() {
-    const cssOverwrite = self.settings.nightModeEnabled() ?
+  this.toggleInvertColors = function() {
+    const cssOverwrite = self.settings.invertColorsEnabled() ?
       { filter: 'invert(100%)' } :
       { filter: 'invert(0%)' };
 
@@ -1029,7 +1060,7 @@ export var App = function(name, version) {
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button disabled';
+      $(storyPreviewPlayButton).addClass('disabled');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
       });
@@ -1049,7 +1080,7 @@ export var App = function(name, version) {
       self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button';
+      $(storyPreviewPlayButton).removeClass('disabled');
       self.previewStory.terminate();
       setTimeout(() => {
         if (

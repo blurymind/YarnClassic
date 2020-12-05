@@ -22,8 +22,6 @@ import 'jquery.transit';
 import 'spectrum-colorpicker';
 import 'lightweight-emoji-picker/dist/picker.js';
 
-import '@fortawesome/fontawesome-free/js/all.js';
-
 // Keep these imports, they are used elsewhere in the app
 import spoken from 'spoken';
 import Swal from 'sweetalert2';

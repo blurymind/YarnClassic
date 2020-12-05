@@ -24,7 +24,7 @@ a:hover {
 }
 
 .app-menu .menu {
-  width: 160px;
+  width: 180px;
   float: left;
   margin-left: 10px;
   border-radius: 2px;
@@ -91,6 +91,31 @@ a:hover {
 .app-menu .menu:active .title {
   background: #ddd;
   color: #555;
+}
+
+.menu-icon {
+  color: #289aa5;
+}
+
+.settings-icon {
+  color: #289aa5;
+}
+
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  color: grey;
+}
+
+.app-add-node:hover {
+  color: #289aa5;
+}
+
+.app-button span {
+  color: grey;
+}
+
+.app-button span:hover {
+  color: #289aa5;
 }
 
 /*-- Search ----------------------------------------------------------------- */
@@ -164,6 +189,11 @@ a:hover {
 .title-style-9 {
   background-color: black;
   color: white;
+}
+
+.node.selected {
+  box-shadow: 0px 0px 0px 2px cyan;
+  border: none;
 }
 
 

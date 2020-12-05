@@ -55,6 +55,7 @@ input[type='checkbox'] {
   background: #ccc;
   border-radius: 12px;
   border: 1px solid #ccc;
+  cursor: pointer;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #289aa5;
@@ -90,129 +91,81 @@ input[type='checkbox'] {
 /* --- ZOOM --- */
 
 .app-zoom {
-  position: absolute;
   bottom: 5px;
   right: 5px;
-
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 5px 5px 5px 5px;
-  z-index: 10000;
-  opacity: 0.2;
-}
-
-.app-zoom:hover {
-  opacity: 0.6;
-}
-
-.app-zoom span {
-  width: 22px;
-  height: 22px;
-  margin: 8px;
-  float: left;
-  background: #fff url('../public/images/zooms.png') no-repeat;
-  display: inline;
-  opacity: 0.15;
-  cursor: pointer;
-  transition: opacity 0.25s;
-}
-
-.app-zoom span:nth-child(2) {
-  background-position: -32px 0px;
-}
-.app-zoom span:nth-child(3) {
-  background-position: -64px 0px;
-}
-.app-zoom span:nth-child(4) {
-  background-position: -96px 0px;
-}
-.app-zoom span:hover {
-  opacity: 0.5;
 }
 
 /* --- SORT --- */
 
 .app-sort {
-  position: absolute;
   bottom: 60px;
   right: 5px;
+}
+
+
+/* --- UNDO REDO --- */
+.app-undo-redo {
+  bottom: 115px;
+  right: 5px;
+}
+
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  position: absolute;
+  bottom: 115px;
+  right: 98px;
+  width: 60px;
+  height: 38px;
   background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 5px 5px 5px 5px;
+  color: grey;
+  border-radius: 5px;
+  padding: 5px;
+  line-height: 40px;
   z-index: 10000;
-  opacity: 0.2;
+  cursor: pointer;
   text-align: center;
   transition: opacity 0.2s;
 }
 
-.app-sort:hover {
-  opacity: 0.6;
+.app-add-node:hover {
+  color: black;
 }
 
-.app-sort span {
+.app-add-node span {
+  margin: auto;
   width: 22px;
   height: 22px;
-  margin: 8px;
-  background: #fff url('../public/images/sort.png') no-repeat;
-  float: left;
-  display: inline;
-  opacity: 0.25;
-  cursor: pointer;
-  transition: opacity 0.25s;
 }
 
-.app-sort span:nth-child(2) {
-  background-position: -32px 0px;
+.app-add-node:active {
+  opacity: 0;
 }
 
-.app-add-node:hover {
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-.app-sort span:nth-child(4) {
-  background-position: -96px 0px;
-}
-.app-sort span:hover {
-  opacity: 0.5;
-}
-
-/* --- UNDO REDO --- */
-.app-undo-redo {
+.app-button {
   position: absolute;
-  bottom: 115px;
-  right: 5px;
   background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
   padding: 5px 5px 5px 5px;
   z-index: 10000;
-  opacity: 0.2;
-  transition: opacity 0.2s;
 }
 
-.app-undo-redo:hover {
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.app-undo-redo span {
+.app-button span {
   width: 22px;
   height: 22px;
   margin: 8px;
-  background: #fff url('../public/images/undo-redo.png') no-repeat;
   float: left;
-  opacity: 0.25;
   cursor: pointer;
+  text-align: center;
   transition: opacity 0.25s;
+  color: grey;
 }
 
-.app-undo-redo span:nth-child(2) {
-  background-position: -38px 0px;
+.app-button span:hover {
+  color: black;
 }
-.app-undo-redo span:hover {
-  opacity: 0.5;
+
+.app-button span:active {
+  opacity: 0;
 }
 
 /* --- NODE WINDOW CSS --- */
@@ -253,18 +206,8 @@ input[type='checkbox'] {
   background: #fff;
   border-radius: 2px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0);
-  border-top: 1px solid #fff;
   cursor: pointer;
   transition: border 0.25s;
-}
-
-.node.selected {
-  border: 1px solid #49eff1;
-}
-
-.node:hover {
-  border: 1px solid #49eff1;
 }
 
 .node .title {
@@ -332,34 +275,47 @@ input[type='checkbox'] {
 .node .colorUp,
 .node .colorDown {
   position: absolute;
-  right: 40px;
-  top: 4px;
+  top: 6px;
+  bottom: 164px;
+  line-height: 30px;
   opacity: 0;
   transition: opacity 0.125s;
+  background: white;
+  border-radius: 5px;
+  text-align: center;
+  height: 30px;
+  width: 28px;
 }
 
 .node .delete {
-  right: 4px;
-  background-position: -32px 0px;
+  right: 6px;
 }
 
 .node .colorUp {
-  width: 16px;
-  right: 40px;
-  background-position: -112px 0px;
+  right: 39px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .node .colorDown {
-  width: 16px;
-  right: 56px;
-  background-position: -96px 0px;
+  right: 67px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .node:hover .edit,
 .node:hover .delete,
 .node:hover .colorUp,
 .node:hover .colorDown {
+  opacity: 0.5;
+}
+
+.node .delete:hover,
+.node .colorUp:hover,
+.node .colorDown:hover,
+.node .edit:hover {
   opacity: 1;
+  transition: opacity 0.2s;
 }
 
 .node .resize {
@@ -504,6 +460,31 @@ input[type='checkbox'] {
   background: #2470F7;
   cursor: pointer;
 }
+
+/* --- ICONS --- */
+.icon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  vertical-align: -0.125em;
+  overflow: visible;
+}
+.icon-lg {
+  font-size: 1.333em;
+  line-height: .75em;
+  vertical-align: -.225em;
+}
+.icon-fw {
+  width: 1.25em;
+  text-align: center;
+}
+.icon-flip {
+  transform: scale(-1, 1);
+}
+
 /* --- NODE EDITOR --- */
 
 .node-editor {
@@ -581,6 +562,7 @@ input[type='checkbox'] {
 .bbcode-button-separator {
   color: grey;
   opacity: 0.2;
+  line-height: 22px;
 }
 
 .float-right {
@@ -594,7 +576,7 @@ input[type='checkbox'] {
 
 .bbcode-button-separator-float-right {
   float: right;
-  padding: 5px 0;
+  line-height: 22px;
   margin: 0 2px;
 }
 
@@ -666,7 +648,6 @@ input[type='checkbox'] {
   font-size: 0.9em;
   color: #666;
   font-family: yarnFont;
-  cursor: text;
 }
 
 .node-editor .form .editor-container {
@@ -889,19 +870,40 @@ input:focus + span + .dropdown {
   text-align:center;
 }
 
+.item img {
+  width: 24px;
+}
+
 .add-link {
   position: absolute;
-  top: 0;
-  right: 5px;
-  height: 30px;
+  top: 15px;
+  right: 15px;
+  height: 40px;
   font-family: sans-serif;
   line-height: 1.6em;
-  font-size: 0.8em;
+  font-size: 0.7em;
   cursor: default;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 1px 1px #e8e8e8;
   z-index: 10000;
   background-color: white;
   max-width: 40%;
+}
+
+.add-link:hover {
+  background: #e8e8e8;
+}
+
+#linkHelperMenuFilter {
+  border-right: 2px solid #e8e8e8;
+  border-left: 2px solid #e8e8e8;
+  border-bottom: 0;
+}
+
+#add-link-title {
+  line-height: 40px;
+  text-align: center;
+  padding: 0;
+  width: 100%;
 }
 
 .tooltip {
@@ -990,35 +992,8 @@ input:focus + span + .dropdown {
   color: black;
 }
 
-/*-- New node button ------------------------------------------------------- */
-.app-add-node {
-  position: absolute;
-  bottom: 115px;
-  right: 110px;
-  width: 35px;
-  height: 40px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding-top: 11px;
-  padding-left: 17px;
-  z-index: 10000;
-  opacity: 0.2;
-}
-
-span.add-node:after {
-  font-weight: bolder;
-  font-size: xx-large;
-  color: lightgray;
-  content: '+';
-}
-
-.app-add-node:hover {
-  opacity: 0.6;
-}
-
-.add-node:active {
-  color: gray;
+.ace-content {
+  cursor: text;
 }
 
 /*-- ----------------------------HTML previews------------------------------- */
@@ -1069,6 +1044,11 @@ span.add-node:after {
     font-size: 0.6em !important;
   }
 
+  .node-editor .form .toggle-toolbar {
+    padding: 0;
+    font-size: 0.6em !important;
+  }
+
   .editor-counter {
     white-space: nowrap;
   }
@@ -1088,9 +1068,20 @@ span.add-node:after {
     height: 90% !important;
   }
 
-  .bbcode-button {
+  button.bbcode-button {
     border: 1px solid #e7e7e7 !important;
     font-size: 0.8em;
+    padding-bottom: 0 !important;
+    padding-top: 1px !important;
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+  }
+
+  .bbcode-toolbar .styled-checkbox label {
+    font-size: 0.8em;
+    padding: 0 !important;
+    padding-top: 4px !important;
+    padding-bottom: 3px !important;
   }
 
   .context-menu-visible > .context-menu-list {
@@ -1135,6 +1126,11 @@ span.add-node:after {
 
   .app-add-node {
     bottom: 60px;
+    opacity: 0.5;
+  }
+
+  .app-button {
+    opacity: 0.5;
   }
 
   .settings-item,
@@ -1143,7 +1139,7 @@ span.add-node:after {
   }
 
   .ace_gutter {
-    width: 26px !important;
+     width: 26px !important;
   }
   .ace_gutter-cell {
     padding-left: 0px !important;
@@ -1155,5 +1151,16 @@ span.add-node:after {
   }
   .ace_scroller {
     left: 23px !important;
+  }
+
+  .add-link {
+    top: 0;
+    right: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+  
+  #add-link-title {
+    line-height: 20px;
   }
 }

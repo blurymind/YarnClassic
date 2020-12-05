@@ -27,7 +27,6 @@
     "update-version": "node ./scripts/copy-version.js --update"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.1",
     "ace-builds": "^1.4.5",
     "bbcode": "^0.1.5",
     "bondage": "^2.0.1",
