@@ -159,6 +159,14 @@ a:hover {
 
 /*-- Node ------------------------------------------------------------------ */
 
+.node.selected {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
+.node:hover {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
 .title-style-1 {
   background-color: #EBEBEB;
   color: black;
