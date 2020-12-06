@@ -64,7 +64,7 @@ input[type='checkbox'] {
 
 .templates,
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* --- VARIOUS CSS --- */

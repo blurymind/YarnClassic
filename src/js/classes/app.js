@@ -1061,6 +1061,8 @@ export var App = function(name, version) {
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
       $(storyPreviewPlayButton).addClass('disabled');
+      $('.toggle-toolbar').addClass('hidden');
+      $('.editor-counter').addClass('hidden');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
       });
@@ -1081,6 +1083,8 @@ export var App = function(name, version) {
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       $(storyPreviewPlayButton).removeClass('disabled');
+      $('.toggle-toolbar').removeClass('hidden');
+      $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
       setTimeout(() => {
         if (
