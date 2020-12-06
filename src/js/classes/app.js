@@ -1106,6 +1106,7 @@ export var App = function(name, version) {
     self.isEditorInPreviewMode = previewModeOverwrite;
     if (previewModeOverwrite) {
       self.togglePlayMode(false);
+      $('.bbcode-toolbar').addClass('hidden');
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
@@ -1113,6 +1114,7 @@ export var App = function(name, version) {
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
       //edit mode
+      $('.bbcode-toolbar').removeClass('hidden');
       self.editor.session.setScrollTop(editorPreviewer.scrollTop);
       editorPreviewer.innerHTML = '';
       editorPreviewer.style.display = 'none';
