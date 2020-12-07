@@ -1,3 +1,11 @@
+/*-- Scrollbar ------------------------------------------------------------------ */
+
+::-webkit-scrollbar-thumb:hover {
+  background: orange;
+  border: 1px solid orange;
+}
+
+
 /*-- Menu ------------------------------------------------------------------ */
 .app-menu {
   position: absolute;
@@ -59,6 +67,26 @@
   color: #555;
 }
 
+.menu-icon {
+  color: orange;
+}
+
+.menu .dropdown .item:hover .menu-icon {
+  color: black;
+}
+
+.add-link {
+  box-shadow: 0 0 1px 1px #e8e8e8;
+}
+
+.add-link:hover {
+  background: orange;
+}
+
+#linkHelperMenuFilter {
+  border-right: 2px solid orange;
+  border-left: 2px solid orange;
+}
 
 /*-- Search ------------------------------------------------------------------ */
 .app-search {
@@ -110,8 +138,11 @@
   top: 2.5%;
 }
 
+.node-editor .form .bbcode-toolbar .bbcode-button:hover {
+  background: orange;
+}
+
 .node {
-  border: none;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   border-bottom-left-radius: 12px;
@@ -130,9 +161,6 @@
 .node.selected .body {
   background-color: orange;
   color: black;
-}
-.node:hover {
-  border: none
 }
 .node .title {
   width: 100%;
@@ -160,6 +188,22 @@
   background-color: #E0D6C5;
   color: #8D8374;
 }
+
+/* SPECIAL CHECKBOX START */
+.styled-checkbox input:checked + label {
+  background-color: #FBCEB1;
+  border: 2px solid orange;
+}
+
+.styled-checkbox input:checked + label.transcribe-button {
+  background-color: #EFC7C7;
+  border: 2px solid #DC8484;
+}
+
+.settings-icon {
+  color: orange;
+}
+
 .tag-style-1 {
   border: 1px solid red;
   background-color: red !important;
@@ -230,8 +274,25 @@
   color: white;
 }
 
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  color: grey;
+}
+
+.app-add-node:hover {
+  color: orange;
+}
+
+.app-button span {
+  color: grey;
+}
+
+.app-button span:hover {
+  color: orange;
+}
+
 /* --------------------------- Narrow overrides -----------------------------*/
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 600px) {
   .app-menu {
     box-shadow: 0 0;
   }
@@ -254,4 +315,8 @@
 
 .grid-canvas {
   color: lightgrey;
+}
+
+.arrows {
+  color: white;
 }
