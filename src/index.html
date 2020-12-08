@@ -322,7 +322,7 @@
     </div>
 
     <!-- ko if:app.editing() != null -->
-    <div class="node-editor" data-bind="mousedown:app.saveNode">
+    <div class="node-editor" data-bind="mousedown: function() { app.saveNode(); app.closeEditor(); }">
 
       <div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
         <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">

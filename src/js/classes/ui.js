@@ -2,6 +2,10 @@ export const UI = function(app) {
   const self = this;
 
   this.settingsDialogVisible = ko.observable(false);
+  this.narrowScreenThreshold = 600;
+  this.isScreenNarrow = ko.computed(function() {
+    return ($(window).width() <= self.narrowScreenThreshold);
+  });
 
   // Markup selector -----------------------------------------------------------
   this.availableMarkupLanguages = [

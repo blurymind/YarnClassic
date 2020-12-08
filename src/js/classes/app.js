@@ -768,6 +768,9 @@ export var App = function(name, version) {
       .css({ y: '-100' })
       .transition({ y: '0' }, 250);
     self.editor = ace.edit('editor');
+    self.editor.setOptions({
+      scrollPastEnd: 0.5
+    })
     self.editor.navigateFileEnd();
 
     /// set color picker
@@ -823,30 +826,6 @@ export var App = function(name, version) {
             }
           });
         }, 200);
-      }
-    });
-
-    /// Hide bbcode-toolbar on scroll down for narrow displays
-    self.editor.getSession().on('changeScrollTop', function() {
-      let position = self.editor.getFirstVisibleRow();
-      if ($(window).width() > 600 || position === self.editorPreviousScrollPosition) {
-        return;
-      }
-      if (position >= self.editorPreviousScrollPosition && position !== 0) {
-        $('.bbcode-toolbar').addClass('hidden');
-        $('#editorTags').addClass('hidden');
-      } else {
-        $('.bbcode-toolbar').removeClass('hidden');
-        $('#editorTags').removeClass('hidden');
-      }
-      self.editorPreviousScrollPosition = position;
-    });
-
-    /// Recover editor toolbars from hidden state if window is resized
-    $(window).on('resize', function() {
-      if ($(window).width() > 600) {
-        $('.bbcode-toolbar').removeClass('hidden');
-        $('#editorTags').removeClass('hidden');
       }
     });
 
@@ -919,6 +898,7 @@ export var App = function(name, version) {
   this.openLastEditedNode = function() {
     if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
+      self.closeEditor();
     } else {
       const title = self.nodeVisitHistory.pop();
       self.propagateUpdateFromNode(self.editing());
@@ -1170,7 +1150,7 @@ export var App = function(name, version) {
     return self.richTextFormatter.identifyTag(textBeforeCursor);
   };
 
-  this.saveNode = function(closeEditor = true) {
+  this.saveNode = function() {
     const node = self.editing();
     if (node) {
       const editorTitleElement = $('#editorTitle')[0];
@@ -1192,16 +1172,15 @@ export var App = function(name, version) {
 
       setTimeout(self.updateSearch, 600);
 
-      // Close editor. SaveNode and CloseEditor should be different functions
-      if (closeEditor) {
-        $('.node-editor').transition({ opacity: 0 }, 250);
-        $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
-          self.editing(null);
-        });
-      }
-
       self.setYarnDocumentIsDirty();
     }
+  };
+
+  this.closeEditor = function() {
+    $('.node-editor').transition({ opacity: 0 }, 250);
+    $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
+      self.editing(null);
+    });
   };
 
   this.convertMarkup = function() {
