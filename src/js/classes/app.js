@@ -684,7 +684,7 @@ export var App = function(name, version) {
         self.limitNodesUpdate( () => {
           for (let i = list.length-1; i >= 0; --i) {
             if (self.inEditor()) {
-              if (self.editing().title() === list[i].title() && self.editing().body() === list[i].body()) {
+              if (self.editing() === list[i]) {
                 self.closeEditor();
               }
             }

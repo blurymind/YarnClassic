@@ -698,13 +698,20 @@ export const Workspace = function(app) {
     const nodeHeight = 100;
     const nodeXScaled = -(x * self.scale);
     const nodeYScaled = -(y * self.scale);
-    const winXCenter = $(window).width() / 2;
+    const winXCenter = ($(window).width() / 2);
     const winYCenter = $(window).height() / 2;
     const nodeWidthShift = (nodeWidth * self.scale) / 2;
     const nodeHeightShift = (nodeHeight * self.scale) / 2;
 
+    let splitEditorXOffset = 0;
+    if (app.settings.editorSplit()) {
+      splitEditorXOffset = ($('#editor-form').width() / 2);
+      
+      if (app.settings.editorSplitDirection() === 'right') { splitEditorXOffset *= -1; }
+    }
+
     self.setTranslation(
-      nodeXScaled + winXCenter - nodeWidthShift,
+      nodeXScaled + winXCenter - nodeWidthShift + splitEditorXOffset,
       nodeYScaled + winYCenter - nodeHeightShift,
       100
     );
