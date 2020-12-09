@@ -703,15 +703,8 @@ export const Workspace = function(app) {
     const nodeWidthShift = (nodeWidth * self.scale) / 2;
     const nodeHeightShift = (nodeHeight * self.scale) / 2;
 
-    let splitEditorXOffset = 0;
-    if (app.settings.editorSplit()) {
-      splitEditorXOffset = ($('#editor-form').width() / 2);
-      
-      if (app.settings.editorSplitDirection() === 'right') { splitEditorXOffset *= -1; }
-    }
-
     self.setTranslation(
-      nodeXScaled + winXCenter - nodeWidthShift + splitEditorXOffset,
+      nodeXScaled + winXCenter - nodeWidthShift + app.getSplitEditorXOffset(),
       nodeYScaled + winYCenter - nodeHeightShift,
       100
     );

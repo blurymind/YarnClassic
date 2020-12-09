@@ -968,6 +968,17 @@ export var App = function(name, version) {
     }
   };
 
+  this.getSplitEditorXOffset = function() {
+    let splitEditorXOffset = 0;
+    if (self.settings.editorSplit()) {
+      splitEditorXOffset = ($('#editor-form').width() / 2);
+      
+      if (self.settings.editorSplitDirection() === 'right') { splitEditorXOffset *= -1; }
+    }
+
+    return splitEditorXOffset;
+  }
+
   // called by the "Edit in Visual Studio Code Text Editor" button
   // this sends a message to the extension telling it to open the node in a text editor
   this.editNodeInVisualStudioCodeEditor = function(node) {
