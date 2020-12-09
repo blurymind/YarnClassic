@@ -149,6 +149,15 @@
       <symbol id="icon-grid" viewBox="0 0 448 512">
         <path d="M416 32H32A32 32 0 0 0 0 64v384a32 32 0 0 0 32 32h384a32 32 0 0 0 32-32V64a32 32 0 0 0-32-32zm-32 64v128H256V96zm-192 0v128H64V96zM64 416V288h128v128zm192 0V288h128v128z"></path>
       </symbol>
+      <symbol id="icon-exit" viewBox="0 0 352 512"> 
+        <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path> 
+      </symbol> 
+      <symbol id="icon-snap-document" viewBox="0 0 512 512"> 
+        <path d="M0 168v-16c0-13.255 10.745-24 24-24h360V80c0-21.367 25.899-32.042 40.971-16.971l80 80c9.372 9.373 9.372 24.569 0 33.941l-80 80C409.956 271.982 384 261.456 384 240v-48H24c-13.255 0-24-10.745-24-24zm488 152H128v-48c0-21.314-25.862-32.08-40.971-16.971l-80 80c-9.372 9.373-9.372 24.569 0 33.941l80 80C102.057 463.997 128 453.437 128 432v-48h360c13.255 0 24-10.745 24-24v-16c0-13.255-10.745-24-24-24z"></path> 
+      </symbol> 
+      <symbol id="icon-no-columns" viewBox="0 0 500 500"> 
+        <path d="M 457.776 0 L 41.776 0 C 15.266 0 -6.224 21.49 -6.224 48 L -6.224 400 C -6.224 426.51 15.266 448 41.776 448 L 457.776 448 C 484.286 448 505.776 426.51 505.776 400 L 505.776 48 C 505.776 21.49 484.286 0 457.776 0 Z M 445.473 384 L 57.776 384 L 57.776 128 L 445.473 127.481 L 445.473 384 Z"></path> 
+      </symbol> 
     </defs>
   </svg>
 
@@ -322,9 +331,10 @@
     </div>
 
     <!-- ko if:app.editing() != null -->
-    <div class="node-editor" data-bind="mousedown: function() { app.saveNode(); app.closeEditor(); }">
+    <div id="node-editor-background" data-bind="mousedown: function() { app.saveNode(); app.closeEditor(); }"></div>
+    <div id="node-editor" class="node-editor">
 
-      <div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+      <div id="editor-form" class="form">
         <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
         <input type="text" id="editorTags" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
@@ -379,11 +389,28 @@
             <label for="toglAutocompleteTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="#icon-tag"></use></svg></label>
           </span>
 
+          <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor"> 
+            <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="#icon-exit"></use></svg> 
+          </button> 
+          <button id="snap-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.editorSnapToggle()" title="Snap to Other Side"> 
+            <svg class="icon icon-snap-document icon-lg icon-fw"><use xlink:href="#icon-snap-document"></use></svg> 
+          </button> 
+          <button id="full-size-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.toggleEditorView()" title="Full Size Editor"> 
+            <svg class="icon icon-no-columns icon-lg icon-fw"><use xlink:href="#icon-no-columns"></use></svg> 
+          </button>
+          <span id="split-button-separator" class="hidden">
+            <span class="hide-when-narrow float-right">&nbsp;</span>
+            <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
+            <span class="hide-when-narrow float-right">&nbsp;</span>
+          </span>
           <button id="storyPlayButton" class="bbcode-button bbcode-button-right" onclick="app.togglePlayMode(true)" title="Preview"><svg class="icon icon-play icon-lg icon-fw"><use xlink:href="#icon-play"></use></svg></button>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><svg class="icon icon-search icon-lg icon-fw"><use xlink:href="#icon-search"></use></svg></button>
+          <button id="split-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.toggleEditorView()" title="Split View">
+            <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="#icon-columns"></use></svg> 
+          </button> 
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
@@ -474,6 +501,9 @@
           </span>
         </div>
       </div>
+      <div id="editor-resize-handle" class="hidden" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"> 
+        <span>||</span>
+      </div> 
     </div>
     <!-- /ko -->
 

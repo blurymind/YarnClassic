@@ -49,7 +49,7 @@ export let Node = function(options = {}) {
   }, this);
 
   this.clippedBody = ko.computed(function() {
-    if (app.editing()) {
+    if (app.ui.isScreenNarrow() && app.editing()) {
       return;
     }
 
@@ -277,20 +277,19 @@ export let Node = function(options = {}) {
       }
     });
 
-    $(self.element).on('pointerdown', function(e) {
-      e.stopPropagation();
-    });
-
     $(self.element).on('touchend', function(e) {
       app.workspace.selectNodes(self);
     });
-    $('.nodes').on('pointerup touchend', function(e) {
-      dragging = false;
-      groupDragging = false;
+    // Make sure dragging stops when cursor is above another element
+    $(document).on('pointerup touchend', function() {
+      if (dragging || groupDragging) {
+        dragging = false;
+        groupDragging = false;
 
-      // this will tell the VSCode extension that we've moved the node
-      app.setYarnDocumentIsDirty();
-    });
+        // this will tell the VSCode extension that we've moved the node
+        app.setYarnDocumentIsDirty();
+      }
+    })
   };
 
   this.moveTo = function(newX, newY) {

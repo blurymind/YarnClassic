@@ -158,4 +158,15 @@ export const Settings = function(app) {
       storage.getItem('alwaysOpenNodesInVisualStudioCodeEditor') === 'true' :
       false
     ).extend({ persist:'alwaysOpenNodesInVisualStudioCodeEditor' });
+  
+  
+  this.editorSplitDirection = ko
+  .observable(storage.getItem('editorSplitDirection') || 'left')
+  .extend({ persist:'editorSplitDirection' });
+
+  this.editorSplit = ko
+  .observable(storage.getItem('editorSplit') !== null ?
+  storage.getItem('editorSplit') === 'true' :
+  false
+  ).extend({ persist:'editorSplit' });
 };

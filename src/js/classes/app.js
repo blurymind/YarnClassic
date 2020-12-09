@@ -90,19 +90,32 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
-  this.editorPreviousScrollPosition = 0;
+  this.isEditorSplit = false;
+  this.isEditorFocused = false;
+  this.editorResizeHandleOptions = {
+    handleSelector: "#editor-resize-handle",
+    resizeHeight: false,
+    resizeWidthFrom: 'right',
+    onDragStart: function() {
+      self.isSplitEditorInFocus = true;
+      $('#node-editor').removeClass('split-editor-out-of-focus')
+    },
+    onDragEnd: function() {
+      self.editor.resize();
+    }
+  }
 
   // inEditor
   //
   // Indicates if we are in the editor view
   this.inEditor = () =>
-    self.editing() && !self.ui.isDialogOpen();
+    (self.editing() || (self.isEditorSplit && self.isEditorFocused)) && !self.ui.isDialogOpen();
 
   // inWorkspace
   //
   // Indicates if we are in the workspace view
   this.inWorkspace = () =>
-    !self.editing() && !self.ui.isDialogOpen();
+    (!self.editing() || (self.isEditorSplit && self.isEditorFocused === false)) && !self.ui.isDialogOpen();
 
   // run
   //
@@ -201,8 +214,14 @@ export var App = function(name, version) {
 
     if (osName === 'mobile') self.workspace.setZoom(3);
 
-    $(window).on('resize', self.workspace.updateArrows);
-    $(window).on('resize', self.initGrid);
+    $(window).on('resize', function() {
+      if (self.ui.isScreenNarrow() && self.editing() && self.isEditorSplit) {
+        self.toggleEditorView();
+      }
+
+      self.workspace.updateArrows();
+      self.initGrid();
+    });
     self.initGrid();
 
     this.guessPopUpHelper = function() {
@@ -663,8 +682,14 @@ export var App = function(name, version) {
     Promise.all(promises)
       .then( () => {
         self.limitNodesUpdate( () => {
-          for (let i = list.length-1; i >= 0; --i)
+          for (let i = list.length-1; i >= 0; --i) {
+            if (self.inEditor()) {
+              if (self.editing().title() === list[i].title() && self.editing().body() === list[i].body()) {
+                self.closeEditor();
+              }
+            }
             self.deleteNode(list[i]);
+          }
 
           self.updateNodeLinks();
           self.workspace.deselectNodes(list);
@@ -761,12 +786,12 @@ export var App = function(name, version) {
 
     self.mustUpdateTags = true;
 
-    $('.node-editor')
+    $('#node-editor-background')
       .css({ opacity: 0 })
       .transition({ opacity: 1 }, 250);
-    $('.node-editor .form')
-      .css({ y: '-100' })
-      .transition({ y: '0' }, 250);
+    $('#node-editor')
+      .css({ y: '-100', opacity: 0 })
+      .transition({ y: '0', opacity: 1.0 }, 250);
     self.editor = ace.edit('editor');
     self.editor.setOptions({
       scrollPastEnd: 0.5
@@ -852,6 +877,94 @@ export var App = function(name, version) {
 
     if (self.$searchField.val().length > 0 && $('.search-body input').is(':checked')){
       self.editor.findAll(self.$searchField.val());
+    }
+
+    if (self.settings.editorSplit()) {
+      self.splitEditor();
+    }
+
+    if (self.settings.editorSplitDirection() === "right") {
+      $('#editor-form').addClass('split-editor-right');
+      $('#editor-resize-handle').addClass('float-right');
+    } else {
+      $('#editor-form').removeClass('split-editor-right');
+      $('#editor-resize-handle').removeClass('float-right');
+    }
+
+    $('.node-editor').on('pointerdown', '> *', function(e) {
+      if (self.isEditorSplit) {
+        self.focusEditor(true);
+        e.stopPropagation();
+      }
+    })
+
+    // Remove app-info while editor is open, can't see it anyway
+    $('.app-info').hide();
+
+    self.editor.resize();
+  };
+
+  this.splitEditor = function() {
+    self.isEditorSplit = true;
+    self.focusEditor(true);
+    self.settings.editorSplit(true);
+
+    self.editorResizeHandleOptions.resizeWidthFrom = (self.settings.editorSplitDirection() === 'right') ? 'left' : 'right';
+
+    // Editor Classes
+    $('#editor-form')
+    .width('50%')
+    .addClass('split-editor')
+    .toggleClass('split-editor-right', self.settings.editorSplitDirection() === 'right')
+    .resizable(self.editorResizeHandleOptions);
+
+    // Hide editor background
+    $('#node-editor-background').addClass('hidden');
+
+    // Lower z-index
+    $('#node-editor').css({'z-index': 10002});
+
+    // Show resize handle
+    $('#editor-resize-handle').removeClass('hidden').toggleClass('float-right', self.settings.editorSplitDirection() === 'right');
+
+    // Reveal/hide buttons
+    $('#split-editor-button').addClass('hidden');
+    $('#snap-editor-button').removeClass('hidden');
+    $('#exit-editor').removeClass('hidden');
+    $('#full-size-editor-button').removeClass('hidden');
+    $('#split-button-separator').removeClass('hidden');
+
+    self.ui.checkAndMoveAppButtons();
+  };
+
+  this.toggleEditorView = function() {
+    self.settings.editorSplit(!self.settings.editorSplit());
+
+    self.reopenEditor();
+  };
+
+  this.reopenEditor = function() {
+    self.saveNode();
+    let editingNode = self.editing();
+    self.closeEditor();
+    setTimeout(() => {
+      self.editNode(editingNode);
+    }, 250);
+  }
+
+  this.editorSnapToggle = function() {
+    self.settings.editorSplitDirection((self.settings.editorSplitDirection() === 'right') ? 'left' : 'right')
+
+    self.reopenEditor();
+  };
+
+  this.focusEditor = function(value) {
+    if (value === true) {
+      $('#node-editor').removeClass('split-editor-unfocused');
+      self.isEditorFocused = true;
+    } else {
+      $('#node-editor').addClass('split-editor-unfocused');
+      self.isEditorFocused = false;
     }
   };
 
@@ -1177,10 +1290,17 @@ export var App = function(name, version) {
   };
 
   this.closeEditor = function() {
-    $('.node-editor').transition({ opacity: 0 }, 250);
-    $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
+    $('#node-editor-background').transition({ opacity: 0 }, 250);
+    $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
       self.editing(null);
     });
+
+    self.isEditorSplit = false;
+    self.isEditorFocused = false;
+
+    $('.app-info').show();
+
+    app.ui.resetAppButtonsLocation();
   };
 
   this.convertMarkup = function() {

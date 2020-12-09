@@ -3,9 +3,9 @@ export const UI = function(app) {
 
   this.settingsDialogVisible = ko.observable(false);
   this.narrowScreenThreshold = 600;
-  this.isScreenNarrow = ko.computed(function() {
+  this.isScreenNarrow = function() {
     return ($(window).width() <= self.narrowScreenThreshold);
-  });
+  };
 
   // Markup selector -----------------------------------------------------------
   this.availableMarkupLanguages = [
@@ -176,4 +176,19 @@ export const UI = function(app) {
       }
     });
   };
+
+  this.checkAndMoveAppButtons = function() {
+    // Move app buttons to either side depending on direction
+    $('.app-add-node').toggleClass('app-add-node-alt', app.settings.editorSplitDirection() === 'right');
+    $('.app-sort').toggleClass('app-sort-alt', app.settings.editorSplitDirection() === 'right');
+    $('.app-undo-redo').toggleClass('app-undo-redo-alt', app.settings.editorSplitDirection() === 'right');
+    $('.app-zoom').toggleClass('app-zoom-alt', app.settings.editorSplitDirection() === 'right');
+  }
+
+  this.resetAppButtonsLocation = function() {
+    $('.app-add-node').removeClass('app-add-node-alt');
+    $('.app-sort').removeClass('app-sort-alt');
+    $('.app-undo-redo').removeClass('app-undo-redo-alt');
+    $('.app-zoom').removeClass('app-zoom-alt');
+  }
 };
