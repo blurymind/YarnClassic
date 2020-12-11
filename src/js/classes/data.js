@@ -518,7 +518,7 @@ export const data = {
           });
           Swal.fire(
             'Saved!',
-            `The Yarn has been saved to gitst ${gists.file}`,
+            `The Yarn has been saved to gist ${gists.file}`,
             'success'
           );
           data.lastStorageHost('GIST');

@@ -277,7 +277,7 @@ export const Input = function(app) {
       }
       else {
         switch (e.keyCode) {
-        case Key.Escape: app.saveNode(); break;
+        case Key.Escape: app.saveNode(); app.closeEditor(); break;
         }
       }
     });
@@ -290,7 +290,7 @@ export const Input = function(app) {
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
         case Key.Enter:
-          app.saveNode(); break; //ctrl+alt+enter closes/saves an open node
+          app.saveNode(); app.closeEditor(); break; //ctrl+alt+enter closes/saves an open node
         }
       }
     });

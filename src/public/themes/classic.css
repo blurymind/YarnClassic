@@ -24,7 +24,7 @@ a:hover {
 }
 
 .app-menu .menu {
-  width: 160px;
+  width: 180px;
   float: left;
   margin-left: 10px;
   border-radius: 2px;
@@ -93,6 +93,31 @@ a:hover {
   color: #555;
 }
 
+.menu-icon {
+  color: #289aa5;
+}
+
+.settings-icon {
+  color: #289aa5;
+}
+
+/*-- Canvas Buttons ------------------------------------------------------- */
+.app-add-node {
+  color: grey;
+}
+
+.app-add-node:hover {
+  color: #289aa5;
+}
+
+.app-button span {
+  color: grey;
+}
+
+.app-button span:hover {
+  color: #289aa5;
+}
+
 /*-- Search ----------------------------------------------------------------- */
 
 .app-search {
@@ -134,6 +159,14 @@ a:hover {
 
 /*-- Node ------------------------------------------------------------------ */
 
+.node.selected {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
+.node:hover {
+  box-shadow: 0 0 0 2px #49eff1;
+}
+
 .title-style-1 {
   background-color: #EBEBEB;
   color: black;
@@ -164,6 +197,11 @@ a:hover {
 .title-style-9 {
   background-color: black;
   color: white;
+}
+
+.node.selected {
+  box-shadow: 0px 0px 0px 2px cyan;
+  border: none;
 }
 
 

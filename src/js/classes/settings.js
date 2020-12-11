@@ -30,7 +30,7 @@ export const Settings = function(app) {
   this.apply = function () {
     app.setTheme(self.theme());
     app.setLanguage(self.language());
-    app.toggleNightMode();
+    app.toggleInvertColors();
     app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
     app.setGistCredentials({token:self.gistToken(), file: self.gistFile() !== null ? self.gistFile().split('/').pop() : null});
@@ -104,11 +104,11 @@ export const Settings = function(app) {
     ).extend({ persist:'completeClosingCharacters' });
 
   // Night mode
-  this.nightModeEnabled = ko
-    .observable(storage.getItem('nightModeEnabled') !== null ?
-      storage.getItem('nightModeEnabled') === 'true' :
+  this.invertColorsEnabled = ko
+    .observable(storage.getItem('invertColorsEnabled') !== null ?
+      storage.getItem('invertColorsEnabled') === 'true' :
       false
-    ).extend({ persist:'nightModeEnabled' });
+    ).extend({ persist:'invertColorsEnabled' });
 
   // Snap to grid
   this.snapGridEnabled = ko

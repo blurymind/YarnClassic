@@ -90,6 +90,7 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
+  this.editorPreviousScrollPosition = 0;
 
   // inEditor
   //
@@ -767,6 +768,9 @@ export var App = function(name, version) {
       .css({ y: '-100' })
       .transition({ y: '0' }, 250);
     self.editor = ace.edit('editor');
+    self.editor.setOptions({
+      scrollPastEnd: 0.5
+    })
     self.editor.navigateFileEnd();
 
     /// set color picker
@@ -835,8 +839,11 @@ export var App = function(name, version) {
       }
     );
 
+    /// init spell check
+    enable_spellcheck();
+
     self.toggleTranscribing();
-    self.toggleNightMode();
+    self.toggleInvertColors();
     self.toggleShowCounter();
     self.toggleWordCompletion();
     self.toggleSpellCheck();
@@ -891,6 +898,7 @@ export var App = function(name, version) {
   this.openLastEditedNode = function() {
     if (self.nodeVisitHistory.length === 0) {
       self.saveNode();
+      self.closeEditor();
     } else {
       const title = self.nodeVisitHistory.pop();
       self.propagateUpdateFromNode(self.editing());
@@ -949,14 +957,17 @@ export var App = function(name, version) {
   };
 
   this.toggleSpellCheck = function() {
-    if (self.settings.spellcheckEnabled())
+    // Timeout so spellcheck can toggle after the spelling check settings are updated
+    setTimeout(function() {
+      if (self.settings.spellcheckEnabled())
       enable_spellcheck();
     else
       disable_spellcheck();
+    }, 50);
   };
 
-  this.toggleNightMode = function() {
-    const cssOverwrite = self.settings.nightModeEnabled() ?
+  this.toggleInvertColors = function() {
+    const cssOverwrite = self.settings.invertColorsEnabled() ?
       { filter: 'invert(100%)' } :
       { filter: 'invert(0%)' };
 
@@ -984,11 +995,11 @@ export var App = function(name, version) {
 
   this.toggleShowCounter = function() {
     if (self.settings.editorStatsEnabled()) {
-      $('.node-editor .form .bbcode-toolbar .editor-counter').css({
+      $('.node-editor .form .editor-counter').css({
         display: 'initial',
       });
     } else {
-      $('.node-editor .form .bbcode-toolbar .editor-counter').css({
+      $('.node-editor .form .editor-counter').css({
         display: 'none',
       });
     }
@@ -1029,7 +1040,9 @@ export var App = function(name, version) {
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button disabled';
+      $(storyPreviewPlayButton).addClass('disabled');
+      $('.toggle-toolbar').addClass('hidden');
+      $('.editor-counter').addClass('hidden');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
       });
@@ -1049,7 +1062,9 @@ export var App = function(name, version) {
       self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
-      storyPreviewPlayButton.className = 'bbcode-button';
+      $(storyPreviewPlayButton).removeClass('disabled');
+      $('.toggle-toolbar').removeClass('hidden');
+      $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
       setTimeout(() => {
         if (
@@ -1071,6 +1086,7 @@ export var App = function(name, version) {
     self.isEditorInPreviewMode = previewModeOverwrite;
     if (previewModeOverwrite) {
       self.togglePlayMode(false);
+      $('.bbcode-toolbar').addClass('hidden');
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
@@ -1078,6 +1094,7 @@ export var App = function(name, version) {
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
       //edit mode
+      $('.bbcode-toolbar').removeClass('hidden');
       self.editor.session.setScrollTop(editorPreviewer.scrollTop);
       editorPreviewer.innerHTML = '';
       editorPreviewer.style.display = 'none';
@@ -1133,7 +1150,7 @@ export var App = function(name, version) {
     return self.richTextFormatter.identifyTag(textBeforeCursor);
   };
 
-  this.saveNode = function(closeEditor = true) {
+  this.saveNode = function() {
     const node = self.editing();
     if (node) {
       const editorTitleElement = $('#editorTitle')[0];
@@ -1155,16 +1172,15 @@ export var App = function(name, version) {
 
       setTimeout(self.updateSearch, 600);
 
-      // Close editor. SaveNode and CloseEditor should be different functions
-      if (closeEditor) {
-        $('.node-editor').transition({ opacity: 0 }, 250);
-        $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
-          self.editing(null);
-        });
-      }
-
       self.setYarnDocumentIsDirty();
     }
+  };
+
+  this.closeEditor = function() {
+    $('.node-editor').transition({ opacity: 0 }, 250);
+    $('.node-editor .form').transition({ y: '-100' }, 250, function(e) {
+      self.editing(null);
+    });
   };
 
   this.convertMarkup = function() {
