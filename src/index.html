@@ -178,9 +178,10 @@
     </div>
 
     <!-- ko if:app.editing() != null -->
-    <div class="node-editor" data-bind="mousedown: function() { app.saveNode(); app.closeEditor(); }">
+    <div id="node-editor-background" data-bind="mousedown: function() { app.saveNode(); app.closeEditor(); }"></div>
+    <div id="node-editor" class="node-editor">
 
-      <div class="form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
+      <div id="editor-form" class="form">
         <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
         <input type="text" id="editorTags" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
@@ -235,11 +236,28 @@
             <label for="toglAutocompleteTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
           </span>
 
+          <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor"> 
+            <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-exit"></use></svg> 
+          </button> 
+          <button id="snap-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.editorSnapToggle()" title="Snap to Other Side">
+            <svg class="icon icon-snap-document icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-snap-document"></use></svg>
+          </button>
+          <button id="full-size-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.toggleEditorView()" title="Full Size Editor">
+            <svg class="icon icon-no-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-no-columns"></use></svg>
+          </button>
+          <span id="split-button-separator" class="hidden">
+            <span class="hide-when-narrow float-right">&nbsp;</span>
+            <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
+            <span class="hide-when-narrow float-right">&nbsp;</span>
+          </span>
           <button id="storyPlayButton" class="bbcode-button bbcode-button-right" onclick="app.togglePlayMode(true)" title="Preview"><svg class="icon icon-play icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-play"></use></svg></button>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><svg class="icon icon-search icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-search"></use></svg></button>
+          <button id="split-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.toggleEditorView()" title="Split View">
+            <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-columns"></use></svg> 
+          </button> 
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
@@ -330,6 +348,9 @@
           </span>
         </div>
       </div>
+      <div id="editor-resize-handle" class="hidden" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"> 
+        <span>||</span>
+      </div> 
     </div>
     <!-- /ko -->
 
@@ -484,7 +505,7 @@
             </div>
 
             <div class="settings-item">
-              <label class="settings-label" for="line-style">Line link style</label>
+              <label class="settings-label" for="line-style"><svg class="icon icon-bezier icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-bezier"></use></svg> Line link style</label>
               <select id="line-style" class="settings-value" data-bind="
                 options: app.ui.availableLineStyles,
                 optionsText: 'name',

@@ -18,79 +18,43 @@ a:hover {
 
 .app-menu {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10001;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background-color: white;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .app-menu .menu {
-  width: 180px;
+  display: block;
   float: left;
   margin-left: 10px;
   border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0;
   font-size: 0.9em;
   color: #666;
-  text-transform: uppercase;
-  background: #fff;
   cursor: pointer;
 }
 
-.app-menu .title {
+.title {
   box-sizing: border-box;
-  padding: 15px;
-  width: 100%;
-  height: 50px;
-  line-height: 20px;
-  font-weight: bold;
-  float: left;
-  transition: background 0.25s;
-}
-
-.app-menu .menu .add.node {
-  box-sizing: border-box;
-  padding: 15px;
-  width: 100%;
-  height: 50px;
+  padding: 5px;
+  width: fit-content;
+  min-width: 100px;
   line-height: 20px;
   font-weight: bold;
   float: left;
 }
 
-.app-menu .dropdown .item {
-  box-sizing: border-box;
-  float: left;
-  display: block;
-  width: 100%;
-  padding: 7px;
+.menu .dropdown {
+  color: black;
+  background-color: white;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
 }
 
-.app-menu .dropdown .item:hover {
-  background: #eee;
-  color: #000;
-}
-
-.app-menu .dropdown .item:active {
-  background: #ddd;
-  color: #555;
-}
-
-.app-menu .menu .dropdown .search-field {
-  box-sizing: border-box;
-  float: left;
-  display: block;
-  width: 100%;
-  padding: 10px;
-  text-align:center;
-}
-
-.app-menu .menu:hover .title {
-  background: #f4f4f4;
-}
-
-.app-menu .menu:active .title {
-  background: #ddd;
-  color: #555;
+.menu .dropdown .item:hover .menu-icon {
+  color: black;
 }
 
 .menu-icon {
@@ -122,13 +86,8 @@ a:hover {
 
 .app-search {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 10002;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
-  padding: 10px 20px 10px 10px;
+  top: 0;
+  right: 10px;
 }
 
 .app-search input {
@@ -144,7 +103,8 @@ a:hover {
 
 .search-field:focus,
 .dropdown .item:hover {
-  outline: 1px solid cyan;
+  background: #289aa5;
+  color: white;
 }
 
 .app-search input[type='checkbox'] {
@@ -209,31 +169,17 @@ a:hover {
 
 @media only screen and (max-width: 600px) {
   .app-menu {
-    position: relative;
-    top: 10px;
-    left: 10px;
+    box-shadow: 0 0;
   }
-
-  .app-menu .menu {
-    font-size: 0.8em;
-    margin: 0;
-  }
-
-  .app-menu .title {
-    height: 30px;
-    line-height: 0px;
-    z-index: 10000;
-  }
-
 
   .app-search {
-    top: 5px;
-    left: 10px;
-    position: relative;
-    float: left;
-    z-index: 10000;
-    overflow: hidden;
+    position: absolute;
+    top: 26px;
+    left: 0px;
+    width: 100%;
+    background-color: white;
     padding: 5px 10px 5px 5px;
+    z-index: 10000;
   }
 
   .app-search input {

@@ -95,6 +95,11 @@ input[type='checkbox'] {
   right: 5px;
 }
 
+.app-zoom-alt {
+  left: 5px;
+  right: unset;
+}
+
 /* --- SORT --- */
 
 .app-sort {
@@ -102,11 +107,20 @@ input[type='checkbox'] {
   right: 5px;
 }
 
+.app-sort-alt {
+  left: 5px;
+  right: unset;
+}
 
 /* --- UNDO REDO --- */
 .app-undo-redo {
   bottom: 115px;
   right: 5px;
+}
+
+.app-undo-redo-alt {
+  left: 82px;
+  right: unset;
 }
 
 /*-- Canvas Buttons ------------------------------------------------------- */
@@ -125,6 +139,11 @@ input[type='checkbox'] {
   cursor: pointer;
   text-align: center;
   transition: opacity 0.2s;
+}
+
+.app-add-node-alt {
+  left: 5px;
+  right: unset;
 }
 
 .app-add-node:hover {
@@ -357,7 +376,7 @@ input[type='checkbox'] {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 10002;
+  z-index: 10004;
   background: rgba(0, 0, 0, 0.5);
   color: grey;
 }
@@ -491,8 +510,18 @@ input[type='checkbox'] {
   position: absolute;
   width: 100%;
   height: 100%;
+  background: none;
+  pointer-events: none;
+  z-index: 10004;
+}
+
+#node-editor-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   z-index: 10002;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 10004;
 }
 
 .node-editor .form {
@@ -510,6 +539,8 @@ input[type='checkbox'] {
   display: flex;
   flex-flow: column;
   overflow: hidden;
+  z-index: 10002;
+  pointer-events: all;
 }
 
 .node-editor .form .close {
@@ -559,6 +590,27 @@ input[type='checkbox'] {
   display: inline-block;
 }
 
+.split-editor {
+  position: relative !important;
+  top: 30px !important;
+  left: 0px !important;
+  height: calc(100% - 30px) !important;
+  float: left;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  min-width: 710px;
+  max-width: calc(100% - 190px);
+}
+
+.split-editor-right {
+  right: 0px !important;
+  float: right !important;
+}
+
+.split-editor-unfocused {
+  opacity: 0.6 !important;
+}
+
 .bbcode-button-separator {
   color: grey;
   opacity: 0.2;
@@ -566,7 +618,7 @@ input[type='checkbox'] {
 }
 
 .float-right {
-  float: right;
+  float: right !important;
 }
 
 .bbcode-button-right {
@@ -584,10 +636,6 @@ input[type='checkbox'] {
   background-color: #e7e7e7;
 }
 
-.node-editor .form .bbcode-toolbar .bbcode-button:active {
-  color: purple;
-}
-
 #edit-node-in-vscode {
   float: right;
   font-size: 125%;
@@ -600,6 +648,27 @@ input[type='checkbox'] {
 .menu:hover .title {
   width: 100%;
 }
+
+#editor-resize-handle {
+  height: calc(100% - 30px);
+  width: 10px;
+  position: relative;
+  flex: 0 0 auto;
+  right: 0px;
+  float: left;
+  top: 30px;
+  background: #e7e7e7;
+  cursor: ew-resize;
+  pointer-events: all;
+} 
+ 
+#editor-resize-handle span {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  height: calc(100% - 30px);
+} 
 
 /* SPECIAL CHECKBOX START */
 .styled-checkbox input {
@@ -747,7 +816,7 @@ input[type='checkbox'] {
  }
 
 #NVrichTextLabel {
-  position: fixed;
+  position: absolute;
   bottom: 10px;
   padding: 10px;
 }
@@ -787,7 +856,7 @@ input[type='checkbox'] {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 10002;
+  z-index: 10004;
   background: rgba(0, 0, 0, 0.5);
 }
 
@@ -833,6 +902,14 @@ input[type='checkbox'] {
 }
 
 /*-- Menu -------------------------------------------------------------- */
+.app-menu {
+  z-index: 10003;
+}
+
+.app-search {
+  z-index: 10004;
+}
+
 .menu:hover .dropdown {
   max-height: var(--menu-dropdown-max-height);
 }
@@ -964,7 +1041,7 @@ input:focus + span + .dropdown {
   color: #000;
   font-size: 0.8em;
   text-transform: uppercase;
-  opacity: 0.4;
+  opacity: 0.7;
   line-height: 1.2em;
   z-index: -999;
 }

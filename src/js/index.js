@@ -8,6 +8,7 @@ window.ko = ko;
 window.$ = window.jQuery = require('jquery');
 import 'jquery-contextmenu';
 import 'jquery-mousewheel';
+import 'jquery-resizable-dom';
 
 import ace from 'ace-builds/src-noconflict/ace';
 window.ace = ace;

@@ -698,13 +698,13 @@ export const Workspace = function(app) {
     const nodeHeight = 100;
     const nodeXScaled = -(x * self.scale);
     const nodeYScaled = -(y * self.scale);
-    const winXCenter = $(window).width() / 2;
+    const winXCenter = ($(window).width() / 2);
     const winYCenter = $(window).height() / 2;
     const nodeWidthShift = (nodeWidth * self.scale) / 2;
     const nodeHeightShift = (nodeHeight * self.scale) / 2;
 
     self.setTranslation(
-      nodeXScaled + winXCenter - nodeWidthShift,
+      nodeXScaled + winXCenter - nodeWidthShift + app.getSplitEditorXOffset(),
       nodeYScaled + winYCenter - nodeHeightShift,
       100
     );

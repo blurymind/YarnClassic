@@ -37,6 +37,7 @@ export const Input = function(app) {
   this.isLeftButtonDown = false;
   this.isShiftDown = false;
   this.isCtrlDown = false;
+  this.isHoverOverWorkspace = false;
 
   // trackMouseEvents
   //
@@ -119,9 +120,26 @@ export const Input = function(app) {
       if (event.altKey)
         return;
 
-      if (app.inWorkspace()) {
+      if (app.inWorkspace() || self.isHoverOverWorkspace) {
         app.workspace.onZoom(event.pageX, event.pageY, event.deltaY);
         event.preventDefault();
+      }
+    });
+
+    $('.nodes').hover(() => {
+      self.isHoverOverWorkspace = true;
+    }, () => {
+      self.isHoverOverWorkspace = false;
+    })
+
+    $('.nodes').on('pointerdown', () => {
+      if (app.isEditorSplit) {
+        app.focusEditor(false);
+        app.makeNewNodesFromLinks();
+        app.propagateUpdateFromNode(app.editing());
+        app.mustUpdateTags = true;
+        app.updateTagsRepository();
+        app.workspace.updateArrows();
       }
     });
 
