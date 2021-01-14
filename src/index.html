@@ -160,7 +160,7 @@
     <!-- foreach loop  of the nodes -->
     <div class="nodes">
       <div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
-        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}">
+        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}, attr: { title: '[ ' + node.title() + ' ]\n' + node.body() }">
           <div class="title-container" data-bind="css: { active: node.active() && node.active().title === true}">
             <div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
           </div>
