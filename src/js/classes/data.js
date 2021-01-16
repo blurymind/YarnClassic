@@ -10,6 +10,7 @@ export const data = {
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
   isDocumentDirty: ko.observable(false),
+  restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
@@ -48,6 +49,8 @@ export const data = {
     });
   },
   saveAppStateToLocalStorage: function() {
+    if (!data.restoreFromLocalStorage()) return;
+
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
@@ -69,6 +72,8 @@ export const data = {
     );
   },
   loadAppStateFromLocalStorage: function() {
+    if (!data.restoreFromLocalStorage()) return;
+
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
     if (appState) {
