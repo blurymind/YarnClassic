@@ -1038,10 +1038,8 @@ input:focus + span + .dropdown {
   position: absolute;
   left: 20px;
   bottom: 20px;
-  color: #000;
   font-size: 0.8em;
   text-transform: uppercase;
-  opacity: 0.7;
   line-height: 1.2em;
   z-index: -999;
 }

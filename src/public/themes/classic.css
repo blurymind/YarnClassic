@@ -187,7 +187,9 @@ a:hover {
   border: none;
 }
 
-
+.app-info {
+  color: #b9786d;
+}
 /*-- ----------------------------Narrow overrides---------------------------- */
 
 @media only screen and (max-width: 600px) {
