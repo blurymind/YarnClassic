@@ -272,6 +272,9 @@
   color: white;
 }
 
+.app-info {
+  color: #153d58;
+}
 /*-- Canvas Buttons ------------------------------------------------------- */
 .app-add-node {
   color: grey;
