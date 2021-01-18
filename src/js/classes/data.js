@@ -33,18 +33,29 @@ export const data = {
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
   },
+  askForFileName: function() {
+    Swal.fire({
+      title: 'Enter a New File Name',
+      input: 'text',
+      inputPlaceholder: 'NewFile',
+      showCancelButton: true,
+    }).then((result) => {
+      if (result.value || result.value === "") {
+        data.startNewFile((result.value || 'NewFile'));
+      }
+    })
+  },
   setNewFile: function() {
     Swal.fire({
-      title: '📔 Start a New file?',
-      text: `Any unsaved ${data.editingName()} progress will be lost!`,
+      title: 'Create a New File?',
+      text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'New file',
       cancelButtonText: 'No, cancel!',
-      reverseButtons: true,
     }).then((result) => {
       if (result.value) {
-        data.startNewFile();
+        data.askForFileName();
       }
     });
   },
