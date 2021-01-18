@@ -98,8 +98,7 @@ export const UI = function(app) {
 
   // isDialogOpen
   this.isDialogOpen = function () {
-    return self.settingsDialogVisible() ||
-      $('.swal2-popup').length > 0;
+    return self.settingsDialogVisible() || (Swal.isVisible() && !Swal.isTimerRunning());
   };
 
   // confirmMarkupConversion

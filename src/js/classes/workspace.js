@@ -6,6 +6,15 @@ export const Workspace = function(app) {
   const PAN_SMALL_STEP = 100;
   const PAN_BIG_STEP = 500;
   const PAN_TRANSITION_TIME = 100;
+  const swalSortWarning = {
+      toast: true,
+      position: 'bottom',
+      icon: 'error',
+      title: 'Alignment requires two or more nodes be selected.',
+      showConfirmButton: false,
+      timer: 3500,
+      timerProgressBar: true,
+  }
 
   this.canvas = $('.arrows')[0];
   this.context = self.canvas.getContext('2d');
@@ -731,7 +740,7 @@ export const Workspace = function(app) {
       });
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
 
@@ -758,7 +767,7 @@ export const Workspace = function(app) {
       });
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
 
@@ -795,7 +804,7 @@ export const Workspace = function(app) {
       });
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
     
@@ -822,7 +831,7 @@ export const Workspace = function(app) {
       });
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
     
@@ -845,7 +854,7 @@ export const Workspace = function(app) {
     const selectedNodes = self.getSelectedNodes();
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
 
@@ -868,7 +877,7 @@ export const Workspace = function(app) {
     });
 
     if (selectedNodes.length < 2) {
-      alert('Select nodes to align');
+      Swal.fire(swalSortWarning);
       return;
     }
 
