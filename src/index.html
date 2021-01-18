@@ -186,7 +186,7 @@
         <input type="text" id="editorTags" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
         <div class="bbcode-toolbar">
-          <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back to last edited" onfocus="app.togglePreviewMode(false)">
+          <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back To Last Edited Node" onfocus="app.togglePreviewMode(false)">
             <svg class="icon icon-arrow-left icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg>
           </button>
           <span class="hide-when-narrow">&nbsp;</span>
@@ -228,12 +228,12 @@
           <!-- /ko -->
 
           <span class="styled-checkbox show-when-narrow">
-            <input id="toglAutocompleteWords" type="checkbox" data-bind="checked: app.settings.completeWordsEnabled" onclick="app.toggleWordCompletion()"></input>
-            <label for="toglAutocompleteWords" title="auto-completion"><svg class="icon icon-comment icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-comment"></use></svg></label>
+            <input id="toglAutocompleteSuggestions" type="checkbox" data-bind="checked: app.settings.autocompleteSuggestionsEnabled" onclick="app.toggleAutocompleteSuggestions()"></input>
+            <label for="toglAutocompleteSuggestions" title="Autocompletion Suggestions"><svg class="icon icon-comment icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-comment"></use></svg></label>
           </span>
           <span class="styled-checkbox show-when-narrow">
-            <input type="checkbox" id="toglAutocompleteTags" data-bind="checked: app.settings.completeTagsEnabled"></input>
-            <label for="toglAutocompleteTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
+            <input type="checkbox" id="togleAutoCloseTags" data-bind="checked: app.settings.autoCloseTags"></input>
+            <label for="togleAutoCloseTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
           </span>
 
           <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor"> 
@@ -261,7 +261,7 @@
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
-          <button class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.speakText()" title="Hear text"><svg class="icon icon-voice icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-voice"></use></svg></button>
+          <button class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.speakText()" title="Hear Text"><svg class="icon icon-voice icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-voice"></use></svg></button>
 
           <span class="show-when-narrow">
             <button class="bbcode-button bbcode-button-right" onclick="app.editor.redo()" title="Redo"><svg class="icon icon-undo icon-lg icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-undo"></use></svg></button>
@@ -322,23 +322,23 @@
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="styled-checkbox">
             <input id="toglShowCounter" type="checkbox" data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"></input>
-            <label for="toglShowCounter" title="Show line counter"><svg class="icon icon-paragraph icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-paragraph"></use></svg></label>
+            <label for="toglShowCounter" title="Show Line Counter"><svg class="icon icon-paragraph icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-paragraph"></use></svg></label>
           </span>
           <span class="styled-checkbox">
             <input id="toglSpellCheck" class="styled-checkbox" type="checkbox" data-bind="checked: app.settings.spellcheckEnabled" onclick="app.toggleSpellCheck()"></input>
-            <label for="toglSpellCheck" title="spell-check"><svg class="icon icon-spell-check icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-spell-check"></use></svg></label>
+            <label for="toglSpellCheck" title="Spell Check"><svg class="icon icon-spell-check icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-spell-check"></use></svg></label>
           </span>
           <span class="styled-checkbox">
-            <input id="toglAutocompleteWords" type="checkbox" data-bind="checked: app.settings.completeWordsEnabled" onclick="app.toggleWordCompletion()"></input>
-            <label for="toglAutocompleteWords" title="auto-completion"><svg class="icon icon-comment icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-comment"></use></svg></label>
+            <input id="toglAutocompleteSuggestions" type="checkbox" data-bind="checked: app.settings.autocompleteSuggestionsEnabled" onclick="app.toggleAutocompleteSuggestions()"></input>
+            <label for="toglAutocompleteSuggestions" title="Autocompletion Suggestions"><svg class="icon icon-comment icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-comment"></use></svg></label>
           </span>
           <span class="styled-checkbox">
-            <input type="checkbox" id="toglAutocomplete" data-bind="checked: app.settings.completeTagsEnabled"></input>
-            <label for="toglAutocomplete" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
+            <input type="checkbox" id="toglAutoCloseTags" data-bind="checked: app.settings.autoCloseTags"></input>
+            <label for="toglAutoCloseTags" title="Auto Close Tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
           </span>
           <span class="styled-checkbox">
-            <input id="toglAutocompleteClosingCharacters" type="checkbox" data-bind="checked: app.settings.completeClosingCharacters" onclick="app.toggleClosingCharactersCompletion()"></input>
-            <label for="toglAutocompleteClosingCharacters" title="Auto closing characters"><svg class="icon icon-code icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-code"></use></svg></label>
+            <input id="toglAutoCloseBrackets" type="checkbox" data-bind="checked: app.settings.autoCloseBrackets" onclick="app.toggleAutoCloseBrackets()"></input>
+            <label for="toglAutoCloseBrackets" title="Auto Close Brackets"><svg class="icon icon-code icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-code"></use></svg></label>
           </span>
           <span class="styled-checkbox">
             <input class="styled-checkbox" type="checkbox" id="toglTranscribing" data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"></input>
@@ -373,7 +373,7 @@
           <div class="settings-column">
             <!-- Language -->
             <div class="settings-item">
-              <label class="settings-label" for="language">Story language</label>
+              <label class="settings-label" for="language">Story Language</label>
               <select id="language" class="settings-value" data-bind="
                 options: app.ui.availableLanguages,
                 optionsText: 'name',
@@ -414,7 +414,7 @@
 
             <!-- Story playtesting style -->
             <div class="settings-item">
-              <label class="settings-label" for="theme">Playtesting style</label>
+              <label class="settings-label" for="theme">Playtesting Style</label>
               <div class="settings-value markup">
                 <select id="theme" data-bind="
                   options: app.ui.availablePlaytestStyles,
@@ -428,7 +428,7 @@
 
             <!-- Throttle delay -->
             <div class="settings-item">
-              <label class="settings-label" for="throttle-threshold">Redraw delay</label>
+              <label class="settings-label" for="throttle-threshold">Redraw Delay</label>
               <div class="slidecontainer settings-value">
                 <input type="range" class="slider settings-value" min="16" max="250" data-bind="value: app.settings.redrawThrottle, event: { change: app.workspace.setThrottle }">
               </div>
@@ -445,7 +445,7 @@
             </div> <!-- settgins-item -->
 
             <div class="settings-item">
-              <label class="settings-label" for="throttle-threshold">Gist id</label>
+              <label class="settings-label" for="throttle-threshold">Gist ID</label>
               <div class="slidecontainer settings-value">
                 <input type="input" class="settings-value" placeholder="gist.github.com/you/(gist id)" data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
               </div>
@@ -458,54 +458,54 @@
 
             <!-- Spellcheck -->
             <div class="settings-item">
-              <label class="settings-label" for="spellcheck"><svg class="icon icon-spell-check icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-spell-check"></use></svg> Spell check</label>
+              <label class="settings-label" for="spellcheck"><svg class="icon icon-spell-check icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-spell-check"></use></svg> Spell Check</label>
               <input id="spellcheck" type="checkbox" data-bind="checked: app.settings.spellcheckEnabled">
             </div>
 
-            <!-- AutocompleteWords -->
+            <!-- Autocomplete Suggestions -->
             <div class="settings-item">
-              <label class="settings-label" for="completeWords"><svg class="icon icon-comment icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-comment"></use></svg> Complete words</label>
-              <input id="completeWords" type="checkbox" data-bind="checked: app.settings.completeWordsEnabled">
+              <label class="settings-label" for="autocompleteSuggestions"><svg class="icon icon-comment icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-comment"></use></svg> Autocompletion Suggestions</label>
+              <input id="autocompleteSuggestions" type="checkbox" data-bind="checked: app.settings.autocompleteSuggestionsEnabled">
             </div>
 
-            <!-- AutocloseTags -->
+            <!-- Auto Close Tags -->
             <div class="settings-item">
-              <label class="settings-label" for="completeTags"><svg class="icon icon-tag icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-tag"></use></svg> Complete tags</label>
-              <input id="completeTags" type="checkbox" data-bind="checked: app.settings.completeTagsEnabled">
+              <label class="settings-label" for="autoCloseTags"><svg class="icon icon-tag icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-tag"></use></svg> Auto Close Tags</label>
+              <input id="autoCloseTags" type="checkbox" data-bind="checked: app.settings.autoCloseTags">
             </div>
 
-            <!-- Auto closingCharacters -->
+            <!-- Auto Close Brackets -->
             <div class="settings-item">
-              <label class="settings-label" for="completeClosingCharacters"><svg class="icon icon-code icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-code"></use></svg> Complete closing characters</label>
-              <input id="completeClosingCharacters" type="checkbox" data-bind="checked: app.settings.completeClosingCharacters">
+              <label class="settings-label" for="autoCloseBrackets"><svg class="icon icon-code icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-code"></use></svg> Auto Close Brackets</label>
+              <input id="autoCloseBrackets" type="checkbox" data-bind="checked: app.settings.autoCloseBrackets">
             </div>
 
             <!-- AutocreateNodes -->
             <div class="settings-item">
-              <label class="settings-label" for="autocreation"><svg class="icon icon-node-diagram icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-node-diagram"></use></svg> Autocreate nodes</label>
+              <label class="settings-label" for="autocreation"><svg class="icon icon-node-diagram icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-node-diagram"></use></svg> Auto Create Nodes</label>
               <input id="autocreation" type="checkbox" checked="true" data-bind="checked: app.settings.createNodesEnabled">
             </div>
 
             <!-- Night mode -->
             <div class="settings-item">
-              <label class="settings-label" for="invertColors"><svg class="icon icon-invert-color icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-invert-color"></use></svg> Invert colors</label>
+              <label class="settings-label" for="invertColors"><svg class="icon icon-invert-color icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-invert-color"></use></svg> Invert Colors</label>
               <input id="invertColors" type="checkbox" checked="true" data-bind="checked: app.settings.invertColorsEnabled, event: { change: app.toggleInvertColors }">
             </div>
 
             <!-- Snap to Grid -->
             <div class="settings-item">
-              <label class="settings-label" for="snapGrid"><svg class="icon icon-th-large icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-th-large"></use></svg> Snap to grid</label>
+              <label class="settings-label" for="snapGrid"><svg class="icon icon-th-large icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-th-large"></use></svg> Snap to Grid</label>
               <input id="snapGrid" type="checkbox" checked="true" data-bind="checked: app.settings.snapGridEnabled, event: { change: app.initGrid }">
             </div>
 
             <!-- Grid Size -->
             <div class="settings-item">
-              <label class="settings-label" for="gridSize"><svg class="icon icon-th-small icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-th-small"></use></svg> Grid size</label>
+              <label class="settings-label" for="gridSize"><svg class="icon icon-th-small icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-th-small"></use></svg> Grid Size</label>
               <input id="gridSize" type="number" min="0" step="1" placeholder="20 - 200 (Default: 40)" data-bind="value: app.settings.gridSize, event: { change: app.settings.validateGridSize }">
             </div>
 
             <div class="settings-item">
-              <label class="settings-label" for="line-style"><svg class="icon icon-bezier icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-bezier"></use></svg> Line link style</label>
+              <label class="settings-label" for="line-style"><svg class="icon icon-bezier icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-bezier"></use></svg> Line Link Style</label>
               <select id="line-style" class="settings-value" data-bind="
                 options: app.ui.availableLineStyles,
                 optionsText: 'name',

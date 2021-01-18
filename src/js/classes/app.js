@@ -838,15 +838,28 @@ export var App = function(name, version) {
     // autocompletion
     let autoCompleteTimeout = undefined;
     self.editor.getSession().on('change', function(evt) {
-      const autoComplete = $('#toglAutocomplete').prop('checked');
+      const autoComplete = self.settings.autoCloseTags();
       if (evt.action === 'insert' && autoComplete) {
+        if (self.richTextFormatter.justInsertedAutoComplete) {
+          self.richTextFormatter.justInsertedAutoComplete = false;
+          return;
+        }
         autoCompleteTimeout && clearTimeout (autoCompleteTimeout);
         autoCompleteTimeout = setTimeout(() => {
           autoCompleteTimeout = undefined;
           self.richTextFormatter.completableTags.forEach( tag => {
             if (self.getTagBeforeCursor() === tag.Start) {
-              tag.Completion && self.insertTextAtCursor(tag.Completion);
-              tag.Offset && self.moveEditCursor(tag.Offset);
+              self.richTextFormatter.justInsertedAutoComplete = true;
+              let insertedText = tag.Completion;
+              let offset = tag.Offset;
+              if (self.settings.autoCloseBrackets()) {
+                if (tag.BehaviorCompletion) {
+                  insertedText = tag.BehaviorCompletion;
+                  offset += 1;
+                }
+              }
+              tag.Completion && self.insertTextAtCursor(insertedText);
+              tag.Offset && self.moveEditCursor(offset);
               tag.Func && tag.Func();
             }
           });
@@ -870,10 +883,10 @@ export var App = function(name, version) {
     self.toggleTranscribing();
     self.toggleInvertColors();
     self.toggleShowCounter();
-    self.toggleWordCompletion();
     self.toggleSpellCheck();
     self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
+    self.updateEditorOptions();
 
     if (self.$searchField.val().length > 0 && $('.search-body input').is(':checked')){
       self.editor.findAll(self.$searchField.val());
@@ -1129,19 +1142,21 @@ export var App = function(name, version) {
     }
   };
 
-  this.toggleWordCompletion = function() {
+  this.toggleAutocompleteSuggestions = function() {
+    self.settings.autocompleteSuggestionsEnabled(!self.settings.autocompleteSuggestionsEnabled());
     self.updateEditorOptions();
   };
 
-  this.toggleClosingCharactersCompletion = function() {
+  this.toggleAutoCloseBrackets = function() {
+    self.settings.autoCloseBrackets(!self.settings.autoCloseBrackets());
     self.updateEditorOptions();
   };
 
   this.updateEditorOptions = function() {
     self.editor.setOptions({
-      enableBasicAutocompletion: app.settings.completeWordsEnabled(),
-      enableLiveAutocompletion: app.settings.completeWordsEnabled(),
-      behavioursEnabled: app.settings.completeClosingCharacters(),
+      enableBasicAutocompletion: app.settings.autocompleteSuggestionsEnabled(),
+      enableLiveAutocompletion: app.settings.autocompleteSuggestionsEnabled(),
+      behavioursEnabled: app.settings.autoCloseBrackets(),
     });
   }
 
