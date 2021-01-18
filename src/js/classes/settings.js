@@ -169,4 +169,8 @@ export const Settings = function(app) {
   storage.getItem('editorSplit') === 'true' :
   false
   ).extend({ persist:'editorSplit' });
+
+  this.editorSplitSize = ko
+  .observable(storage.getItem('editorSplitSize') || '50%')
+  .extend({ persist:'editorSplitSize' });
 };

@@ -102,6 +102,7 @@ export var App = function(name, version) {
     },
     onDragEnd: function() {
       self.editor.resize();
+      self.settings.editorSplitSize($('#editor-form').width());
     }
   }
 
@@ -927,7 +928,7 @@ export var App = function(name, version) {
 
     // Editor Classes
     $('#editor-form')
-    .width('50%')
+    .width(self.settings.editorSplitSize())
     .addClass('split-editor')
     .toggleClass('split-editor-right', self.settings.editorSplitDirection() === 'right')
     .resizable(self.editorResizeHandleOptions);
