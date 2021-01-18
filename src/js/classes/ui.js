@@ -149,9 +149,7 @@ export const UI = function(app) {
           if (node.title() !== app.editing().title()) {
             p.setAttribute(
               'onclick',
-              'app.insertTextAtCursor(\' [[Answer:' +
-                node.title() +
-                '|' +
+              'app.insertTextAtCursor(\'[[' +
                 node.title() +
                 ']]\')'
             );
