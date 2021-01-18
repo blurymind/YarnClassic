@@ -30,8 +30,8 @@ export var App = function(name, version) {
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
-    setTimeout(self.initGrid, 35);
-    setTimeout(self.workspace.updateArrows, 35);
+    setTimeout(self.initGrid, 50);
+    setTimeout(self.workspace.updateArrows, 50);
     $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
   };
 
@@ -222,7 +222,7 @@ export var App = function(name, version) {
       self.workspace.updateArrows();
       self.initGrid();
     });
-    self.initGrid();
+    setTimeout(self.initGrid, 50);
 
     this.guessPopUpHelper = function() {
       if (/color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
