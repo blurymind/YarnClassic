@@ -958,7 +958,7 @@ input:focus + span + .dropdown {
   height: 40px;
   font-family: sans-serif;
   line-height: 1.6em;
-  font-size: 0.7em;
+  font-size: 0.9em;
   cursor: default;
   box-shadow: 0 0 1px 1px #e8e8e8;
   z-index: 10000;
