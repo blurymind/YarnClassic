@@ -985,7 +985,8 @@ export var App = function(name, version) {
 
   this.getSplitEditorXOffset = function() {
     let splitEditorXOffset = 0;
-    if (self.settings.editorSplit()) {
+
+    if (self.inEditor() && self.settings.editorSplit()) {
       splitEditorXOffset = ($('#editor-form').width() / 2);
       
       if (self.settings.editorSplitDirection() === 'right') { splitEditorXOffset *= -1; }
