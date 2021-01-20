@@ -1,6 +1,7 @@
 /* eslint-disable jquery/no-ajax */
 const path = require('path');
 const saveAs = require('file-saver');
+import Swal from 'sweetalert2';
 import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 
@@ -126,7 +127,11 @@ export const data = {
     reader.onload = function(e) {
       // fileDisplayArea.innerText = reader.result;
       var type = data.getFileType(filename);
-      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
+      if (type == FILETYPE.UNKNOWN)
+        Swal.fire({
+          title: 'Unknown filetype!',
+          icon: 'error'
+        });
       else {
         data.editingPath(file.path);
         data.editingType(type);
@@ -138,22 +143,23 @@ export const data = {
 
   openFile: function(file, filename) {
     if (data.editingPath()) {
-      if (
-        !confirm(
-          'Are you sure you want to close \n' +
-            data.editingPath() +
-            '\nAny unsaved progress will be lost...',
-        )
-      ) {
-        return;
-      }
+      Swal.fire({
+        title: 'Are you sure you want to open another file?',
+        text: 'Any unsaved progress to ' + data.editingName() + ' will be lost.',
+        icon: 'warning',
+        showConfirmButton: true,
+        showCancelButton: true
+      }).then((result) => {
+        if (result.value === true) {
+          data.editingName(filename.replace(/^.*[\\\/]/, ''));
+          data.readFile(file, filename, true);
+          data.isDocumentDirty(false);
+          data.editingPath(file.path);
+          data.lastStorageHost('LOCAL');
+          app.refreshWindowTitle();
+        }
+      })
     }
-    data.editingName(filename.replace(/^.*[\\\/]/, ''));
-    data.readFile(file, filename, true);
-    data.isDocumentDirty(false);
-    data.editingPath(file.path);
-    data.lastStorageHost('LOCAL');
-    app.refreshWindowTitle();
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
@@ -164,9 +170,10 @@ export const data = {
   },
   openFolder: function(e, foldername) {
     editingFolder = foldername;
-    alert(
-      'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
-    );
+    Swal.fire({
+      text: 'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
+      icon: 'error'
+    })
   },
 
   appendFile: function(file, filename) {
@@ -436,7 +443,11 @@ export const data = {
       app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
-        if (err) alert('Error Saving Data to ' + path + ': ' + err);
+        if (err)
+          Swal.fire({
+            title: 'Error Saving Data to ' + path + ': ' + err,
+            icon: 'error'
+          })
       });
     }
   },
@@ -545,9 +556,10 @@ export const data = {
           .then(() => console.log('Successful share'))
           .catch((error) => console.log('Error sharing', error));
       } else {
-        alert(
-          'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
-        );
+        Swal.fire({
+          title: 'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
+          icon: 'error'
+        })
       }
     });
   },

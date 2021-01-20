@@ -17,6 +17,7 @@ import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 import { RichTextFormatter } from './richTextFormatter';
+import Swal from 'sweetalert2';
 
 // TODO: refactoring proposals
 //
@@ -375,7 +376,10 @@ export var App = function(name, version) {
     this.hearText = function() {
       const available = spoken.listen.available();
       if (!available) {
-        alert('Speech recognition not avaiilable!');
+        Swal.fire({
+          title: 'Speech recognition not avaiilable!',
+          icon: 'error'
+        });
         return;
       }
 
@@ -759,7 +763,9 @@ export var App = function(name, version) {
       dataType: 'jsonp',
       data: 'method=getQuote&format=jsonp&lang=en&jsonp=?',
       success: function(response) {
-        alert(response.quoteText + '\n\n-' + response.quoteAuthor);
+        Swal.fire({
+          text: (response.quoteText + '\n\n-' + response.quoteAuthor)
+        })
       },
     });
   };
