@@ -142,24 +142,26 @@ export const data = {
   },
 
   openFile: function(file, filename) {
-    if (data.editingPath()) {
-      Swal.fire({
-        title: 'Are you sure you want to open another file?',
-        text: 'Any unsaved progress to ' + data.editingName() + ' will be lost.',
-        icon: 'warning',
-        showConfirmButton: true,
-        showCancelButton: true
-      }).then((result) => {
-        if (result.value === true) {
-          data.editingName(filename.replace(/^.*[\\\/]/, ''));
-          data.readFile(file, filename, true);
-          data.isDocumentDirty(false);
-          data.editingPath(file.path);
-          data.lastStorageHost('LOCAL');
-          app.refreshWindowTitle();
-        }
-      })
-    }
+    const confirmText = data.editingPath() ?
+    'Any unsaved progress to ' + data.editingName() + ' will be lost.' :
+    'Any unsaved progress will be lost.';
+
+    Swal.fire({
+      title: 'Are you sure you want to open another file?',
+      text: confirmText,
+      icon: 'warning',
+      showConfirmButton: true,
+      showCancelButton: true
+    }).then((result) => {
+      if (result.value === true) {
+        data.editingName(filename.replace(/^.*[\\\/]/, ''));
+        data.readFile(file, filename, true);
+        data.isDocumentDirty(false);
+        data.editingPath(file.path);
+        data.lastStorageHost('LOCAL');
+        app.refreshWindowTitle();
+      }
+    })
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
