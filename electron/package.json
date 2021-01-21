@@ -40,6 +40,15 @@
     ]
   },
   "build": {
-    "productName": "Yarn Editor"
+    "productName": "Yarn Editor",
+    "fileAssociations": {
+      "ext": "yarn",
+      "name": "Yarn File",
+      "role": "editor"
+    },
+    "win": {
+      "target": "msi",
+      "icon": "build/icon.ico"
+    }
   }
 }
