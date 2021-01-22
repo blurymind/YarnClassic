@@ -902,6 +902,9 @@ export var App = function(name, version) {
     $('.app-info').hide();
 
     self.editor.resize();
+    if (node.undoManager != null) {
+      self.editor.session.setUndoManager(node.undoManager);
+    }
   };
 
   this.splitEditor = function() {
@@ -1301,6 +1304,7 @@ export var App = function(name, version) {
   };
 
   this.closeEditor = function() {
+    self.editing().undoManager = self.editor.session.getUndoManager();
     $('#node-editor-background').transition({ opacity: 0 }, 250);
     $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
       self.editing(null);
