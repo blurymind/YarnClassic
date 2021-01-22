@@ -1,5 +1,11 @@
 export const UI = function(app) {
   const self = this;
+  this.notification = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 2500
+  });
 
   this.settingsDialogVisible = ko.observable(false);
   this.narrowScreenThreshold = 600;

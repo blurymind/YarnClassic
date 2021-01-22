@@ -43,7 +43,7 @@
     </div>
 
     <!-- add node -->	
-    <div class="app-add-node" data-bind="click:app.newNode">
+    <div class="app-add-node" data-bind="click:app.newNode" title="Create Node">
       <span>
         <svg class="icon icon-plus icon-lg icon-fw">
           <use xlink:href="public/icons.svg#icon-plus"></use>
@@ -52,10 +52,10 @@
     </div>	
     <!-- undo/redo controls -->	
     <div class="app-undo-redo app-button">	
-      <span data-bind="click: function() { app.historyDirection('undo'); }">
+      <span data-bind="click: function() { app.historyDirection('undo'); }" title="Undo">
         <svg class="icon icon-undo icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-undo"></use></svg>
       </span>	
-      <span data-bind="click: function() { app.historyDirection('redo'); }">
+      <span data-bind="click: function() { app.historyDirection('redo'); }" title="Redo">
         <svg class="icon icon-undo icon-lg icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-undo"></use></svg>
       </span>	
     </div>	

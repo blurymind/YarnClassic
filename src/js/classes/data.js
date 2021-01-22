@@ -469,11 +469,17 @@ export const data = {
       app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
-        if (err)
+        if (err) {
           Swal.fire({
             title: 'Error Saving Data to ' + path + ': ' + err,
             icon: 'error'
           })
+        } else {
+          app.ui.notification.fire({
+            title: 'Saved!',
+            icon: 'success',
+          })
+        }
       });
     }
   },
