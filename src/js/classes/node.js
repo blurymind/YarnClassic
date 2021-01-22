@@ -33,7 +33,6 @@ export let Node = function(options = {}) {
   this.selected = false;
   this.createX = options.x || null;
   this.createY = options.y || null;
-  this.undoManager = null;
 
   // clippedTags
   //
