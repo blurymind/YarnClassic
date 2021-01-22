@@ -91,6 +91,7 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
+  this.isEditorInPlayMode = false;
   this.isEditorSplit = false;
   this.isEditorFocused = false;
   this.editorResizeHandleOptions = {
@@ -792,6 +793,9 @@ export var App = function(name, version) {
     // one using the context menu
     if (self.editing() && self.editing() !== node)
       self.saveNode(false);
+    
+    if (self.isEditorInPlayMode) { self.togglePlayMode(false); }
+    if (self.isEditorInPreviewMode) { self.togglePreviewMode(false); }
 
     node.oldTitle = node.title(); // To check later if "title" changed
 
@@ -1181,14 +1185,17 @@ export var App = function(name, version) {
       if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
         self.previewStory.vnSelectChoice();
       }
+    } else {
+      self.togglePlayMode(false);
+      self.gotoLastPlayNode();
     }
-    else self.togglePlayMode(false);
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
+    self.isEditorInPlayMode = playModeOverwrite;
     if (playModeOverwrite) {
       self.togglePreviewMode(false);
       //preview play mode
@@ -1199,6 +1206,12 @@ export var App = function(name, version) {
       $('.editor-counter').addClass('hidden');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
+        self.gotoLastPlayNode();
+      });
+      self.previewStory.emiter.on('startedNode', function(e) {
+        if (self.isEditorSplit) {
+          self.workspace.warpToNode(self.getFirstFoundNode(e.title.toLowerCase().trim()));
+        }
       });
       self.previewStory.initYarn(
         JSON.parse(data.getSaveData(FILETYPE.JSON)),
@@ -1220,17 +1233,15 @@ export var App = function(name, version) {
       $('.toggle-toolbar').removeClass('hidden');
       $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
-      setTimeout(() => {
-        if (
-          self.editing() &&
-          self.editing().title() !== self.previewStory.node.title
-        ) {
-          self.openNodeByTitle(self.previewStory.node.title);
-        }
-        self.editor.focus();
-      }, 1000);
     }
   };
+
+  this.gotoLastPlayNode = function() {
+    if (self.editing() && self.editing().title() !== self.previewStory.node.title) {
+      self.openNodeByTitle(self.previewStory.node.title);
+    }
+    self.editor.focus();
+  }
 
   // TODO: move to UI?
   this.togglePreviewMode = function(previewModeOverwrite) {
@@ -1239,7 +1250,10 @@ export var App = function(name, version) {
 
     self.isEditorInPreviewMode = previewModeOverwrite;
     if (previewModeOverwrite) {
-      self.togglePlayMode(false);
+      if (self.isEditorInPlayMode) {
+        self.togglePlayMode(false);
+        self.gotoLastPlayNode();
+      }
       $('.bbcode-toolbar').addClass('hidden');
       //preview mode
       editor.style.display = 'none';
@@ -1342,6 +1356,8 @@ export var App = function(name, version) {
     $('.app-info').show();
 
     app.ui.resetAppButtonsLocation();
+    if (self.isEditorInPlayMode) { self.togglePlayMode(false); }
+    if (self.isEditorInPreviewMode) { self.togglePreviewMode(false); }
   };
 
   this.convertMarkup = function() {
@@ -1619,12 +1635,7 @@ export var App = function(name, version) {
   };
 
   this.getFirstFoundNode = function(search) {
-    return self.nodes().find(node =>
-      node
-        .title()
-        .toLowerCase()
-        .includes(search)
-    );
+    return self.nodes().find(node => node.title().toLowerCase().trim() === search)
   };
 
   this.searchWarp = function() {
