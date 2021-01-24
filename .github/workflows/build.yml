@@ -66,8 +66,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        echo "ARTIFACT_FILE=./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME=Yarn.Editor.Setup.${{ steps.package-version.outputs.version }}.exe" >> $GITHUB_ENV
+        echo "ARTIFACT_FILE=./electron/dist/Yarn Editor Setup ${{ steps.package-version.outputs.version }}.exe" >> $env:GITHUB_ENV
+        echo "ARTIFACT_NAME=Yarn.Editor.Setup.${{ steps.package-version.outputs.version }}.exe" >> $env:GITHUB_ENV
 
     - name: Set environment vars for Linux
       if: matrix.os == 'ubuntu-latest'

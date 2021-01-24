@@ -33,10 +33,10 @@ jobs:
         $env:RELEASE_TAG=$($env:GITHUB_REF.Substring(10))
         $env:RELEASE_VERSION=$($env:GITHUB_REF.Substring(11))
 
-        echo "RELEASE_TAG=$($env:RELEASE_TAG)" >> $GITHUB_ENV
-        echo "RELEASE_VERSION=$($env:RELEASE_VERSION)" >> $GITHUB_ENV
-        echo "ARTIFACT_FILE=./electron/dist/Yarn Editor Setup $($env:RELEASE_VERSION).exe" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME=Yarn.Editor.Setup.$($env:RELEASE_VERSION).exe" >> $GITHUB_ENV
+        echo "RELEASE_TAG=$($env:RELEASE_TAG)" >> $env:GITHUB_ENV
+        echo "RELEASE_VERSION=$($env:RELEASE_VERSION)" >> $env:GITHUB_ENV
+        echo "ARTIFACT_FILE=./electron/dist/Yarn Editor Setup $($env:RELEASE_VERSION).exe" >> $env:GITHUB_ENV
+        echo "ARTIFACT_NAME=Yarn.Editor.Setup.$($env:RELEASE_VERSION).exe" >> $env:GITHUB_ENV
 
     - name: Set environment vars for Linux
       if: matrix.os == 'ubuntu-latest'
