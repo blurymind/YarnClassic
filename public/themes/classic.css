@@ -106,7 +106,7 @@ a:hover {
 
 .app-search {
   position: absolute;
-  top: 0;
+  top: 3px;
   right: 10px;
 }
 
@@ -117,11 +117,16 @@ a:hover {
 }
 
 .app-search .search-field {
+  border-radius: 15px;
+  border-width: thin;
+  border-color: cyan;
   margin-left: 0px;
   margin-right: 0px;
 }
+.search-field:focus {
+  background-color: var(--yarnBg);
+}
 
-.search-field:focus,
 .dropdown .item:hover {
   background-color: var(--yarnBg);
   color: black;
@@ -198,8 +203,8 @@ a:hover {
   }
 
   .app-search {
+    top: 0;
     position: absolute;
-    margin: 5px;
     width: 50%;
     padding: 5px 10px 5px 5px;
     z-index: 10000;
