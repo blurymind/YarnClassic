@@ -147,13 +147,7 @@ export var App = function(name, version) {
       return null;
     });
     window.addEventListener('DOMContentLoaded', e => {
-      if (self.isElectron) {
-        var event = new CustomEvent('yarnReadyToLoad');
-        event.app = this;
-        window.parent.dispatchEvent(event);
-      } else {
-        self.data.loadAppStateFromLocalStorage();
-      }
+      this.data.loadAppStateFromLocalStorage();
       
       const parsedUrl = new URL(window.location);
       const sharedText = parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');

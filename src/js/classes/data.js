@@ -163,30 +163,6 @@ export const data = {
       }
     })
   },
-  openFileOnStart: function(path, filename) {
-    $.ajax({
-      url: path,
-      async: false,
-      success: (result) => {
-        let type = data.getFileType(filename);
-        if (type == FILETYPE.UNKNOWN) {
-          Swal.fire({
-            title: 'Unknown filetype!',
-            icon: 'error'
-          });
-          self.loadAppStateFromLocalStorage();
-        } else {
-          data.editingName(filename.replace(/^.*[\\\/]/, ''));
-          data.editingPath(path);
-          data.editingType(type);
-          data.loadData(result, type, true);
-          data.isDocumentDirty(false);
-          data.lastStorageHost('LOCAL');
-          app.refreshWindowTitle();
-        }
-      }
-    })
-  },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
     Object.entries(files).forEach(([key, value]) => {
