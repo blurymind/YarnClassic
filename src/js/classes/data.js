@@ -141,6 +141,13 @@ export const data = {
     reader.readAsText(file);
   },
 
+  setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
+    data.editingName(fileName.replace(/^.*[\\\/]/, ''));
+    data.isDocumentDirty(false);
+    data.editingPath(filePath);
+    data.lastStorageHost(lastStorageHost);
+    app.refreshWindowTitle();
+  },
   openFile: function(file, filename) {
     const confirmText = data.editingPath()
       ? 'Any unsaved progress to ' + data.editingName() + ' will be lost.'
@@ -154,14 +161,30 @@ export const data = {
       showCancelButton: true,
     }).then((result) => {
       if (result.value === true) {
-        data.editingName(filename.replace(/^.*[\\\/]/, ''));
         data.readFile(file, filename, true);
-        data.isDocumentDirty(false);
-        data.editingPath(file.path);
-        data.lastStorageHost('LOCAL');
+        data.setNewFileStats(filename, file.path);
         app.refreshWindowTitle();
       }
-    })
+    });
+  },
+  openFileFromFilePath: function(filePath) {
+    const fileName = app.path.basename(filePath);
+    $.ajax({
+      url: filePath,
+      async: false,
+      success: (result) => {
+        const type = data.getFileType(fileName);
+        if (type == FILETYPE.UNKNOWN) {
+          Swal.fire({
+            title: 'Unknown filetype!',
+            icon: 'error',
+          });
+        } else {
+          data.loadData(result, type, true);
+          data.setNewFileStats(fileName, filePath);
+        }
+      },
+    });
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;

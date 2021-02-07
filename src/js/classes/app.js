@@ -152,7 +152,18 @@ export var App = function(name, version) {
       this.data.saveAppStateToLocalStorage();
       return null;
     });
-    window.addEventListener('DOMContentLoaded', e => {
+    window.addEventListener('DOMContentLoaded', (e) => {
+      // Electron is receiving a filepath
+      if (self.electron) {
+        let filePath =
+          self.electron.remote.process.argv.length > 1
+            ? self.electron.remote.process.argv[1]
+            : null;
+        if (filePath && app.fs.existsSync(filePath)) {
+          this.data.openFileFromFilePath(filePath);
+          return;
+        }
+      }
       this.data.loadAppStateFromLocalStorage();
 
       // PWA is receiving shared data
