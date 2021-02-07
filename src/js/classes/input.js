@@ -291,6 +291,9 @@ export const Input = function(app) {
           app.clipboard = app.editor.getSelectedText();
           app.insertTextAtCursor('');
           break;
+        case Key.S:
+          app.data.trySaveCurrent();
+          break;
         }
       }
       else {

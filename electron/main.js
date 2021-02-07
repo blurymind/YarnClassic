@@ -25,7 +25,8 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    icon: __dirname + '/icon.ico'
   });
   mainWindow.setMenu(null);
   // and load the index.html of the app.

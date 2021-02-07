@@ -33,18 +33,29 @@ export const data = {
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
   },
+  askForFileName: function() {
+    Swal.fire({
+      title: 'Enter a New File Name',
+      input: 'text',
+      inputPlaceholder: 'NewFile',
+      showCancelButton: true,
+    }).then((result) => {
+      if (result.value || result.value === '') {
+        data.startNewFile(result.value || 'NewFile');
+      }
+    });
+  },
   setNewFile: function() {
     Swal.fire({
-      title: '📔 Start a New file?',
-      text: `Any unsaved ${data.editingName()} progress will be lost!`,
+      title: 'Create a New File?',
+      text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'New file',
       cancelButtonText: 'No, cancel!',
-      reverseButtons: true,
     }).then((result) => {
       if (result.value) {
-        data.startNewFile();
+        data.askForFileName();
       }
     });
   },
@@ -115,7 +126,11 @@ export const data = {
     reader.onload = function(e) {
       // fileDisplayArea.innerText = reader.result;
       var type = data.getFileType(filename);
-      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
+      if (type == FILETYPE.UNKNOWN)
+        Swal.fire({
+          title: 'Unknown filetype!',
+          icon: 'error',
+        });
       else {
         data.editingPath(file.path);
         data.editingType(type);
@@ -125,24 +140,50 @@ export const data = {
     reader.readAsText(file);
   },
 
-  openFile: function(file, filename) {
-    if (data.editingPath()) {
-      if (
-        !confirm(
-          'Are you sure you want to close \n' +
-            data.editingPath() +
-            '\nAny unsaved progress will be lost...',
-        )
-      ) {
-        return;
-      }
-    }
-    data.editingName(filename.replace(/^.*[\\\/]/, ''));
-    data.readFile(file, filename, true);
+  setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
+    data.editingName(fileName.replace(/^.*[\\\/]/, ''));
     data.isDocumentDirty(false);
-    data.editingPath(file.path);
-    data.lastStorageHost('LOCAL');
+    data.editingPath(filePath);
+    data.lastStorageHost(lastStorageHost);
     app.refreshWindowTitle();
+  },
+  openFile: function(file, filename) {
+    const confirmText = data.editingPath()
+      ? 'Any unsaved progress to ' + data.editingName() + ' will be lost.'
+      : 'Any unsaved progress will be lost.';
+
+    Swal.fire({
+      title: 'Are you sure you want to open another file?',
+      text: confirmText,
+      icon: 'warning',
+      showConfirmButton: true,
+      showCancelButton: true,
+    }).then((result) => {
+      if (result.value === true) {
+        data.readFile(file, filename, true);
+        data.setNewFileStats(filename, file.path);
+        app.refreshWindowTitle();
+      }
+    });
+  },
+  openFileFromFilePath: function(filePath) {
+    const fileName = app.path.basename(filePath);
+    $.ajax({
+      url: filePath,
+      async: false,
+      success: (result) => {
+        const type = data.getFileType(fileName);
+        if (type == FILETYPE.UNKNOWN) {
+          Swal.fire({
+            title: 'Unknown filetype!',
+            icon: 'error',
+          });
+        } else {
+          data.loadData(result, type, true);
+          data.setNewFileStats(fileName, filePath);
+        }
+      },
+    });
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
@@ -153,9 +194,11 @@ export const data = {
   },
   openFolder: function(e, foldername) {
     editingFolder = foldername;
-    alert(
-      'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
-    );
+    Swal.fire({
+      text:
+        'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
+      icon: 'error',
+    });
   },
 
   appendFile: function(file, filename) {
@@ -425,7 +468,17 @@ export const data = {
       app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
-        if (err) alert('Error Saving Data to ' + path + ': ' + err);
+        if (err) {
+          Swal.fire({
+            title: 'Error Saving Data to ' + path + ': ' + err,
+            icon: 'error',
+          });
+        } else {
+          app.ui.notification.fire({
+            title: 'Saved!',
+            icon: 'success',
+          });
+        }
       });
     }
   },
@@ -534,9 +587,11 @@ export const data = {
           .then(() => console.log('Successful share'))
           .catch((error) => console.log('Error sharing', error));
       } else {
-        alert(
-          'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
-        );
+        Swal.fire({
+          title:
+            'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
+          icon: 'error',
+        });
       }
     });
   },

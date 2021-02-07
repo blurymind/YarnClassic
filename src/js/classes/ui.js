@@ -1,5 +1,11 @@
 export const UI = function(app) {
   const self = this;
+  this.notification = Swal.mixin({
+    toast: true,
+    position: 'top',
+    showConfirmButton: false,
+    timer: 2500
+  });
 
   this.settingsDialogVisible = ko.observable(false);
   this.narrowScreenThreshold = 600;
@@ -98,8 +104,7 @@ export const UI = function(app) {
 
   // isDialogOpen
   this.isDialogOpen = function () {
-    return self.settingsDialogVisible() ||
-      $('.swal2-popup').length > 0;
+    return self.settingsDialogVisible() || (Swal.isVisible() && !Swal.isTimerRunning());
   };
 
   // confirmMarkupConversion
@@ -149,9 +154,7 @@ export const UI = function(app) {
           if (node.title() !== app.editing().title()) {
             p.setAttribute(
               'onclick',
-              'app.insertTextAtCursor(\' [[Answer:' +
-                node.title() +
-                '|' +
+              'app.insertTextAtCursor(\'[[' +
                 node.title() +
                 ']]\')'
             );

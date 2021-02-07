@@ -562,6 +562,11 @@ input[type='checkbox'] {
   font-family: 'Lucida Console', Monaco, monospace;
 }
 
+input#editorTitle {
+  width: calc(100% - 230px);
+  padding-right: 10px;
+}
+
 .node-editor .form .bbcode-toolbar {
   float: left;
   width: 100%;
@@ -958,7 +963,7 @@ input:focus + span + .dropdown {
   height: 40px;
   font-family: sans-serif;
   line-height: 1.6em;
-  font-size: 0.7em;
+  font-size: 0.9em;
   cursor: default;
   box-shadow: 0 0 1px 1px #e8e8e8;
   z-index: 10000;
@@ -1134,6 +1139,10 @@ input:focus + span + .dropdown {
     margin-top: 0em !important;
     margin-bottom: 0px !important;
     border-bottom: 0px !important;
+  }
+
+  input#editorTitle {
+    width: calc(60% - 25px);
   }
 
   .settings-form {

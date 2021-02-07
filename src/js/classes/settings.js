@@ -82,26 +82,26 @@ export const Settings = function(app) {
   this.transcribeEnabled = ko
     .observable(false);
 
-  // Autocomplete tags
-  this.completeTagsEnabled = ko
-    .observable(storage.getItem('completeTagsEnabled') !== null ?
-      storage.getItem('completeTagsEnabled') === 'true' :
+  // Auto Close Tags
+  this.autoCloseTags = ko
+    .observable(storage.getItem('autoCloseTags') !== null ?
+      storage.getItem('autoCloseTags') === 'true' :
       true
-    ).extend({ persist:'completeTagsEnabled' });
+    ).extend({ persist:'autoCloseTags' });
 
-  // Autocomplete words
-  this.completeWordsEnabled = ko
-    .observable(storage.getItem('completeWordsEnabled') !== null ?
-      storage.getItem('completeWordsEnabled') === 'true' :
+  // Autocomplete Suggestions
+  this.autocompleteSuggestionsEnabled = ko
+    .observable(storage.getItem('autocompleteSuggestionsEnabled') !== null ?
+      storage.getItem('autocompleteSuggestionsEnabled') === 'true' :
       true
-    ).extend({ persist:'completeWordsEnabled' });
+    ).extend({ persist:'autocompleteSuggestionsEnabled' });
 
-  // Autocomplete closing characters
-  this.completeClosingCharacters = ko
-    .observable(storage.getItem('completeClosingCharacters') !== null ?
-      storage.getItem('completeClosingCharacters') === 'true' :
+  // Auto Close Brackets
+  this.autoCloseBrackets = ko
+    .observable(storage.getItem('autoCloseBrackets') !== null ?
+      storage.getItem('autoCloseBrackets') === 'true' :
       true
-    ).extend({ persist:'completeClosingCharacters' });
+    ).extend({ persist:'autoCloseBrackets' });
 
   // Night mode
   this.invertColorsEnabled = ko
@@ -169,4 +169,8 @@ export const Settings = function(app) {
   storage.getItem('editorSplit') === 'true' :
   false
   ).extend({ persist:'editorSplit' });
+
+  this.editorSplitSize = ko
+  .observable(storage.getItem('editorSplitSize') || '50%')
+  .extend({ persist:'editorSplitSize' });
 };

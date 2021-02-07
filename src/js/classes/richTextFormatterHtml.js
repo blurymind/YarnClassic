@@ -1,15 +1,15 @@
 export const HtmlRichTextFormatter = function(app) {
   const self = this;
+  this.justInsertedAutoComplete = false;
 
   this.completableTags = Object.freeze([
-    { Start: '[[', Completion: ' answer: | ]] ', Offset: -4 },
-    { Start: '<<', Completion: ' >> ', Offset: -3 },
-    { Start: '<colo', Completion: 'r=#></color> ', Offset: -10, Func: () => { app.insertColorCode(); } },
-    { Start: '<b', Completion: '></b> ', Offset: -5 },
-    { Start: '<img', Completion: '></img> ', Offset: -7 },
-    { Start: '<i', Completion: '></i> ', Offset: -5 },
-    { Start: '<u', Completion: '></u> ', Offset: -5 },
-    { Start: '<url', Completion: '></url> ', Offset: -7 },
+    { Start: '<<', Completion: '>>', Offset: -2 },
+    { Start: '<colo', Completion: 'r=#></color>', Offset: -9, Func: () => { app.insertColorCode(); } },
+    { Start: '<b', Completion: '></b>', Offset: -4 },
+    { Start: '<img', Completion: '></img>', Offset: -6 },
+    { Start: '<i', Completion: '></i>', Offset: -4 },
+    { Start: '<u', Completion: '></u>', Offset: -4 },
+    { Start: '<url', Completion: '></url>', Offset: -6 },
   ]);
 
   this.getTagOpen = function(tag) {
