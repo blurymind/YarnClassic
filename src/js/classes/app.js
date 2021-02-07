@@ -154,7 +154,7 @@ export var App = function(name, version) {
     window.addEventListener('DOMContentLoaded', (e) => {
       // Electron is receiving a filepath
       if (self.electron) {
-        let filePath =
+        const filePath =
           self.electron.remote.process.argv.length > 1
             ? self.electron.remote.process.argv[1]
             : null;
