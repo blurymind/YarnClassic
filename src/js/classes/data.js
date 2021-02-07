@@ -1,7 +1,6 @@
 /* eslint-disable jquery/no-ajax */
 const path = require('path');
 const saveAs = require('file-saver');
-import Swal from 'sweetalert2';
 import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 

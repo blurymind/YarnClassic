@@ -17,7 +17,6 @@ import { data } from './data';
 import { yarnRender } from './renderer';
 import { Utils, FILETYPE } from './utils';
 import { RichTextFormatter } from './richTextFormatter';
-import Swal from 'sweetalert2';
 
 // TODO: refactoring proposals
 //
