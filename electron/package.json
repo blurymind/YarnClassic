@@ -47,7 +47,6 @@
       "role": "editor"
     },
     "win": {
-      "target": "msi",
       "icon": "build/icon.ico"
     }
   }
