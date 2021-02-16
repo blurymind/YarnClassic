@@ -691,6 +691,8 @@ export const data = {
   },
 
   trySaveCurrent: function() {
+    if (!data.isDocumentDirty()) return;
+
     if (data.lastStorageHost() === 'GIST') {
       const gists = app.gists;
       gists.get(gists.file).then((gist) => {

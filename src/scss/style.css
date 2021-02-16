@@ -1046,7 +1046,7 @@ input:focus + span + .dropdown {
   font-size: 0.8em;
   text-transform: uppercase;
   line-height: 1.2em;
-  z-index: -999;
+  opacity: 0.5;
 }
 
 #addPwa {
