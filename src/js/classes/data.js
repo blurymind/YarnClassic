@@ -705,6 +705,10 @@ export const data = {
         data.isDocumentDirty(false);
         app.refreshWindowTitle();
       });
+    } else if (!data.editingPath()) {
+      if (app.gists && app.gists.options.token) {
+        data.trySaveGist(app.gists);
+      } else data.trySave(FILETYPE.JSON);
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
