@@ -170,18 +170,11 @@ export var App = function(name, version) {
       const sharedText =
         parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
       if (sharedText !== null) {
-        self.insertTextAtCursor(sharedText);
+        self.insertTextAtCursor(sharedText + '\n', true);
         // setTimeout(() => self.insertTextAtCursor(sharedText), 100);
       }
-      // searchParams.get() will properly handle decoding the values.
-      // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
-      // if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
-      //console.log(self.settings);
     });
     // PWA install promotion banner on start
-    // window.addEventListener('beforeinstallprompt', function(event) {
-    //   event.prompt();
-    // });
     let deferredPrompt;
     const addBtn = $('#addPwa')[0];
     addBtn.style.display = 'none';
@@ -1347,24 +1340,31 @@ export var App = function(name, version) {
   this.appendText = function(textToAppend) {
     self.editing().body(self.editing().body() + textToAppend);
     // scroll to end of line
-    var row = self.editor.session.getLength() - 1;
-    var column = self.editor.session.getLine(row).length;
+    const row = self.editor.session.getLength() - 1;
+    const column = self.editor.session.getLine(row).length;
     self.editor.gotoLine(row + 1, column);
   };
 
   // TODO: move to editor class
   this.moveEditCursor = function(offset) {
-    var position = self.editor.getCursorPosition();
+    const position = self.editor.getCursorPosition();
     self.editor.gotoLine(position.row + 1, position.column + offset);
     self.editor.focus();
   };
 
   // TODO: move to editor class
-  this.insertTextAtCursor = function(textToInsert) {
+  this.insertTextAtCursor = function(textToInsert, scrollToLine = false) {
     if (!self.editing()) return;
     self.editor.session.replace(self.editor.selection.getRange(), '');
-    self.editor.session.insert(self.editor.getCursorPosition(), textToInsert);
-    self.editor.focus();
+    const position = self.editor.getCursorPosition();
+    self.editor.session.insert(position, textToInsert);
+
+    if (scrollToLine) {
+      const newPosition = self.editor.getCursorPosition();
+      editor.scrollToLine(newPosition.row, true, true, function() {});
+      self.editor.focus();
+    }
+    self.updateEditorStats();
   };
 
   // TODO: move to editor class
