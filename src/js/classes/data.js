@@ -353,6 +353,7 @@ export const data = {
 
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
+    data.isDocumentDirty(false);
 
     // Callback for embedding in other webapps
     var event = new CustomEvent('yarnLoadedData');
