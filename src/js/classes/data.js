@@ -79,6 +79,7 @@ export const data = {
         transform: app.workspace.transform,
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
+        pluginStorage: app.plugins.pluginStorage(),
       })
     );
   },
@@ -100,6 +101,7 @@ export const data = {
         tags,
         transform,
         scale,
+        pluginStorage,
       } = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
@@ -116,6 +118,7 @@ export const data = {
         app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
+      app.plugins.pluginStorage(pluginStorage);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
     }

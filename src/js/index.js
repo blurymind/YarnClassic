@@ -48,3 +48,8 @@ if ('serviceWorker' in navigator) {
 
 window.app = new App('Yarn', version);
 window.app.run();
+
+// Register plugins from plugin folder
+import { Plugins } from './plugins';
+const appPlugins = new Plugins(window.app);
+window.app.plugins = appPlugins;
