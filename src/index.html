@@ -42,33 +42,33 @@
       </form>
     </div>
 
-    <!-- add node -->	
+    <!-- add node -->
     <div class="app-add-node" data-bind="click:app.newNode" title="Create Node">
       <span>
         <svg class="icon icon-plus icon-lg icon-fw">
           <use xlink:href="public/icons.svg#icon-plus"></use>
         </svg>
       </span>
-    </div>	
-    <!-- undo/redo controls -->	
-    <div class="app-undo-redo app-button">	
+    </div>
+    <!-- undo/redo controls -->
+    <div class="app-undo-redo app-button">
       <span data-bind="click: function() { app.historyDirection('undo'); }" title="Undo">
         <svg class="icon icon-undo icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-undo"></use></svg>
-      </span>	
+      </span>
       <span data-bind="click: function() { app.historyDirection('redo'); }" title="Redo">
         <svg class="icon icon-undo icon-lg icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-undo"></use></svg>
-      </span>	
-    </div>	
-    <!-- align controls -->	
-    <div class="app-sort app-button">	
+      </span>
+    </div>
+    <!-- align controls -->
+    <div class="app-sort app-button">
       <span data-bind="click: app.workspace.alignH, event: { dblclick: app.workspace.reduceAlignH }" title="Align Horizontally"><svg class="icon icon-ellipsis-h icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-ellipsis-h"></use></svg></span>
       <span data-bind="click: app.workspace.alignV, event: { dblclick: app.workspace.reduceAlignV }" title="Align Vertically"><svg class="icon icon-ellipsis-v icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-ellipsis-v"></use></svg></span>
       <span data-bind="click: app.workspace.arrangeSpiral" title="Align Spiral"><svg class="icon icon-spinner icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-spinner"></use></svg></span>
       <span data-bind="click: app.workspace.sortAlphabetical" title="Sort Alphabetically"><svg class="icon icon-sort-alpha-asc icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-sort-alpha-asc"></use></svg></span>
-    </div>	
-    <!-- zoom controls -->	
-    <div class="app-zoom app-button">	
-      <span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"><svg class="icon icon-square icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-square"></use></svg></span>	
+    </div>
+    <!-- zoom controls -->
+    <div class="app-zoom app-button">
+      <span data-bind="click: function() { app.workspace.setZoom(4); }" title="Zoom 1:1"><svg class="icon icon-square icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-square"></use></svg></span>
       <span data-bind="click: function() { app.workspace.setZoom(3); }" title="Zoom 2:1"><svg class="icon icon-th-large icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-th-large"></use></svg></span>
       <span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"><svg class="icon icon-th icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-th"></use></svg></span>
       <span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"><svg class="icon icon-th icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-th-small"></use></svg></span>
@@ -79,7 +79,7 @@
       <!-- File menu -->
       <div class="menu">
         <span class="title">File</span>
-        <div class="dropdown">
+        <div class="dropdown" id="fileMenuDropdown">
           <span class="item" data-bind="click: app.data.setNewFile">
             <svg class="icon menu-icon icon-file-text icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-file-text"></use></svg>
             <span class="hide-when-narrow">&nbsp;</span>
@@ -168,7 +168,7 @@
           <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }, css: { active: node.active() && node.active().tags === true}">
             <span data-bind="text: tag.text, css: tag.style"></span>
           </div>
-          <div class="colorDown" data-bind="click: node.cycleColorDown"><svg class="icon icon-arrow-left icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>	
+          <div class="colorDown" data-bind="click: node.cycleColorDown"><svg class="icon icon-arrow-left icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
           <div class="colorUp" data-bind="click: node.cycleColorUp"><svg class="icon icon-arrow-left icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
           <!--<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>-->
           <div class="delete" data-bind="click: () => app.confirmDeleteNodes(node)"><svg class="icon icon-trash icon-fw"><use xlink:href="public/icons.svg#icon-trash"></use></svg></div>
@@ -236,9 +236,9 @@
             <label for="togleAutoCloseTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
           </span>
 
-          <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor"> 
-            <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-exit"></use></svg> 
-          </button> 
+          <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor">
+            <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-exit"></use></svg>
+          </button>
           <button id="snap-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.editorSnapToggle()" title="Snap to Other Side">
             <svg class="icon icon-snap-document icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-snap-document"></use></svg>
           </button>
@@ -256,8 +256,8 @@
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><svg class="icon icon-search icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-search"></use></svg></button>
           <button id="split-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.toggleEditorView()" title="Split View">
-            <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-columns"></use></svg> 
-          </button> 
+            <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-columns"></use></svg>
+          </button>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
@@ -348,9 +348,9 @@
           </span>
         </div>
       </div>
-      <div id="editor-resize-handle" class="hidden" data-bind="preventBubble: 'click', preventBubble: 'mousedown'"> 
+      <div id="editor-resize-handle" class="hidden" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
         <span>||</span>
-      </div> 
+      </div>
     </div>
     <!-- /ko -->
 

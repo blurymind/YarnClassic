@@ -4,33 +4,33 @@ export const Input = function(app) {
   const self = this;
 
   const MouseButton = Object.freeze({
-    'Left': 0,
-    'Middle': 1,
-    'Right': 2
+    Left: 0,
+    Middle: 1,
+    Right: 2,
   });
 
   const Key = Object.freeze({
-    'Enter': 13,
-    'Escape': 27,
-    'Space': 32,
-    'Left': 37,
-    'Up': 38,
-    'Right': 39,
-    'Down': 40,
-    'Delete': 46,
-    'A': 65,
-    'C': 67,
-    'D': 68,
-    'O': 79,
-    'S': 83,
-    'V': 86,
-    'W': 87,
-    'X': 88,
-    'Y': 89,
-    'Z': 90
+    Enter: 13,
+    Escape: 27,
+    Space: 32,
+    Left: 37,
+    Up: 38,
+    Right: 39,
+    Down: 40,
+    Delete: 46,
+    A: 65,
+    C: 67,
+    D: 68,
+    O: 79,
+    S: 83,
+    V: 86,
+    W: 87,
+    X: 88,
+    Y: 89,
+    Z: 90,
   });
 
-  this.mouse = { x: 0, y:0 };
+  this.mouse = { x: 0, y: 0 };
   this.isDragging = false;
   this.isScreenTouched = false;
   this.isMiddleButtonDown = false;
@@ -48,19 +48,19 @@ export const Input = function(app) {
       self.mouse.x = e.pageX;
       self.mouse.y = e.pageY;
 
-      self.isMiddleButtonDown = (e.button === MouseButton.Middle);
-      this.isLeftButtonDown = (e.button === MouseButton.Left);
+      self.isMiddleButtonDown = e.button === MouseButton.Middle;
+      this.isLeftButtonDown = e.button === MouseButton.Left;
 
       if (app.inWorkspace()) {
         if (self.isDragging) {
           switch (e.button) {
-          case MouseButton.Left:
-            app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
-            break;
+            case MouseButton.Left:
+              app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
+              break;
 
-          case MouseButton.Middle:
-            app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
-            break;
+            case MouseButton.Middle:
+              app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
+              break;
           }
         }
       } else if (app.inEditor() && e.button === MouseButton.Right) {
@@ -82,19 +82,20 @@ export const Input = function(app) {
       if (self.isDragging) {
         app.focusedNodeIdx = -1;
 
-        const pageX = self.isScreenTouched && e.changedTouches ?
-          e.changedTouches[0].pageX :
-          e.pageX;
+        const pageX =
+          self.isScreenTouched && e.changedTouches
+            ? e.changedTouches[0].pageX
+            : e.pageX;
 
-        const pageY = self.isScreenTouched && e.changedTouches ?
-          e.changedTouches[0].pageY :
-          e.pageY;
+        const pageY =
+          self.isScreenTouched && e.changedTouches
+            ? e.changedTouches[0].pageY
+            : e.pageY;
 
         if (app.inWorkspace()) {
           if (e.altKey || self.isMiddleButtonDown || self.isScreenTouched)
-            app.workspace.onDragUpdate({x: pageX, y: pageY});
-          else
-            app.workspace.onMarqueeUpdate({x: pageX, y: pageY});
+            app.workspace.onDragUpdate({ x: pageX, y: pageY });
+          else app.workspace.onMarqueeUpdate({ x: pageX, y: pageY });
         }
       }
     });
@@ -103,11 +104,9 @@ export const Input = function(app) {
       self.isScreenTouched = false;
       self.isDragging = false;
 
-      if (e.button === MouseButton.Left)
-        self.isLeftButtonDown = false;
+      if (e.button === MouseButton.Left) self.isLeftButtonDown = false;
 
-      if (e.button === MouseButton.Middle)
-        self.isMiddleButtonDown = false;
+      if (e.button === MouseButton.Middle) self.isMiddleButtonDown = false;
 
       if (app.inWorkspace()) {
         app.workspace.onDragEnd();
@@ -117,8 +116,7 @@ export const Input = function(app) {
 
     $('.nodes').mousewheel(event => {
       // https://github.com/InfiniteAmmoInc/Yarn/issues/40
-      if (event.altKey)
-        return;
+      if (event.altKey) return;
 
       if (app.inWorkspace() || self.isHoverOverWorkspace) {
         app.workspace.onZoom(event.pageX, event.pageY, event.deltaY);
@@ -126,11 +124,14 @@ export const Input = function(app) {
       }
     });
 
-    $('.nodes').hover(() => {
-      self.isHoverOverWorkspace = true;
-    }, () => {
-      self.isHoverOverWorkspace = false;
-    })
+    $('.nodes').hover(
+      () => {
+        self.isHoverOverWorkspace = true;
+      },
+      () => {
+        self.isHoverOverWorkspace = false;
+      }
+    );
 
     $('.nodes').on('pointerdown', () => {
       if (app.isEditorSplit) {
@@ -144,14 +145,13 @@ export const Input = function(app) {
     });
 
     $(document).contextmenu(e => {
-      if (!app.inWorkspace())
-        return;
+      if (!app.inWorkspace()) return;
 
       const canSpawn =
         $(e.target).hasClass('nodes') || $(e.target).parents('.nodes').length;
 
       if (e.button === MouseButton.Right && canSpawn) {
-        const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
+        const { x, y } = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
         app.newNodeAt(x, y);
       }
 
@@ -171,7 +171,7 @@ export const Input = function(app) {
     // Workspace/Editor keyboard shortcuts
     $(document).on('keyup', function(e) {
       if (e.keyCode === Key.Space) {
-        if ((app.inWorkspace() && e.altKey) || (app.inEditor() && ! e.altKey))
+        if ((app.inWorkspace() && e.altKey) || (app.inEditor() && !e.altKey))
           return;
 
         app.workspace.scale = 1;
@@ -183,7 +183,7 @@ export const Input = function(app) {
         // Cycle focused node
         ++app.focusedNodeIdx;
         if (app.focusedNodeIdx < 0 || app.focusedNodeIdx >= nodes.length)
-          app.focusedNodeIdx = 0 ;
+          app.focusedNodeIdx = 0;
 
         if (app.inWorkspace()) {
           // Spacebar cycles between all or selected nodes
@@ -192,8 +192,7 @@ export const Input = function(app) {
           } else {
             app.workspace.warpToNodeByIdx(app.focusedNodeIdx);
           }
-        }
-        else if (app.inEditor()) {
+        } else if (app.inEditor()) {
           // alt+Spacebar cycles between nodes and edits the focused node
           app.editNode(app.nodes()[app.focusedNodeIdx]);
         }
@@ -206,51 +205,70 @@ export const Input = function(app) {
 
     // Workspace keyboard shortcuts (keydown)
     $(document).on('keydown', e => {
-      if (!app.inWorkspace())
-        return;
+      if (!app.inWorkspace()) return;
 
       if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
         switch (e.keyCode) {
-        case Key.S: app.data.trySave(FILETYPE.JSON); break; // ctrl+shift+s
-        case Key.A: app.data.tryAppend(); break; // ctrl+shift+a
+          case Key.S:
+            app.data.trySave(FILETYPE.JSON);
+            break; // ctrl+shift+s
+          case Key.A:
+            app.data.tryAppend();
+            break; // ctrl+shift+a
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
-        case Key.S: app.data.trySave(FILETYPE.YARN); break;  // ctrl+alt+s
+          case Key.S:
+            app.data.trySave(FILETYPE.YARN);
+            break; // ctrl+alt+s
         }
-      }
-      else if (e.metaKey || e.ctrlKey) {
+      } else if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.C: // ctrl+c
-          app.nodeClipboard = app.cloneNodeArray(app.workspace.getSelectedNodes());
-          break;
-        case Key.D: app.workspace.deselectAll(); break; // ctrl+d
-        case Key.O: app.data.tryOpenFile(); break; // ctrl+o
-        case Key.S: app.data.trySaveCurrent(); break; // ctrl+s
-        case Key.X: // ctrl+x
-          const selected = app.workspace.getSelectedNodes();
-          app.nodeClipboard = app.cloneNodeArray(selected);
-          app.deleteNodes(selected);
-          break;
-        case Key.Y: app.historyDirection('redo'); break; // ctrl+y
-        case Key.Z: app.historyDirection('undo'); break; // ctrl+z
+          case Key.C: // ctrl+c
+            app.nodeClipboard = app.cloneNodeArray(
+              app.workspace.getSelectedNodes()
+            );
+            break;
+          case Key.D:
+            app.workspace.deselectAll();
+            break; // ctrl+d
+          case Key.O:
+            app.data.tryOpenFile();
+            break; // ctrl+o
+          case Key.S:
+            app.data.trySaveCurrent();
+            break; // ctrl+s
+          case Key.X: // ctrl+x
+            const selected = app.workspace.getSelectedNodes();
+            app.nodeClipboard = app.cloneNodeArray(selected);
+            app.deleteNodes(selected);
+            break;
+          case Key.Y:
+            app.historyDirection('redo');
+            break; // ctrl+y
+          case Key.Z:
+            app.historyDirection('undo');
+            break; // ctrl+z
         }
-      }
-      else {
+      } else {
         // Delete
         if (e.keyCode === Key.Delete || e.key === 'Delete') {
           app.confirmDeleteNodes(app.workspace.getSelectedNodes());
         }
         // Arrows
         else if (!app.$searchField.is(':focus') && !e.ctrlKey && !e.metaKey) {
-          if (e.keyCode === Key.A || e.keyCode === Key.Left) // a or left arrow
+          if (e.keyCode === Key.A || e.keyCode === Key.Left)
+            // a or left arrow
             app.workspace.onPanLeft();
-          else if (e.keyCode === Key.D || e.keyCode === Key.Right) // d or right arrow
+          else if (e.keyCode === Key.D || e.keyCode === Key.Right)
+            // d or right arrow
             app.workspace.onPanRight();
-          else if (e.keyCode === Key.W || e.keyCode === Key.Up) // w or up arrow
+          else if (e.keyCode === Key.W || e.keyCode === Key.Up)
+            // w or up arrow
             app.workspace.onPanUp();
-          else if (e.keyCode === Key.S || e.keyCode === Key.Down) // s or down arrow
+          else if (e.keyCode === Key.S || e.keyCode === Key.Down)
+            // s or down arrow
             app.workspace.onPanDown();
         }
       }
@@ -258,103 +276,105 @@ export const Input = function(app) {
 
     // Workspace keyboard shortcuts (keyup)
     $(document).on('keyup', e => {
-      if (!app.inWorkspace())
-        return;
+      if (!app.inWorkspace()) return;
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.A: app.workspace.selectAll(); break; // ctrl+a
-        case Key.V: app.pasteNodes(); break; // ctrl+v
+          case Key.A:
+            app.workspace.selectAll();
+            break; // ctrl+a
+          case Key.V:
+            app.pasteNodes();
+            break; // ctrl+v
         }
-      }
-      else {
+      } else {
         if (e.keyCode === Key.Enter || e.key === 'Enter') {
           const activeNode = app.nodes()[app.focusedNodeIdx];
-          if (activeNode)
-            app.editNode(activeNode);
-          else
-            app.editNode(app.nodes()[0]);
+          if (activeNode) app.editNode(activeNode);
+          else app.editNode(app.nodes()[0]);
         }
       }
     });
 
     // Editor keyboard shortcuts (keydown)
     $(document).on('keydown', function(e) {
-      if (!app.inEditor())
-        return;
+      if (!app.inEditor()) return;
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.C: self.clipboard = app.editor.getSelectedText(); break;
-        case Key.X:
-          document.execCommand('copy');
-          app.clipboard = app.editor.getSelectedText();
-          app.insertTextAtCursor('');
-          break;
-        case Key.S:
-          app.data.trySaveCurrent();
-          break;
+          case Key.C:
+            self.clipboard = app.editor.getSelectedText();
+            break;
+          case Key.X:
+            document.execCommand('copy');
+            app.clipboard = app.editor.getSelectedText();
+            app.insertTextAtCursor('');
+            break;
+          case Key.S:
+            app.data.trySaveCurrent();
+            break;
         }
-      }
-      else {
+      } else {
         switch (e.keyCode) {
-        case Key.Escape: app.saveNode(); app.closeEditor(); break;
+          case Key.Escape:
+            app.saveNode();
+            app.closeEditor();
+            break;
         }
       }
     });
 
     // Editor keyboard shortcuts (keup)
     $(document).on('keyup', function(e) {
-      if (!app.inEditor())
-        return;
+      if (!app.inEditor()) return;
 
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
-        case Key.Enter:
-          app.saveNode(); app.closeEditor(); break; //ctrl+alt+enter closes/saves an open node
+          case Key.Enter:
+            app.saveNode();
+            app.closeEditor();
+            break; //ctrl+alt+enter closes/saves an open node
         }
       }
     });
 
     // Settings dialog shortcuts
     $(document).on('keydown', function(e) {
-      if (!app.ui.settingsDialogVisible())
-        return;
+      if (!app.ui.settingsDialogVisible()) return;
 
       switch (e.keyCode) {
-      case Key.Escape: app.ui.closeSettingsDialog(); break;
+        case Key.Escape:
+          app.ui.closeSettingsDialog();
+          break;
       }
     });
 
-
     $(document).on('keyup keydown pointerdown pointerup', function(e) {
-      if (!app.inEditor())
-        return;
+      if (!app.inEditor()) return;
 
       app.updateEditorStats();
     });
 
     // Preview keyboard shortcuts
     $(document).on('keydown', e => {
-      if (!app.editing() || app.previewStory.finished)
-        return;
+      if (!app.editing() || app.previewStory.finished) return;
 
       switch (e.keyCode) {
-      case Key.Z:
-        app.previewStory.changeTextScrollSpeed(10);
-        if (app.previewStory.vnSelectedChoice != -1)
-          app.previewStory.vnSelectChoice();
-        break;
+        case Key.Z:
+          app.previewStory.changeTextScrollSpeed(10);
+          if (app.previewStory.vnSelectedChoice != -1)
+            app.previewStory.vnSelectChoice();
+          break;
 
-      case Key.Up:
-        if (app.previewStory.vnSelectedChoice != -1)
-          app.previewStory.vnUpdateChoice(-1);
-        break;
+        case Key.Up:
+          if (app.previewStory.vnSelectedChoice != -1)
+            app.previewStory.vnUpdateChoice(-1);
+          break;
 
-      case Key.Down:
-        if (app.previewStory.vnSelectedChoice != -1)
-          app.previewStory.vnUpdateChoice(1);
-        break;
+        case Key.Down:
+          if (app.previewStory.vnSelectedChoice != -1)
+            app.previewStory.vnUpdateChoice(1);
+          break;
       }
     });
   };

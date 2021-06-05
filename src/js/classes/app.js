@@ -34,7 +34,7 @@ export var App = function(name, version) {
     setTimeout(self.workspace.updateArrows, 50);
     $('#theme-stylesheet').attr(
       'href',
-      Utils.getPublicPath(`themes/${themeName}.css`),
+      Utils.getPublicPath(`themes/${themeName}.css`)
     );
   };
 
@@ -147,11 +147,11 @@ export var App = function(name, version) {
 
     if (osName == 'Windows') self.workspace.zoomSpeed = 0.1;
 
-    window.addEventListener('beforeunload', (e) => {
+    window.addEventListener('beforeunload', e => {
       this.data.saveAppStateToLocalStorage();
       return null;
     });
-    window.addEventListener('DOMContentLoaded', (e) => {
+    window.addEventListener('DOMContentLoaded', e => {
       // Electron is receiving a filepath
       if (self.electron) {
         const filePath =
@@ -179,19 +179,19 @@ export var App = function(name, version) {
     const addBtn = $('#addPwa')[0];
     addBtn.style.display = 'none';
     // addBtn.addEventListener('click', (e) => {console.log(e)});
-    window.addEventListener('beforeinstallprompt', (e) => {
+    window.addEventListener('beforeinstallprompt', e => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       deferredPrompt = e;
       // Update UI to notify the user they can add to home screen
       addBtn.style.display = 'block';
 
-      addBtn.addEventListener('click', (e) => {
+      addBtn.addEventListener('click', e => {
         // hide our user interface that shows our A2HS button
         addBtn.style.display = 'none';
         deferredPrompt.prompt();
         // Wait for the user to respond to the prompt
-        deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt.userChoice.then(choiceResult => {
           if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the A2HS prompt');
             addBtn.style.display = 'none';
@@ -279,7 +279,7 @@ export var App = function(name, version) {
     // TODO: move to editor
     this.applyPickerColorEditor = function(color) {
       const selectRange = JSON.parse(
-        JSON.stringify(self.editor.selection.getRange()),
+        JSON.stringify(self.editor.selection.getRange())
       );
       self.editor.selection.setRange(selectRange);
       const colorCode = color.toHexString().replace('#', '');
@@ -299,7 +299,7 @@ export var App = function(name, version) {
       function(evt) {
         if (self.editing()) evt.preventDefault();
       },
-      false,
+      false
     );
 
     this.speakText = function() {
@@ -308,9 +308,9 @@ export var App = function(name, version) {
         ? selectedText
         : self.editor.getSession().getValue();
 
-      spoken.voices().then((countries) => {
+      spoken.voices().then(countries => {
         const lookUp = self.settings.language().split('-')[0];
-        const voices = countries.filter((v) => !v.lang.indexOf(lookUp));
+        const voices = countries.filter(v => !v.lang.indexOf(lookUp));
 
         if (voices.length) {
           console.log('Loaded voice', voices[0]);
@@ -324,7 +324,7 @@ export var App = function(name, version) {
     this.startCapture = function() {
       spoken
         .listen({ continuous: true })
-        .then((transcript) => {
+        .then(transcript => {
           console.log(transcript);
           if (self.editing()) {
             self.insertTextAtCursor(transcript + '. ');
@@ -355,7 +355,7 @@ export var App = function(name, version) {
             this.continueCapture();
           });
         })
-        .catch((e) => spoken.listen.stop().then(() => this.continueCapture()));
+        .catch(e => spoken.listen.stop().then(() => this.continueCapture()));
     };
 
     this.continueCapture = function() {
@@ -368,7 +368,7 @@ export var App = function(name, version) {
       const available = spoken.listen.available();
       var speakBubble = document.getElementById('speakTextBtnBubble');
       if (available && self.settings.transcribeEnabled()) {
-        spoken.listen.on.partial((ts) => {
+        spoken.listen.on.partial(ts => {
           if (self.editing()) {
             speakBubble.style.visibility = 'visible';
             speakBubble.title = `🗣️ ${ts} 🦜`;
@@ -395,37 +395,37 @@ export var App = function(name, version) {
       }
 
       // spoken.listen.on.partial(ts => ($("#speakTextBtn").title = ts));
-      spoken.listen.on.partial((ts) => {
+      spoken.listen.on.partial(ts => {
         console.log(ts);
         document.getElementById('speakTextBtnBubble').title = `🗣️ ${ts} 🦜`;
       });
 
       spoken
         .listen()
-        .then((transcript) => {
+        .then(transcript => {
           self.insertTextAtCursor(transcript + ' ');
           document.getElementById('speakTextBtnBubble').title = 'Transcribe';
         })
-        .catch((error) => console.warn(error.message));
+        .catch(error => console.warn(error.message));
     };
 
     // Handle file dropping
-    document.ondragover = document.ondrop = (e) => {
+    document.ondragover = document.ondrop = e => {
       e.preventDefault();
     };
-    document.body.ondrop = (e) => {
+    document.body.ondrop = e => {
       e.preventDefault();
       for (var i = 0; i < e.dataTransfer.files.length; i++) {
         data.appendFile(
           e.dataTransfer.files[i],
           e.dataTransfer.files[i].name,
-          false,
+          false
         );
       }
     };
 
     // this is how the VSCode extension sends its messages back to the app
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', event => {
       const message = event.data;
 
       switch (message.type) {
@@ -433,7 +433,7 @@ export var App = function(name, version) {
         case 'UpdateNode':
           // find the node that was being edited... we check originalNodeTitle here
           // since it's possible that the user changed the node's title in the editor
-          self.nodes().forEach((node) => {
+          self.nodes().forEach(node => {
             if (
               node.title().trim() === message.payload.originalNodeTitle.trim()
             ) {
@@ -464,7 +464,7 @@ export var App = function(name, version) {
       rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 },
     });
     fn();
-    self.nodes.limit((callback) => () => callback());
+    self.nodes.limit(callback => () => callback());
   };
 
   this.getNodesConnectedTo = function(toNode) {
@@ -509,7 +509,7 @@ export var App = function(name, version) {
       editorTitle.attr('class', 'title title-error');
       editorTitle.attr(
         'title',
-        'Only upper or lower case letters and numbers are allowed in a node title.',
+        'Only upper or lower case letters and numbers are allowed in a node title.'
       );
     } else {
       editorTitle.removeAttr('title');
@@ -697,7 +697,7 @@ export var App = function(name, version) {
         confirmButtonText: 'Yes, delete!',
         cancelButtonText: 'No, cancel!',
         reverseButtons: true,
-      }).then((result) => {
+      }).then(result => {
         if (result.value) {
           self.deleteNodes(selected);
         }
@@ -868,7 +868,7 @@ export var App = function(name, version) {
     const nodeLinksCompleter = Utils.createAutocompleter(
       ['string.llink', 'string.rlink'],
       self.getOtherNodeTitles(),
-      'Node Link',
+      'Node Link'
     );
     // console.log(langTools);
     langTools.setCompleters([
@@ -890,7 +890,7 @@ export var App = function(name, version) {
         autoCompleteTimeout && clearTimeout(autoCompleteTimeout);
         autoCompleteTimeout = setTimeout(() => {
           autoCompleteTimeout = undefined;
-          self.richTextFormatter.completableTags.forEach((tag) => {
+          self.richTextFormatter.completableTags.forEach(tag => {
             if (self.getTagBeforeCursor() === tag.Start) {
               self.richTextFormatter.justInsertedAutoComplete = true;
               let insertedText = tag.Completion;
@@ -913,11 +913,11 @@ export var App = function(name, version) {
     /// init emoji picker
     this.emPicker = new EmojiPicker(
       document.getElementById('emojiPickerDom'),
-      (emoji) => {
+      emoji => {
         self.insertTextAtCursor(emoji.char);
         this.emPicker.toggle();
         self.togglePreviewMode(false);
-      },
+      }
     );
 
     /// init spell check
@@ -981,7 +981,7 @@ export var App = function(name, version) {
       .addClass('split-editor')
       .toggleClass(
         'split-editor-right',
-        self.settings.editorSplitDirection() === 'right',
+        self.settings.editorSplitDirection() === 'right'
       )
       .resizable(self.editorResizeHandleOptions);
 
@@ -996,7 +996,7 @@ export var App = function(name, version) {
       .removeClass('hidden')
       .toggleClass(
         'float-right',
-        self.settings.editorSplitDirection() === 'right',
+        self.settings.editorSplitDirection() === 'right'
       );
 
     // Reveal/hide buttons
@@ -1026,7 +1026,7 @@ export var App = function(name, version) {
 
   this.editorSnapToggle = function() {
     self.settings.editorSplitDirection(
-      self.settings.editorSplitDirection() === 'right' ? 'left' : 'right',
+      self.settings.editorSplitDirection() === 'right' ? 'left' : 'right'
     );
 
     self.reopenEditor();
@@ -1075,7 +1075,7 @@ export var App = function(name, version) {
       });
     } else {
       console.error(
-        "Tried to open node in Visual Studio Code text editor but we're not in the Visual Studio Code extension",
+        "Tried to open node in Visual Studio Code text editor but we're not in the Visual Studio Code extension"
       );
     }
   };
@@ -1086,7 +1086,7 @@ export var App = function(name, version) {
 
   this.openNodeByTitle = function(nodeTitle) {
     self.makeNodeWithName(nodeTitle);
-    self.nodes().forEach((node) => {
+    self.nodes().forEach(node => {
       if (
         node
           .title()
@@ -1111,15 +1111,15 @@ export var App = function(name, version) {
 
   this.getSpellCheckSuggestionItems = function() {
     var wordSuggestions = suggest_word_for_misspelled(
-      self.editor.getSelectedText(),
+      self.editor.getSelectedText()
     );
     if (wordSuggestions) {
       var suggestionObject = {};
-      wordSuggestions.forEach((suggestion) => {
+      wordSuggestions.forEach(suggestion => {
         suggestionObject[suggestion] = {
           name: suggestion,
           icon: 'edit',
-          callback: (key) => {
+          callback: key => {
             self.insertTextAtCursor(key);
           },
         };
@@ -1144,11 +1144,11 @@ export var App = function(name, version) {
     });
     if (wordSuggestions.length > 0) {
       var suggestionObject = {};
-      wordSuggestions.forEach((suggestion) => {
+      wordSuggestions.forEach(suggestion => {
         suggestionObject[suggestion] = {
           name: suggestion,
           icon: 'edit',
-          callback: (key) => {
+          callback: key => {
             self.insertTextAtCursor(key);
           },
         };
@@ -1187,7 +1187,7 @@ export var App = function(name, version) {
       $('#grid-canvas').attr('height', height);
       $('#gridSize').attr('disabled', false);
       self.workspace.gridContext.strokeStyle = self.workspace.gridContext.fillStyle = $(
-        '.grid-canvas',
+        '.grid-canvas'
       ).css('color');
     } else {
       $('#gridSize').attr('disabled', true);
@@ -1210,7 +1210,7 @@ export var App = function(name, version) {
 
   this.toggleAutocompleteSuggestions = function() {
     self.settings.autocompleteSuggestionsEnabled(
-      !self.settings.autocompleteSuggestionsEnabled(),
+      !self.settings.autocompleteSuggestionsEnabled()
     );
     self.updateEditorOptions();
   };
@@ -1260,7 +1260,7 @@ export var App = function(name, version) {
       self.previewStory.emiter.on('startedNode', function(e) {
         if (self.isEditorSplit) {
           self.workspace.warpToNode(
-            self.getFirstFoundNode(e.title.toLowerCase().trim()),
+            self.getFirstFoundNode(e.title.toLowerCase().trim())
           );
         }
       });
@@ -1273,7 +1273,7 @@ export var App = function(name, version) {
         'NVrichTextLabel',
         false,
         'commandDebugLabel',
-        self.playtestStyle,
+        self.playtestStyle
       );
     } else {
       //edit mode
@@ -1314,7 +1314,7 @@ export var App = function(name, version) {
       editorPreviewer.style.display = 'block';
       editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(
         self.editing().body(),
-        true,
+        true
       );
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
@@ -1430,7 +1430,7 @@ export var App = function(name, version) {
   };
 
   this.convertMarkup = function() {
-    self.nodes().forEach((node) => {
+    self.nodes().forEach(node => {
       node.body(self.richTextFormatter.convert(node.body()));
     });
   };
@@ -1513,13 +1513,13 @@ export var App = function(name, version) {
 
       node.updateLinks();
 
-      node.linkedTo().forEach((child) => {
+      node.linkedTo().forEach(child => {
         if (!updated.includes(child)) {
           toUpdate.push(child);
         }
       });
 
-      node.linkedFrom().forEach((parent) => {
+      node.linkedFrom().forEach(parent => {
         if (!updated.includes(parent)) {
           toUpdate.push(parent);
         }
@@ -1533,17 +1533,17 @@ export var App = function(name, version) {
     self.mustUpdateTags = false;
 
     const findFirstFreeId = () => {
-      const usedIds = self.tags().map((tag) => tag.id);
+      const usedIds = self.tags().map(tag => tag.id);
       for (let id = 1; ; ++id) if (!usedIds.includes(id)) return id;
     };
 
     // Reset count
-    self.tags().forEach((tag) => (tag.count = 0));
+    self.tags().forEach(tag => (tag.count = 0));
 
     // Recount tags and add new
-    self.nodes().forEach((node) => {
-      Utils.uniqueSplit(node.tags(), ' ').forEach((tag) => {
-        const found = self.tags().find((e) => e.text == tag);
+    self.nodes().forEach(node => {
+      Utils.uniqueSplit(node.tags(), ' ').forEach(tag => {
+        const found = self.tags().find(e => e.text == tag);
         if (found) {
           ++found.count;
         } else {
@@ -1597,8 +1597,8 @@ export var App = function(name, version) {
 
   this.titleExistsTwice = function(title) {
     return (
-      self.nodes().filter((node) => node.title().trim() === title.trim())
-        .length > 1
+      self.nodes().filter(node => node.title().trim() === title.trim()).length >
+      1
     );
   };
 
@@ -1611,7 +1611,7 @@ export var App = function(name, version) {
 
   this.getOtherNodeTitles = function() {
     var result = [];
-    self.nodes().forEach((node) => {
+    self.nodes().forEach(node => {
       if (!self.editing() || node.title() !== self.editing().title()) {
         result.push(node.title().trim());
       }
@@ -1624,27 +1624,27 @@ export var App = function(name, version) {
     text = text.replace(/\>/g, '&gt;');
     text = text.replace(
       /\&lt;\&lt;(.*?)\&gt;\&gt;/g,
-      '<p class="conditionbounds">&lt;&lt;</p><p class="condition">$1</p><p class="conditionbounds">&gt;&gt;</p>',
+      '<p class="conditionbounds">&lt;&lt;</p><p class="condition">$1</p><p class="conditionbounds">&gt;&gt;</p>'
     );
     text = text.replace(
       /\[\[([^\|]*?)\]\]/g,
-      '<p class="linkbounds">[[</p><p class="linkname">$1</p><p class="linkbounds">]]</p>',
+      '<p class="linkbounds">[[</p><p class="linkname">$1</p><p class="linkbounds">]]</p>'
     );
     text = text.replace(
       /\[\[([^\[\]]*?)\|([^\[\]]*?)\]\]/g,
-      '<p class="linkbounds">[[</p>$1<p style="color:red"><p class="linkbounds">|</p><p class="linkname">$2</p><p class="linkbounds">]]</p>',
+      '<p class="linkbounds">[[</p>$1<p style="color:red"><p class="linkbounds">|</p><p class="linkname">$2</p><p class="linkbounds">]]</p>'
     );
     text = text.replace(
       /[^:]\/\/(.*)?($|\n)/g,
-      '<span class="comment">//$1</span>\n',
+      '<span class="comment">//$1</span>\n'
     );
     text = text.replace(
       /\/\*((.|[\r\n])*)?\*\//gm,
-      '<span class="comment">/*$1*/</span>',
+      '<span class="comment">/*$1*/</span>'
     );
     text = text.replace(
       /\/\%((.|[\r\n])*)?\%\//gm,
-      '<span class="comment">/%$1%/</span>',
+      '<span class="comment">/%$1%/</span>'
     );
 
     // create a temporary document and remove all styles inside comments
@@ -1700,11 +1700,11 @@ export var App = function(name, version) {
 
   this.getFirstFoundNode = function(search) {
     return self.nodes().find(
-      (node) =>
+      node =>
         node
           .title()
           .toLowerCase()
-          .trim() === search,
+          .trim() === search
     );
   };
 
