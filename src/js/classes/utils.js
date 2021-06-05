@@ -61,17 +61,19 @@ export var Utils = {
   },
 
   uniqueSplit: function(str, separator = ' ') {
-    return [...(new Set(str.split(separator).filter(item => item)))];
+    return [...new Set(str.split(separator).filter(item => item))];
   },
 
   getHighestZ: function(container) {
     let highestZ = Number.NEGATIVE_INFINITY;
-    $(container).children().each(function() {
-      let z = parseInt($(this).css('z-index')) || 0;
-      if (z > highestZ) {
-        highestZ = z;
-      }
-    });
+    $(container)
+      .children()
+      .each(function() {
+        let z = parseInt($(this).css('z-index')) || 0;
+        if (z > highestZ) {
+          highestZ = z;
+        }
+      });
     return highestZ;
   },
 
@@ -80,10 +82,12 @@ export var Utils = {
   },
 
   rectanglesOverlap: function(r1, r2) {
-    return !(r2.left > r1.right ||
+    return !(
+      r2.left > r1.right ||
       r2.right < r1.left ||
       r2.top > r1.bottom ||
-      r2.bottom < r1.top);
+      r2.bottom < r1.top
+    );
   },
 
   stripHtml: function(html) {
@@ -147,5 +151,5 @@ export var Utils = {
     } else {
       return `public${path ? `/${path}` : ''}`;
     }
-  }
+  },
 };

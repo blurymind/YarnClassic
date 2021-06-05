@@ -39,7 +39,7 @@ export const data = {
       input: 'text',
       inputPlaceholder: 'NewFile',
       showCancelButton: true,
-    }).then((result) => {
+    }).then(result => {
       if (result.value || result.value === '') {
         data.startNewFile(result.value || 'NewFile');
       }
@@ -53,7 +53,7 @@ export const data = {
       showCancelButton: true,
       confirmButtonText: 'New file',
       cancelButtonText: 'No, cancel!',
-    }).then((result) => {
+    }).then(result => {
       if (result.value) {
         data.askForFileName();
       }
@@ -79,7 +79,7 @@ export const data = {
         transform: app.workspace.transform,
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
-      }),
+      })
     );
   },
   loadAppStateFromLocalStorage: function() {
@@ -107,13 +107,13 @@ export const data = {
       data.editingFolder(editingFolder);
       data.lastStorageHost(lastStorageHost);
       app.nodes([]);
-      data.getNodesFromObjects(nodes).forEach((node) => app.nodes.push(node));
+      data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
       app.updateNodeLinks();
       app.workspace.setTranslation(transform.x, transform.y);
       app.workspace.setZoom(scale * 4);
       if (editingTitle) {
-        app.editNode(app.nodes().find((node) => node.title() === editingTitle));
+        app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
       data.isDocumentDirty(true);
@@ -158,7 +158,7 @@ export const data = {
       icon: 'warning',
       showConfirmButton: true,
       showCancelButton: true,
-    }).then((result) => {
+    }).then(result => {
       if (result.value === true) {
         data.readFile(file, filename, true);
         data.setNewFileStats(filename, file.path);
@@ -171,7 +171,7 @@ export const data = {
     $.ajax({
       url: filePath,
       async: false,
-      success: (result) => {
+      success: result => {
         const type = data.getFileType(fileName);
         if (type == FILETYPE.UNKNOWN) {
           Swal.fire({
@@ -255,7 +255,7 @@ export const data = {
           } else if (lines[i].indexOf('colorID:') > -1) {
             if (obj == null) obj = {};
             obj.colorID = Number(
-              lines[i].substr(9, lines[i].length - 9).trim(),
+              lines[i].substr(9, lines[i].length - 9).trim()
             );
           } else if (lines[i].indexOf('tags:') > -1) {
             if (obj == null) obj = {};
@@ -291,7 +291,7 @@ export const data = {
           if (openBracket > 0 && closeBracket > 0) {
             tags = lines[i].substr(
               openBracket + 1,
-              closeBracket - openBracket - 1,
+              closeBracket - openBracket - 1
             );
           }
 
@@ -348,7 +348,7 @@ export const data = {
     app.limitNodesUpdate(() => {
       if (clearNodes) app.nodes.removeAll();
 
-      data.getNodesFromObjects(objects).forEach((node) => app.nodes.push(node));
+      data.getNodesFromObjects(objects).forEach(node => app.nodes.push(node));
     });
 
     app.updateNodeLinks();
@@ -384,7 +384,7 @@ export const data = {
   getNodesFromObjects: function(objects) {
     const appNodes = [];
     if (!objects) return [];
-    objects.forEach((object) => {
+    objects.forEach(object => {
       appNodes.push(data.getNodeFromObject(object));
     });
     return appNodes;
@@ -507,7 +507,7 @@ export const data = {
             accept +
             ' ' +
             saveas +
-            '>',
+            '>'
         );
       dialog.unbind('change');
       dialog.remove();
@@ -520,7 +520,7 @@ export const data = {
     var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     saveAs(
       blob,
-      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type,
+      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type
     );
   },
 
@@ -542,7 +542,7 @@ export const data = {
       <datalist class="form-control" id="select-file-name">    
         ${suggestions &&
           suggestions
-            .map((suggestion) => `<option value="${suggestion}" />`)
+            .map(suggestion => `<option value="${suggestion}" />`)
             .join('')}
       </datalist>`,
       onOpen: () => {
@@ -586,7 +586,7 @@ export const data = {
             file: [file],
           })
           .then(() => console.log('Successful share'))
-          .catch((error) => console.log('Error sharing', error));
+          .catch(error => console.log('Error sharing', error));
       } else {
         Swal.fire({
           title:
@@ -599,7 +599,7 @@ export const data = {
 
   trySaveGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
@@ -609,7 +609,7 @@ export const data = {
           Swal.fire(
             'Saved!',
             `The Yarn has been saved to gist ${gists.file}`,
-            'success',
+            'success'
           );
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
@@ -620,7 +620,7 @@ export const data = {
       Swal.fire(
         'Not configured',
         'Your github settings are not configured',
-        'warning',
+        'warning'
       );
       app.ui.openSettingsDialog();
     }
@@ -628,10 +628,10 @@ export const data = {
 
   tryOpenGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const gistFiles = gist.body.files;
         const inputOptions = {};
-        Object.keys(gistFiles).forEach((key) => {
+        Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
         });
         Swal.fire({
@@ -660,7 +660,7 @@ export const data = {
       Swal.fire(
         'Not configured',
         'Your github settings are not configured',
-        'warning',
+        'warning'
       );
       app.ui.openSettingsDialog();
     }
@@ -695,7 +695,7 @@ export const data = {
 
     if (data.lastStorageHost() === 'GIST') {
       const gists = app.gists;
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const yarnData = data.getSaveData(data.editingType());
         console.log(data.editingName());
         gists.edit(gists.file, {
@@ -731,10 +731,10 @@ export const data = {
       if (navigator.clipboard) {
         navigator.clipboard
           .readText()
-          .then((text) => {
+          .then(text => {
             app.clipboard = text;
           })
-          .catch((err) => {
+          .catch(err => {
             app.clipboard = app.editor.getSelectedText();
             console.log('No clipboard access', err, 'using local instead');
           });
