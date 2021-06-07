@@ -2,8 +2,6 @@ const bondage = require('bondage');
 const bbcode = require('bbcode');
 const yarnRunner = new bondage.Runner();
 const EventEmitter = require('events').EventEmitter;
-// const path = require('path')
-// const fs = require('fs');
 
 export var yarnRender = function() {
   let visitedNodes = [];
@@ -277,7 +275,7 @@ export var yarnRender = function() {
     resourcesPath,
     debugLabelId,
     playtestStyle,
-    platestVariables
+    playtestVariables
   ) => {
     const randomColour = [
       '#f5ff6f',
@@ -359,7 +357,6 @@ export var yarnRender = function() {
       '♥(´∀｀)',
       'ฅ(˵●ﻌ●˵)ฅ',
     ];
-    console.log('variables', platestVariables);
     debugLabelIdToAttachTo = debugLabelId;
     htmIDtoAttachYarnTo = htmlIdToAttachTo;
     this.yarnDataObject = yarnDataObject;
@@ -437,6 +434,13 @@ export var yarnRender = function() {
     yarnRunner.load(yarnDataObject);
     // yarnRunner.setVariableStorage(platestVariables);
     this.loadYarnChapter(startChapter);
+    yarnRunner.variables.data = {};
+
+    Object.keys(playtestVariables).forEach(function(key) {
+      const value = playtestVariables[key];
+      console.log(value);
+      yarnRunner.variables.set(key, value);
+    });
   };
 
   this.loadYarnChapter = storyChapter => {
