@@ -1264,7 +1264,6 @@ export var App = function(name, version) {
           );
         }
       });
-      console.log(self.data, self.data.playtestVariables());
       self.previewStory.initYarn(
         JSON.parse(data.getSaveData(FILETYPE.JSON)),
         self
