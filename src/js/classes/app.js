@@ -1264,6 +1264,7 @@ export var App = function(name, version) {
           );
         }
       });
+      console.log(self.data, self.data.playtestVariables());
       self.previewStory.initYarn(
         JSON.parse(data.getSaveData(FILETYPE.JSON)),
         self
@@ -1273,7 +1274,8 @@ export var App = function(name, version) {
         'NVrichTextLabel',
         false,
         'commandDebugLabel',
-        self.playtestStyle
+        self.playtestStyle,
+        self.data.playtestVariables()
       );
     } else {
       //edit mode
