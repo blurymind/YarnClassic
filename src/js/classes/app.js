@@ -1273,7 +1273,8 @@ export var App = function(name, version) {
         'NVrichTextLabel',
         false,
         'commandDebugLabel',
-        self.playtestStyle
+        self.playtestStyle,
+        self.data.playtestVariables()
       );
     } else {
       //edit mode

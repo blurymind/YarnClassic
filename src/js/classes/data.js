@@ -12,6 +12,7 @@ export const data = {
   isDocumentDirty: ko.observable(false),
   restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
+  playtestVariables: ko.observable({}),
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
@@ -31,6 +32,7 @@ export const data = {
     app.workspace.warpToNodeByIdx(0);
     data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
+    data.playtestVariables({});
     app.refreshWindowTitle();
   },
   askForFileName: function() {
@@ -79,6 +81,8 @@ export const data = {
         transform: app.workspace.transform,
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
+        pluginStorage: app.plugins.pluginStorage(),
+        playtestVariables: data.playtestVariables(),
       })
     );
   },
@@ -100,6 +104,8 @@ export const data = {
         tags,
         transform,
         scale,
+        pluginStorage,
+        playtestVariables,
       } = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
@@ -116,8 +122,12 @@ export const data = {
         app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
+      app.plugins.pluginStorage(pluginStorage);
+      data.playtestVariables(playtestVariables);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
+      // Callback for embedding in other webapps
+      data.dispatchEventDataLoaded();
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -219,6 +229,13 @@ export const data = {
     return FILETYPE.UNKNOWN;
   },
 
+  dispatchEventDataLoaded: function() {
+    var event = new CustomEvent('yarnLoadedData');
+    event.document = document;
+    event.data = data;
+    event.app = app;
+    window.parent.dispatchEvent(event);
+  },
   loadData: function(content, type, clearNodes) {
     const objects = [];
 
@@ -356,11 +373,7 @@ export const data = {
     data.isDocumentDirty(false);
 
     // Callback for embedding in other webapps
-    var event = new CustomEvent('yarnLoadedData');
-    event.document = document;
-    event.data = data;
-    event.app = app;
-    window.parent.dispatchEvent(event);
+    data.dispatchEventDataLoaded();
   },
   getNodeFromObject: function(object) {
     return new Node({
