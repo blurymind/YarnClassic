@@ -1234,6 +1234,7 @@ export var App = function(name, version) {
     });
   };
 
+  // todo move to plugins
   this.advanceStoryPlayMode = function(speed = 5) {
     if (!self.previewStory.finished) {
       self.previewStory.changeTextScrollSpeed(speed);
@@ -1246,6 +1247,7 @@ export var App = function(name, version) {
     }
   };
 
+  // Todo: move to plugins
   this.togglePlayMode = function(playModeOverwrite = false) {
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
@@ -1294,6 +1296,7 @@ export var App = function(name, version) {
     }
   };
 
+  // TODO move to plugins
   this.gotoLastPlayNode = function() {
     if (
       self.editing() &&

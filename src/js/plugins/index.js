@@ -23,15 +23,21 @@ export var Plugins = function(app) {
   };
 
   // plugin helper methods
-  const createButton = (plugin, { name, icon, onClick, attachTo }) => {
+  const createButton = (
+    plugin,
+    { name, icon, onClick, attachTo, className }
+  ) => {
     app.plugins[plugin.constructor.name] = plugin;
     const button = document.createElement('span');
     const iconName = icon || 'cog';
     button.innerHTML = `
-      <span class="item" onclick="click: app.plugins.${plugin.constructor.name}.${onClick}()">
-        <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
+      <span class="item" onclick="click: app.plugins.${
+        plugin.constructor.name
+      }.${onClick}()">
+        <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw ${className ||
+      ''}"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
         <span class="hide-when-narrow">&nbsp;</span>
-        ${name}
+        ${name || ''}
       </span>
     `;
     document.getElementById(attachTo).appendChild(button);
