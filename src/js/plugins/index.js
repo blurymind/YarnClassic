@@ -1,7 +1,6 @@
 import { VarStore } from './var-store';
 
 export var Plugins = function(app) {
-  console.log('APP', app);
   const self = this;
 
   // plugin local storage (see data class)
