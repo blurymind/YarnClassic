@@ -435,6 +435,7 @@ export var yarnRender = function() {
     });
 
     yarnRunner.load(yarnDataObject);
+    // yarnRunner.setVariableStorage(platestVariables);
     this.loadYarnChapter(startChapter);
   };
 

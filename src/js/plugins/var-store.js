@@ -8,6 +8,9 @@ export var VarStore = function({
 }) {
   const self = this;
 
+  const localVariables = getPluginStore(self);
+  app.data.playtestVariables(localVariables.fields || {});
+
   this.onOpenDialog = async () => {
     let editor = null;
     const { value: formValues } = await Swal.fire({
@@ -38,6 +41,7 @@ export var VarStore = function({
 
     if (formValues) {
       setPluginStore(self, 'fields', formValues);
+      app.data.playtestVariables(formValues);
     }
   };
 
@@ -48,5 +52,8 @@ export var VarStore = function({
       attachTo: 'fileMenuDropdown',
       onClick: 'onOpenDialog',
     });
+  };
+  this.onYarnLoadedData = e => {
+    console.log('loaded>>>', e);
   };
 };
