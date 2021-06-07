@@ -18,18 +18,26 @@ export var VarStore = function({
       onOpen: () => {
         // create the editor
         const container = document.getElementById('jsoneditor');
-        const options = {};
+        const options = {
+          mode: 'tree',
+          onEditable: ({ path, field, value }) => {
+            return !(field === undefined && value === '');
+          },
+        };
         editor = new JSONEditor(container, options);
+        editor.setSchema({ type: 'object' });
         require('./jsoneditor/dist/jsoneditor.min.css');
         require('./jsoneditor/size-overrides.css');
-        console.log(app.settings.theme());
+
         if (app.settings.theme() === 'dracula') {
           require('./jsoneditor/json-editor-darktheme.css');
         }
 
         const localVariables = getPluginStore(self);
         // set json
-        editor.set(localVariables.fields);
+        editor.set(
+          typeof localVariables.fields !== 'object' ? {} : localVariables.fields
+        );
       },
       preConfirm: () => {
         return editor.get();
