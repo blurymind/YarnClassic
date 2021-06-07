@@ -52,6 +52,7 @@ export var Plugins = function(app) {
     });
     window.addEventListener('yarnLoadedData', e => {
       // yarnWindow.setTitle(e.data.editingPath());
+      initializedPlugin.onYarnLoadedData(e);
       console.log(
         'loading plugins data in yarn file (if found)',
         e.data,
