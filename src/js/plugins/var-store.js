@@ -61,4 +61,5 @@ export var VarStore = function({
     const localVariables = getPluginStore(self);
     app.data.playtestVariables(localVariables.fields || {});
   };
+  this.onYarnEditorOpen = () => {};
 };

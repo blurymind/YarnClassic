@@ -965,6 +965,12 @@ export var App = function(name, version) {
     if (node.undoManager != null) {
       self.editor.session.setUndoManager(node.undoManager);
     }
+
+    var event = new CustomEvent('yarnEditorOpen');
+    event.document = document;
+    event.data = data;
+    event.app = app;
+    window.parent.dispatchEvent(event);
   };
 
   this.splitEditor = function() {

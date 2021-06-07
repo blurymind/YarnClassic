@@ -4,12 +4,13 @@ export var Plugins = function(app) {
   const self = this;
 
   // plugin local storage (see data class)
-  this.pluginStorage = ko.observable({ changeMe: true });
+  this.pluginStorage = ko.observable({});
   const getPluginStore = plugin => {
-    if (!self.pluginStorage)
-      self.pluginStorage = ko.observable({ changeMe: true });
     if (!this.pluginStorage()[plugin.constructor.name]) {
-      this.pluginStorage({ [plugin.constructor.name]: {} });
+      this.pluginStorage({
+        ...this.pluginStorage(),
+        [plugin.constructor.name]: {},
+      });
     }
     return this.pluginStorage()[plugin.constructor.name];
   };
@@ -51,6 +52,9 @@ export var Plugins = function(app) {
     });
     window.addEventListener('yarnLoadedData', e => {
       initializedPlugin.onYarnLoadedData(e);
+    });
+    window.addEventListener('yarnEditorOpen', e => {
+      initializedPlugin.onYarnEditorOpen(e);
     });
   });
 };

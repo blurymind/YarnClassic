@@ -185,7 +185,7 @@
         <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
         <input type="text" id="editorTags" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
-        <div class="bbcode-toolbar">
+        <div id="bbcodeToolbar" class="bbcode-toolbar">
           <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back To Last Edited Node" onfocus="app.togglePreviewMode(false)">
             <svg class="icon icon-arrow-left icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg>
           </button>
