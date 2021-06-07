@@ -12,8 +12,7 @@ export var VarStore = function({
     let editor = null;
     const { value: formValues } = await Swal.fire({
       title: 'Playtest starting variables',
-      html: `<div id="jsoneditor">
-              </div>`,
+      html: '<div id="jsoneditor"/>',
       focusConfirm: false,
       onOpen: () => {
         // create the editor

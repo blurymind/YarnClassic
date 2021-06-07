@@ -24,7 +24,6 @@ export var Plugins = function(app) {
   // plugin helper methods
   const createButton = (plugin, { name, icon, onClick, attachTo }) => {
     app.plugins[plugin.constructor.name] = plugin;
-    console.log('command', app.plugins[plugin.constructor.name]);
     const button = document.createElement('span');
     const iconName = icon || 'cog';
     button.innerHTML = `
