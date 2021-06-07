@@ -19770,7 +19770,8 @@
          * @return {string}
          */
 
-        function escapeUnicodeChars(text) { // see https://www.wikiwand.com/en/UTF-16
+        function escapeUnicodeChars(text) {
+          // see https://www.wikiwand.com/en/UTF-16
           return (
             // note: we leave surrogate pairs as two individual chars,
             // as JSON doesn't interpret them as a single unicode char.
