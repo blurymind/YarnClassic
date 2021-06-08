@@ -167,7 +167,7 @@ export const Settings = function(app) {
 
   // Filetype version
   this.filetypeVersion = ko
-    .observable(storage.getItem('filetypeVersion') || 1)
+    .observable(storage.getItem('filetypeVersion') || '1')
     .extend({ persist: 'filetypeVersion' });
 
   // Playtest style
