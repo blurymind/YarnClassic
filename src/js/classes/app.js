@@ -55,6 +55,11 @@ export var App = function(name, version) {
     self.playtestStyle = playtestStyle;
   };
 
+  this.setFiletypeVersion = function(typeVersion, e) {
+    const filetypeVersion = e ? e.target.value : typeVersion;
+    self.filetypeVersion = filetypeVersion;
+  };
+
   this.setGistCredentials = function(gist, e) {
     const { token, file } = gist;
     const Gists = require('gists');

@@ -4,32 +4,38 @@ export const UI = function(app) {
     toast: true,
     position: 'top',
     showConfirmButton: false,
-    timer: 2500
+    timer: 2500,
   });
 
   this.settingsDialogVisible = ko.observable(false);
   this.narrowScreenThreshold = 600;
   this.isScreenNarrow = function() {
-    return ($(window).width() <= self.narrowScreenThreshold);
+    return $(window).width() <= self.narrowScreenThreshold;
   };
 
   // Markup selector -----------------------------------------------------------
   this.availableMarkupLanguages = [
     { id: 'bbcode', name: 'Bbcode' },
-    { id: 'html', name: 'Html' }
+    { id: 'html', name: 'Html' },
+  ];
+
+  // Filetype version selector -----------------------------------------------------------
+  this.availableFiletypeVersions = [
+    { id: '1', name: '1' },
+    { id: '2', name: '2' },
   ];
 
   // Theme selector -----------------------------------------------------------
   this.availableThemes = [
     { id: 'classic', name: 'Classic' },
     { id: 'blueprint', name: 'Blueprint' },
-    { id: 'dracula', name: 'Dracula' }
+    { id: 'dracula', name: 'Dracula' },
   ];
 
   // Playtest selector -----------------------------------------------------------
   this.availablePlaytestStyles = [
     { id: 'npc', name: 'Npc bubble' },
-    { id: 'chat', name: 'Chat messages' }
+    { id: 'chat', name: 'Chat messages' },
   ];
 
   // Language selector --------------------------------------------------------
@@ -65,14 +71,14 @@ export const UI = function(app) {
     { name: '한국어', id: 'ko-KR' },
     { name: '中文', id: 'cmn-Hans-CN' },
     { name: '日本語', id: 'ja-JP' },
-    { name: 'Lingua latīna', id: 'la' }
+    { name: 'Lingua latīna', id: 'la' },
   ];
 
-    // Line Style selector -----------------------------------------------------------
-    this.availableLineStyles = [
-      { id: 'straight', name: 'Straight Lines' },
-      { id: 'bezier', name: 'Bezier Curves' }
-    ];
+  // Line Style selector -----------------------------------------------------------
+  this.availableLineStyles = [
+    { id: 'straight', name: 'Straight Lines' },
+    { id: 'bezier', name: 'Bezier Curves' },
+  ];
 
   // openSettingsDialog
   this.openSettingsDialog = function() {
@@ -88,7 +94,7 @@ export const UI = function(app) {
   };
 
   // closeSettingsDialog
-  this.closeSettingsDialog = function () {
+  this.closeSettingsDialog = function() {
     $('.settings-dialog')
       .css({ opacity: 1 })
       .transition({ opacity: 0 }, 250, e => {
@@ -98,26 +104,30 @@ export const UI = function(app) {
     $('.settings-dialog .form')
       .css({ y: '0' })
       .transition({ y: '-100' }, 250);
-    
+
     setTimeout(() => app.settings.apply(), 100);
   };
 
   // isDialogOpen
-  this.isDialogOpen = function () {
-    return self.settingsDialogVisible() || (Swal.isVisible() && !Swal.isTimerRunning());
+  this.isDialogOpen = function() {
+    return (
+      self.settingsDialogVisible() ||
+      (Swal.isVisible() && !Swal.isTimerRunning())
+    );
   };
 
   // confirmMarkupConversion
-  this.confirmMarkupConversion = function () {
+  this.confirmMarkupConversion = function() {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Markup on all nodes will be modified. This can rarely result in broken texts. This operation can\'t be undone.',
+      text:
+        "Markup on all nodes will be modified. This can rarely result in broken texts. This operation can't be undone.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, convert it!',
       cancelButtonText: 'No, cancel!',
-      reverseButtons: true
-    }).then((result) => {
+      reverseButtons: true,
+    }).then(result => {
       if (result.value) {
         app.convertMarkup();
         Swal.fire(
@@ -131,9 +141,10 @@ export const UI = function(app) {
 
   // openNodeListMenu
   this.openNodeListMenu = function(action) {
-    const searchText = action === 'link' ?
-      document.getElementById('linkHelperMenuFilter').value.toLowerCase() :
-      document.getElementById('nodeSearchInput').value.toLowerCase();
+    const searchText =
+      action === 'link'
+        ? document.getElementById('linkHelperMenuFilter').value.toLowerCase()
+        : document.getElementById('nodeSearchInput').value.toLowerCase();
 
     const rootMenu = document.getElementById(action + 'HelperMenu');
     rootMenu.innerHTML = '';
@@ -148,15 +159,15 @@ export const UI = function(app) {
       ) {
         const p = document.createElement('span');
         p.innerHTML = node.title();
-        $(p).addClass('item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]);
+        $(p).addClass(
+          'item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]
+        );
 
         if (action == 'link') {
           if (node.title() !== app.editing().title()) {
             p.setAttribute(
               'onclick',
-              'app.insertTextAtCursor(\'[[' +
-                node.title() +
-                ']]\')'
+              "app.insertTextAtCursor('[[" + node.title() + "]]')"
             );
             rootMenu.appendChild(p);
           }
@@ -182,16 +193,28 @@ export const UI = function(app) {
 
   this.checkAndMoveAppButtons = function() {
     // Move app buttons to either side depending on direction
-    $('.app-add-node').toggleClass('app-add-node-alt', app.settings.editorSplitDirection() === 'right');
-    $('.app-sort').toggleClass('app-sort-alt', app.settings.editorSplitDirection() === 'right');
-    $('.app-undo-redo').toggleClass('app-undo-redo-alt', app.settings.editorSplitDirection() === 'right');
-    $('.app-zoom').toggleClass('app-zoom-alt', app.settings.editorSplitDirection() === 'right');
-  }
+    $('.app-add-node').toggleClass(
+      'app-add-node-alt',
+      app.settings.editorSplitDirection() === 'right'
+    );
+    $('.app-sort').toggleClass(
+      'app-sort-alt',
+      app.settings.editorSplitDirection() === 'right'
+    );
+    $('.app-undo-redo').toggleClass(
+      'app-undo-redo-alt',
+      app.settings.editorSplitDirection() === 'right'
+    );
+    $('.app-zoom').toggleClass(
+      'app-zoom-alt',
+      app.settings.editorSplitDirection() === 'right'
+    );
+  };
 
   this.resetAppButtonsLocation = function() {
     $('.app-add-node').removeClass('app-add-node-alt');
     $('.app-sort').removeClass('app-sort-alt');
     $('.app-undo-redo').removeClass('app-undo-redo-alt');
     $('.app-zoom').removeClass('app-zoom-alt');
-  }
+  };
 };

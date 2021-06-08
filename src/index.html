@@ -412,6 +412,21 @@
               </div>
             </div>
 
+            <!-- Version -->
+            <div class="settings-item">
+              <label class="settings-label" for="theme">Filetype version</label>
+
+              <div class="settings-value markup">
+                <select id="theme" data-bind="
+                  options: app.ui.availableFiletypeVersions,
+                  optionsText: 'name',
+                  optionsValue: 'id',
+                  value: app.settings.filetypeVersion,
+                  event: { change: app.setFiletypeVersion }">
+                </select>
+              </div>
+            </div>
+
             <!-- Story playtesting style -->
             <div class="settings-item">
               <label class="settings-label" for="theme">Playtesting Style</label>

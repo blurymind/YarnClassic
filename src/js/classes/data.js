@@ -249,26 +249,30 @@ export const data = {
         app.settings.markupLanguage(documentHeader.markupLanguage);
       if ('language' in documentHeader)
         app.settings.language(documentHeader.language);
+      if ('filetypeVersion' in documentHeader)
+        app.settings.filetypeVersion(documentHeader.filetypeVersion);
       app.settings.apply();
     }
   },
   loadData: function(content, type, clearNodes) {
     const objects = [];
-
+    const pushContent = extractedNodes => {
+      for (let i = 0; i < extractedNodes.length; i++) {
+        if ('title' in extractedNodes[i]) objects.push(extractedNodes[i]);
+      }
+    };
     if (type == FILETYPE.JSON) {
       content = JSON.parse(content);
       if (!content) {
         return;
       }
-      for (let i = 0; i < content.length; i++) {
-        // Check if the json file contains a header object, done this way for backwards compatibility
-        if (
-          i === 0 &&
-          typeof content[i] === 'object' &&
-          'header' in content[i]
-        ) {
-          data.documentHeader(content[i].header);
-        } else if ('title' in content[i]) objects.push(content[i]);
+      if (Array.isArray(content)) {
+        // Old json format
+        pushContent(content);
+      } else {
+        // New Json format
+        data.documentHeader(content.header);
+        pushContent(content.nodes);
       }
     } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
@@ -441,18 +445,25 @@ export const data = {
 
     if (type == FILETYPE.JSON) {
       // store useful values for later use if the file type supports it
-      const date = new Date();
-      data.documentHeader({
-        ...data.documentHeader(),
-        lastSavedUnix: date,
-        language: app.settings.language(),
-        markupLanguage: app.settings.markupLanguage(),
-      });
-      // append any existing document header data to the array before writing to json
-      content.unshift({
-        header: data.documentHeader(),
-      });
-      output = JSON.stringify(content, null, '\t');
+      console.log(app.settings.filetypeVersion());
+      if (app.settings.filetypeVersion() === '2') {
+        console.log('Saving as Yarn json v2 type');
+        const date = new Date();
+        data.documentHeader({
+          ...data.documentHeader(),
+          lastSavedUnix: date,
+          language: app.settings.language(),
+          markupLanguage: app.settings.markupLanguage(),
+          filetypeVersion: app.settings.filetypeVersion(),
+        });
+        output = JSON.stringify(
+          { header: data.documentHeader(), nodes: content },
+          null,
+          '\t'
+        );
+      } else {
+        output = JSON.stringify(content, null, '\t');
+      }
     } else if (type == FILETYPE.YARN) {
       for (let i = 0; i < content.length; i++) {
         output += 'title: ' + content[i].title + '\n';

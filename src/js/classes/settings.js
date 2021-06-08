@@ -165,6 +165,11 @@ export const Settings = function(app) {
     .observable(storage.getItem('markupLanguage') || 'bbcode')
     .extend({ persist: 'markupLanguage' });
 
+  // Filetype version
+  this.filetypeVersion = ko
+    .observable(storage.getItem('filetypeVersion') || 1)
+    .extend({ persist: 'filetypeVersion' });
+
   // Playtest style
   this.playtestStyle = ko
     .observable(storage.getItem('playtestStyle') || 'chat')
