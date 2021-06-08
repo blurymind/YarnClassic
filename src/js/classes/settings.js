@@ -170,6 +170,7 @@ export const Settings = function(app) {
     .observable(storage.getItem('filetypeVersion') || '1')
     .extend({ persist: 'filetypeVersion' });
 
+  // TODO move to plugins - implement a method to add a  persistent setting without this boilerplate
   // Playtest style
   this.playtestStyle = ko
     .observable(storage.getItem('playtestStyle') || 'chat')
