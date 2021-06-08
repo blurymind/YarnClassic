@@ -9,6 +9,7 @@ export const data = {
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
+  documentHeader: ko.observable(null),
   isDocumentDirty: ko.observable(false),
   restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
@@ -24,6 +25,7 @@ export const data = {
     data.editingName(editingName);
     data.editingType(editingFormat);
     data.editingFolder(null);
+    data.documentHeader(null);
     app.workspace.selectedNodes = [];
     app.editing(null);
     app.nodes([app.newNode(true).title('Start')]);
@@ -76,6 +78,7 @@ export const data = {
         editingFolder: data.editingFolder(),
         editingTitle: app.editing() ? app.editing().title() : null,
         nodes: data.getNodesAsObjects(),
+        documentHeader: data.documentHeader(),
         tags: app.tags(),
         editorSelection: app.editor ? app.editor.selection.getRange() : null,
         transform: app.workspace.transform,
@@ -101,6 +104,7 @@ export const data = {
         editingTitle,
         editorSelection,
         nodes,
+        documentHeader,
         tags,
         transform,
         scale,
@@ -124,6 +128,7 @@ export const data = {
       }
       app.plugins.pluginStorage(pluginStorage);
       data.playtestVariables(playtestVariables);
+      data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
       // Callback for embedding in other webapps
@@ -236,6 +241,17 @@ export const data = {
     event.app = app;
     window.parent.dispatchEvent(event);
   },
+  restoreSettingsFromDocumentHeader: function() {
+    if (data.documentHeader() !== null) {
+      const documentHeader = data.documentHeader();
+      console.log('RESTORE data from header:', documentHeader);
+      if ('markupLanguage' in documentHeader)
+        app.settings.markupLanguage(documentHeader.markupLanguage);
+      if ('language' in documentHeader)
+        app.settings.language(documentHeader.language);
+      app.settings.apply();
+    }
+  },
   loadData: function(content, type, clearNodes) {
     const objects = [];
 
@@ -245,12 +261,18 @@ export const data = {
         return;
       }
       for (let i = 0; i < content.length; i++) {
-        objects.push(content[i]);
+        // Check if the json file contains a header object, done this way for backwards compatibility
+        if (
+          i === 0 &&
+          typeof content[i] === 'object' &&
+          'header' in content[i]
+        ) {
+          data.documentHeader(content[i].header);
+        } else if ('title' in content[i]) objects.push(content[i]);
       }
     } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
-      var index = 0;
       var readingBody = false;
       for (let i = 0; i < lines.length; i++) {
         if (lines[i].trim() === '===') {
@@ -368,6 +390,7 @@ export const data = {
       data.getNodesFromObjects(objects).forEach(node => app.nodes.push(node));
     });
 
+    data.restoreSettingsFromDocumentHeader();
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
     data.isDocumentDirty(false);
@@ -417,6 +440,18 @@ export const data = {
     var content = data.getNodesAsObjects();
 
     if (type == FILETYPE.JSON) {
+      // store useful values for later use if the file type supports it
+      const date = new Date();
+      data.documentHeader({
+        ...data.documentHeader(),
+        lastSavedUnix: date,
+        language: app.settings.language(),
+        markupLanguage: app.settings.markupLanguage(),
+      });
+      // append any existing document header data to the array before writing to json
+      content.unshift({
+        header: data.documentHeader(),
+      });
       output = JSON.stringify(content, null, '\t');
     } else if (type == FILETYPE.YARN) {
       for (let i = 0; i < content.length; i++) {
