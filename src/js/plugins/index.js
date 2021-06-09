@@ -31,11 +31,9 @@ export var Plugins = function(app) {
     const button = document.createElement('span');
     const iconName = icon || 'cog';
     button.innerHTML = `
-      <span class="item" title="${title || ''}" onclick="click: app.plugins.${
-      plugin.constructor.name
-    }.${onClick}()">
-        <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw ${className ||
-      ''}"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
+      <span class="item ${className || ''}" title="${title ||
+      ''}" onclick="click: app.plugins.${plugin.constructor.name}.${onClick}()">
+        <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw" style="color:currentColor;"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
         <span class="hide-when-narrow">&nbsp;</span>
         ${name || ''}
       </span>
