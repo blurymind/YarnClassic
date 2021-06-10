@@ -1,10 +1,4 @@
-const JSONEditor = require('../plugins/jsoneditor/dist/jsoneditor-minimalist.min');
-// import 'jsoneditor/dist/jsoneditor.min.css';
-// require('./public/plugins/jsoneditor/size-overrides.css');
-const cssElement = document.createElement('link');
-cssElement.rel = 'stylesheet';
-cssElement.href = './public/plugins/jsoneditor/dist/jsoneditor.min.css';
-document.body.appendChild(cssElement);
+const JSONEditor = require('./jsoneditor/dist/jsoneditor-minimalist.min');
 
 export var VarStore = function({
   app,
@@ -14,6 +8,7 @@ export var VarStore = function({
 }) {
   const self = this;
 
+  // const k = kaboom.default();
   this.onOpenDialog = async () => {
     let editor = null;
     const { value: formValues } = await Swal.fire({
@@ -31,11 +26,11 @@ export var VarStore = function({
         };
         editor = new JSONEditor(container, options);
         editor.setSchema({ type: 'object' });
-        // require('../plugins/jsoneditor/dist/jsoneditor.min.css');
-        // require('../plugins/jsoneditor/size-overrides.css');
+        require('./jsoneditor/dist/jsoneditor.min.css');
+        require('./jsoneditor/size-overrides.css');
 
         if (app.settings.theme() === 'dracula') {
-          // require('../plugins/jsoneditor/json-editor-darktheme.css');
+          require('./jsoneditor/json-editor-darktheme.css');
         }
 
         const localVariables = getPluginStore(self);
@@ -60,7 +55,7 @@ export var VarStore = function({
     createButton(self, {
       name: 'Variables',
       attachTo: 'fileMenuDropdown',
-      onClick: 'onOpenDialog',
+      onClick: 'onOpenDialog()',
     });
   };
   this.onYarnLoadedData = () => {
