@@ -29,6 +29,7 @@ export const Input = function(app) {
     Y: 89,
     Z: 90,
   });
+  this.keys = Key;
 
   this.mouse = { x: 0, y: 0 };
   this.isDragging = false;
@@ -196,10 +197,6 @@ export const Input = function(app) {
           // alt+Spacebar cycles between nodes and edits the focused node
           app.editNode(app.nodes()[app.focusedNodeIdx]);
         }
-      } else if (e.keyCode === Key.Z) {
-        app.previewStory.changeTextScrollSpeed(200);
-        if (app.previewStory.vnSelectedChoice != -1)
-          app.previewStory.vnSelectChoice();
       }
     });
 
@@ -353,29 +350,6 @@ export const Input = function(app) {
       if (!app.inEditor()) return;
 
       app.updateEditorStats();
-    });
-
-    // Preview keyboard shortcuts
-    $(document).on('keydown', e => {
-      if (!app.editing() || app.previewStory.finished) return;
-
-      switch (e.keyCode) {
-        case Key.Z:
-          app.previewStory.changeTextScrollSpeed(10);
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnSelectChoice();
-          break;
-
-        case Key.Up:
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnUpdateChoice(-1);
-          break;
-
-        case Key.Down:
-          if (app.previewStory.vnSelectedChoice != -1)
-            app.previewStory.vnUpdateChoice(1);
-          break;
-      }
     });
   };
 
