@@ -13,6 +13,7 @@ export const UI = function(app) {
     return $(window).width() <= self.narrowScreenThreshold;
   };
 
+  // TODO turn all of these into a generic function
   // Markup selector -----------------------------------------------------------
   this.availableMarkupLanguages = [
     { id: 'bbcode', name: 'Bbcode' },
@@ -30,12 +31,6 @@ export const UI = function(app) {
     { id: 'classic', name: 'Classic' },
     { id: 'blueprint', name: 'Blueprint' },
     { id: 'dracula', name: 'Dracula' },
-  ];
-
-  // Playtest selector -----------------------------------------------------------
-  this.availablePlaytestStyles = [
-    { id: 'npc', name: 'Npc bubble' },
-    { id: 'chat', name: 'Chat messages' },
   ];
 
   // Language selector --------------------------------------------------------
@@ -91,6 +86,9 @@ export const UI = function(app) {
     $('.settings-dialog .form')
       .css({ y: '-100' })
       .transition({ y: '0' }, 250);
+
+    var event = new CustomEvent('settingsOpened');
+    window.parent.dispatchEvent(event);
   };
 
   // closeSettingsDialog

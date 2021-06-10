@@ -375,6 +375,7 @@ input#nodeSearchInput::-moz-placeholder {
   border: 1px solid transparent;
 }
 
+select,
 .markup #theme {
   background: #21222C;
   color: #f8f8f2;

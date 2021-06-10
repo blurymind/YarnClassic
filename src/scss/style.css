@@ -441,6 +441,7 @@ input[type='checkbox'] {
   display: flex;
 }
 
+select,
 .markup #theme {
   flex: 60%;
 }
@@ -665,15 +666,15 @@ input#editorTitle {
   background: #e7e7e7;
   cursor: ew-resize;
   pointer-events: all;
-} 
- 
+}
+
 #editor-resize-handle span {
   display: flex;
   justify-content: center;
   text-align: center;
   align-items: center;
   height: calc(100% - 30px);
-} 
+}
 
 /* SPECIAL CHECKBOX START */
 .styled-checkbox input {
@@ -1243,7 +1244,7 @@ input:focus + span + .dropdown {
     height: 20px;
     border-radius: 4px;
   }
-  
+
   #add-link-title {
     line-height: 20px;
   }

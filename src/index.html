@@ -250,7 +250,6 @@
             <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
             <span class="hide-when-narrow float-right">&nbsp;</span>
           </span>
-          <button id="storyPlayButton" class="bbcode-button bbcode-button-right" onclick="app.togglePlayMode(true)" title="Preview"><svg class="icon icon-play icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-play"></use></svg></button>
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
@@ -289,12 +288,8 @@
           <div id="emojiPickerDom"></div>
         </div>
 
-        <div class="editor-container">
+        <div class="editor-container" id="editorContainer">
           <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)"></div>
-          <div class="editor-play" id="editor-play" onpointerdown="app.advanceStoryPlayMode(30)" ondblclick="app.advanceStoryPlayMode()">
-            <p class="story-playtest-answer" id="NVrichTextLabel"></p>
-            <div id="commandDebugLabel"></div>
-          </div>
           <div class="editor" id="editor" data-bind="
                 ace: app.editing().body,
                 aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
@@ -370,7 +365,7 @@
       <div class="settings-form" data-bind="preventBubble: 'click', preventBubble: 'mousedown'">
         <h3>Settings</h3>
         <div class="settings-row">
-          <div class="settings-column">
+          <div class="settings-column" id="settingsColumnA">
             <!-- Language -->
             <div class="settings-item">
               <label class="settings-label" for="language">Story Language</label>
@@ -427,20 +422,6 @@
               </div>
             </div>
 
-            <!-- Story playtesting style -->
-            <div class="settings-item">
-              <label class="settings-label" for="theme">Playtesting Style</label>
-              <div class="settings-value markup">
-                <select id="theme" data-bind="
-                  options: app.ui.availablePlaytestStyles,
-                  optionsText: 'name',
-                  optionsValue: 'id',
-                  value: app.settings.playtestStyle,
-                  event: { change: app.setPlaytestStyle }">
-                </select>
-              </div>
-            </div>
-
             <!-- Throttle delay -->
             <div class="settings-item">
               <label class="settings-label" for="throttle-threshold">Redraw Delay</label>
@@ -469,7 +450,7 @@
 
 
           </div> <!-- settgins-column -->
-          <div class="settings-column">
+          <div class="settings-column"  id="settingsColumnB">
 
             <!-- Spellcheck -->
             <div class="settings-item">

@@ -14,8 +14,7 @@ import { Input } from './input';
 import { Settings } from './settings';
 import { UI } from './ui';
 import { data } from './data';
-import { yarnRender } from './renderer';
-import { Utils, FILETYPE } from './utils';
+import { Utils } from './utils';
 import { RichTextFormatter } from './richTextFormatter';
 
 // TODO: refactoring proposals
@@ -23,7 +22,6 @@ import { RichTextFormatter } from './richTextFormatter';
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
-// Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
   const self = this;
@@ -50,11 +48,6 @@ export var App = function(name, version) {
     self.mustRefreshNodes.notifySubscribers();
   };
 
-  this.setPlaytestStyle = function(style, e) {
-    const playtestStyle = e ? e.target.value : style;
-    self.playtestStyle = playtestStyle;
-  };
-
   this.setFiletypeVersion = function(typeVersion, e) {
     const filetypeVersion = e ? e.target.value : typeVersion;
     self.filetypeVersion = filetypeVersion;
@@ -73,7 +66,6 @@ export var App = function(name, version) {
   this.settings = new Settings(self);
   this.workspace = new Workspace(self);
   this.ui = new UI(self);
-  this.previewStory = new yarnRender();
   this.richTextFormatter = new RichTextFormatter(self);
 
   this.data = data;
@@ -1239,115 +1231,25 @@ export var App = function(name, version) {
     });
   };
 
-  // todo move to plugins
-  this.advanceStoryPlayMode = function(speed = 5) {
-    if (!self.previewStory.finished) {
-      self.previewStory.changeTextScrollSpeed(speed);
-      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
-        self.previewStory.vnSelectChoice();
-      }
-    } else {
-      self.togglePlayMode(false);
-      self.gotoLastPlayNode();
-    }
-  };
-
-  // Todo: move to plugins
-  this.togglePlayMode = function(playModeOverwrite = false) {
-    var editor = $('.editor')[0];
-    var storyPreviewPlayButton = document.getElementById('storyPlayButton');
-    var editorPlayPreviewer = document.getElementById('editor-play');
-    self.isEditorInPlayMode = playModeOverwrite;
-    if (playModeOverwrite) {
-      self.togglePreviewMode(false);
-      //preview play mode
-      editor.style.display = 'none';
-      editorPlayPreviewer.style.display = 'flex';
-      $(storyPreviewPlayButton).addClass('disabled');
-      $('.toggle-toolbar').addClass('hidden');
-      $('.editor-counter').addClass('hidden');
-      self.previewStory.emiter.on('finished', function() {
-        self.togglePlayMode(false);
-        self.gotoLastPlayNode();
-      });
-      self.previewStory.emiter.on('startedNode', function(e) {
-        if (self.isEditorSplit) {
-          self.workspace.warpToNode(
-            self.getFirstFoundNode(e.title.toLowerCase().trim())
-          );
-        }
-      });
-      self.previewStory.initYarn(
-        JSON.parse(data.getSaveData(FILETYPE.JSON)),
-        self
-          .editing()
-          .title()
-          .trim(),
-        'NVrichTextLabel',
-        false,
-        'commandDebugLabel',
-        self.playtestStyle,
-        self.data.playtestVariables()
-      );
-    } else {
-      //edit mode
-      self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
-      editorPlayPreviewer.style.display = 'none';
-      editor.style.display = 'flex';
-      $(storyPreviewPlayButton).removeClass('disabled');
-      $('.toggle-toolbar').removeClass('hidden');
-      $('.editor-counter').removeClass('hidden');
-      self.previewStory.terminate();
-    }
-  };
-
-  // TODO move to plugins
-  this.gotoLastPlayNode = function() {
-    if (
-      self.editing() &&
-      self.editing().title() !== self.previewStory.node.title
-    ) {
-      self.openNodeByTitle(self.previewStory.node.title);
-    }
-    self.editor.focus();
-  };
-
   // TODO: move to UI?
   this.togglePreviewMode = function(previewModeOverwrite) {
     const editor = $('.editor')[0];
     const editorPreviewer = $('#editor-preview')[0];
 
     self.isEditorInPreviewMode = previewModeOverwrite;
-    if (previewModeOverwrite) {
-      if (self.isEditorInPlayMode) {
-        self.togglePlayMode(false);
-        self.gotoLastPlayNode();
-      }
-      $('.bbcode-toolbar').addClass('hidden');
-      //preview mode
-      editor.style.display = 'none';
-      editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(
-        self.editing().body(),
-        true
-      );
-      editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
-    } else {
-      //edit mode
-      $('.bbcode-toolbar').removeClass('hidden');
-      self.editor.session.setScrollTop(editorPreviewer.scrollTop);
-      editorPreviewer.innerHTML = '';
-      editorPreviewer.style.display = 'none';
-      editor.style.display = 'flex';
-      self.editor.focus();
-      self.editor.resize();
-      //close any pop up helpers tooltip class
-      if ($('#colorPicker-container').is(':visible')) {
-        $('#colorPicker-container').hide();
-      }
-      if ($('#emojiPicker-container').is(':visible')) {
-        $('#emojiPicker-container').hide();
-      }
+    $('.bbcode-toolbar').removeClass('hidden');
+    self.editor.session.setScrollTop(editorPreviewer.scrollTop);
+    editorPreviewer.innerHTML = '';
+    editorPreviewer.style.display = 'none';
+    editor.style.display = 'flex';
+    self.editor.focus();
+    self.editor.resize();
+    //close any pop up helpers tooltip class
+    if ($('#colorPicker-container').is(':visible')) {
+      $('#colorPicker-container').hide();
+    }
+    if ($('#emojiPicker-container').is(':visible')) {
+      $('#emojiPicker-container').hide();
     }
   };
 
@@ -1401,7 +1303,6 @@ export var App = function(name, version) {
     const node = self.editing();
     if (node) {
       const editorTitleElement = $('#editorTitle')[0];
-      self.previewStory.terminate();
 
       // Ensure the title is unique
       const title = self.getFutureEditedNodeTitle();
@@ -1420,6 +1321,8 @@ export var App = function(name, version) {
       setTimeout(self.updateSearch, 600);
 
       self.setYarnDocumentIsDirty();
+      const event = new CustomEvent('yarnSavedNode');
+      window.parent.dispatchEvent(event);
     }
   };
 

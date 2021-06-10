@@ -54,7 +54,7 @@ export var VarStore = function({
     createButton(self, {
       name: 'Variables',
       attachTo: 'fileMenuDropdown',
-      onClick: 'onOpenDialog',
+      onClick: 'onOpenDialog()',
     });
   };
   this.onYarnLoadedData = () => {

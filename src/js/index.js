@@ -50,6 +50,6 @@ window.app = new App('Yarn', version);
 window.app.run();
 
 // Register plugins from plugin folder
-import { Plugins } from './plugins';
+import { Plugins } from '../public/plugins';
 const appPlugins = new Plugins(window.app);
 window.app.plugins = appPlugins;
