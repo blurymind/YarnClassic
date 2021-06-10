@@ -1,6 +1,5 @@
-// const kaboom = require('./kaboom.js');
-// console.log(kaboom);
-// const kaboom = require('./kaboom.js');
+const kaboom = require('./kaboom/kaboom.mjs');
+
 export var JsEditor = function({
   app,
   createButton,
@@ -9,12 +8,14 @@ export var JsEditor = function({
 }) {
   const self = this;
   this.editor = ko.observable(null);
+  this.k = null;
 
   //  console.log(k);
   this.onOpenDialog = async () => {
     Swal.fire({
       title: '💥Kaboomjs',
-      html: '<div id="jsEditor" style="min-height:70vh"/>',
+      html:
+        '<div id="jsEditor" style="min-height:70vh"/><canvas id="kaboomCanvas"></canvas>',
       focusConfirm: false,
       showConfirmButton: false,
       onOpen: () => {
@@ -30,6 +31,13 @@ export var JsEditor = function({
           enableLiveAutocompletion: true,
           behavioursEnabled: true,
         });
+        self.k = kaboom.default({
+          canvas: document.getElementById('kaboomCanvas'),
+        });
+        console.log(self.k, Object.getOwnPropertyNames(self.k));
+        // Object.getOwnPropertyNames(self.k).forEach(method => {
+        //   console.log(method, self.k[method].arguments());
+        // });
         // self.editor.setOptions({
         //   mode: 'javascript',
         //   value: 'console.log("yahoo")',
@@ -39,6 +47,7 @@ export var JsEditor = function({
       },
       preConfirm: () => {
         // return editor.get();
+        self.k = null;
         return null;
       },
     });
@@ -64,12 +73,12 @@ export var JsEditor = function({
   };
   this.onYarnEditorOpen = () => {
     // create a button in the file menu
-    createButton(self, {
-      icon: 'play',
-      title: 'Preview',
-      attachTo: 'bbcodeToolbar',
-      onClick: 'onOpenDialog()',
-      className: 'bbcode-button bbcode-button-right',
-    });
+    // createButton(self, {
+    //   icon: 'play',
+    //   title: 'Preview',
+    //   attachTo: 'bbcodeToolbar',
+    //   onClick: 'onOpenDialog()',
+    //   className: 'bbcode-button bbcode-button-right',
+    // });
   };
 };

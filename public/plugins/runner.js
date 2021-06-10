@@ -113,7 +113,7 @@ export var Runner = function({ app, createButton, addSettingsItem }) {
       $(storyPreviewPlayButton).removeClass('disabled');
       $('.toggle-toolbar').removeClass('hidden');
       $('.editor-counter').removeClass('hidden');
-      app.previewStory.terminate();
+      self.previewStory.terminate();
     }
   };
 
@@ -154,5 +154,35 @@ export var Runner = function({ app, createButton, addSettingsItem }) {
       </div>
     `;
     document.getElementById('editorContainer').appendChild(element);
+
+    // Preview keyboard shortcuts
+    $(document).on('keydown', e => {
+      if (!app.editing() || self.previewStory.finished) return;
+
+      switch (e.keyCode) {
+        case app.input.keys.Z:
+          self.previewStory.changeTextScrollSpeed(10);
+          if (self.previewStory.vnSelectedChoice != -1)
+            self.previewStory.vnSelectChoice();
+          break;
+
+        case app.input.keys.Up:
+          if (self.previewStory.vnSelectedChoice != -1)
+            self.previewStory.vnUpdateChoice(-1);
+          break;
+
+        case app.input.keys.Down:
+          if (self.previewStory.vnSelectedChoice != -1)
+            self.previewStory.vnUpdateChoice(1);
+          break;
+      }
+    });
+    $(document).on('keyup', function(e) {
+      if (e.keyCode === app.input.keys.Z) {
+        self.previewStory.changeTextScrollSpeed(200);
+        if (self.previewStory.vnSelectedChoice != -1)
+          self.previewStory.vnSelectChoice();
+      }
+    });
   };
 };

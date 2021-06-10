@@ -1,5 +1,8 @@
 import { VarStore } from './var-store';
 import { Runner } from './runner';
+import { JsEditor } from './js-editor';
+
+const PLUGINS = [VarStore, Runner, JsEditor];
 
 export var Plugins = function(app) {
   const self = this;
@@ -118,7 +121,7 @@ export var Plugins = function(app) {
   };
 
   // plugin initiation
-  [VarStore, Runner].forEach(plugin => {
+  PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
       app,
       createButton,
