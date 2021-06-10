@@ -8,7 +8,6 @@ export var VarStore = function({
 }) {
   const self = this;
 
-  // const k = kaboom.default();
   this.onOpenDialog = async () => {
     let editor = null;
     const { value: formValues } = await Swal.fire({

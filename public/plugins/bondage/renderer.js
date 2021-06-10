@@ -1,4 +1,3 @@
-//TODO move this entire code ro plugins
 const bondage = require('bondage');
 const bbcode = require('bbcode');
 const yarnRunner = new bondage.Runner();

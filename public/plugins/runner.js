@@ -1,15 +1,8 @@
 import { yarnRender } from './bondage/renderer';
 
-export var Runner = function({
-  app,
-  createButton,
-  setPluginStore,
-  getPluginStore,
-  addSettingsItem,
-}) {
+export var Runner = function({ app, createButton, addSettingsItem }) {
   const self = this;
   app.plugins.runner = self;
-  console.log(app.plugins);
   const pluginAppPath = 'app.plugins.Runner';
 
   this.previewStory = new yarnRender();
@@ -109,7 +102,7 @@ export var Runner = function({
         'NVrichTextLabel',
         false,
         'commandDebugLabel',
-        app.playtestStyle,
+        app.settings.playtestStyle(),
         app.data.playtestVariables()
       );
     } else {
@@ -123,59 +116,33 @@ export var Runner = function({
       app.previewStory.terminate();
     }
   };
-  //  console.log(k);
-  this.onOpenDialog = async () => {
-    Swal.fire({
-      title: '💥Kaboomjs',
-      html: '<div id="jsEditor" style="min-height:70vh"/>',
-      focusConfirm: false,
-      showConfirmButton: false,
-      onOpen: () => {
-        // create the editor
-
-        // ace.require('ace/ext/language_tools');
-        // self.editor.setOptions({
-        //   mode: 'javascript',
-        //   value: 'console.log("yahoo")',
-        //   autoScrollEditorIntoView: true,
-        // });
-        console.log(self.editor);
-      },
-      preConfirm: () => {
-        // return editor.get();
-        return null;
-      },
-    });
-
-    // if (formValues) {
-    //     setPluginStore(self, 'fields', formValues);
-    //     app.data.playtestVariables(formValues);
-    // }
-  };
 
   this.onload = () => {
     // add actions
+    addSettingsItem({
+      title: 'Playtesting Style',
+      valueKey: 'playtestStyle',
+      defaultValue: 'chat',
+      optionsKey: 'availablePlaytestStyles',
+      options: [
+        { id: 'npc', name: 'Npc bubble' },
+        { id: 'chat', name: 'Chat messages' },
+      ],
+      setterKey: 'setPlaytestStyle',
+      settingsColumn: 'A',
+    });
   };
-  this.onYarnLoadedData = () => {
-    const localVariables = getPluginStore(self);
-    // app.data.playtestVariables(localVariables.fields || {});
-  };
+  this.onYarnLoadedData = () => {};
 
-  // <button id="storyPlayButton" className="bbcode-button bbcode-button-right" onClick="app.togglePlayMode(true)"
-  //         title="Preview">
-  //   <svg className="icon icon-play icon-lg icon-fw">
-  //     <use xlink:href="public/icons.svg#icon-play"></use>
-  //   </svg>
-  // </button>
+  document.addEventListener('yarnSavedNode', () => {
+    self.previewStory.terminate();
+  });
   this.onYarnEditorOpen = () => {
-    // create a button in the file menu
     createButton(self, {
       icon: 'play',
       title: 'Preview',
       attachTo: 'bbcodeToolbar',
       onClick: 'togglePlayMode(true)',
-      // onPointerDown:'',
-      // onDoubleClick:'',
       className: 'bbcode-button bbcode-button-right',
     });
 
@@ -186,7 +153,6 @@ export var Runner = function({
           <div id="commandDebugLabel"></div>
       </div>
     `;
-    console.log(`onpointerdown="${pluginAppPath}.advanceStoryPlayMode(30)"`);
     document.getElementById('editorContainer').appendChild(element);
   };
 };

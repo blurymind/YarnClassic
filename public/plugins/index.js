@@ -8,22 +8,52 @@ export var Plugins = function(app) {
     app.plugins[plugin.constructor.name] = plugin;
   };
 
-  //TODO
-  const addSettingsItem = () => {
-    return `
-                <div class="settings-item">
-              <label class="settings-label" for="theme">Playtesting Style</label>
+  const addSettingsItem = ({
+    title,
+    valueKey,
+    defaultValue,
+    optionsKey,
+    options,
+    setterKey,
+    settingsColumn,
+  }) => {
+    app.settings[valueKey] = ko
+      .observable(app.settings.storage.getItem(valueKey) || defaultValue)
+      .extend({ persist: valueKey });
+
+    app.ui[optionsKey] = options;
+    app[setterKey] = function(value, e) {
+      const newValue = e ? e.target.value : value;
+      app.settings[valueKey](newValue);
+    };
+
+    window.addEventListener('settingsOpened', () => {
+      const options = app.ui[optionsKey]
+        .map(
+          option =>
+            `<option value="${option.id}" ${
+              option.id === app.settings[valueKey]() ? 'selected="true"' : ''
+            }>${option.name}</option>`
+        )
+        .join('');
+      const settingsHtml = `
+              <label class="settings-label" for="theme">${title}</label>
               <div class="settings-value markup">
-                <select id="theme" data-bind="
-                  options: app.ui.availablePlaytestStyles,
-                  optionsText: 'name',
-                  optionsValue: 'id',
-                  value: app.settings.playtestStyle,
-                  event: { change: app.setPlaytestStyle }">
+                <select id="mySelect">
+                   ${options}
                 </select>
               </div>
-            </div>
     `;
+      const settingsElement = document.createElement('div');
+      settingsElement.className = 'settings-item';
+      settingsElement.innerHTML = settingsHtml;
+      document
+        .getElementById(`settingsColumn${settingsColumn || 'A'}`)
+        .appendChild(settingsElement);
+      document.getElementById('mySelect').addEventListener('change', e => {
+        app[setterKey](false, e);
+      });
+    });
   };
 
   // plugin local storage (see data class)
@@ -45,7 +75,6 @@ export var Plugins = function(app) {
     });
   };
 
-  // plugin helper methods
   const createButton = (
     plugin,
     {
@@ -59,13 +88,6 @@ export var Plugins = function(app) {
       onDoubleClick,
     }
   ) => {
-    // app.plugins[plugin.constructor.name] = plugin;
-    console.log(
-      plugin.constructor.name,
-      'button',
-      `onclick="click: app.plugins.${plugin.constructor.name}.${onClick}"`,
-      app
-    );
     const button = document.createElement('span');
     const iconName = icon || 'cog';
     button.innerHTML = `
@@ -102,7 +124,6 @@ export var Plugins = function(app) {
       createButton,
       getPluginStore,
       setPluginStore,
-      // addScriptToBody,
       addSettingsItem,
     });
 
