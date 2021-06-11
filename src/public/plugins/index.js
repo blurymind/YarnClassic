@@ -1,8 +1,7 @@
 import { VarStore } from './var-store';
 import { Runner } from './runner';
-import { JsEditor } from './js-editor';
 
-const PLUGINS = [VarStore, Runner, JsEditor];
+const PLUGINS = [VarStore, Runner];
 
 export var Plugins = function(app) {
   const self = this;
