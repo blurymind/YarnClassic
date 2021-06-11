@@ -25,6 +25,7 @@ import { RichTextFormatter } from './richTextFormatter';
 
 export var App = function(name, version) {
   const self = this;
+  this.utils = Utils;
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;

@@ -19,7 +19,7 @@ export var Utils = {
         var token = editor.session.getTokenAt(pos.row, pos.column);
         if (
           prefix.length < prefixLength ||
-          !allowedTokens.includes(token.type)
+          (allowedTokens && !allowedTokens.includes(token.type))
         ) {
           callback(null, []);
           return;
