@@ -5,8 +5,10 @@ export var VarStore = function({
   createButton,
   setPluginStore,
   getPluginStore,
+  onLoad,
 }) {
   const self = this;
+  this.name = self.constructor.name;
 
   this.onOpenDialog = async () => {
     let editor = null;
@@ -32,10 +34,12 @@ export var VarStore = function({
           require('./jsoneditor/json-editor-darktheme.css');
         }
 
-        const localVariables = getPluginStore(self);
+        const localVariables = getPluginStore(self.name);
         // set json
         editor.set(
-          typeof localVariables.fields !== 'object' ? {} : localVariables.fields
+          typeof localVariables.variables !== 'object'
+            ? {}
+            : localVariables.variables
         );
       },
       preConfirm: () => {
@@ -44,22 +48,16 @@ export var VarStore = function({
     });
 
     if (formValues) {
-      setPluginStore(self, 'fields', formValues);
-      app.data.playtestVariables(formValues);
+      setPluginStore(self.name, 'variables', formValues);
     }
   };
 
-  this.onload = () => {
+  onLoad(() => {
     // create a button in the file menu
-    createButton(self, {
+    createButton(self.name, {
       name: 'Variables',
       attachTo: 'fileMenuDropdown',
       onClick: 'onOpenDialog()',
     });
-  };
-  this.onYarnLoadedData = () => {
-    const localVariables = getPluginStore(self);
-    app.data.playtestVariables(localVariables.fields || {});
-  };
-  this.onYarnEditorOpen = () => {};
+  });
 };

@@ -431,7 +431,12 @@ export var yarnRender = function() {
       emiter.removeAllListeners();
     });
 
-    yarnRunner.load(yarnDataObject);
+    if (Array.isArray(yarnDataObject)) {
+      yarnRunner.load(yarnDataObject);
+    } else if ('nodes' in yarnDataObject) {
+      yarnRunner.load(yarnDataObject.nodes);
+    } else return;
+
     // yarnRunner.setVariableStorage(platestVariables);
     this.loadYarnChapter(startChapter);
     yarnRunner.variables.data = {};

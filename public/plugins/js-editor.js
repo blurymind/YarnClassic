@@ -1,3 +1,5 @@
+import { edit } from 'ace-builds';
+
 const kaboom = require('./kaboom/kaboom.mjs');
 
 export var JsEditor = function({
@@ -5,24 +7,27 @@ export var JsEditor = function({
   createButton,
   setPluginStore,
   getPluginStore,
+  onLoad,
 }) {
   const self = this;
-  this.editor = ko.observable(null);
+  this.name = self.constructor.name;
+
   this.k = null;
 
   //  console.log(k);
   this.onOpenDialog = async () => {
-    Swal.fire({
+    let editor = null;
+    const { value: formValues } = await Swal.fire({
       title: '💥Kaboomjs',
       html:
         '<div id="jsEditor" style="min-height:70vh"/><canvas id="kaboomCanvas"></canvas>',
       focusConfirm: false,
-      showConfirmButton: false,
+      showConfirmButton: true,
       onOpen: () => {
         // create the editor
 
         // ace.require('ace/ext/language_tools');
-        self.editor = ace.edit('jsEditor', {
+        editor = ace.edit('jsEditor', {
           theme: 'ace/theme/monokai',
           mode: 'ace/mode/javascript',
           value: 'console.log("yahoo");',
@@ -35,50 +40,55 @@ export var JsEditor = function({
           canvas: document.getElementById('kaboomCanvas'),
         });
         console.log(self.k, Object.getOwnPropertyNames(self.k));
-        // Object.getOwnPropertyNames(self.k).forEach(method => {
-        //   console.log(method, self.k[method].arguments());
-        // });
-        // self.editor.setOptions({
-        //   mode: 'javascript',
-        //   value: 'console.log("yahoo")',
-        //   autoScrollEditorIntoView: true,
-        // });
-        console.log(self.editor);
+        const langTools = ace.require('ace/ext/language_tools');
+
+        console.log(app.getOtherNodeTitles());
+        const nodeAutocompleter = app.utils.createAutocompleter(
+          false,
+          app.getOtherNodeTitles(),
+          'Node Link'
+        );
+        const kaboomAutocompleter = app.utils.createAutocompleter(
+          false,
+          Object.getOwnPropertyNames(self.k),
+          'Kaboomjs'
+        );
+        langTools.setCompleters([
+          nodeAutocompleter,
+          kaboomAutocompleter,
+          ...editor.completers,
+          langTools.keyWordCompleter,
+          langTools.textCompleter,
+          langTools.snippetCompleter,
+        ]);
+        editor.completers = [
+          nodeAutocompleter,
+          kaboomAutocompleter,
+          ...editor.completers,
+        ];
+
+        const localVariables = getPluginStore(self.name);
+        console.log(editor, localVariables);
+        editor.setValue(localVariables.kaboomjs || '');
       },
       preConfirm: () => {
-        // return editor.get();
-        self.k = null;
-        return null;
+        return editor.getValue();
       },
     });
 
-    // if (formValues) {
-    //     setPluginStore(self, 'fields', formValues);
-    //     app.data.playtestVariables(formValues);
-    // }
+    console.log(formValues);
+    if (formValues) {
+      setPluginStore(self.name, 'kaboomjs', formValues);
+    }
   };
 
-  this.onload = () => {
-    createButton(self, {
+  onLoad(() => {
+    createButton(self.name, {
       title: 'kaboomjs',
       attachTo: 'appHeader',
       onClick: 'onOpenDialog()',
       name: '💥Kaboomjs',
       className: 'menu dropdown',
     });
-  };
-  this.onYarnLoadedData = () => {
-    const localVariables = getPluginStore(self);
-    // app.data.playtestVariables(localVariables.fields || {});
-  };
-  this.onYarnEditorOpen = () => {
-    // create a button in the file menu
-    // createButton(self, {
-    //   icon: 'play',
-    //   title: 'Preview',
-    //   attachTo: 'bbcodeToolbar',
-    //   onClick: 'onOpenDialog()',
-    //   className: 'bbcode-button bbcode-button-right',
-    // });
-  };
+  });
 };
