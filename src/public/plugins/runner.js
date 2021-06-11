@@ -5,6 +5,8 @@ export var Runner = function({
   createButton,
   addSettingsItem,
   getPluginStore,
+  onYarnEditorOpen,
+  onLoad,
 }) {
   const self = this;
   app.plugins.runner = self;
@@ -125,7 +127,7 @@ export var Runner = function({
     }
   };
 
-  this.onload = () => {
+  onLoad(() => {
     // add actions
     addSettingsItem({
       title: 'Playtesting Style',
@@ -139,13 +141,12 @@ export var Runner = function({
       setterKey: 'setPlaytestStyle',
       settingsColumn: 'A',
     });
-  };
-  this.onYarnLoadedData = () => {};
+  });
 
   document.addEventListener('yarnSavedNode', () => {
     self.previewStory.terminate();
   });
-  this.onYarnEditorOpen = () => {
+  onYarnEditorOpen(() => {
     createButton(self.name, {
       icon: 'play',
       title: 'Preview',
@@ -192,5 +193,5 @@ export var Runner = function({
           self.previewStory.vnSelectChoice();
       }
     });
-  };
+  });
 };

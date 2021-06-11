@@ -126,6 +126,22 @@ export var Plugins = function(app) {
     return button;
   };
 
+  // yarneditor lifecycle events
+  const onYarnLoadedData = cb => {
+    window.addEventListener('yarnLoadedData', e => {
+      cb(e);
+    });
+  };
+  const onYarnEditorOpen = cb => {
+    window.addEventListener('yarnEditorOpen', e => {
+      cb(e);
+    });
+  };
+  const onLoad = cb => {
+    window.addEventListener('DOMContentLoaded', e => {
+      cb(e);
+    });
+  };
   // plugin initiation
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
@@ -134,17 +150,13 @@ export var Plugins = function(app) {
       getPluginStore,
       setPluginStore,
       addSettingsItem,
+      onYarnLoadedData,
+      onYarnEditorOpen,
+      onLoad,
     });
 
     window.addEventListener('DOMContentLoaded', e => {
       registerPlugin(initializedPlugin);
-      initializedPlugin.onload();
-    });
-    window.addEventListener('yarnLoadedData', e => {
-      initializedPlugin.onYarnLoadedData(e);
-    });
-    window.addEventListener('yarnEditorOpen', e => {
-      initializedPlugin.onYarnEditorOpen(e);
     });
   });
 };

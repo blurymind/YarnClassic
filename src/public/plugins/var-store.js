@@ -5,6 +5,7 @@ export var VarStore = function({
   createButton,
   setPluginStore,
   getPluginStore,
+  onLoad,
 }) {
   const self = this;
   this.name = self.constructor.name;
@@ -51,14 +52,12 @@ export var VarStore = function({
     }
   };
 
-  this.onload = () => {
+  onLoad(() => {
     // create a button in the file menu
     createButton(self.name, {
       name: 'Variables',
       attachTo: 'fileMenuDropdown',
       onClick: 'onOpenDialog()',
     });
-  };
-  this.onYarnLoadedData = () => {};
-  this.onYarnEditorOpen = () => {};
+  });
 };
