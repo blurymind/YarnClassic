@@ -1,5 +1,8 @@
 import { VarStore } from './var-store';
 import { Runner } from './runner';
+import { JsEditor } from './js-editor';
+
+const PLUGINS = [VarStore, Runner, JsEditor];
 
 export var Plugins = function(app) {
   const self = this;
@@ -7,6 +10,34 @@ export var Plugins = function(app) {
   const registerPlugin = plugin => {
     app.plugins[plugin.constructor.name] = plugin;
   };
+  this.pluginStorage = ko.observable({});
+  const getPluginStore = pluginName => {
+    if (!self.pluginStorage()[pluginName]) {
+      self.pluginStorage({
+        ...self.pluginStorage(),
+        [pluginName]: {},
+      });
+    }
+    return this.pluginStorage()[pluginName];
+  };
+  const setPluginStore = (pluginName, key, val) => {
+    const storeVals = { ...getPluginStore(pluginName), [key]: val };
+    self.pluginStorage({
+      ...self.pluginStorage(),
+      [pluginName]: storeVals,
+    });
+  };
+
+  window.addEventListener('yarnLoadedData', e => {
+    if (app.data.documentHeader() !== null) {
+      const documentHeader = app.data.documentHeader();
+      if ('pluginStorage' in documentHeader)
+        self.pluginStorage(documentHeader.pluginStorage);
+    }
+  });
+  window.addEventListener('newYarnFileStarted', e => {
+    self.pluginStorage({});
+  });
 
   const addSettingsItem = ({
     title,
@@ -56,27 +87,8 @@ export var Plugins = function(app) {
     });
   };
 
-  // plugin local storage (see data class)
-  this.pluginStorage = ko.observable({});
-  const getPluginStore = plugin => {
-    if (!this.pluginStorage()[plugin.constructor.name]) {
-      this.pluginStorage({
-        ...this.pluginStorage(),
-        [plugin.constructor.name]: {},
-      });
-    }
-    return this.pluginStorage()[plugin.constructor.name];
-  };
-  const setPluginStore = (plugin, key, val) => {
-    const storeVals = { ...getPluginStore(plugin), [key]: val };
-    this.pluginStorage({
-      ...self.pluginStorage(),
-      [plugin.constructor.name]: storeVals,
-    });
-  };
-
   const createButton = (
-    plugin,
+    pluginName,
     {
       name,
       icon,
@@ -92,18 +104,16 @@ export var Plugins = function(app) {
     const iconName = icon || 'cog';
     button.innerHTML = `
       <span class="item ${className || ''}" title="${title || ''}" ${
-      onClick
-        ? `onclick="click: app.plugins.${plugin.constructor.name}.${onClick}"`
-        : ''
+      onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
     }
        ${
          onPointerDown
-           ? ` onpointerdown="app.plugins.${plugin.constructor.name}.${onPointerDown}"`
+           ? ` onpointerdown="app.plugins.${pluginName}.${onPointerDown}"`
            : ''
        }
               ${
                 onDoubleClick
-                  ? `ondblclick="app.plugins.${plugin.constructor.name}.${onDoubleClick}"`
+                  ? `ondblclick="app.plugins.${pluginName}.${onDoubleClick}"`
                   : ''
               }
        >
@@ -118,7 +128,7 @@ export var Plugins = function(app) {
   };
 
   // plugin initiation
-  [VarStore, Runner].forEach(plugin => {
+  PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
       app,
       createButton,

@@ -1,8 +1,15 @@
 import { yarnRender } from './bondage/renderer';
 
-export var Runner = function({ app, createButton, addSettingsItem }) {
+export var Runner = function({
+  app,
+  createButton,
+  addSettingsItem,
+  getPluginStore,
+}) {
   const self = this;
   app.plugins.runner = self;
+  this.name = self.constructor.name;
+
   const pluginAppPath = 'app.plugins.Runner';
 
   this.previewStory = new yarnRender();
@@ -93,6 +100,7 @@ export var Runner = function({ app, createButton, addSettingsItem }) {
           );
         }
       });
+      const localVariables = getPluginStore('VarStore');
       self.previewStory.initYarn(
         JSON.parse(app.data.getSaveData('json')),
         app
@@ -103,7 +111,7 @@ export var Runner = function({ app, createButton, addSettingsItem }) {
         false,
         'commandDebugLabel',
         app.settings.playtestStyle(),
-        app.data.playtestVariables()
+        localVariables.variables || {}
       );
     } else {
       //edit mode
@@ -138,7 +146,7 @@ export var Runner = function({ app, createButton, addSettingsItem }) {
     self.previewStory.terminate();
   });
   this.onYarnEditorOpen = () => {
-    createButton(self, {
+    createButton(self.name, {
       icon: 'play',
       title: 'Preview',
       attachTo: 'bbcodeToolbar',

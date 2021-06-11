@@ -13,7 +13,6 @@ export const data = {
   isDocumentDirty: ko.observable(false),
   restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
-  playtestVariables: ko.observable({}),
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
@@ -34,8 +33,9 @@ export const data = {
     app.workspace.warpToNodeByIdx(0);
     data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
-    data.playtestVariables({});
     app.refreshWindowTitle();
+    const event = new CustomEvent('newYarnFileStarted');
+    window.parent.dispatchEvent(event);
   },
   askForFileName: function() {
     Swal.fire({
@@ -85,7 +85,6 @@ export const data = {
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
         pluginStorage: app.plugins.pluginStorage(),
-        playtestVariables: data.playtestVariables(),
       })
     );
   },
@@ -109,7 +108,6 @@ export const data = {
         transform,
         scale,
         pluginStorage,
-        playtestVariables,
       } = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
@@ -127,12 +125,9 @@ export const data = {
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
       app.plugins.pluginStorage(pluginStorage);
-      data.playtestVariables(playtestVariables);
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
-      // Callback for embedding in other webapps
-      data.dispatchEventDataLoaded();
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -455,6 +450,7 @@ export const data = {
           language: app.settings.language(),
           markupLanguage: app.settings.markupLanguage(),
           filetypeVersion: app.settings.filetypeVersion(),
+          pluginStorage: app.plugins.pluginStorage(),
         });
         output = JSON.stringify(
           { header: data.documentHeader(), nodes: content },
