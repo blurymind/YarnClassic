@@ -88,6 +88,8 @@ export const data = {
         pluginStorage: app.plugins.pluginStorage(),
       })
     );
+    const event = new CustomEvent('yarnSavedStateToLocalStorage');
+    window.parent.dispatchEvent(event);
   },
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return;
@@ -129,6 +131,8 @@ export const data = {
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
+      const event = new CustomEvent('yarnLoadedStateFromLocalStorage');
+      window.parent.dispatchEvent(event);
     }
   },
   readFile: function(file, filename, clearNodes) {

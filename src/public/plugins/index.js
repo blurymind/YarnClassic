@@ -193,6 +193,16 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+  const onYarnLoadedStateFromLocalStorage = cb => {
+    window.addEventListener('yarnLoadedStateFromLocalStorage', e => {
+      cb(e);
+    });
+  };
+  const onYarnSavedStateToLocalStorage = cb => {
+    window.addEventListener('yarnSavedStateToLocalStorage', e => {
+      cb(e);
+    });
+  };
   const onKeyUp = cb => {
     $(document).on('keyup', e => {
       cb(e);
@@ -217,6 +227,8 @@ export var Plugins = function(app) {
       onYarnInPreviewMode,
       onYarnSavedNode,
       onYarnSetLanguage,
+      onYarnLoadedStateFromLocalStorage,
+      onYarnSavedStateToLocalStorage,
       onKeyUp,
       onKeyDown,
       onLoad,
