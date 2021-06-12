@@ -10,10 +10,7 @@ export var Runner = function({
 }) {
   const self = this;
   app.plugins.runner = self;
-  this.name = self.constructor.name;
-
-  const pluginAppPath = 'app.plugins.Runner';
-
+  this.name = 'Runner';
   this.previewStory = new yarnRender();
 
   this.togglePreviewMode = function(previewModeOverwrite) {
@@ -157,7 +154,7 @@ export var Runner = function({
 
     const element = document.createElement('div');
     element.innerHTML = `
-      <div class="editor-play" id="editor-play" onpointerdown="${pluginAppPath}.advanceStoryPlayMode(30)" ondblclick="${pluginAppPath}.advanceStoryPlayMode()">
+      <div class="editor-play" id="editor-play" onpointerdown="app.plugins.${self.name}.advanceStoryPlayMode(30)" ondblclick="app.plugins.${self.name}.advanceStoryPlayMode()">
           <p class="story-playtest-answer" id="NVrichTextLabel"></p>
           <div id="commandDebugLabel"></div>
       </div>

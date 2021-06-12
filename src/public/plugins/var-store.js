@@ -8,7 +8,7 @@ export var VarStore = function({
   onLoad,
 }) {
   const self = this;
-  this.name = self.constructor.name;
+  this.name = 'VarStore';
 
   this.onOpenDialog = async () => {
     let editor = null;

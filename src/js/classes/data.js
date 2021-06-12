@@ -69,6 +69,7 @@ export const data = {
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
+    // console.log('Update storage', app.plugins.pluginStorage());
     storage.setItem(
       'appState',
       JSON.stringify({
@@ -239,7 +240,7 @@ export const data = {
   restoreSettingsFromDocumentHeader: function() {
     if (data.documentHeader() !== null) {
       const documentHeader = data.documentHeader();
-      console.log('RESTORE data from header:', documentHeader);
+      console.log('Apply settings from file header:', documentHeader);
       if ('markupLanguage' in documentHeader)
         app.settings.markupLanguage(documentHeader.markupLanguage);
       if ('language' in documentHeader)
@@ -440,7 +441,6 @@ export const data = {
 
     if (type == FILETYPE.JSON) {
       // store useful values for later use if the file type supports it
-      console.log(app.settings.filetypeVersion());
       if (app.settings.filetypeVersion() === '2') {
         console.log('Saving as Yarn json v2 type');
         const date = new Date();
