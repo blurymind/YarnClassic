@@ -128,6 +128,16 @@ export var Plugins = function(app) {
   };
 
   // yarneditor lifecycle events
+  const onYarnInPreviewMode = cb => {
+    window.addEventListener('yarnSavedNode', e => {
+      cb(e);
+    });
+  };
+  const onYarnSavedNode = cb => {
+    window.addEventListener('yarnInPreviewMode', e => {
+      cb(e);
+    });
+  };
   const onYarnLoadedData = cb => {
     window.addEventListener('yarnLoadedData', e => {
       cb(e);
@@ -153,6 +163,8 @@ export var Plugins = function(app) {
       addSettingsItem,
       onYarnLoadedData,
       onYarnEditorOpen,
+      onYarnInPreviewMode,
+      onYarnSavedNode,
       onLoad,
     });
 

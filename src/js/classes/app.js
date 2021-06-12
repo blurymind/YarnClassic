@@ -1238,19 +1238,34 @@ export var App = function(name, version) {
     const editorPreviewer = $('#editor-preview')[0];
 
     self.isEditorInPreviewMode = previewModeOverwrite;
-    $('.bbcode-toolbar').removeClass('hidden');
-    self.editor.session.setScrollTop(editorPreviewer.scrollTop);
-    editorPreviewer.innerHTML = '';
-    editorPreviewer.style.display = 'none';
-    editor.style.display = 'flex';
-    self.editor.focus();
-    self.editor.resize();
-    //close any pop up helpers tooltip class
-    if ($('#colorPicker-container').is(':visible')) {
-      $('#colorPicker-container').hide();
-    }
-    if ($('#emojiPicker-container').is(':visible')) {
-      $('#emojiPicker-container').hide();
+    if (previewModeOverwrite) {
+      $('.bbcode-toolbar').addClass('hidden');
+      //preview mode
+      editor.style.display = 'none';
+      editorPreviewer.style.display = 'block';
+      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(
+        self.editing().body(),
+        true
+      );
+      editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
+
+      const event = new CustomEvent('yarnInPreviewMode');
+      window.parent.dispatchEvent(event);
+    } else {
+      $('.bbcode-toolbar').removeClass('hidden');
+      self.editor.session.setScrollTop(editorPreviewer.scrollTop);
+      editorPreviewer.innerHTML = '';
+      editorPreviewer.style.display = 'none';
+      editor.style.display = 'flex';
+      self.editor.focus();
+      self.editor.resize();
+      //close any pop up helpers tooltip class
+      if ($('#colorPicker-container').is(':visible')) {
+        $('#colorPicker-container').hide();
+      }
+      if ($('#emojiPicker-container').is(':visible')) {
+        $('#emojiPicker-container').hide();
+      }
     }
   };
 

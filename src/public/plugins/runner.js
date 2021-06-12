@@ -6,50 +6,14 @@ export var Runner = function({
   addSettingsItem,
   getPluginStore,
   onYarnEditorOpen,
+  onYarnInPreviewMode,
+  onYarnSavedNode,
   onLoad,
 }) {
   const self = this;
   this.name = 'Runner';
 
   this.previewStory = new yarnRender();
-
-  this.togglePreviewMode = function(previewModeOverwrite) {
-    const editor = $('.editor')[0];
-    const editorPreviewer = $('#editor-preview')[0];
-
-    app.isEditorInPreviewMode = previewModeOverwrite;
-    if (previewModeOverwrite) {
-      if (self.isEditorInPlayMode) {
-        self.togglePlayMode(false);
-        self.gotoLastPlayNode();
-      }
-      $('.bbcode-toolbar').addClass('hidden');
-      //preview mode
-      editor.style.display = 'none';
-      editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(
-        self.editing().body(),
-        true
-      );
-      editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
-    } else {
-      //edit mode
-      $('.bbcode-toolbar').removeClass('hidden');
-      app.editor.session.setScrollTop(editorPreviewer.scrollTop);
-      editorPreviewer.innerHTML = '';
-      editorPreviewer.style.display = 'none';
-      editor.style.display = 'flex';
-      app.editor.focus();
-      app.editor.resize();
-      //close any pop up helpers tooltip class
-      if ($('#colorPicker-container').is(':visible')) {
-        $('#colorPicker-container').hide();
-      }
-      if ($('#emojiPicker-container').is(':visible')) {
-        $('#emojiPicker-container').hide();
-      }
-    }
-  };
 
   this.gotoLastPlayNode = function() {
     if (
@@ -81,7 +45,7 @@ export var Runner = function({
     var editorPlayPreviewer = document.getElementById('editor-play');
     self.isEditorInPlayMode = playModeOverwrite;
     if (playModeOverwrite) {
-      self.togglePreviewMode(false);
+      app.togglePreviewMode(false);
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
@@ -140,9 +104,9 @@ export var Runner = function({
     });
   });
 
-  document.addEventListener('yarnSavedNode', () => {
-    self.previewStory.terminate();
-  });
+  onYarnInPreviewMode(() => self.togglePlayMode(false));
+  onYarnSavedNode(() => self.togglePlayMode(false));
+
   onYarnEditorOpen(() => {
     createButton(self.name, {
       icon: 'play',
