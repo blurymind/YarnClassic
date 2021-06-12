@@ -300,6 +300,7 @@ export var App = function(name, version) {
       false
     );
 
+    // TODO move to transcribe plugin
     this.speakText = function() {
       const selectedText = self.editor.getSelectedText();
       const say = selectedText
@@ -310,6 +311,7 @@ export var App = function(name, version) {
         const lookUp = self.settings.language().split('-')[0];
         const voices = countries.filter(v => !v.lang.indexOf(lookUp));
 
+        console.log(lookUp, voices);
         if (voices.length) {
           console.log('Loaded voice', voices[0]);
           spoken.say(say, voices[0]);
@@ -319,6 +321,7 @@ export var App = function(name, version) {
       });
     };
 
+    // TODO move to transcribe plugin
     this.startCapture = function() {
       spoken
         .listen({ continuous: true })
@@ -355,13 +358,13 @@ export var App = function(name, version) {
         })
         .catch(e => spoken.listen.stop().then(() => this.continueCapture()));
     };
-
+    // TODO move to transcribe plugin
     this.continueCapture = function() {
       spoken.delay(500).then(() => {
         if (spoken.recognition.continuous) self.startCapture();
       });
     };
-
+    // TODO move to transcribe plugin
     this.toggleTranscribing = function() {
       const available = spoken.listen.available();
       var speakBubble = document.getElementById('speakTextBtnBubble');
@@ -382,6 +385,7 @@ export var App = function(name, version) {
       }
     };
 
+    // TODO move to transcribe plugin
     this.hearText = function() {
       const available = spoken.listen.available();
       if (!available) {
@@ -1238,6 +1242,8 @@ export var App = function(name, version) {
     const editorPreviewer = $('#editor-preview')[0];
 
     self.isEditorInPreviewMode = previewModeOverwrite;
+    const event = new CustomEvent('yarnInPreviewMode');
+    window.parent.dispatchEvent(event);
     if (previewModeOverwrite) {
       $('.bbcode-toolbar').addClass('hidden');
       //preview mode
@@ -1248,9 +1254,6 @@ export var App = function(name, version) {
         true
       );
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
-
-      const event = new CustomEvent('yarnInPreviewMode');
-      window.parent.dispatchEvent(event);
     } else {
       $('.bbcode-toolbar').removeClass('hidden');
       self.editor.session.setScrollTop(editorPreviewer.scrollTop);

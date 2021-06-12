@@ -98,9 +98,13 @@ export var Plugins = function(app) {
       title,
       onPointerDown,
       onDoubleClick,
+      id,
     }
   ) => {
+    if (document.getElementById(id) !== null) return;
+
     const button = document.createElement('span');
+    button.id = id || name || title || icon;
     const iconName = icon || 'cog';
     button.innerHTML = `
       <span class="item ${className || ''}" title="${title || ''}" ${
