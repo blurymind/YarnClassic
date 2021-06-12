@@ -8,6 +8,8 @@ export var Runner = function({
   onYarnEditorOpen,
   onYarnInPreviewMode,
   onYarnSavedNode,
+  onKeyUp,
+  onKeyDown,
   onLoad,
 }) {
   const self = this;
@@ -38,9 +40,9 @@ export var Runner = function({
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    var editor = $('.editor')[0];
-    var storyPreviewPlayButton = document.getElementById('storyPlayButton');
-    var editorPlayPreviewer = document.getElementById('editor-play');
+    const editor = $('.editor')[0];
+    const storyPreviewPlayButton = document.getElementById('storyPlayButton');
+    const editorPlayPreviewer = document.getElementById('editor-play');
     self.isEditorInPlayMode = playModeOverwrite;
     if (playModeOverwrite) {
       //preview play mode
@@ -78,6 +80,7 @@ export var Runner = function({
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       $(storyPreviewPlayButton).removeClass('disabled');
+      $('.bbcode-toolbar').removeClass('hidden');
       $('.toggle-toolbar').removeClass('hidden');
       $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
@@ -105,7 +108,7 @@ export var Runner = function({
 
   onYarnEditorOpen(() => {
     createButton(self.name, {
-      icon: 'play',
+      iconName: 'play',
       title: 'Preview',
       attachTo: 'bbcodeToolbar',
       onClick: 'togglePlayMode(true)',
@@ -122,10 +125,8 @@ export var Runner = function({
     `;
     document.getElementById('editorContainer').appendChild(element);
 
-    // Preview keyboard shortcuts
-    $(document).on('keydown', e => {
+    onKeyDown(e => {
       if (!app.editing() || self.previewStory.finished) return;
-
       switch (e.keyCode) {
         case app.input.keys.Z:
           self.previewStory.changeTextScrollSpeed(10);
@@ -144,7 +145,7 @@ export var Runner = function({
           break;
       }
     });
-    $(document).on('keyup', function(e) {
+    onKeyUp(e => {
       if (e.keyCode === app.input.keys.Z) {
         self.previewStory.changeTextScrollSpeed(200);
         if (self.previewStory.vnSelectedChoice != -1)

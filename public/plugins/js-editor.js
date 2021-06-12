@@ -1,5 +1,19 @@
 import { genPreview } from './kaboom/genGame';
 
+const helloKaboom = `
+kaboom({
+  global: true,
+  fullscreen: true,
+  scale: 1,
+});
+
+scene("main", () => {
+  add([ text("hello from kaboom ;)"), pos(100, 100),]);
+});
+
+start("main");
+`;
+
 export var JsEditor = function({
   app,
   createButton,
@@ -71,7 +85,7 @@ export var JsEditor = function({
           editor.focus();
         };
         const localVariables = getPluginStore(self.name);
-        editor.setValue(localVariables.kaboomjs || '');
+        editor.setValue(localVariables.kaboomjs || helloKaboom);
 
         const reRun = () => {
           kaboomIframe.srcdoc = genPreview(editor.getValue());

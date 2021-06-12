@@ -58,6 +58,7 @@ export var VarStore = function({
       name: 'Variables',
       attachTo: 'fileMenuDropdown',
       onClick: 'onOpenDialog()',
+      iconName: 'cog',
     });
   });
 };
