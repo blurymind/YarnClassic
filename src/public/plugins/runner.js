@@ -45,6 +45,7 @@ export var Runner = function({
     if (playModeOverwrite) {
       //preview play mode
       editor.style.display = 'none';
+      $('.bbcode-toolbar').addClass('hidden');
       editorPlayPreviewer.style.display = 'flex';
       $(storyPreviewPlayButton).addClass('disabled');
       self.previewStory.emiter.on('finished', function() {
