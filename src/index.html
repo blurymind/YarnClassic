@@ -260,7 +260,6 @@
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
-          <button class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.speakText()" title="Hear Text"><svg class="icon icon-voice icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-voice"></use></svg></button>
 
           <span class="show-when-narrow">
             <button class="bbcode-button bbcode-button-right" onclick="app.editor.redo()" title="Redo"><svg class="icon icon-undo icon-lg icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-undo"></use></svg></button>
@@ -313,7 +312,7 @@
           <span class="hide-when-narrow">&nbsp;</span>
           Column Index: <span class="column-index">0</span>
         </div>
-        <div class="toggle-toolbar hide-when-narrow">
+        <div class="toggle-toolbar hide-when-narrow" id="editorFooter">
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="styled-checkbox">
             <input id="toglShowCounter" type="checkbox" data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"></input>
@@ -334,12 +333,6 @@
           <span class="styled-checkbox">
             <input id="toglAutoCloseBrackets" type="checkbox" data-bind="checked: app.settings.autoCloseBrackets" onclick="app.toggleAutoCloseBrackets()"></input>
             <label for="toglAutoCloseBrackets" title="Auto Close Brackets"><svg class="icon icon-code icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-code"></use></svg></label>
-          </span>
-          <span class="styled-checkbox">
-            <input class="styled-checkbox" type="checkbox" id="toglTranscribing" data-bind="checked: app.settings.transcribeEnabled, event: { change: app.toggleTranscribing }"></input>
-            <label for="toglTranscribing" title="Transcribe" class="transcribe-button"><span title="Transcribe" class="button-bubble" id="speakTextBtnBubble"></span>
-              <svg class="icon icon-microphone icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-microphone"></use></svg>
-            </label>
           </span>
         </div>
       </div>

@@ -1,7 +1,9 @@
 import { VarStore } from './var-store';
 import { Runner } from './runner';
+// import { JsEditor } from './js-editor';
+import { Transcribe } from './transcribe';
 
-const PLUGINS = [VarStore, Runner];
+const PLUGINS = [VarStore, Runner, Transcribe];
 
 export var Plugins = function(app) {
   const self = this;
@@ -58,6 +60,7 @@ export var Plugins = function(app) {
       app.settings[valueKey](newValue);
     };
 
+    // Dom rendering helper methods
     window.addEventListener('settingsOpened', () => {
       const options = app.ui[optionsKey]
         .map(
@@ -131,6 +134,32 @@ export var Plugins = function(app) {
     return button;
   };
 
+  const createToggle = (
+    pluginName,
+    {
+      attachTo,
+      className,
+      title,
+      tooltipId,
+      toggleValueKey,
+      onToggle,
+      enableKey,
+      iconName,
+    }
+  ) => {
+    const toggleButton = document.createElement('span');
+    toggleButton.className = 'styled-checkbox';
+    toggleButton.innerHTML = `
+            <input class="styled-checkbox" type="checkbox" id="${toggleValueKey}" data-bind="checked: app.plugins.${pluginName}.${enableKey}, event: { change: app.plugins.${pluginName}.${onToggle} }"></input>
+            <label for="${toggleValueKey}" title="${title}" class="${className}"><span title="${title}" class="button-bubble" id="${tooltipId}"></span>
+              <svg class="icon icon-${iconName} icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
+            </label>
+    `;
+    document.getElementById(attachTo).appendChild(toggleButton);
+
+    return toggleButton;
+  };
+
   // yarneditor lifecycle events
   const onYarnInPreviewMode = cb => {
     window.addEventListener('yarnSavedNode', e => {
@@ -157,11 +186,17 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+  const onYarnSetLanguage = cb => {
+    window.addEventListener('yarnSetLanguage', e => {
+      cb(e);
+    });
+  };
   // plugin initiation
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
       app,
       createButton,
+      createToggle,
       getPluginStore,
       setPluginStore,
       addSettingsItem,
@@ -169,6 +204,7 @@ export var Plugins = function(app) {
       onYarnEditorOpen,
       onYarnInPreviewMode,
       onYarnSavedNode,
+      onYarnSetLanguage,
       onLoad,
     });
 

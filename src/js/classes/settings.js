@@ -89,9 +89,6 @@ export const Settings = function(app) {
     )
     .extend({ persist: 'spellcheckEnabled' });
 
-  // Transcribe enabled
-  this.transcribeEnabled = ko.observable(false);
-
   // Auto Close Tags
   this.autoCloseTags = ko
     .observable(

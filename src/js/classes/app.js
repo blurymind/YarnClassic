@@ -39,8 +39,10 @@ export var App = function(name, version) {
 
   this.setLanguage = function(language, e) {
     const languageId = e ? e.target.value : language;
-    spoken.recognition.lang = languageId;
     load_dictionary(self.settings.language().split('-')[0]);
+    const event = new CustomEvent('yarnSetLanguage');
+    event.language = languageId;
+    window.parent.dispatchEvent(event);
   };
 
   this.setMarkupLanguage = function(language, e) {
@@ -299,117 +301,6 @@ export var App = function(name, version) {
       },
       false
     );
-
-    // TODO move to transcribe plugin
-    this.speakText = function() {
-      const selectedText = self.editor.getSelectedText();
-      const say = selectedText
-        ? selectedText
-        : self.editor.getSession().getValue();
-
-      spoken.voices().then(countries => {
-        const lookUp = self.settings.language().split('-')[0];
-        const voices = countries.filter(v => !v.lang.indexOf(lookUp));
-
-        console.log(lookUp, voices);
-        if (voices.length) {
-          console.log('Loaded voice', voices[0]);
-          spoken.say(say, voices[0]);
-        } else {
-          spoken.say(say);
-        }
-      });
-    };
-
-    // TODO move to transcribe plugin
-    this.startCapture = function() {
-      spoken
-        .listen({ continuous: true })
-        .then(transcript => {
-          console.log(transcript);
-          if (self.editing()) {
-            self.insertTextAtCursor(transcript + '. ');
-            document.getElementById('speakTextBtnBubble').title = 'Transcribe';
-          } else {
-            if (transcript === 'open') {
-              console.log('try open...');
-              var firstFoundTitle = self
-                .getFirstFoundNode(self.$searchField.val().toLowerCase())
-                .title();
-              console.log('try open:', firstFoundTitle);
-              self.openNodeByTitle(firstFoundTitle);
-            } else if (transcript === 'clear') {
-              self.$searchField.val('');
-              self.updateSearch();
-            } else {
-              self.$searchField.val(transcript);
-              self.updateSearch();
-            }
-          }
-
-          spoken.listen.stop().then(() => {
-            if (self.editing()) {
-              document.getElementById('speakTextBtnBubble').style.visibility =
-                'hidden';
-            }
-
-            this.continueCapture();
-          });
-        })
-        .catch(e => spoken.listen.stop().then(() => this.continueCapture()));
-    };
-    // TODO move to transcribe plugin
-    this.continueCapture = function() {
-      spoken.delay(500).then(() => {
-        if (spoken.recognition.continuous) self.startCapture();
-      });
-    };
-    // TODO move to transcribe plugin
-    this.toggleTranscribing = function() {
-      const available = spoken.listen.available();
-      var speakBubble = document.getElementById('speakTextBtnBubble');
-      if (available && self.settings.transcribeEnabled()) {
-        spoken.listen.on.partial(ts => {
-          if (self.editing()) {
-            speakBubble.style.visibility = 'visible';
-            speakBubble.title = `🗣️ ${ts} 🦜`;
-          } else {
-            self.$searchField.val(`🗣️ ${ts} 🦜`);
-          }
-        });
-        self.startCapture();
-      } else {
-        speakBubble.style.visibility = 'hidden';
-        spoken.recognition.continuous = false;
-        spoken.listen.stop();
-      }
-    };
-
-    // TODO move to transcribe plugin
-    this.hearText = function() {
-      const available = spoken.listen.available();
-      if (!available) {
-        Swal.fire({
-          title: 'Speech recognition not avaiilable!',
-          icon: 'error',
-        });
-        return;
-      }
-
-      // spoken.listen.on.partial(ts => ($("#speakTextBtn").title = ts));
-      spoken.listen.on.partial(ts => {
-        console.log(ts);
-        document.getElementById('speakTextBtnBubble').title = `🗣️ ${ts} 🦜`;
-      });
-
-      spoken
-        .listen()
-        .then(transcript => {
-          self.insertTextAtCursor(transcript + ' ');
-          document.getElementById('speakTextBtnBubble').title = 'Transcribe';
-        })
-        .catch(error => console.warn(error.message));
-    };
 
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
@@ -924,8 +815,6 @@ export var App = function(name, version) {
 
     /// init spell check
     enable_spellcheck();
-
-    self.toggleTranscribing();
     self.toggleInvertColors();
     self.toggleShowCounter();
     self.toggleSpellCheck();
