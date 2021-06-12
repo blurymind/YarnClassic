@@ -1,6 +1,4 @@
-// import { VarStore } from './var-store';
 import { Runner } from './runner';
-// import { JsEditor } from './js-editor';
 import { Transcribe } from './transcribe';
 
 const PLUGINS = [Runner, Transcribe];
