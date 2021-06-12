@@ -1,9 +1,9 @@
-import { VarStore } from './var-store';
+// import { VarStore } from './var-store';
 import { Runner } from './runner';
 // import { JsEditor } from './js-editor';
 import { Transcribe } from './transcribe';
 
-const PLUGINS = [VarStore, Runner, Transcribe];
+const PLUGINS = [Runner, Transcribe];
 
 export var Plugins = function(app) {
   const self = this;

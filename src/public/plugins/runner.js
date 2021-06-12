@@ -1,4 +1,5 @@
 import { yarnRender } from './bondage/renderer';
+const { JSONEditor } = require('./jsoneditor/jsoneditor.min');
 
 export var Runner = function({
   app,
@@ -11,6 +12,7 @@ export var Runner = function({
   onKeyUp,
   onKeyDown,
   onLoad,
+  setPluginStore,
 }) {
   const self = this;
   this.name = 'Runner';
@@ -61,7 +63,8 @@ export var Runner = function({
           );
         }
       });
-      const localVariables = getPluginStore('VarStore');
+      const localVariables = getPluginStore(self.name);
+      console.log('variables', localVariables);
       self.previewStory.initYarn(
         JSON.parse(app.data.getSaveData('json')),
         app
@@ -72,7 +75,7 @@ export var Runner = function({
         false,
         'commandDebugLabel',
         app.settings.playtestStyle(),
-        localVariables.variables || {}
+        localVariables.variables ? localVariables.variables.playTest || {} : {}
       );
     } else {
       //edit mode
@@ -84,6 +87,67 @@ export var Runner = function({
       $('.toggle-toolbar').removeClass('hidden');
       $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
+    }
+  };
+
+  // Variables editor dialog
+  this.onOpenDialog = async () => {
+    let editor = null;
+    const { value: formValues } = await Swal.fire({
+      title: 'Playtest starting variables',
+      html: '<div class="json-editor-wrapper"><div id="jsoneditor"/></div>',
+      focusConfirm: false,
+      onOpen: () => {
+        // create the editor
+        require('./jsoneditor/size-overrides.css');
+        console.log(JSONEditor);
+
+        editor = new JSONEditor(document.getElementById('jsoneditor'), {
+          // theme: 'bootstrap2',
+          schema: {
+            type: 'object',
+            title: 'Resources',
+            properties: {
+              playTest: {
+                type: 'array',
+                format: 'table',
+                title: 'Playtest values',
+                uniqueItems: true,
+                items: {
+                  type: 'object',
+                  title: 'Variable',
+                  format: 'grid',
+                  properties: {
+                    key: {
+                      type: 'string',
+                      default: 'true',
+                    },
+                    value: {
+                      type: 'string',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        });
+        const localVariables = getPluginStore(self.name);
+
+        // set json
+        editor.setValue(
+          typeof localVariables.variables !== 'object'
+            ? [{ key: 'er', value: 'erd' }]
+            : localVariables.variables
+        );
+      },
+      preConfirm: () => {
+        console.log(editor.getValue());
+        return editor.getValue();
+      },
+    });
+
+    if (formValues) {
+      setPluginStore(self.name, 'variables', formValues);
     }
   };
 
@@ -100,6 +164,13 @@ export var Runner = function({
       ],
       setterKey: 'setPlaytestStyle',
       settingsColumn: 'A',
+    });
+    // create a button in the file menu
+    createButton(self.name, {
+      name: 'Variables',
+      attachTo: 'fileMenuDropdown',
+      onClick: 'onOpenDialog()',
+      iconName: 'cog',
     });
   });
 
