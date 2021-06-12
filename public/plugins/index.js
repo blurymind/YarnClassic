@@ -8,6 +8,7 @@ export var Plugins = function(app) {
   app.plugins = {};
   const registerPlugin = plugin => {
     app.plugins[plugin.constructor.name] = plugin;
+    console.log('attaching plugin', plugin, app.plugins);
   };
   this.pluginStorage = ko.observable({});
   const getPluginStore = pluginName => {
