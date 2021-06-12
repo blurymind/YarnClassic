@@ -8,6 +8,8 @@ export var Runner = function({
   onYarnEditorOpen,
   onYarnInPreviewMode,
   onYarnSavedNode,
+  onKeyUp,
+  onKeyDown,
   onLoad,
 }) {
   const self = this;
@@ -122,10 +124,8 @@ export var Runner = function({
     `;
     document.getElementById('editorContainer').appendChild(element);
 
-    // Preview keyboard shortcuts
-    $(document).on('keydown', e => {
+    onKeyDown(e => {
       if (!app.editing() || self.previewStory.finished) return;
-
       switch (e.keyCode) {
         case app.input.keys.Z:
           self.previewStory.changeTextScrollSpeed(10);
@@ -144,7 +144,7 @@ export var Runner = function({
           break;
       }
     });
-    $(document).on('keyup', function(e) {
+    onKeyUp(e => {
       if (e.keyCode === app.input.keys.Z) {
         self.previewStory.changeTextScrollSpeed(200);
         if (self.previewStory.vnSelectedChoice != -1)

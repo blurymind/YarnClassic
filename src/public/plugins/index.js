@@ -191,6 +191,16 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+  const onKeyUp = cb => {
+    $(document).on('keyup', e => {
+      cb(e);
+    });
+  };
+  const onKeyDown = cb => {
+    $(document).on('keydown', e => {
+      cb(e);
+    });
+  };
   // plugin initiation
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
@@ -205,6 +215,8 @@ export var Plugins = function(app) {
       onYarnInPreviewMode,
       onYarnSavedNode,
       onYarnSetLanguage,
+      onKeyUp,
+      onKeyDown,
       onLoad,
     });
 
