@@ -9,8 +9,8 @@ export var Runner = function({
   onLoad,
 }) {
   const self = this;
-  app.plugins.runner = self;
   this.name = 'Runner';
+
   this.previewStory = new yarnRender();
 
   this.togglePreviewMode = function(previewModeOverwrite) {
