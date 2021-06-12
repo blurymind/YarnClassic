@@ -80,7 +80,6 @@ export var Transcribe = function({
   this.toggleTranscribing = function() {
     const available = spoken.listen.available();
     const speakBubble = document.getElementById('speakTextBtnBubble');
-    console.log('speakbbl', speakBubble);
     if (speakBubble === null) return;
     if (available && self.transcribeEnabled()) {
       spoken.listen.on.partial(ts => {
@@ -104,7 +103,7 @@ export var Transcribe = function({
     const available = spoken.listen.available();
     if (!available) {
       Swal.fire({
-        title: 'Speech recognition not avaiilable!',
+        title: 'Speech recognition not available!',
         icon: 'error',
       });
       return;
