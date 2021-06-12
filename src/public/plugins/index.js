@@ -94,7 +94,7 @@ export var Plugins = function(app) {
     pluginName,
     {
       name,
-      icon,
+      iconName,
       onClick,
       attachTo,
       className,
@@ -107,8 +107,7 @@ export var Plugins = function(app) {
     if (document.getElementById(id) !== null) return;
 
     const button = document.createElement('span');
-    button.id = id || name || title || icon;
-    const iconName = icon || 'cog';
+    button.id = id || name || title || iconName;
     button.innerHTML = `
       <span class="item ${className || ''}" title="${title || ''}" ${
       onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
@@ -137,6 +136,7 @@ export var Plugins = function(app) {
   const createToggle = (
     pluginName,
     {
+      id,
       attachTo,
       className,
       title,
@@ -147,7 +147,9 @@ export var Plugins = function(app) {
       iconName,
     }
   ) => {
+    if (document.getElementById(id) !== null) return;
     const toggleButton = document.createElement('span');
+    toggleButton.id = id;
     toggleButton.className = 'styled-checkbox';
     toggleButton.innerHTML = `
             <input class="styled-checkbox" type="checkbox" id="${toggleValueKey}" data-bind="checked: app.plugins.${pluginName}.${enableKey}, event: { change: app.plugins.${pluginName}.${onToggle} }"></input>

@@ -40,9 +40,9 @@ export var Runner = function({
   };
 
   this.togglePlayMode = function(playModeOverwrite = false) {
-    var editor = $('.editor')[0];
-    var storyPreviewPlayButton = document.getElementById('storyPlayButton');
-    var editorPlayPreviewer = document.getElementById('editor-play');
+    const editor = $('.editor')[0];
+    const storyPreviewPlayButton = document.getElementById('storyPlayButton');
+    const editorPlayPreviewer = document.getElementById('editor-play');
     self.isEditorInPlayMode = playModeOverwrite;
     if (playModeOverwrite) {
       //preview play mode
@@ -80,6 +80,7 @@ export var Runner = function({
       editorPlayPreviewer.style.display = 'none';
       editor.style.display = 'flex';
       $(storyPreviewPlayButton).removeClass('disabled');
+      $('.bbcode-toolbar').removeClass('hidden');
       $('.toggle-toolbar').removeClass('hidden');
       $('.editor-counter').removeClass('hidden');
       self.previewStory.terminate();
@@ -107,7 +108,7 @@ export var Runner = function({
 
   onYarnEditorOpen(() => {
     createButton(self.name, {
-      icon: 'play',
+      iconName: 'play',
       title: 'Preview',
       attachTo: 'bbcodeToolbar',
       onClick: 'togglePlayMode(true)',
