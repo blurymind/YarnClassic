@@ -25,7 +25,6 @@ export var Runner = function({
     app.editor.focus();
   };
 
-  // todo move to plugins
   this.advanceStoryPlayMode = function(speed = 5) {
     if (!self.previewStory.finished) {
       self.previewStory.changeTextScrollSpeed(speed);
@@ -38,20 +37,16 @@ export var Runner = function({
     }
   };
 
-  // Todo: move to plugins
   this.togglePlayMode = function(playModeOverwrite = false) {
     var editor = $('.editor')[0];
     var storyPreviewPlayButton = document.getElementById('storyPlayButton');
     var editorPlayPreviewer = document.getElementById('editor-play');
     self.isEditorInPlayMode = playModeOverwrite;
     if (playModeOverwrite) {
-      app.togglePreviewMode(false);
       //preview play mode
       editor.style.display = 'none';
       editorPlayPreviewer.style.display = 'flex';
       $(storyPreviewPlayButton).addClass('disabled');
-      $('.toggle-toolbar').addClass('hidden');
-      $('.editor-counter').addClass('hidden');
       self.previewStory.emiter.on('finished', function() {
         self.togglePlayMode(false);
         self.gotoLastPlayNode();
@@ -114,6 +109,7 @@ export var Runner = function({
       attachTo: 'bbcodeToolbar',
       onClick: 'togglePlayMode(true)',
       className: 'bbcode-button bbcode-button-right',
+      id: 'storyPlayButton',
     });
 
     const element = document.createElement('div');
