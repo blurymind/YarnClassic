@@ -10,7 +10,7 @@ export var Runner = function({
 }) {
   const self = this;
   app.plugins.runner = self;
-  this.name = self.constructor.name;
+  this.name = 'Runner';
 
   const pluginAppPath = 'app.plugins.Runner';
 
