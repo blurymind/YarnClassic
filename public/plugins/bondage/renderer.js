@@ -441,10 +441,9 @@ export var yarnRender = function() {
     this.loadYarnChapter(startChapter);
     yarnRunner.variables.data = {};
 
-    Object.keys(playtestVariables).forEach(function(key) {
-      const value = playtestVariables[key];
-      console.log(value);
-      yarnRunner.variables.set(key, value);
+    playtestVariables.forEach(function(variable) {
+      console.log(variable);
+      yarnRunner.variables.set(variable.key, variable.value);
     });
   };
 

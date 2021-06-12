@@ -56,10 +56,11 @@ export function genPreview(code) {
 </head>
 
 <body>
-	<script src="public/plugins/kaboom/kaboom.js"></script>
+	<script src="public/plugins/yarn-editor-kaboomjs/kaboom.js"></script>
 	<script>
 ${code}
 	</script>
+	<canvas id="kaboomCanvas"></canvas>
 </body>
 
 </html>
