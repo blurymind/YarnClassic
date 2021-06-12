@@ -1,0 +1,32 @@
+#kbEditor{
+    display: flex;
+}
+#jsEditor{
+    flex:1;
+}
+#kaboomCanvas{
+    flex:1;
+    position: absolute;
+    right: 0;
+    opacity: 0.7;
+}
+#kaboomCanvas:hover{
+    opacity: 1;
+}
+
+.swal2-popup.swal2-modal.swal-wide.swal2-show {
+    width: 95vw;
+}
+
+@media only screen and (max-width: 600px) {
+    #kaboomCanvas {
+        bottom: 20px;
+        width: 80%;
+    }
+    .swal2-popup{
+        padding: 2px !important;
+    }
+    .swal2-actions{
+        margin: 1px !important;
+    }
+}

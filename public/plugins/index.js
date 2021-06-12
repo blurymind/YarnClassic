@@ -1,7 +1,8 @@
 import { VarStore } from './var-store';
 import { Runner } from './runner';
+import { JsEditor } from './js-editor';
 
-const PLUGINS = [VarStore, Runner];
+const PLUGINS = [VarStore, Runner, JsEditor];
 
 export var Plugins = function(app) {
   const self = this;
@@ -128,6 +129,16 @@ export var Plugins = function(app) {
   };
 
   // yarneditor lifecycle events
+  const onYarnInPreviewMode = cb => {
+    window.addEventListener('yarnSavedNode', e => {
+      cb(e);
+    });
+  };
+  const onYarnSavedNode = cb => {
+    window.addEventListener('yarnInPreviewMode', e => {
+      cb(e);
+    });
+  };
   const onYarnLoadedData = cb => {
     window.addEventListener('yarnLoadedData', e => {
       cb(e);
@@ -153,6 +164,8 @@ export var Plugins = function(app) {
       addSettingsItem,
       onYarnLoadedData,
       onYarnEditorOpen,
+      onYarnInPreviewMode,
+      onYarnSavedNode,
       onLoad,
     });
 

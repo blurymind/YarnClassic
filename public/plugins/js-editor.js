@@ -1,6 +1,4 @@
-import { edit } from 'ace-builds';
-
-const kaboom = require('./kaboom/kaboom.mjs');
+import { genPreview } from './kaboom/genGame';
 
 export var JsEditor = function({
   app,
@@ -10,23 +8,22 @@ export var JsEditor = function({
   onLoad,
 }) {
   const self = this;
-  this.name = self.constructor.name;
+  this.name = 'JsEditor';
 
   this.k = null;
 
   //  console.log(k);
   this.onOpenDialog = async () => {
     let editor = null;
+    require('./kaboom/style.css');
     const { value: formValues } = await Swal.fire({
       title: '💥Kaboomjs',
+      customClass: 'swal-wide',
       html:
-        '<div id="jsEditor" style="min-height:70vh"/><canvas id="kaboomCanvas"></canvas>',
+        '<div id="kbEditor"><div id="jsEditor" style="min-height:70vh"/></div>',
       focusConfirm: false,
-      showConfirmButton: true,
       onOpen: () => {
-        // create the editor
-
-        // ace.require('ace/ext/language_tools');
+        // create the editor with autocompletions
         editor = ace.edit('jsEditor', {
           theme: 'ace/theme/monokai',
           mode: 'ace/mode/javascript',
@@ -36,47 +33,64 @@ export var JsEditor = function({
           enableLiveAutocompletion: true,
           behavioursEnabled: true,
         });
-        self.k = kaboom.default({
-          canvas: document.getElementById('kaboomCanvas'),
-        });
-        console.log(self.k, Object.getOwnPropertyNames(self.k));
-        const langTools = ace.require('ace/ext/language_tools');
-
-        console.log(app.getOtherNodeTitles());
-        const nodeAutocompleter = app.utils.createAutocompleter(
-          false,
-          app.getOtherNodeTitles(),
-          'Node Link'
-        );
-        const kaboomAutocompleter = app.utils.createAutocompleter(
-          false,
-          Object.getOwnPropertyNames(self.k),
-          'Kaboomjs'
-        );
-        langTools.setCompleters([
-          nodeAutocompleter,
-          kaboomAutocompleter,
-          ...editor.completers,
-          langTools.keyWordCompleter,
-          langTools.textCompleter,
-          langTools.snippetCompleter,
-        ]);
-        editor.completers = [
-          nodeAutocompleter,
-          kaboomAutocompleter,
-          ...editor.completers,
-        ];
-
+        // const kaboomCanvas = document.createElement('canvas');
+        // kaboomCanvas.id = 'kaboomCanvas';
+        // document.getElementById('kbEditor').appendChild(kaboomCanvas);
+        // self.k = kaboom.default({
+        //   canvas: document.getElementById('kaboomCanvas'),
+        //   global: true,
+        // });
+        // const langTools = ace.require('ace/ext/language_tools');
+        // const nodeAutocompleter = app.utils.createAutocompleter(
+        //   false,
+        //   app.getOtherNodeTitles(),
+        //   'Node Link'
+        // );
+        // const kaboomAutoCompleter = app.utils.createAutocompleter(
+        //   false,
+        //   Object.getOwnPropertyNames(self.k),
+        //   'Kaboomjs'
+        // );
+        // langTools.setCompleters([
+        //   nodeAutocompleter,
+        //   kaboomAutoCompleter,
+        //   ...editor.completers,
+        //   langTools.keyWordCompleter,
+        //   langTools.textCompleter,
+        //   langTools.snippetCompleter,
+        // ]);
+        // editor.completers = [
+        //   nodeAutocompleter,
+        //   kaboomAutoCompleter,
+        //   ...editor.completers,
+        // ];
+        const kaboomIframe = document.createElement('iframe');
+        kaboomIframe.id = 'kaboomCanvas';
+        document.getElementById('kbEditor').appendChild(kaboomIframe);
+        kaboomIframe.onload = () => {
+          editor.focus();
+        };
         const localVariables = getPluginStore(self.name);
-        console.log(editor, localVariables);
         editor.setValue(localVariables.kaboomjs || '');
+
+        const reRun = () => {
+          kaboomIframe.srcdoc = genPreview(editor.getValue());
+        };
+        reRun();
+        editor.getSession().on('change', ev => {
+          reRun();
+        });
       },
-      preConfirm: () => {
-        return editor.getValue();
+      // preConfirm: () => {
+      //   return editor.getValue();
+      // },
+      showConfirmButton: false,
+      onClose: () => {
+        setPluginStore(self.name, 'kaboomjs', editor.getValue());
       },
     });
 
-    console.log(formValues);
+    // console.log(formValues);
     if (formValues) {
       setPluginStore(self.name, 'kaboomjs', formValues);
     }
