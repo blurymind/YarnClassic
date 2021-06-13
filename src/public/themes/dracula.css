@@ -504,6 +504,7 @@ input[type='checkbox'] {
 
 input[type="text"] {
   color: #f8f8f2;
+  background: #44475a;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button {
