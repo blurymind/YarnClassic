@@ -1,55 +1,6 @@
-import { genPreview } from './genGame';
+import { genPreview, helloKaboom } from './genGame';
 const { JSONEditor } = require('../jsoneditor/jsoneditor.min');
 
-const helloKaboom = `
-kaboom({
-  global: true,
-  fullscreen: true,
-  scale: 1,
-});
-
-scene("main", () => {
-  add([ text("hello from kaboom ;)"), pos(100, 100),]);
-});
-
-start("main");
-`;
-
-// editor = new JSONEditor(document.getElementById('jsoneditor'), {
-//   schema: {
-//     type: 'object',
-//     title: 'Resources',
-//     properties: {
-//       // pictures: {
-//       //   type: 'array',
-//       //   title: 'Pictures',
-//       //   items: {
-//       //     type: 'object',
-//       //     title: 'Image',
-//       //     format: 'grid',
-//       //     properties: {
-//       //       file: {
-//       //         type: 'string',
-//       //         title: 'file',
-//       //         media: {
-//       //           binaryEncoding: 'base64',
-//       //           type: 'img/png',
-//       //         },
-//       //         options: {
-//       //           grid_columns: 6,
-//       //           multiple: true,
-//       //         },
-//       //       },
-//       //       // description: {
-//       //       //   type: 'string',
-//       //       //   title: 'Description',
-//       //       //   options: {
-//       //       //     grid_columns: 6,
-//       //       //   },
-//       //       // },
-//       //     },
-//       //   },
-//       // },
 export var JsEditor = function({
   app,
   onYarnLoadedStateFromLocalStorage,
@@ -62,28 +13,29 @@ export var JsEditor = function({
   const self = this;
   this.name = 'JsEditor';
 
-  this.onOpenSpritesManager = async () => {
+  this.onOpenResourcesManager = async () => {
     let editor = null;
     const { value: formValues } = await Swal.fire({
       title: 'Images',
-      html: '<div class="json-editor-wrapper"><div id="spritesEditor"/></div>',
+      html:
+        '<div class="json-editor-wrapper"><div id="resourcesEditor"/></div>',
       focusConfirm: false,
       customClass: 'swal-wide',
       onOpen: () => {
         // create the editor
         require('../jsoneditor/size-overrides.css');
-        editor = new JSONEditor(document.getElementById('spritesEditor'), {
+        editor = new JSONEditor(document.getElementById('resourcesEditor'), {
           schema: {
             type: 'array',
-            title: 'Pictures',
+            // title: 'Resources',
             items: {
               type: 'object',
-              title: 'Image',
+              title: 'Resource',
               format: 'grid',
               properties: {
                 file: {
                   type: 'string',
-                  title: 'file',
+                  // title: 'file',
                   media: {
                     binaryEncoding: 'base64',
                     type: 'img/png',
@@ -91,9 +43,6 @@ export var JsEditor = function({
                   options: {
                     grid_columns: 6,
                     multiple: true,
-                    // include_filename: true,
-                    // includeFilename: true,
-                    // getFileBase: true,
                   },
                 },
                 name: {
@@ -110,11 +59,7 @@ export var JsEditor = function({
         const localVariables = getPluginStore(self.name);
 
         // set json
-        // editor.setValue(
-        //     typeof localVariables.variables !== 'object'
-        //         ? [{ key: 'er', value: 'erd' }]
-        //         : localVariables.variables
-        // );
+        editor.setValue(localVariables.spriteResources);
       },
       preConfirm: () => {
         console.log(editor.getValue());
@@ -123,8 +68,8 @@ export var JsEditor = function({
     });
 
     if (formValues) {
-      console.log('Sprites', formValues);
-      // setPluginStore(self.name, 'spriteResources', formValues);
+      console.log('Resources', formValues);
+      setPluginStore(self.name, 'spriteResources', formValues);
     }
   };
   //  console.log(k);
@@ -135,14 +80,14 @@ export var JsEditor = function({
     Swal.fire({
       title:
         '<div class="kaboom-header">' +
-        '<div><input type="checkbox" checked id="kbBehindMode" name="kbBehind"><label for="kbBehind" class="hide-when-narrow">behind</label><label for="kbBehind" class="show-when-narrow">b</label></div>' +
-        '<div><input type="checkbox" checked id="kbShouldHotReload" name="hotReload"><label for="hotReload" class="hide-when-narrow">hot</label><label for="hotReload" class="show-when-narrow">h</label></div>' +
-        '<div>💥Kaboomjs</div>' +
+        '<div><input type="checkbox" checked id="kbBehindMode" name="kbBehind"><label for="kbBehind">behind</label> </div>' +
+        '<div id="hotReloadBtn"><input type="checkbox" checked id="kbShouldHotReload" name="hotReload"><label for="hotReload">hot</label> </div>' +
+        '<div class="hide-when-narrow">💥Kaboomjs</div>' +
         '</div>',
       customClass: 'swal-wide',
       html:
         '<div id="kbEditor" class="kb-behind-mode"><div id="jsEditor" style="min-height:70vh"/></div>' +
-        '<div id="kbSpritesButton" class="kb-sprites-btn">Sprites</div>',
+        '<div id="kbResourcesButton" class="kb-resources-btn">Resources</div>',
       focusConfirm: false,
       onOpen: () => {
         // create the editor with autocompletions
@@ -197,21 +142,28 @@ export var JsEditor = function({
         });
         shouldReloadToggle.checked = localVariables.kaboomjsEditorShouldReload;
         const reRun = () => {
-          kaboomIframe.srcdoc = genPreview(editor.getValue());
+          kaboomIframe.srcdoc = genPreview(
+            editor.getValue(),
+            localVariables.spriteResources
+          );
         };
+        document
+          .getElementById('hotReloadBtn')
+          .addEventListener('click', () => reRun());
         reRun();
         editor.getSession().on('change', ev => {
+          setPluginStore(self.name, 'kaboomjs', editor.getValue());
           if (shouldReloadToggle.checked) reRun();
         });
         iframeWrapper.addEventListener('pointerenter', () => {
           if (!shouldReloadToggle.checked) reRun();
         });
 
-        // Sprites manager
+        // resources manager
         document
-          .getElementById('kbSpritesButton')
+          .getElementById('kbResourcesButton')
           .addEventListener('click', () => {
-            self.onOpenSpritesManager();
+            self.onOpenResourcesManager();
           });
         // TODO: restore autocompleters
         // const kaboomCanvas = document.createElement('canvas');

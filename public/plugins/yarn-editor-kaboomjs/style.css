@@ -67,7 +67,7 @@
     }
 }
 
-.kb-sprites-btn{
+.kb-resources-btn{
     position: absolute;
     background-color: #3e3e3e;
     color: #3ecfe9;
@@ -79,6 +79,13 @@
     z-index: 100;
 }
 
-.kb-sprites-btn:hover{
+.kb-resources-btn:hover{
     background-color: #393939;
+}
+
+.ace_gutter{
+    opacity: 0.5;
+}
+.ace_gutter-cell {
+    padding-left:0px;
 }
