@@ -1,4 +1,5 @@
 import { genPreview } from './genGame';
+const { JSONEditor } = require('../jsoneditor/jsoneditor.min');
 
 const helloKaboom = `
 kaboom({
@@ -61,6 +62,71 @@ export var JsEditor = function({
   const self = this;
   this.name = 'JsEditor';
 
+  this.onOpenSpritesManager = async () => {
+    let editor = null;
+    const { value: formValues } = await Swal.fire({
+      title: 'Images',
+      html: '<div class="json-editor-wrapper"><div id="spritesEditor"/></div>',
+      focusConfirm: false,
+      customClass: 'swal-wide',
+      onOpen: () => {
+        // create the editor
+        require('../jsoneditor/size-overrides.css');
+        editor = new JSONEditor(document.getElementById('spritesEditor'), {
+          schema: {
+            type: 'array',
+            title: 'Pictures',
+            items: {
+              type: 'object',
+              title: 'Image',
+              format: 'grid',
+              properties: {
+                file: {
+                  type: 'string',
+                  title: 'file',
+                  media: {
+                    binaryEncoding: 'base64',
+                    type: 'img/png',
+                  },
+                  options: {
+                    grid_columns: 6,
+                    multiple: true,
+                    // include_filename: true,
+                    // includeFilename: true,
+                    // getFileBase: true,
+                  },
+                },
+                name: {
+                  type: 'string',
+                  title: 'Name',
+                  options: {
+                    grid_columns: 6,
+                  },
+                },
+              },
+            },
+          },
+        });
+        const localVariables = getPluginStore(self.name);
+
+        // set json
+        // editor.setValue(
+        //     typeof localVariables.variables !== 'object'
+        //         ? [{ key: 'er', value: 'erd' }]
+        //         : localVariables.variables
+        // );
+      },
+      preConfirm: () => {
+        console.log(editor.getValue());
+        return editor.getValue();
+      },
+    });
+
+    if (formValues) {
+      console.log('Sprites', formValues);
+      // setPluginStore(self.name, 'spriteResources', formValues);
+    }
+  };
   //  console.log(k);
   this.onOpenDialog = () => {
     let editor = null;
@@ -69,13 +135,14 @@ export var JsEditor = function({
     Swal.fire({
       title:
         '<div class="kaboom-header">' +
-        '<div><input type="checkbox" checked id="kbBehindMode" name="kbBehind"><label for="kbBehind" class="hide-when-narrow">behind</label></div>' +
-        '<div><input type="checkbox" checked id="kbShouldHotReload" name="hotReload"><label for="hotReload" class="hide-when-narrow">hot</label></div>' +
+        '<div><input type="checkbox" checked id="kbBehindMode" name="kbBehind"><label for="kbBehind" class="hide-when-narrow">behind</label><label for="kbBehind" class="show-when-narrow">b</label></div>' +
+        '<div><input type="checkbox" checked id="kbShouldHotReload" name="hotReload"><label for="hotReload" class="hide-when-narrow">hot</label><label for="hotReload" class="show-when-narrow">h</label></div>' +
         '<div>💥Kaboomjs</div>' +
         '</div>',
       customClass: 'swal-wide',
       html:
-        '<div id="kbEditor" class="kb-behind-mode"><div id="jsEditor" style="min-height:70vh"/></div>',
+        '<div id="kbEditor" class="kb-behind-mode"><div id="jsEditor" style="min-height:70vh"/></div>' +
+        '<div id="kbSpritesButton" class="kb-sprites-btn">Sprites</div>',
       focusConfirm: false,
       onOpen: () => {
         // create the editor with autocompletions
@@ -139,6 +206,13 @@ export var JsEditor = function({
         iframeWrapper.addEventListener('pointerenter', () => {
           if (!shouldReloadToggle.checked) reRun();
         });
+
+        // Sprites manager
+        document
+          .getElementById('kbSpritesButton')
+          .addEventListener('click', () => {
+            self.onOpenSpritesManager();
+          });
         // TODO: restore autocompleters
         // const kaboomCanvas = document.createElement('canvas');
         // kaboomCanvas.id = 'kaboomCanvas';

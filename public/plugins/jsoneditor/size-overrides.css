@@ -1,32 +1,25 @@
-/*div.jsoneditor-tree {*/
-/*    min-height: 50vh;*/
-/*    max-height: 70vh;*/
-/*    overflow: auto;*/
-/*}*/
+div.jsoneditor-tree {
+    min-height: 50vh;
+    max-height: 70vh;
+    overflow: auto;
+}
 
-/*.swal2-popup.swal2-modal.swal-wide.swal2-show {*/
-/*    width: 95vw;*/
-/*}*/
+@media only screen and (max-width: 600px) {
+    .swal2-popup{
+        padding: 2px !important;
+    }
+    .swal2-actions{
+        margin: 1px !important;
+    }
+}
 
-/*@media only screen and (max-width: 600px) {*/
-/*    .swal2-popup{*/
-/*        padding: 2px !important;*/
-/*    }*/
-/*    .swal2-actions{*/
-/*        margin: 1px !important;*/
-/*    }*/
-/*}*/
-
-/*.swal2-title{*/
-/*    width:100%;*/
-/*}*/
-/*.swal2-popup{*/
-/*    min-width: 80vw;*/
-/*}*/
-/*.swal2-content{*/
-/*    max-height: 80vh;*/
-/*    overflow: auto;*/
-/*}*/
+.swal2-title{
+    width:100%;
+}
+.swal2-content{
+    max-height: 80vh;
+    overflow: auto;
+}
 @media only screen and (max-width: 600px) {
     .form-control > input {
         max-width: 100px;

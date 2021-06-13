@@ -66,3 +66,19 @@
         left: 70%;
     }
 }
+
+.kb-sprites-btn{
+    position: absolute;
+    background-color: #3e3e3e;
+    color: #3ecfe9;
+    bottom: 0;
+    left: 50%;
+    border: solid 1px #1d5d5c;
+    border-radius: 3px;
+    padding: 2px;
+    z-index: 100;
+}
+
+.kb-sprites-btn:hover{
+    background-color: #393939;
+}
