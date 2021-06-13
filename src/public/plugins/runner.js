@@ -75,7 +75,7 @@ export var Runner = function({
         false,
         'commandDebugLabel',
         app.settings.playtestStyle(),
-        localVariables.variables ? localVariables.variables.playTest || {} : {}
+        localVariables.variables || []
       );
     } else {
       //edit mode
@@ -97,35 +97,29 @@ export var Runner = function({
       title: 'Playtest starting variables',
       html: '<div class="json-editor-wrapper"><div id="jsoneditor"/></div>',
       focusConfirm: false,
+      customClass: 'swal-wide',
       onOpen: () => {
         // create the editor
         require('./jsoneditor/size-overrides.css');
-        console.log(JSONEditor);
-
         editor = new JSONEditor(document.getElementById('jsoneditor'), {
           // theme: 'bootstrap2',
           schema: {
-            type: 'object',
-            title: 'Resources',
-            properties: {
-              playTest: {
-                type: 'array',
-                format: 'table',
-                title: 'Playtest values',
-                uniqueItems: true,
-                items: {
-                  type: 'object',
-                  title: 'Variable',
-                  format: 'grid',
-                  properties: {
-                    key: {
-                      type: 'string',
-                      default: 'true',
-                    },
-                    value: {
-                      type: 'string',
-                    },
-                  },
+            type: 'array',
+            format: 'table',
+            title: 'Playtest values',
+            uniqueItems: true,
+            items: {
+              type: 'object',
+              title: 'Variable',
+              format: 'grid',
+              properties: {
+                key: {
+                  type: 'string',
+                  default: 'myVar',
+                },
+                value: {
+                  type: 'string',
+                  default: 'true',
                 },
               },
             },
@@ -139,9 +133,10 @@ export var Runner = function({
             ? [{ key: 'er', value: 'erd' }]
             : localVariables.variables
         );
+        setPluginStore(self.name, 'runnerVariablesOpen', true);
       },
       preConfirm: () => {
-        console.log(editor.getValue());
+        setPluginStore(self.name, 'runnerVariablesOpen', false);
         return editor.getValue();
       },
     });
@@ -172,6 +167,8 @@ export var Runner = function({
       onClick: 'onOpenDialog()',
       iconName: 'cog',
     });
+    const localVariables = getPluginStore(self.name);
+    if (localVariables.runnerVariablesOpen) self.onOpenDialog();
   });
 
   onYarnInPreviewMode(() => self.togglePlayMode(false));
