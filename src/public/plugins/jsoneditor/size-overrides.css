@@ -21,9 +21,12 @@ div.jsoneditor-tree {
     overflow: auto;
 }
 @media only screen and (max-width: 600px) {
-    .form-control > input {
-        max-width: 100px;
-    }
+    /*.form-control > input {*/
+    /*    max-width: 100px;*/
+    /*}*/
+}
+.form-control > input {
+    max-width: 100px;
 }
 .je-table{
     display: flex;
