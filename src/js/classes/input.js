@@ -217,7 +217,7 @@ export const Input = function(app) {
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
           case Key.S:
-            app.data.trySave(FILETYPE.YARN);
+            app.data.trySaveCurrent();
             break; // ctrl+alt+s
         }
       } else if (e.metaKey || e.ctrlKey) {
