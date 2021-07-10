@@ -861,7 +861,7 @@ export var App = function(name, version) {
     event.document = document;
     event.data = data;
     event.app = app;
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
 
   this.splitEditor = function() {
