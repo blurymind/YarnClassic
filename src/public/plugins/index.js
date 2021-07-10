@@ -5,14 +5,12 @@ const PLUGINS = [Runner, Transcribe];
 
 export var Plugins = function(app) {
   const self = this;
-  app.plugins = {};
   const registerPlugin = plugin => {
     app.plugins[plugin.name] = plugin;
     // console.log('attaching plugin', plugin, app.plugins);
   };
 
   const getPluginStore = pluginName => {
-    if (!app.plugins.pluginStorage) app.plugins.pluginStorage = {};
     if (!self.pluginStorage[pluginName]) {
       self.pluginStorage = {
         ...self.pluginStorage,

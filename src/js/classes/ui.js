@@ -89,7 +89,7 @@ export const UI = function(app) {
       .transition({ y: '0' }, 250);
 
     var event = new CustomEvent('settingsOpened');
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
 
   // closeSettingsDialog

@@ -42,7 +42,7 @@ export var App = function(name, version) {
     load_dictionary(self.settings.language().split('-')[0]);
     const event = new CustomEvent('yarnSetLanguage');
     event.language = languageId;
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
 
   this.setMarkupLanguage = function(language, e) {
@@ -87,6 +87,7 @@ export var App = function(name, version) {
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
+  this.plugins = { pluginStorage: {} };
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
@@ -349,7 +350,7 @@ export var App = function(name, version) {
     event.document = document;
     event.data = data;
     event.app = this;
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
 
   this.limitNodesUpdate = function(fn) {
@@ -1132,7 +1133,7 @@ export var App = function(name, version) {
 
     self.isEditorInPreviewMode = previewModeOverwrite;
     const event = new CustomEvent('yarnInPreviewMode');
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
     if (previewModeOverwrite) {
       $('.bbcode-toolbar').addClass('hidden');
       //preview mode
@@ -1230,7 +1231,7 @@ export var App = function(name, version) {
 
       self.setYarnDocumentIsDirty();
       const event = new CustomEvent('yarnSavedNode');
-      window.parent.dispatchEvent(event);
+      window.dispatchEvent(event);
     }
   };
 

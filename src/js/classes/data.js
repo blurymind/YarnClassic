@@ -35,7 +35,7 @@ export const data = {
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
     const event = new CustomEvent('newYarnFileStarted');
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   },
   askForFileName: function() {
     Swal.fire({
@@ -89,7 +89,7 @@ export const data = {
       })
     );
     const event = new CustomEvent('yarnSavedStateToLocalStorage');
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   },
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return;
@@ -132,7 +132,7 @@ export const data = {
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
       const event = new CustomEvent('yarnLoadedStateFromLocalStorage');
-      window.parent.dispatchEvent(event);
+      window.dispatchEvent(event);
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -239,7 +239,7 @@ export const data = {
     event.document = document;
     event.data = data;
     event.app = app;
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   },
   restoreSettingsFromDocumentHeader: function() {
     if (data.documentHeader() !== null) {
