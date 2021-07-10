@@ -85,7 +85,7 @@ export const data = {
         transform: app.workspace.transform,
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
-        pluginStorage: app.plugins.pluginStorage(),
+        pluginStorage: app.plugins.pluginStorage,
       })
     );
     const event = new CustomEvent('yarnSavedStateToLocalStorage');
@@ -127,7 +127,7 @@ export const data = {
         app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
-      app.plugins.pluginStorage(pluginStorage);
+      app.plugins.pluginStorage = pluginStorage;
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
@@ -454,7 +454,7 @@ export const data = {
           language: app.settings.language(),
           markupLanguage: app.settings.markupLanguage(),
           filetypeVersion: app.settings.filetypeVersion(),
-          pluginStorage: app.plugins.pluginStorage(),
+          pluginStorage: app.plugins.pluginStorage,
         });
         output = JSON.stringify(
           { header: data.documentHeader(), nodes: content },

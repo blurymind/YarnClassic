@@ -10,33 +10,34 @@ export var Plugins = function(app) {
     app.plugins[plugin.name] = plugin;
     // console.log('attaching plugin', plugin, app.plugins);
   };
-  this.pluginStorage = ko.observable({});
+
   const getPluginStore = pluginName => {
-    if (!self.pluginStorage()[pluginName]) {
-      self.pluginStorage({
-        ...self.pluginStorage(),
+    if (!app.plugins.pluginStorage) app.plugins.pluginStorage = {};
+    if (!self.pluginStorage[pluginName]) {
+      self.pluginStorage = {
+        ...self.pluginStorage,
         [pluginName]: {},
-      });
+      };
     }
-    return this.pluginStorage()[pluginName];
+    return this.pluginStorage[pluginName];
   };
   const setPluginStore = (pluginName, key, val) => {
     const storeVals = { ...getPluginStore(pluginName), [key]: val };
-    self.pluginStorage({
-      ...self.pluginStorage(),
+    self.pluginStorage = {
+      ...self.pluginStorage,
       [pluginName]: storeVals,
-    });
+    };
   };
 
   window.addEventListener('yarnLoadedData', e => {
     if (app.data.documentHeader() !== null) {
       const documentHeader = app.data.documentHeader();
       if ('pluginStorage' in documentHeader)
-        self.pluginStorage(documentHeader.pluginStorage);
+        self.pluginStorage = documentHeader.pluginStorage;
     }
   });
   window.addEventListener('newYarnFileStarted', e => {
-    self.pluginStorage({});
+    self.pluginStorage = {};
   });
 
   const addSettingsItem = ({
