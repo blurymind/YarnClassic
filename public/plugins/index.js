@@ -11,6 +11,7 @@ export var Plugins = function(app) {
   };
 
   const getPluginStore = pluginName => {
+    if (!self.pluginStorage) self.pluginStorage = {};
     if (!self.pluginStorage[pluginName]) {
       self.pluginStorage = {
         ...self.pluginStorage,
