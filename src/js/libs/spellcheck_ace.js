@@ -18,10 +18,10 @@ var affPath = utils.Utils.getPublicPath('dictionaries/en/index.aff');
 
 // Make red underline for gutter and words.
 $(
-  '<style type=\'text/css\'>.ace_marker-layer .misspelled { position: absolute; z-index: -2; border-bottom: 1px solid red; margin-bottom: -1px; }</style>'
+  "<style type='text/css'>.ace_marker-layer .misspelled { position: absolute; z-index: -2; border-bottom: 1px solid red; margin-bottom: -1px; }</style>"
 ).appendTo('head');
 $(
-  '<style type=\'text/css\'>.misspelled { border-bottom: 1px solid red; margin-bottom: -1px; }</style>'
+  "<style type='text/css'>.misspelled { border-bottom: 1px solid red; margin-bottom: -1px; }</style>"
 ).appendTo('head');
 
 // Load the dictionary.
@@ -40,8 +40,8 @@ function load_dictionary(dicLanguage) {
       console.error(
         `${dicLanguage} not found locally. Loading dictionary from server instead...`
       );
-      dicPath = `https://raw.githubusercontent.com/wooorm/dictionaries/master/dictionaries/${dicLanguage}/index.dic`;
-      affPath = `https://raw.githubusercontent.com/wooorm/dictionaries/master/dictionaries/${dicLanguage}/index.aff`;
+      dicPath = `https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/${dicLanguage}/index.dic`;
+      affPath = `https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries/${dicLanguage}/index.aff`;
 
       $.get(dicPath, function(data) {
         dicData = data;
