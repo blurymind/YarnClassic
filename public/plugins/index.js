@@ -1,6 +1,5 @@
 import { Runner } from './runner';
 import { Transcribe } from './transcribe';
-// import { JsEditor } from './yarn-editor-kaboomjs/js-editor';
 
 const PLUGINS = [Runner, Transcribe];
 
