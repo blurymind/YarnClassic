@@ -761,7 +761,17 @@ export var App = function(name, version) {
     const langTools = ace.require('ace/ext/language_tools');
     const nodeLinksCompleter = Utils.createAutocompleter(
       ['string.llink', 'string.rlink'],
-      self.getOtherNodeTitles(),
+      app.getOtherNodeTitles().map(title => {
+        const otherNode = self.getNodeByTitle(title);
+        return {
+          word: title,
+          title,
+          about: `${
+            otherNode.tags().length > 0 ? `tags: ${otherNode.tags()}\n` : ''
+          }Preview:\n${otherNode.clippedBody()}`,
+          titleStyle: node.titleStyles[otherNode.colorID()],
+        };
+      }),
       'Node Link'
     );
     // console.log(langTools);
@@ -982,6 +992,15 @@ export var App = function(name, version) {
     self.insertTextAtCursor(imagePath);
   };
 
+  this.getNodeByTitle = function(nodeTitle) {
+    return self.nodes().find(
+      node =>
+        node
+          .title()
+          .trim()
+          .toLowerCase() === nodeTitle.trim().toLowerCase()
+    );
+  };
   this.openNodeByTitle = function(nodeTitle) {
     self.makeNodeWithName(nodeTitle);
     self.nodes().forEach(node => {
