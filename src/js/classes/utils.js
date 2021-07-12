@@ -58,7 +58,7 @@ export var Utils = {
           '</p>',
           `<div class='node' style='
             position:relative;
-            width: 100%;
+            min-width: 100%;
             overflow: hidden;'>`,
           `<div class='body' style='
              font-size: 0.7rem;
