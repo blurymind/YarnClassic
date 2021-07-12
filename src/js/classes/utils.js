@@ -55,13 +55,17 @@ export var Utils = {
           '<p>',
           item.title,
           '</p>',
-          `<code style='
-             background-color:black;
-             color:yellow;
+          `<div class='node' style='
+            position:relative;
+            overflow: hidden;'>`,
+          `<div class='body' style='
              font-size: 0.7rem;
-             margin: 3px'>`,
+             line-height: 1rem;
+             top: 0;
+             padding: 3px'>`,
           item.about,
-          '</code>',
+          '</div>',
+          '</div>',
           '</div>',
         ].join('');
       },

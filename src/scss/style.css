@@ -1076,6 +1076,9 @@ input:focus + span + .dropdown {
 .ace-content {
   cursor: text;
 }
+.ace_tooltip {
+  background-color: unset;
+}
 
 /*-- ----------------------------HTML previews------------------------------- */
 .story-playtest-bubble > img,

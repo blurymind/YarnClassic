@@ -767,8 +767,8 @@ export var App = function(name, version) {
           word: title,
           title,
           about: `${
-            otherNode.tags().length > 0 ? `tags: ${otherNode.tags()}\n` : ''
-          }Preview:\n${otherNode.clippedBody()}`,
+            otherNode.tags().length > 0 ? `tags: ${otherNode.tags()}<br/>` : ''
+          }Preview:<br/>${otherNode.clippedBody()}`,
           titleStyle: node.titleStyles[otherNode.colorID()],
         };
       }),
