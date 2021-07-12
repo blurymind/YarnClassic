@@ -375,6 +375,7 @@ input#nodeSearchInput::-moz-placeholder {
   border: 1px solid transparent;
 }
 
+select,
 .markup #theme {
   background: #21222C;
   color: #f8f8f2;
@@ -503,6 +504,7 @@ input[type='checkbox'] {
 
 input[type="text"] {
   color: #f8f8f2;
+  background: #44475a;
 }
 
 .node-editor .form .bbcode-toolbar .bbcode-button {
@@ -704,8 +706,18 @@ input.sp-input {
 }
 
 .swal2-popup {
-  background: #282a36;
-  border: 2px solid #8be9fd;
+  background: #282a36 !important;
+  /* border: 2px solid #bd93f9; */
+}
+
+.swal2-popup.swal2-toast {
+  background: #282a36 !important;
+  /* border: 2px solid #bd93f9; */
+  box-shadow: 0 0 0.625em #191A21;
+}
+
+.swal2-timer-progress-bar {
+  background: #bd93f9;
 }
 
 .swal2-popup.swal2-modal.swal2-icon-warning.swal2-show {

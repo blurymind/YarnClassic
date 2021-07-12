@@ -14,8 +14,7 @@ import { Input } from './input';
 import { Settings } from './settings';
 import { UI } from './ui';
 import { data } from './data';
-import { yarnRender } from './renderer';
-import { Utils, FILETYPE } from './utils';
+import { Utils } from './utils';
 import { RichTextFormatter } from './richTextFormatter';
 
 // TODO: refactoring proposals
@@ -23,22 +22,27 @@ import { RichTextFormatter } from './richTextFormatter';
 // Create Platform class: provides platform specific info and abstractions
 // Create History class: handles command history navigation (undo/redo)
 // Create Editor class: handles editor setup and events
-// Rename yarnRender to YarnPlayer
 
 export var App = function(name, version) {
   const self = this;
+  this.utils = Utils;
 
   this.setTheme = function(name, e) {
     let themeName = e ? e.target.value : name;
-    setTimeout(self.initGrid, 35);
-    setTimeout(self.workspace.updateArrows, 35);
-    $('#theme-stylesheet').attr('href', Utils.getPublicPath(`themes/${themeName}.css`));
+    setTimeout(self.initGrid, 50);
+    setTimeout(self.workspace.updateArrows, 50);
+    $('#theme-stylesheet').attr(
+      'href',
+      Utils.getPublicPath(`themes/${themeName}.css`)
+    );
   };
 
   this.setLanguage = function(language, e) {
     const languageId = e ? e.target.value : language;
-    spoken.recognition.lang = languageId;
     load_dictionary(self.settings.language().split('-')[0]);
+    const event = new CustomEvent('yarnSetLanguage');
+    event.language = languageId;
+    window.dispatchEvent(event);
   };
 
   this.setMarkupLanguage = function(language, e) {
@@ -47,13 +51,13 @@ export var App = function(name, version) {
     self.mustRefreshNodes.notifySubscribers();
   };
 
-  this.setPlaytestStyle = function(style, e) {
-    const playtestStyle = e ? e.target.value : style;
-    self.playtestStyle = playtestStyle;
+  this.setFiletypeVersion = function(typeVersion, e) {
+    const filetypeVersion = e ? e.target.value : typeVersion;
+    self.filetypeVersion = filetypeVersion;
   };
 
   this.setGistCredentials = function(gist, e) {
-    const {token, file} = gist;
+    const { token, file } = gist;
     const Gists = require('gists');
     const gists = new Gists({ token });
     self.gists = gists;
@@ -65,7 +69,6 @@ export var App = function(name, version) {
   this.settings = new Settings(self);
   this.workspace = new Workspace(self);
   this.ui = new UI(self);
-  this.previewStory = new yarnRender();
   this.richTextFormatter = new RichTextFormatter(self);
 
   this.data = data;
@@ -84,38 +87,44 @@ export var App = function(name, version) {
   this.isElectron = false;
   this.editor = null;
   this.nodeVisitHistory = [];
+  this.plugins = { pluginStorage: {} };
   this.clipboard = '';
   this.nodeClipboard = [];
   this.speachInstance = null;
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
+  this.isEditorInPlayMode = false;
   this.isEditorSplit = false;
   this.isEditorFocused = false;
   this.editorResizeHandleOptions = {
-    handleSelector: "#editor-resize-handle",
+    handleSelector: '#editor-resize-handle',
     resizeHeight: false,
     resizeWidthFrom: 'right',
     onDragStart: function() {
       self.isSplitEditorInFocus = true;
-      $('#node-editor').removeClass('split-editor-out-of-focus')
+      $('#node-editor').removeClass('split-editor-out-of-focus');
     },
     onDragEnd: function() {
       self.editor.resize();
-    }
-  }
+      self.settings.editorSplitSize($('#editor-form').width());
+    },
+  };
 
   // inEditor
   //
   // Indicates if we are in the editor view
   this.inEditor = () =>
-    (self.editing() || (self.isEditorSplit && self.isEditorFocused)) && !self.ui.isDialogOpen();
+    (self.editing() || (self.isEditorSplit && self.isEditorFocused)) &&
+    !self.ui.isDialogOpen();
 
   // inWorkspace
   //
   // Indicates if we are in the workspace view
   this.inWorkspace = () =>
-    (!self.editing() || (self.isEditorSplit && self.isEditorFocused === false)) && !self.ui.isDialogOpen();
+    (!self.editing() ||
+      (self.isEditorSplit && self.isEditorFocused === false)) &&
+    !self.ui.isDialogOpen();
 
   // run
   //
@@ -144,40 +153,46 @@ export var App = function(name, version) {
       return null;
     });
     window.addEventListener('DOMContentLoaded', e => {
+      // Electron is receiving a filepath
+      if (self.electron) {
+        const filePath =
+          self.electron.remote.process.argv.length > 1
+            ? self.electron.remote.process.argv[1]
+            : null;
+        if (filePath && app.fs.existsSync(filePath)) {
+          this.data.openFileFromFilePath(filePath);
+          return;
+        }
+      }
       this.data.loadAppStateFromLocalStorage();
-      
+
+      // PWA is receiving shared data
       const parsedUrl = new URL(window.location);
-      const sharedText = parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
+      const sharedText =
+        parsedUrl.searchParams.get('text') || parsedUrl.searchParams.get('url');
       if (sharedText !== null) {
-        self.insertTextAtCursor(sharedText);
+        self.insertTextAtCursor(sharedText + '\n', true);
         // setTimeout(() => self.insertTextAtCursor(sharedText), 100);
       }
-      // searchParams.get() will properly handle decoding the values.
-      // alert('Title shared: ' + parsedUrl.searchParams.get('title'));
-      // if (parsedUrl.searchParams.get('text') !== null) alert('Text shared: ' + parsedUrl.searchParams.get('text'));
-      //console.log(self.settings);
     });
     // PWA install promotion banner on start
-    // window.addEventListener('beforeinstallprompt', function(event) {
-    //   event.prompt();
-    // });
     let deferredPrompt;
     const addBtn = $('#addPwa')[0];
     addBtn.style.display = 'none';
     // addBtn.addEventListener('click', (e) => {console.log(e)});
-    window.addEventListener('beforeinstallprompt', (e) => {
+    window.addEventListener('beforeinstallprompt', e => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       deferredPrompt = e;
       // Update UI to notify the user they can add to home screen
       addBtn.style.display = 'block';
 
-      addBtn.addEventListener('click', (e) => {
+      addBtn.addEventListener('click', e => {
         // hide our user interface that shows our A2HS button
         addBtn.style.display = 'none';
         deferredPrompt.prompt();
         // Wait for the user to respond to the prompt
-        deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt.userChoice.then(choiceResult => {
           if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the A2HS prompt');
             addBtn.style.display = 'none';
@@ -222,7 +237,7 @@ export var App = function(name, version) {
       self.workspace.updateArrows();
       self.initGrid();
     });
-    self.initGrid();
+    setTimeout(self.initGrid, 50);
 
     this.guessPopUpHelper = function() {
       if (/color=#([a-zA-Z0-9]{3,6})$/.test(self.getTagBeforeCursor())) {
@@ -236,7 +251,7 @@ export var App = function(name, version) {
       self.togglePreviewMode(true);
       $('#emojiPicker-container').css({
         left: self.input.mouse.x - 200,
-        top: self.input.mouse.y - 125
+        top: self.input.mouse.y - 125,
       });
       $('#emojiPicker-container').show();
     };
@@ -251,10 +266,9 @@ export var App = function(name, version) {
       $('#colorPicker').spectrum('toggle');
       $('#colorPicker-container').css({
         left: self.input.mouse.x - 70,
-        top: self.input.mouse.y - 50
+        top: self.input.mouse.y - 50,
       });
       $('#colorPicker-container').show();
-
 
       self.togglePreviewMode(true);
       setTimeout(() => {
@@ -289,110 +303,6 @@ export var App = function(name, version) {
       false
     );
 
-    this.speakText = function() {
-      const selectedText = self.editor.getSelectedText();
-      const say = selectedText
-        ? selectedText
-        : self.editor.getSession().getValue();
-
-      spoken.voices().then(countries => {
-        const lookUp = self.settings.language().split('-')[0];
-        const voices = countries.filter(v => !v.lang.indexOf(lookUp));
-
-        if (voices.length) {
-          console.log('Loaded voice', voices[0]);
-          spoken.say(say, voices[0]);
-        } else {
-          spoken.say(say);
-        }
-      });
-    };
-
-    this.startCapture = function() {
-      spoken
-        .listen({ continuous: true })
-        .then(transcript => {
-          console.log(transcript);
-          if (self.editing()) {
-            self.insertTextAtCursor(transcript + '. ');
-            document.getElementById('speakTextBtnBubble').title = 'Transcribe';
-          } else {
-            if (transcript === 'open') {
-              console.log('try open...');
-              var firstFoundTitle = self
-                .getFirstFoundNode(self.$searchField.val().toLowerCase())
-                .title();
-              console.log('try open:', firstFoundTitle);
-              self.openNodeByTitle(firstFoundTitle);
-            } else if (transcript === 'clear') {
-              self.$searchField.val('');
-              self.updateSearch();
-            } else {
-              self.$searchField.val(transcript);
-              self.updateSearch();
-            }
-          }
-
-          spoken.listen.stop().then(() => {
-            if (self.editing()) {
-              document.getElementById('speakTextBtnBubble').style.visibility =
-                'hidden';
-            }
-
-            this.continueCapture();
-          });
-        })
-        .catch(e => spoken.listen.stop().then(() => this.continueCapture()));
-    };
-
-    this.continueCapture = function() {
-      spoken.delay(500).then(() => {
-        if (spoken.recognition.continuous) self.startCapture();
-      });
-    };
-
-    this.toggleTranscribing = function() {
-      const available = spoken.listen.available();
-      var speakBubble = document.getElementById('speakTextBtnBubble');
-      if (available && self.settings.transcribeEnabled()) {
-        spoken.listen.on.partial(ts => {
-          if (self.editing()) {
-            speakBubble.style.visibility = 'visible';
-            speakBubble.title = `🗣️ ${ts} 🦜`;
-          } else {
-            self.$searchField.val(`🗣️ ${ts} 🦜`);
-          }
-        });
-        self.startCapture();
-      } else {
-        speakBubble.style.visibility = 'hidden';
-        spoken.recognition.continuous = false;
-        spoken.listen.stop();
-      }
-    };
-
-    this.hearText = function() {
-      const available = spoken.listen.available();
-      if (!available) {
-        alert('Speech recognition not avaiilable!');
-        return;
-      }
-
-      // spoken.listen.on.partial(ts => ($("#speakTextBtn").title = ts));
-      spoken.listen.on.partial(ts => {
-        console.log(ts);
-        document.getElementById('speakTextBtnBubble').title = `🗣️ ${ts} 🦜`;
-      });
-
-      spoken
-        .listen()
-        .then(transcript => {
-          self.insertTextAtCursor(transcript + ' ');
-          document.getElementById('speakTextBtnBubble').title = 'Transcribe';
-        })
-        .catch(error => console.warn(error.message));
-    };
-
     // Handle file dropping
     document.ondragover = document.ondrop = e => {
       e.preventDefault();
@@ -409,30 +319,29 @@ export var App = function(name, version) {
     };
 
     // this is how the VSCode extension sends its messages back to the app
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', event => {
       const message = event.data;
 
       switch (message.type) {
-      // sent whenever the temporary file that's open gets changed
-      case 'UpdateNode':
-        // find the node that was being edited... we check originalNodeTitle here
-        // since it's possible that the user changed the node's title in the editor
-        self.nodes().forEach(node => {
-          if (
-            node.title().trim() ===
-            message.payload.originalNodeTitle.trim()
-          ) {
-            node.title(message.payload.title);
-            node.tags(message.payload.tags);
-            node.body(message.payload.body);
+        // sent whenever the temporary file that's open gets changed
+        case 'UpdateNode':
+          // find the node that was being edited... we check originalNodeTitle here
+          // since it's possible that the user changed the node's title in the editor
+          self.nodes().forEach(node => {
+            if (
+              node.title().trim() === message.payload.originalNodeTitle.trim()
+            ) {
+              node.title(message.payload.title);
+              node.tags(message.payload.tags);
+              node.body(message.payload.body);
 
-            // re-send the document back to the extension so it updates its underlying text document
-            self.setYarnDocumentIsDirty();
-          }
-        });
-        break;
-      default:
-        break;
+              // re-send the document back to the extension so it updates its underlying text document
+              self.setYarnDocumentIsDirty();
+            }
+          });
+          break;
+        default:
+          break;
       }
     });
 
@@ -441,13 +350,15 @@ export var App = function(name, version) {
     event.document = document;
     event.data = data;
     event.app = this;
-    window.parent.dispatchEvent(event);
+    window.dispatchEvent(event);
   };
 
-  this.limitNodesUpdate = function ( fn ) {
-    self.nodes.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 } });
+  this.limitNodesUpdate = function(fn) {
+    self.nodes.extend({
+      rateLimit: { method: 'notifyWhenChangesStop', timeout: 250 },
+    });
     fn();
-    self.nodes.limit( callback => () => callback() );
+    self.nodes.limit(callback => () => callback());
   };
 
   this.getNodesConnectedTo = function(toNode) {
@@ -490,7 +401,10 @@ export var App = function(name, version) {
       editorTitle.attr('title', 'Another node has the same title');
     } else if (!RegExp('^[a-z0-9]+$', 'i').test(enteredValue)) {
       editorTitle.attr('class', 'title title-error');
-      editorTitle.attr('title', 'Only upper or lower case letters and numbers are allowed in a node title.');
+      editorTitle.attr(
+        'title',
+        'Only upper or lower case letters and numbers are allowed in a node title.'
+      );
     } else {
       editorTitle.removeAttr('title');
       editorTitle.removeClass('title-error');
@@ -500,9 +414,17 @@ export var App = function(name, version) {
   this.refreshWindowTitle = function() {
     let title = '';
     if (data.lastStorageHost() === 'LOCAL') {
-      title = 'Yarn - ' + (data.editingPath() || data.editingName()) + ' ' + (data.isDocumentDirty() ? '*' : '');
-    } else if (data.lastStorageHost() === 'GIST'){
-      title = 'Gist - ' + (data.editingPath() || data.editingName()) + ' ' + (data.isDocumentDirty() ? '*' : '');
+      title =
+        'Yarn - ' +
+        (data.editingPath() || data.editingName()) +
+        ' ' +
+        (data.isDocumentDirty() ? '*' : '');
+    } else if (data.lastStorageHost() === 'GIST') {
+      title =
+        'Gist - ' +
+        (data.editingPath() || data.editingName()) +
+        ' ' +
+        (data.isDocumentDirty() ? '*' : '');
     }
     if (self.electron) {
       self.electron.remote.getCurrentWindow().setTitle(title);
@@ -526,12 +448,15 @@ export var App = function(name, version) {
   // This should be called whenever we want to mark the document as changed.
   this.setYarnDocumentIsDirty = function() {
     // If we're in the VSCode extension, send it an update
-    if (self.usingVisualStudioCodeExtension() && self.editingVisualStudioCodeFile()) {
+    if (
+      self.usingVisualStudioCodeExtension() &&
+      self.editingVisualStudioCodeFile()
+    ) {
       window.vsCodeApi.postMessage({
         type: 'DocumentEdit',
-        
+
         // we just send the whole doc here every time...
-        payload: data.getSaveData(data.editingType())
+        payload: data.getSaveData(data.editingType()),
       });
     }
   };
@@ -649,22 +574,24 @@ export var App = function(name, version) {
 
   this.confirmDeleteNodes = function(toDelete) {
     const node = Array.isArray(toDelete) ? undefined : toDelete;
-    const selected = Array.isArray(toDelete) ?
-      [...toDelete] :
-      node && node.selected ?
-        [...self.workspace.getSelectedNodes()] :
-        [toDelete];
+    const selected = Array.isArray(toDelete)
+      ? [...toDelete]
+      : node && node.selected
+      ? [...self.workspace.getSelectedNodes()]
+      : [toDelete];
 
     if (selected.length) {
       Swal.fire({
         title: 'Are you sure?',
-        text: `${selected.length} ${selected.length === 1 ? 'node' : 'nodes'} will be deleted.`,
+        text: `${selected.length} ${
+          selected.length === 1 ? 'node' : 'nodes'
+        } will be deleted.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes, delete!',
         cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-      }).then((result) => {
+        reverseButtons: true,
+      }).then(result => {
         if (result.value) {
           self.deleteNodes(selected);
         }
@@ -676,26 +603,24 @@ export var App = function(name, version) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
     const promises = [];
 
-    for (let i = list.length-1; i >= 0; --i)
-      promises.push( list[i].remove() );
+    for (let i = list.length - 1; i >= 0; --i) promises.push(list[i].remove());
 
-    Promise.all(promises)
-      .then( () => {
-        self.limitNodesUpdate( () => {
-          for (let i = list.length-1; i >= 0; --i) {
-            if (self.inEditor()) {
-              if (self.editing() === list[i]) {
-                self.closeEditor();
-              }
+    Promise.all(promises).then(() => {
+      self.limitNodesUpdate(() => {
+        for (let i = list.length - 1; i >= 0; --i) {
+          if (self.inEditor()) {
+            if (self.editing() === list[i]) {
+              self.closeEditor();
             }
-            self.deleteNode(list[i]);
           }
+          self.deleteNode(list[i]);
+        }
 
-          self.updateNodeLinks();
-          self.workspace.deselectNodes(list);
-          self.workspace.updateArrows();
-        });
+        self.updateNodeLinks();
+        self.workspace.deselectNodes(list);
+        self.workspace.updateArrows();
       });
+    });
   };
 
   this.deleteNode = function(node) {
@@ -721,12 +646,11 @@ export var App = function(name, version) {
   };
 
   // TODO: used just once. Fuse with newNodeAt and makeNodeWithName
-  this.newNode = function(updateLinks=true) {
+  this.newNode = function(updateLinks = true) {
     var node = new Node();
     self.nodes.push(node);
 
-    if (updateLinks)
-      self.updateNodeLinks();
+    if (updateLinks) self.updateNodeLinks();
 
     self.recordNodeAction('created', node);
 
@@ -734,7 +658,7 @@ export var App = function(name, version) {
   };
 
   this.newNodeAt = function(x, y) {
-    var node = new Node({ x: x - 100, y: y - 100});
+    var node = new Node({ x: x - 100, y: y - 100 });
 
     self.nodes.push(node);
 
@@ -758,7 +682,9 @@ export var App = function(name, version) {
       dataType: 'jsonp',
       data: 'method=getQuote&format=jsonp&lang=en&jsonp=?',
       success: function(response) {
-        alert(response.quoteText + '\n\n-' + response.quoteAuthor);
+        Swal.fire({
+          text: response.quoteText + '\n\n-' + response.quoteAuthor,
+        });
       },
     });
   };
@@ -777,8 +703,14 @@ export var App = function(name, version) {
 
     // Make sure we save the node being currently edited before editing a new
     // one using the context menu
-    if (self.editing() && self.editing() !== node)
-      self.saveNode(false);
+    if (self.editing() && self.editing() !== node) self.saveNode(false);
+
+    if (self.isEditorInPlayMode) {
+      self.togglePlayMode(false);
+    }
+    if (self.isEditorInPreviewMode) {
+      self.togglePreviewMode(false);
+    }
 
     node.oldTitle = node.title(); // To check later if "title" changed
 
@@ -794,8 +726,8 @@ export var App = function(name, version) {
       .transition({ y: '0', opacity: 1.0 }, 250);
     self.editor = ace.edit('editor');
     self.editor.setOptions({
-      scrollPastEnd: 0.5
-    })
+      scrollPastEnd: 0.5,
+    });
     self.editor.navigateFileEnd();
 
     /// set color picker
@@ -833,20 +765,38 @@ export var App = function(name, version) {
       'Node Link'
     );
     // console.log(langTools);
-    langTools.setCompleters([nodeLinksCompleter, langTools.keyWordCompleter, langTools.textCompleter, langTools.snippetCompleter]);
+    langTools.setCompleters([
+      nodeLinksCompleter,
+      langTools.keyWordCompleter,
+      langTools.textCompleter,
+      langTools.snippetCompleter,
+    ]);
 
     // autocompletion
     let autoCompleteTimeout = undefined;
     self.editor.getSession().on('change', function(evt) {
-      const autoComplete = $('#toglAutocomplete').prop('checked');
+      const autoComplete = self.settings.autoCloseTags();
       if (evt.action === 'insert' && autoComplete) {
-        autoCompleteTimeout && clearTimeout (autoCompleteTimeout);
+        if (self.richTextFormatter.justInsertedAutoComplete) {
+          self.richTextFormatter.justInsertedAutoComplete = false;
+          return;
+        }
+        autoCompleteTimeout && clearTimeout(autoCompleteTimeout);
         autoCompleteTimeout = setTimeout(() => {
           autoCompleteTimeout = undefined;
-          self.richTextFormatter.completableTags.forEach( tag => {
+          self.richTextFormatter.completableTags.forEach(tag => {
             if (self.getTagBeforeCursor() === tag.Start) {
-              tag.Completion && self.insertTextAtCursor(tag.Completion);
-              tag.Offset && self.moveEditCursor(tag.Offset);
+              self.richTextFormatter.justInsertedAutoComplete = true;
+              let insertedText = tag.Completion;
+              let offset = tag.Offset;
+              if (self.settings.autoCloseBrackets()) {
+                if (tag.BehaviorCompletion) {
+                  insertedText = tag.BehaviorCompletion;
+                  offset += 1;
+                }
+              }
+              tag.Completion && self.insertTextAtCursor(insertedText);
+              tag.Offset && self.moveEditCursor(offset);
               tag.Func && tag.Func();
             }
           });
@@ -866,24 +816,26 @@ export var App = function(name, version) {
 
     /// init spell check
     enable_spellcheck();
-
-    self.toggleTranscribing();
     self.toggleInvertColors();
     self.toggleShowCounter();
-    self.toggleWordCompletion();
     self.toggleSpellCheck();
     self.validateTitle(); // warn if title already exists
     self.updateEditorStats();
+    self.updateEditorOptions();
 
-    if (self.$searchField.val().length > 0 && $('.search-body input').is(':checked')){
+    if (
+      self.$searchField.val().length > 0 &&
+      $('.search-body input').is(':checked')
+    ) {
       self.editor.findAll(self.$searchField.val());
     }
 
     if (self.settings.editorSplit()) {
       self.splitEditor();
+      self.workspace.warpToNodeByIdx(node.index() - 1);
     }
 
-    if (self.settings.editorSplitDirection() === "right") {
+    if (self.settings.editorSplitDirection() === 'right') {
       $('#editor-form').addClass('split-editor-right');
       $('#editor-resize-handle').addClass('float-right');
     } else {
@@ -896,12 +848,21 @@ export var App = function(name, version) {
         self.focusEditor(true);
         e.stopPropagation();
       }
-    })
+    });
 
     // Remove app-info while editor is open, can't see it anyway
     $('.app-info').hide();
 
     self.editor.resize();
+    if (node.undoManager != null) {
+      self.editor.session.setUndoManager(node.undoManager);
+    }
+
+    var event = new CustomEvent('yarnEditorOpen');
+    event.document = document;
+    event.data = data;
+    event.app = app;
+    window.dispatchEvent(event);
   };
 
   this.splitEditor = function() {
@@ -909,23 +870,32 @@ export var App = function(name, version) {
     self.focusEditor(true);
     self.settings.editorSplit(true);
 
-    self.editorResizeHandleOptions.resizeWidthFrom = (self.settings.editorSplitDirection() === 'right') ? 'left' : 'right';
+    self.editorResizeHandleOptions.resizeWidthFrom =
+      self.settings.editorSplitDirection() === 'right' ? 'left' : 'right';
 
     // Editor Classes
     $('#editor-form')
-    .width('50%')
-    .addClass('split-editor')
-    .toggleClass('split-editor-right', self.settings.editorSplitDirection() === 'right')
-    .resizable(self.editorResizeHandleOptions);
+      .width(self.settings.editorSplitSize())
+      .addClass('split-editor')
+      .toggleClass(
+        'split-editor-right',
+        self.settings.editorSplitDirection() === 'right'
+      )
+      .resizable(self.editorResizeHandleOptions);
 
     // Hide editor background
     $('#node-editor-background').addClass('hidden');
 
     // Lower z-index
-    $('#node-editor').css({'z-index': 10002});
+    $('#node-editor').css({ 'z-index': 10002 });
 
     // Show resize handle
-    $('#editor-resize-handle').removeClass('hidden').toggleClass('float-right', self.settings.editorSplitDirection() === 'right');
+    $('#editor-resize-handle')
+      .removeClass('hidden')
+      .toggleClass(
+        'float-right',
+        self.settings.editorSplitDirection() === 'right'
+      );
 
     // Reveal/hide buttons
     $('#split-editor-button').addClass('hidden');
@@ -950,10 +920,12 @@ export var App = function(name, version) {
     setTimeout(() => {
       self.editNode(editingNode);
     }, 250);
-  }
+  };
 
   this.editorSnapToggle = function() {
-    self.settings.editorSplitDirection((self.settings.editorSplitDirection() === 'right') ? 'left' : 'right')
+    self.settings.editorSplitDirection(
+      self.settings.editorSplitDirection() === 'right' ? 'left' : 'right'
+    );
 
     self.reopenEditor();
   };
@@ -970,14 +942,17 @@ export var App = function(name, version) {
 
   this.getSplitEditorXOffset = function() {
     let splitEditorXOffset = 0;
-    if (self.settings.editorSplit()) {
-      splitEditorXOffset = ($('#editor-form').width() / 2);
-      
-      if (self.settings.editorSplitDirection() === 'right') { splitEditorXOffset *= -1; }
+
+    if (self.inEditor() && self.settings.editorSplit()) {
+      splitEditorXOffset = $('#editor-form').width() / 2;
+
+      if (self.settings.editorSplitDirection() === 'right') {
+        splitEditorXOffset *= -1;
+      }
     }
 
     return splitEditorXOffset;
-  }
+  };
 
   // called by the "Edit in Visual Studio Code Text Editor" button
   // this sends a message to the extension telling it to open the node in a text editor
@@ -993,11 +968,13 @@ export var App = function(name, version) {
         payload: {
           title: node.title().trim(),
           tags: node.tags().trim(),
-          body: self.trimBodyLinks(node.body().trim())
-        }
+          body: self.trimBodyLinks(node.body().trim()),
+        },
       });
     } else {
-      console.error('Tried to open node in Visual Studio Code text editor but we\'re not in the Visual Studio Code extension');
+      console.error(
+        "Tried to open node in Visual Studio Code text editor but we're not in the Visual Studio Code extension"
+      );
     }
   };
 
@@ -1083,17 +1060,15 @@ export var App = function(name, version) {
   this.toggleSpellCheck = function() {
     // Timeout so spellcheck can toggle after the spelling check settings are updated
     setTimeout(function() {
-      if (self.settings.spellcheckEnabled())
-      enable_spellcheck();
-    else
-      disable_spellcheck();
+      if (self.settings.spellcheckEnabled()) enable_spellcheck();
+      else disable_spellcheck();
     }, 50);
   };
 
   this.toggleInvertColors = function() {
-    const cssOverwrite = self.settings.invertColorsEnabled() ?
-      { filter: 'invert(100%)' } :
-      { filter: 'invert(0%)' };
+    const cssOverwrite = self.settings.invertColorsEnabled()
+      ? { filter: 'invert(100%)' }
+      : { filter: 'invert(0%)' };
 
     $('#app').css(cssOverwrite);
     $('#app-bg').css(cssOverwrite);
@@ -1109,13 +1084,15 @@ export var App = function(name, version) {
       $('#grid-canvas').attr('width', width);
       $('#grid-canvas').attr('height', height);
       $('#gridSize').attr('disabled', false);
-      self.workspace.gridContext.strokeStyle = self.workspace.gridContext.fillStyle = $('.grid-canvas').css('color');
+      self.workspace.gridContext.strokeStyle = self.workspace.gridContext.fillStyle = $(
+        '.grid-canvas'
+      ).css('color');
     } else {
       $('#gridSize').attr('disabled', true);
     }
 
     app.workspace.updateGrid();
-  }
+  };
 
   this.toggleShowCounter = function() {
     if (self.settings.editorStatsEnabled()) {
@@ -1129,77 +1106,24 @@ export var App = function(name, version) {
     }
   };
 
-  this.toggleWordCompletion = function() {
+  this.toggleAutocompleteSuggestions = function() {
+    self.settings.autocompleteSuggestionsEnabled(
+      !self.settings.autocompleteSuggestionsEnabled()
+    );
     self.updateEditorOptions();
   };
 
-  this.toggleClosingCharactersCompletion = function() {
+  this.toggleAutoCloseBrackets = function() {
+    self.settings.autoCloseBrackets(!self.settings.autoCloseBrackets());
     self.updateEditorOptions();
   };
 
   this.updateEditorOptions = function() {
     self.editor.setOptions({
-      enableBasicAutocompletion: app.settings.completeWordsEnabled(),
-      enableLiveAutocompletion: app.settings.completeWordsEnabled(),
-      behavioursEnabled: app.settings.completeClosingCharacters(),
+      enableBasicAutocompletion: app.settings.autocompleteSuggestionsEnabled(),
+      enableLiveAutocompletion: app.settings.autocompleteSuggestionsEnabled(),
+      behavioursEnabled: app.settings.autoCloseBrackets(),
     });
-  }
-
-  this.advanceStoryPlayMode = function(speed = 5) {
-    if (!self.previewStory.finished) {
-      self.previewStory.changeTextScrollSpeed(speed);
-      if (self.previewStory.vnSelectedChoice != -1 && speed === 5) {
-        self.previewStory.vnSelectChoice();
-      }
-    }
-    else self.togglePlayMode(false);
-  };
-
-  this.togglePlayMode = function(playModeOverwrite = false) {
-    var editor = $('.editor')[0];
-    var storyPreviewPlayButton = document.getElementById('storyPlayButton');
-    var editorPlayPreviewer = document.getElementById('editor-play');
-    if (playModeOverwrite) {
-      self.togglePreviewMode(false);
-      //preview play mode
-      editor.style.display = 'none';
-      editorPlayPreviewer.style.display = 'flex';
-      $(storyPreviewPlayButton).addClass('disabled');
-      $('.toggle-toolbar').addClass('hidden');
-      $('.editor-counter').addClass('hidden');
-      self.previewStory.emiter.on('finished', function() {
-        self.togglePlayMode(false);
-      });
-      self.previewStory.initYarn(
-        JSON.parse(data.getSaveData(FILETYPE.JSON)),
-        self
-          .editing()
-          .title()
-          .trim(),
-        'NVrichTextLabel',
-        false,
-        'commandDebugLabel',
-        self.playtestStyle
-      );
-    } else {
-      //edit mode
-      self.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
-      editorPlayPreviewer.style.display = 'none';
-      editor.style.display = 'flex';
-      $(storyPreviewPlayButton).removeClass('disabled');
-      $('.toggle-toolbar').removeClass('hidden');
-      $('.editor-counter').removeClass('hidden');
-      self.previewStory.terminate();
-      setTimeout(() => {
-        if (
-          self.editing() &&
-          self.editing().title() !== self.previewStory.node.title
-        ) {
-          self.openNodeByTitle(self.previewStory.node.title);
-        }
-        self.editor.focus();
-      }, 1000);
-    }
   };
 
   // TODO: move to UI?
@@ -1208,16 +1132,19 @@ export var App = function(name, version) {
     const editorPreviewer = $('#editor-preview')[0];
 
     self.isEditorInPreviewMode = previewModeOverwrite;
+    const event = new CustomEvent('yarnInPreviewMode');
+    window.dispatchEvent(event);
     if (previewModeOverwrite) {
-      self.togglePlayMode(false);
       $('.bbcode-toolbar').addClass('hidden');
       //preview mode
       editor.style.display = 'none';
       editorPreviewer.style.display = 'block';
-      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(self.editing().body(), true);
+      editorPreviewer.innerHTML = self.richTextFormatter.richTextToHtml(
+        self.editing().body(),
+        true
+      );
       editorPreviewer.scrollTop = self.editor.renderer.scrollTop;
     } else {
-      //edit mode
       $('.bbcode-toolbar').removeClass('hidden');
       self.editor.session.setScrollTop(editorPreviewer.scrollTop);
       editorPreviewer.innerHTML = '';
@@ -1239,24 +1166,31 @@ export var App = function(name, version) {
   this.appendText = function(textToAppend) {
     self.editing().body(self.editing().body() + textToAppend);
     // scroll to end of line
-    var row = self.editor.session.getLength() - 1;
-    var column = self.editor.session.getLine(row).length;
+    const row = self.editor.session.getLength() - 1;
+    const column = self.editor.session.getLine(row).length;
     self.editor.gotoLine(row + 1, column);
   };
 
   // TODO: move to editor class
   this.moveEditCursor = function(offset) {
-    var position = self.editor.getCursorPosition();
+    const position = self.editor.getCursorPosition();
     self.editor.gotoLine(position.row + 1, position.column + offset);
     self.editor.focus();
   };
 
   // TODO: move to editor class
-  this.insertTextAtCursor = function(textToInsert) {
+  this.insertTextAtCursor = function(textToInsert, scrollToLine = false) {
     if (!self.editing()) return;
     self.editor.session.replace(self.editor.selection.getRange(), '');
-    self.editor.session.insert(self.editor.getCursorPosition(), textToInsert);
-    self.editor.focus();
+    const position = self.editor.getCursorPosition();
+    self.editor.session.insert(position, textToInsert);
+
+    if (scrollToLine) {
+      const newPosition = self.editor.getCursorPosition();
+      editor.scrollToLine(newPosition.row, true, true, function() {});
+      self.editor.focus();
+    }
+    self.updateEditorStats();
   };
 
   // TODO: move to editor class
@@ -1278,7 +1212,6 @@ export var App = function(name, version) {
     const node = self.editing();
     if (node) {
       const editorTitleElement = $('#editorTitle')[0];
-      self.previewStory.terminate();
 
       // Ensure the title is unique
       const title = self.getFutureEditedNodeTitle();
@@ -1297,10 +1230,13 @@ export var App = function(name, version) {
       setTimeout(self.updateSearch, 600);
 
       self.setYarnDocumentIsDirty();
+      const event = new CustomEvent('yarnSavedNode');
+      window.dispatchEvent(event);
     }
   };
 
   this.closeEditor = function() {
+    self.editing().undoManager = self.editor.session.getUndoManager();
     $('#node-editor-background').transition({ opacity: 0 }, 250);
     $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
       self.editing(null);
@@ -1312,10 +1248,16 @@ export var App = function(name, version) {
     $('.app-info').show();
 
     app.ui.resetAppButtonsLocation();
+    if (self.isEditorInPlayMode) {
+      self.togglePlayMode(false);
+    }
+    if (self.isEditorInPreviewMode) {
+      self.togglePreviewMode(false);
+    }
   };
 
   this.convertMarkup = function() {
-    self.nodes().forEach( node => {
+    self.nodes().forEach(node => {
       node.body(self.richTextFormatter.convert(node.body()));
     });
   };
@@ -1354,7 +1296,7 @@ export var App = function(name, version) {
             .indexOf(search) >= 0;
 
         if (matchTitle || matchBody || matchTags) {
-          node.active({ title: matchTitle, body: matchBody, tags: matchTags});
+          node.active({ title: matchTitle, body: matchBody, tags: matchTags });
           element.clearQueue();
           element.transition({ opacity: on }, 500);
         } else {
@@ -1413,20 +1355,17 @@ export var App = function(name, version) {
   };
 
   this.updateTagsRepository = function() {
-    if (!self.mustUpdateTags)
-      return;
+    if (!self.mustUpdateTags) return;
 
     self.mustUpdateTags = false;
 
     const findFirstFreeId = () => {
-      const usedIds = self.tags().map( tag => tag.id );
-      for (let id = 1; ;++id)
-        if (!usedIds.includes(id))
-          return id;
+      const usedIds = self.tags().map(tag => tag.id);
+      for (let id = 1; ; ++id) if (!usedIds.includes(id)) return id;
     };
 
     // Reset count
-    self.tags().forEach(tag => tag.count = 0);
+    self.tags().forEach(tag => (tag.count = 0));
 
     // Recount tags and add new
     self.nodes().forEach(node => {
@@ -1434,14 +1373,13 @@ export var App = function(name, version) {
         const found = self.tags().find(e => e.text == tag);
         if (found) {
           ++found.count;
-        }
-        else {
+        } else {
           const id = findFirstFreeId();
           self.tags.push({
             id: id,
             style: 'tag-style-' + id,
             text: tag,
-            count: 1
+            count: 1,
           });
         }
       });
@@ -1450,8 +1388,7 @@ export var App = function(name, version) {
     // Remove unused tags
     let i = self.tags().length;
     while (i--) {
-      if(self.tags()[i].count === 0)
-        self.tags().splice(i, 1);
+      if (self.tags()[i].count === 0) self.tags().splice(i, 1);
     }
   };
 
@@ -1492,7 +1429,7 @@ export var App = function(name, version) {
     );
   };
 
-  this.getFutureEditedNodeTitle = function(){
+  this.getFutureEditedNodeTitle = function() {
     // Ensure the title is unique
     const editorTitleElement = $('#editorTitle')[0];
     // Return the title that will be used when changes are applied
@@ -1589,11 +1526,12 @@ export var App = function(name, version) {
   };
 
   this.getFirstFoundNode = function(search) {
-    return self.nodes().find(node =>
-      node
-        .title()
-        .toLowerCase()
-        .includes(search)
+    return self.nodes().find(
+      node =>
+        node
+          .title()
+          .toLowerCase()
+          .trim() === search
     );
   };
 

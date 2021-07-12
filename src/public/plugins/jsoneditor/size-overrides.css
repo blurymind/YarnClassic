@@ -1,0 +1,35 @@
+div.jsoneditor-tree {
+    min-height: 50vh;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+@media only screen and (max-width: 600px) {
+    .swal2-popup{
+        padding: 2px !important;
+    }
+    .swal2-actions{
+        margin: 1px !important;
+    }
+}
+
+.swal2-title{
+    width:100%;
+}
+.swal2-content{
+    max-height: 80vh;
+    overflow: auto;
+}
+@media only screen and (max-width: 600px) {
+    /*.form-control > input {*/
+    /*    max-width: 100px;*/
+    /*}*/
+}
+.form-control > input {
+    max-width: 100px;
+}
+.je-table{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}

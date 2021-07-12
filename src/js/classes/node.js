@@ -33,6 +33,7 @@ export let Node = function(options = {}) {
   this.selected = false;
   this.createX = options.x || null;
   this.createY = options.y || null;
+  this.undoManager = null;
 
   // clippedTags
   //
@@ -40,12 +41,9 @@ export let Node = function(options = {}) {
   this.clippedTags = ko.computed(function() {
     app.updateTagsRepository();
 
-    return Utils
-      .uniqueSplit(self.tags(), ' ')
-      .map (
-        tag => app.tags().find (e => e.text === tag)
-      )
-      .filter (item => item);
+    return Utils.uniqueSplit(self.tags(), ' ')
+      .map(tag => app.tags().find(e => e.text === tag))
+      .filter(item => item);
   }, this);
 
   this.clippedBody = ko.computed(function() {
@@ -199,7 +197,7 @@ export let Node = function(options = {}) {
   };
 
   this.remove = async function() {
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       $(self.element).transition(
         { opacity: 0, scale: 0.8, y: '-=80px', rotate: '-45deg' },
         250,
@@ -210,7 +208,7 @@ export let Node = function(options = {}) {
   };
 
   this.drag = function() {
-    const offset = { x:0, y:0 }; // Where inside the node did the mouse click
+    const offset = { x: 0, y: 0 }; // Where inside the node did the mouse click
     let dragging = false;
     let groupDragging = false;
 
@@ -225,7 +223,7 @@ export let Node = function(options = {}) {
             ? e.changedTouches[0].pageY
             : e.pageY;
 
-        let {x, y} = app.workspace.toWorkspaceCoordinates(pageX, pageY);
+        let { x, y } = app.workspace.toWorkspaceCoordinates(pageX, pageY);
 
         x -= offset.x;
         y -= offset.y;
@@ -233,10 +231,12 @@ export let Node = function(options = {}) {
         let movedX = x - self.x();
         let movedY = y - self.y();
 
-
         const nodes = app.workspace.getSelectedNodes();
         // Prevent yarn from moving a node when you scroll its contents on a touch screen
-        if(e.originalEvent.type === 'mousemove' || (nodes.includes(self) && e.originalEvent.type === 'touchmove')){
+        if (
+          e.originalEvent.type === 'mousemove' ||
+          (nodes.includes(self) && e.originalEvent.type === 'touchmove')
+        ) {
           self.x(x);
           self.y(y);
         }
@@ -263,17 +263,21 @@ export let Node = function(options = {}) {
     });
 
     $(self.element).on('pointerdown', function(e) {
-      if (!dragging && self.active() && e.button === 0 ) {
+      if (!dragging && self.active() && e.button === 0) {
         dragging = true;
 
         if (app.input.isShiftDown || self.selected) {
           groupDragging = true;
         }
 
-        const {x, y} = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
+        const { x, y } = app.workspace.toWorkspaceCoordinates(e.pageX, e.pageY);
 
-        offset.x = (app.settings.snapGridEnabled()) ? app.workspace.stepify(x - self.x(), app.settings.gridSize()) : x - self.x();
-        offset.y = (app.settings.snapGridEnabled()) ? app.workspace.stepify(y - self.y(), app.settings.gridSize()) : y - self.y();
+        offset.x = app.settings.snapGridEnabled()
+          ? app.workspace.stepify(x - self.x(), app.settings.gridSize())
+          : x - self.x();
+        offset.y = app.settings.snapGridEnabled()
+          ? app.workspace.stepify(y - self.y(), app.settings.gridSize())
+          : y - self.y();
       }
     });
 
@@ -289,7 +293,7 @@ export let Node = function(options = {}) {
         // this will tell the VSCode extension that we've moved the node
         app.setYarnDocumentIsDirty();
       }
-    })
+    });
   };
 
   this.moveTo = function(newX, newY) {
@@ -364,8 +368,7 @@ export let Node = function(options = {}) {
           const newBody = parent.body().replace(re, '|' + self.title() + ']]');
           parent.body(newBody);
           self.linkedFrom.push(parent);
-        }
-        else if (parentLinks.includes(self.title())) {
+        } else if (parentLinks.includes(self.title())) {
           self.linkedFrom.push(parent);
         }
       }

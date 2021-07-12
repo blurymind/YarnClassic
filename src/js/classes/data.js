@@ -9,6 +9,7 @@ export const data = {
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
+  documentHeader: ko.observable(null),
   isDocumentDirty: ko.observable(false),
   restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
@@ -23,6 +24,7 @@ export const data = {
     data.editingName(editingName);
     data.editingType(editingFormat);
     data.editingFolder(null);
+    data.documentHeader(null);
     app.workspace.selectedNodes = [];
     app.editing(null);
     app.nodes([app.newNode(true).title('Start')]);
@@ -32,19 +34,32 @@ export const data = {
     data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
+    const event = new CustomEvent('newYarnFileStarted');
+    window.dispatchEvent(event);
+  },
+  askForFileName: function() {
+    Swal.fire({
+      title: 'Enter a New File Name',
+      input: 'text',
+      inputPlaceholder: 'NewFile',
+      showCancelButton: true,
+    }).then(result => {
+      if (result.value || result.value === '') {
+        data.startNewFile(result.value || 'NewFile');
+      }
+    });
   },
   setNewFile: function() {
     Swal.fire({
-      title: '📔 Start a New file?',
-      text: `Any unsaved ${data.editingName()} progress will be lost!`,
+      title: 'Create a New File?',
+      text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'New file',
       cancelButtonText: 'No, cancel!',
-      reverseButtons: true,
-    }).then((result) => {
+    }).then(result => {
       if (result.value) {
-        data.startNewFile();
+        data.askForFileName();
       }
     });
   },
@@ -54,6 +69,7 @@ export const data = {
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
+    // console.log('Update storage', app.plugins.pluginStorage());
     storage.setItem(
       'appState',
       JSON.stringify({
@@ -63,13 +79,17 @@ export const data = {
         editingFolder: data.editingFolder(),
         editingTitle: app.editing() ? app.editing().title() : null,
         nodes: data.getNodesAsObjects(),
+        documentHeader: data.documentHeader(),
         tags: app.tags(),
         editorSelection: app.editor ? app.editor.selection.getRange() : null,
         transform: app.workspace.transform,
         scale: app.workspace.scale,
         lastStorageHost: data.lastStorageHost(),
-      }),
+        pluginStorage: app.plugins.pluginStorage,
+      })
     );
+    const event = new CustomEvent('yarnSavedStateToLocalStorage');
+    window.dispatchEvent(event);
   },
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return;
@@ -86,9 +106,11 @@ export const data = {
         editingTitle,
         editorSelection,
         nodes,
+        documentHeader,
         tags,
         transform,
         scale,
+        pluginStorage,
       } = appState;
       data.editingPath(editingPath);
       data.editingName(editingName);
@@ -96,17 +118,21 @@ export const data = {
       data.editingFolder(editingFolder);
       data.lastStorageHost(lastStorageHost);
       app.nodes([]);
-      data.getNodesFromObjects(nodes).forEach((node) => app.nodes.push(node));
+      data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);
       app.updateNodeLinks();
       app.workspace.setTranslation(transform.x, transform.y);
       app.workspace.setZoom(scale * 4);
       if (editingTitle) {
-        app.editNode(app.nodes().find((node) => node.title() === editingTitle));
+        app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
+      app.plugins.pluginStorage = pluginStorage;
+      data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
+      const event = new CustomEvent('yarnLoadedStateFromLocalStorage');
+      window.dispatchEvent(event);
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -115,7 +141,11 @@ export const data = {
     reader.onload = function(e) {
       // fileDisplayArea.innerText = reader.result;
       var type = data.getFileType(filename);
-      if (type == FILETYPE.UNKNOWN) alert('Unknown filetype!');
+      if (type == FILETYPE.UNKNOWN)
+        Swal.fire({
+          title: 'Unknown filetype!',
+          icon: 'error',
+        });
       else {
         data.editingPath(file.path);
         data.editingType(type);
@@ -125,24 +155,50 @@ export const data = {
     reader.readAsText(file);
   },
 
-  openFile: function(file, filename) {
-    if (data.editingPath()) {
-      if (
-        !confirm(
-          'Are you sure you want to close \n' +
-            data.editingPath() +
-            '\nAny unsaved progress will be lost...',
-        )
-      ) {
-        return;
-      }
-    }
-    data.editingName(filename.replace(/^.*[\\\/]/, ''));
-    data.readFile(file, filename, true);
+  setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
+    data.editingName(fileName.replace(/^.*[\\\/]/, ''));
     data.isDocumentDirty(false);
-    data.editingPath(file.path);
-    data.lastStorageHost('LOCAL');
+    data.editingPath(filePath);
+    data.lastStorageHost(lastStorageHost);
     app.refreshWindowTitle();
+  },
+  openFile: function(file, filename) {
+    const confirmText = data.editingPath()
+      ? 'Any unsaved progress to ' + data.editingName() + ' will be lost.'
+      : 'Any unsaved progress will be lost.';
+
+    Swal.fire({
+      title: 'Are you sure you want to open another file?',
+      text: confirmText,
+      icon: 'warning',
+      showConfirmButton: true,
+      showCancelButton: true,
+    }).then(result => {
+      if (result.value === true) {
+        data.readFile(file, filename, true);
+        data.setNewFileStats(filename, file.path);
+        app.refreshWindowTitle();
+      }
+    });
+  },
+  openFileFromFilePath: function(filePath) {
+    const fileName = app.path.basename(filePath);
+    $.ajax({
+      url: filePath,
+      async: false,
+      success: result => {
+        const type = data.getFileType(fileName);
+        if (type == FILETYPE.UNKNOWN) {
+          Swal.fire({
+            title: 'Unknown filetype!',
+            icon: 'error',
+          });
+        } else {
+          data.loadData(result, type, true);
+          data.setNewFileStats(fileName, filePath);
+        }
+      },
+    });
   },
   openFiles: function(file, filename) {
     const files = document.getElementById('open-file').files;
@@ -153,9 +209,11 @@ export const data = {
   },
   openFolder: function(e, foldername) {
     editingFolder = foldername;
-    alert(
-      'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
-    );
+    Swal.fire({
+      text:
+        'openFolder not yet implemented e: ' + e + ' foldername: ' + foldername,
+      icon: 'error',
+    });
   },
 
   appendFile: function(file, filename) {
@@ -176,21 +234,49 @@ export const data = {
     return FILETYPE.UNKNOWN;
   },
 
+  dispatchEventDataLoaded: function() {
+    var event = new CustomEvent('yarnLoadedData');
+    event.document = document;
+    event.data = data;
+    event.app = app;
+    window.dispatchEvent(event);
+  },
+  restoreSettingsFromDocumentHeader: function() {
+    if (data.documentHeader() !== null) {
+      const documentHeader = data.documentHeader();
+      console.log('Apply settings from file header:', documentHeader);
+      if ('markupLanguage' in documentHeader)
+        app.settings.markupLanguage(documentHeader.markupLanguage);
+      if ('language' in documentHeader)
+        app.settings.language(documentHeader.language);
+      if ('filetypeVersion' in documentHeader)
+        app.settings.filetypeVersion(documentHeader.filetypeVersion);
+      app.settings.apply();
+    }
+  },
   loadData: function(content, type, clearNodes) {
     const objects = [];
-
+    const pushContent = extractedNodes => {
+      for (let i = 0; i < extractedNodes.length; i++) {
+        if ('title' in extractedNodes[i]) objects.push(extractedNodes[i]);
+      }
+    };
     if (type == FILETYPE.JSON) {
       content = JSON.parse(content);
       if (!content) {
         return;
       }
-      for (let i = 0; i < content.length; i++) {
-        objects.push(content[i]);
+      if (Array.isArray(content)) {
+        // Old json format
+        pushContent(content);
+      } else {
+        // New Json format
+        data.documentHeader(content.header);
+        pushContent(content.nodes);
       }
     } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
-      var index = 0;
       var readingBody = false;
       for (let i = 0; i < lines.length; i++) {
         if (lines[i].trim() === '===') {
@@ -212,7 +298,7 @@ export const data = {
           } else if (lines[i].indexOf('colorID:') > -1) {
             if (obj == null) obj = {};
             obj.colorID = Number(
-              lines[i].substr(9, lines[i].length - 9).trim(),
+              lines[i].substr(9, lines[i].length - 9).trim()
             );
           } else if (lines[i].indexOf('tags:') > -1) {
             if (obj == null) obj = {};
@@ -248,7 +334,7 @@ export const data = {
           if (openBracket > 0 && closeBracket > 0) {
             tags = lines[i].substr(
               openBracket + 1,
-              closeBracket - openBracket - 1,
+              closeBracket - openBracket - 1
             );
           }
 
@@ -305,18 +391,16 @@ export const data = {
     app.limitNodesUpdate(() => {
       if (clearNodes) app.nodes.removeAll();
 
-      data.getNodesFromObjects(objects).forEach((node) => app.nodes.push(node));
+      data.getNodesFromObjects(objects).forEach(node => app.nodes.push(node));
     });
 
+    data.restoreSettingsFromDocumentHeader();
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
+    data.isDocumentDirty(false);
 
     // Callback for embedding in other webapps
-    var event = new CustomEvent('yarnLoadedData');
-    event.document = document;
-    event.data = data;
-    event.app = app;
-    window.parent.dispatchEvent(event);
+    data.dispatchEventDataLoaded();
   },
   getNodeFromObject: function(object) {
     return new Node({
@@ -340,7 +424,7 @@ export const data = {
   getNodesFromObjects: function(objects) {
     const appNodes = [];
     if (!objects) return [];
-    objects.forEach((object) => {
+    objects.forEach(object => {
       appNodes.push(data.getNodeFromObject(object));
     });
     return appNodes;
@@ -360,7 +444,26 @@ export const data = {
     var content = data.getNodesAsObjects();
 
     if (type == FILETYPE.JSON) {
-      output = JSON.stringify(content, null, '\t');
+      // store useful values for later use if the file type supports it
+      if (app.settings.filetypeVersion() === '2') {
+        console.log('Saving as Yarn json v2 type');
+        const date = new Date();
+        data.documentHeader({
+          ...data.documentHeader(),
+          lastSavedUnix: date,
+          language: app.settings.language(),
+          markupLanguage: app.settings.markupLanguage(),
+          filetypeVersion: app.settings.filetypeVersion(),
+          pluginStorage: app.plugins.pluginStorage,
+        });
+        output = JSON.stringify(
+          { header: data.documentHeader(), nodes: content },
+          null,
+          '\t'
+        );
+      } else {
+        output = JSON.stringify(content, null, '\t');
+      }
     } else if (type == FILETYPE.YARN) {
       for (let i = 0; i < content.length; i++) {
         output += 'title: ' + content[i].title + '\n';
@@ -425,7 +528,17 @@ export const data = {
       app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
-        if (err) alert('Error Saving Data to ' + path + ': ' + err);
+        if (err) {
+          Swal.fire({
+            title: 'Error Saving Data to ' + path + ': ' + err,
+            icon: 'error',
+          });
+        } else {
+          app.ui.notification.fire({
+            title: 'Saved!',
+            icon: 'success',
+          });
+        }
       });
     }
   },
@@ -453,7 +566,7 @@ export const data = {
             accept +
             ' ' +
             saveas +
-            '>',
+            '>'
         );
       dialog.unbind('change');
       dialog.remove();
@@ -466,7 +579,7 @@ export const data = {
     var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     saveAs(
       blob,
-      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type,
+      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type
     );
   },
 
@@ -488,7 +601,7 @@ export const data = {
       <datalist class="form-control" id="select-file-name">    
         ${suggestions &&
           suggestions
-            .map((suggestion) => `<option value="${suggestion}" />`)
+            .map(suggestion => `<option value="${suggestion}" />`)
             .join('')}
       </datalist>`,
       onOpen: () => {
@@ -532,18 +645,20 @@ export const data = {
             file: [file],
           })
           .then(() => console.log('Successful share'))
-          .catch((error) => console.log('Error sharing', error));
+          .catch(error => console.log('Error sharing', error));
       } else {
-        alert(
-          'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
-        );
+        Swal.fire({
+          title:
+            'Web Share API is not supported in your browser.\nTry using it on your smartphone or tablet...',
+          icon: 'error',
+        });
       }
     });
   },
 
   trySaveGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
@@ -553,7 +668,7 @@ export const data = {
           Swal.fire(
             'Saved!',
             `The Yarn has been saved to gist ${gists.file}`,
-            'success',
+            'success'
           );
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
@@ -564,7 +679,7 @@ export const data = {
       Swal.fire(
         'Not configured',
         'Your github settings are not configured',
-        'warning',
+        'warning'
       );
       app.ui.openSettingsDialog();
     }
@@ -572,10 +687,10 @@ export const data = {
 
   tryOpenGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const gistFiles = gist.body.files;
         const inputOptions = {};
-        Object.keys(gistFiles).forEach((key) => {
+        Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
         });
         Swal.fire({
@@ -604,7 +719,7 @@ export const data = {
       Swal.fire(
         'Not configured',
         'Your github settings are not configured',
-        'warning',
+        'warning'
       );
       app.ui.openSettingsDialog();
     }
@@ -635,9 +750,11 @@ export const data = {
   },
 
   trySaveCurrent: function() {
+    if (!data.isDocumentDirty()) return;
+
     if (data.lastStorageHost() === 'GIST') {
       const gists = app.gists;
-      gists.get(gists.file).then((gist) => {
+      gists.get(gists.file).then(gist => {
         const yarnData = data.getSaveData(data.editingType());
         console.log(data.editingName());
         gists.edit(gists.file, {
@@ -647,6 +764,10 @@ export const data = {
         data.isDocumentDirty(false);
         app.refreshWindowTitle();
       });
+    } else if (!data.editingPath()) {
+      if (app.gists && app.gists.options.token) {
+        data.trySaveGist(app.gists);
+      } else data.trySave(FILETYPE.JSON);
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
     }
@@ -669,10 +790,10 @@ export const data = {
       if (navigator.clipboard) {
         navigator.clipboard
           .readText()
-          .then((text) => {
+          .then(text => {
             app.clipboard = text;
           })
-          .catch((err) => {
+          .catch(err => {
             app.clipboard = app.editor.getSelectedText();
             console.log('No clipboard access', err, 'using local instead');
           });
