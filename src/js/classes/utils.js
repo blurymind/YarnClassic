@@ -34,6 +34,7 @@ export var Utils = {
                 meta: meta,
                 title: word.title,
                 about: word.about,
+                titleStyle: word.titleStyle,
               };
             }
             return {
@@ -47,11 +48,9 @@ export var Utils = {
       getDocTooltip: function(item) {
         if (!item.title && !item.about) return '';
         item.docHTML = [
-          `<div style='
-            background-color: #2d2d2d;
+          `<div class='${item.titleStyle || 'title-style-1'}' style='
             display: flex;
-            flex-direction: column;
-            color: cyan;
+            flex-direction: column; 
             padding: 3px;'>`,
           '<p>',
           item.title,
@@ -59,6 +58,7 @@ export var Utils = {
           `<code style='
              background-color:black;
              color:yellow;
+             font-size: 0.7rem;
              margin: 3px'>`,
           item.about,
           '</code>',
