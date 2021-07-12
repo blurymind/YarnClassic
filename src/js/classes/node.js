@@ -354,7 +354,7 @@ export let Node = function(options = {}) {
 
   this.updateLinksFromParents = function() {
     // If title didn't change there's nothing we need to update on parents
-    if (!self.oldTitle || self.oldTitle === self.title()) {
+    if (!self.oldTitle || (self.oldTitle === self.title())) {
       return;
     }
 
@@ -364,11 +364,14 @@ export let Node = function(options = {}) {
       const parentLinks = self.getLinksInNode(parent);
       if (parentLinks) {
         if (parentLinks.includes(self.oldTitle)) {
-          const re = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
-          const newBody = parent.body().replace(re, '|' + self.title() + ']]');
+          const re1 = RegExp('\\|\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
+          const re2 = RegExp('\\[\\[\\s*' + self.oldTitle + '\\s*\\]\\]', 'g');
+          let newBody = parent.body().replace(re1, '|' + self.title() + ']]');
+          newBody = newBody.replace(re2, '[[' + self.title() + ']]');
           parent.body(newBody);
           self.linkedFrom.push(parent);
-        } else if (parentLinks.includes(self.title())) {
+        }
+        else if (parentLinks.includes(self.title())) {
           self.linkedFrom.push(parent);
         }
       }
