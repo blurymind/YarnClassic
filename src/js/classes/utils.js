@@ -27,6 +27,15 @@ export var Utils = {
         callback(
           null,
           wordList.map(function(word) {
+            if (typeof word === 'object') {
+              return {
+                caption: word.word,
+                value: word.word,
+                meta: meta,
+                title: word.title,
+                about: word.about,
+              };
+            }
             return {
               caption: word,
               value: word,
@@ -34,6 +43,27 @@ export var Utils = {
             };
           })
         );
+      },
+      getDocTooltip: function(item) {
+        if (!item.title && !item.about) return '';
+        item.docHTML = [
+          `<div style='
+            background-color: #2d2d2d;
+            display: flex;
+            flex-direction: column;
+            color: cyan;
+            padding: 3px;'>`,
+          '<p>',
+          item.title,
+          '</p>',
+          `<code style='
+             background-color:black;
+             color:yellow;
+             margin: 3px'>`,
+          item.about,
+          '</code>',
+          '</div>',
+        ].join('');
       },
     };
   },
