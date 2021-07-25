@@ -350,6 +350,7 @@ export var App = function(name, version) {
     event.document = document;
     event.data = data;
     event.app = this;
+    window.dispatchEvent(event);
     window.parent.dispatchEvent(event);
   };
 
