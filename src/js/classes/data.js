@@ -34,8 +34,8 @@ export const data = {
     data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
-    const event = new CustomEvent('newYarnFileStarted');
-    window.dispatchEvent(event);
+
+    app.ui.dispatchEvent('newYarnFileStarted');
   },
   askForFileName: function() {
     Swal.fire({
@@ -88,8 +88,7 @@ export const data = {
         pluginStorage: app.plugins.pluginStorage,
       })
     );
-    const event = new CustomEvent('yarnSavedStateToLocalStorage');
-    window.dispatchEvent(event);
+    app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   },
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return;
@@ -131,8 +130,7 @@ export const data = {
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
-      const event = new CustomEvent('yarnLoadedStateFromLocalStorage');
-      window.dispatchEvent(event);
+      app.ui.dispatchEvent('yarnLoadedStateFromLocalStorage');
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -156,6 +154,7 @@ export const data = {
   },
 
   setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
+    console.log('Updated save data', fileName, filePath);
     data.editingName(fileName.replace(/^.*[\\\/]/, ''));
     data.isDocumentDirty(false);
     data.editingPath(filePath);
@@ -240,6 +239,7 @@ export const data = {
     event.data = data;
     event.app = app;
     window.dispatchEvent(event);
+    window.parent.dispatchEvent(event);
   },
   restoreSettingsFromDocumentHeader: function() {
     if (data.documentHeader() !== null) {
@@ -538,6 +538,8 @@ export const data = {
             title: 'Saved!',
             icon: 'success',
           });
+          app.ui.dispatchEvent('yarnSavedData');
+          data.setNewFileStats(path, path, 'LOCAL');
         }
       });
     }
@@ -576,11 +578,29 @@ export const data = {
   },
 
   saveFileDialog: function(dialog, type, content) {
-    var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    saveAs(
-      blob,
-      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type
-    );
+    const fileName = (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
+    if(app.electron){
+      // console.log(app.electron)
+      app.electron.remote.dialog.showSaveDialog({
+        title: 'Saving ' + fileName,
+        filters: [{
+          name: type + ' file',
+          extensions: [type]
+        }],
+        defaultPath: fileName,
+      }).then((result) => {
+        data.saveTo(result.filePath, content);
+      }).catch((err) => {
+        console.error(err);
+      });
+    } else {
+      var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      saveAs(
+        blob,
+        fileName
+      );
+    }
+
   },
 
   insertImageFileName: function() {
@@ -756,7 +776,6 @@ export const data = {
       const gists = app.gists;
       gists.get(gists.file).then(gist => {
         const yarnData = data.getSaveData(data.editingType());
-        console.log(data.editingName());
         gists.edit(gists.file, {
           files: { [data.editingName()]: { content: yarnData } },
         });

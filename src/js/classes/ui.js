@@ -7,6 +7,14 @@ export const UI = function(app) {
     timer: 2500,
   });
 
+  this.dispatchEvent = function (eventName, options){
+    const event = new CustomEvent(eventName);
+    event.options = options;
+    window.dispatchEvent(event);
+    window.parent.dispatchEvent(event);
+    console.log('Dispatched event', eventName, event);
+  };
+
   this.settingsDialogVisible = ko.observable(false);
   this.narrowScreenThreshold = 600;
   this.isScreenNarrow = function() {
