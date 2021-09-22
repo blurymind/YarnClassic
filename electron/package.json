@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "copyfiles": "^2.1.1",
-    "electron": "^6.0.0",
+    "electron": "^9.4.0",
     "electron-builder": "^21.2.0"
   },
   "lint-staged": {
