@@ -195,6 +195,7 @@ export const data = {
         } else {
           data.loadData(result, type, true);
           data.setNewFileStats(fileName, filePath);
+          data.editingType(type);
         }
       },
     });
