@@ -198,8 +198,21 @@ export const BbcodeRichTextFormatter = function(app) {
         })
       }, 500)
     };
+    // create Youtube previews :)
+    if (showRowNumbers) {
+      result = result.replace(/(https:\/\/www.youtube.com\/watch\?v=[A-z0-9]+)/gi, function (id) {
+        const extractedId = id.match(/https:\/\/www.youtube.com\/watch\?v=([A-z0-9]+)/i);
+        if (extractedId.length > 1) {
+          return `
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen></iframe> 
+        `;
+        }
+      });
+    }
 
-    /// finaly return the html result
     return result;
   };
 };
