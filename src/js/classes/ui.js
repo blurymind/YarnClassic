@@ -100,6 +100,60 @@ export const UI = function(app) {
     window.dispatchEvent(event);
   };
 
+  // openHelpDialog
+  this.openHelpDialog = function() {
+    Swal.fire({
+      title: 'Help',
+      html: `
+      <div style="text-align: justify">
+        <p>Useful editor shortcuts:</p>
+        <ul>
+          <li>Cmd/Ctrl + Left Click -- Create multiple input carets</li>
+          <li>Cmd/Ctrl + Left/Right -- Caret jump word</li>
+          <li>Cmd/Ctrl + Up/Down -- Scroll up/down</li>
+          <li>Cmd/Ctrl + Left/Right + Shift -- Caret jump word selection</li>
+          <li>Cmd/Ctrl + F -- Search</li>
+          <li>Cmd/Ctrl + Alt + K -- Find All</li>
+          <li>Cmd/Ctrl + H -- Search and Replace</li>
+          <li>Cmd/Ctrl + A -- Select all</li>
+          <li>Cmd/Ctrl + U -- To Uppercase</li>
+          <li>Cmd/Ctrl + Shift + U -- To Lowercase</li>
+          <li>Alt + Up/Down -- Move line(s) up/down</li>
+          <li><a href="https://ace.c9.io/demo/keyboard_shortcuts.html" target="_blank">...</a></li>   
+        </ul>
+        <div>How to use <a href="https://yarnspinner.dev/docs/syntax/" target="_blank">Yarn Syntax</a></div>
+        <p>Runtimes:</p>
+        <a href="https://github.com/YarnSpinnerTool/YarnSpinner" target="_blank">YarnSpinner (Unity3d)</a>
+        <a href="https://github.com/hylyh/bondage.js" target="_blank">BondageJs (javascript)</a>
+      </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'About',
+      cancelButtonText: 'Close',
+    }).then(result => {
+      if (result.value) {
+        Swal.fire({
+          title: 'About',
+          html: `
+          <div style="text-align: justify">
+            <div><a href="https://github.com/YarnSpinnerTool" target="_blank">Yarn</a> was created by <a href="https://github.com/AlecHolowka" target="_blank">Alec Holowka</a></div>
+            <br>
+            <a href="https://github.com/YarnSpinnerTool/YarnEditor/graphs/contributors" target="_blank">Top contributors:</a>
+            <ul>
+              <li><a href="https://github.com/blurymind" target="_blank">Todor Imreorov</a></li>
+              <li><a href="https://github.com/daviddq" target="_blank">David Diaz</a></li>
+              <li><a href="https://github.com/FaultyFunctions" target="_blank">@FaultyFunctions</a></li>
+            </ul>   
+            <a href="https://github.com/YarnSpinnerTool/YarnEditor/issues/new" target="_blank">Report a Bug</a>
+          </div>
+          `,
+          showCancelButton: false,
+          confirmButtonText: 'OK',
+        });
+      }
+    });
+  };
+
   // closeSettingsDialog
   this.closeSettingsDialog = function() {
     $('.settings-dialog')
