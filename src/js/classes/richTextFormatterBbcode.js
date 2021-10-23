@@ -200,8 +200,8 @@ export const BbcodeRichTextFormatter = function(app) {
     };
     // create Youtube previews :)
     if (showRowNumbers) {
-      result = result.replace(/(https:\/\/www.youtube.com\/watch\?v=[A-z0-9]+)/gi, function (id) {
-        const extractedId = id.match(/https:\/\/www.youtube.com\/watch\?v=([A-z0-9]+)/i);
+      result = result.replace(/(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi, function (id) {
+        const extractedId = id.match(/(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/i);
         if (extractedId.length > 1) {
           return `
           <iframe width="560" height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"

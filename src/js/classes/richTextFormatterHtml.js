@@ -222,6 +222,20 @@ export const HtmlRichTextFormatter = function(app) {
         })
       }, 500)
     };
+    // create Youtube previews :)
+    if (showRowNumbers) {
+      result = result.replace(/(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi, function (id) {
+        const extractedId = id.match(/(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/i);
+        if (extractedId.length > 1) {
+          return `
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen></iframe> 
+        `;
+        }
+      });
+    }
 
     /// finaly return the html result
     return result;
