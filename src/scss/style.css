@@ -1252,3 +1252,16 @@ input:focus + span + .dropdown {
     line-height: 20px;
   }
 }
+
+.twitter-tweet-rendered{
+  position:relative !important;
+  height: 0 !important;
+  padding-bottom: 56.25% !important;
+}
+.twitter-tweet-rendered>iframe {
+  position:absolute !important;
+  top:0 !important;
+  left:0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
