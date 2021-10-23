@@ -5,9 +5,20 @@ export const RichTextFormatter = function(app) {
   const type = app.settings.markupLanguage();
 
   const addExtraPreviewerEmbeds = (result) => {
+    const twRegex = /(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi;
+    const ytRegex = /(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi;
+    const otherUrlPattern = `^(?!${twRegex.source}|${ytRegex.source})https?:.*$`;
+    const combinedRegex = new RegExp(otherUrlPattern, 'gm');
+    result = result.replace(combinedRegex, function (id) {
+      return `
+       <div style="position: relative">
+        <iframe src="${id}" style="position:relative;left:-70px !important;width:90%;height:500px"></iframe>
+       </div>
+    `;
+    });
     // add tweet embeds :3
     const tweets = [];
-    result = result.replace(/(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi, function(id) {
+    result = result.replace(twRegex, function(id) {
       const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
       if (extractedtweetId.length > 1) {
         tweets.push(extractedtweetId[1]);
@@ -15,17 +26,16 @@ export const RichTextFormatter = function(app) {
       }
     });
     setTimeout(() => {
-      const tweetItems = document.querySelectorAll(".tweet");
+      const tweetItems = document.querySelectorAll('.tweet');
       tweets.forEach((tweetPost, index)=>{
         twttr.widgets.createTweet(tweetPost, tweetItems[index], {
-          align: "center",
+          align: 'center',
           follow: false,
         });
-      })
-    }, 500)
-
+      });
+    }, 500);
     // create Youtube previews :)
-    result = result.replace(/(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi, function (id) {
+    result = result.replace(ytRegex, function (id) {
       const extractedId = id.match(/(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/i);
       if (extractedId.length > 1) {
         return `

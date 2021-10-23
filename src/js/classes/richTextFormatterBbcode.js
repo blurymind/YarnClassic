@@ -165,6 +165,7 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       }
     });
 
+    if (showRowNumbers) result = addExtraPreviewerEmbeds(result);
     /// do this last, as we need the newline characters in previous regex tests
     result = result.replace(/[\n\r]/g, function(row) {
       let rowAppend = '</font><br/>';
@@ -178,7 +179,7 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
     /// other bbcode tag parsing in preview mode
     result = bbcode.parse(result);
 
-    if (showRowNumbers) result = addExtraPreviewerEmbeds(result);
+
     return result;
   };
 };

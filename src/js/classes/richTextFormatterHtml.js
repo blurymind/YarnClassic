@@ -191,6 +191,7 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       }
     });
 
+    if (showRowNumbers) result = addExtraPreviewerEmbeds(result);
     // newLines. Do this last, as we need the newline characters in previous regex tests
     result = result.replace(/[\n\r]/g, function(row) {
       let rowAppend = '</font><br/>';
@@ -201,7 +202,6 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       return rowAppend;
     });
 
-    if (showRowNumbers) result = addExtraPreviewerEmbeds(result);
     /// finaly return the html result
     return result;
   };
