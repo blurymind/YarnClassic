@@ -1,6 +1,6 @@
 const bbcode = require('bbcode');
 
-export const BbcodeRichTextFormatter = function(app) {
+export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
   const self = this;
   this.justInsertedAutoComplete = false;
 
@@ -178,41 +178,7 @@ export const BbcodeRichTextFormatter = function(app) {
     /// other bbcode tag parsing in preview mode
     result = bbcode.parse(result);
 
-    /// create tweet previews :3
-    if (showRowNumbers) {
-      const tweets = [];
-      result = result.replace(/(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi, function(id) {
-        const extractedtweetId = id.match(/https:\/\/twitter.com\/.*\/status\/([0-9]+)/i);
-        if (extractedtweetId.length > 1) {
-          tweets.push(extractedtweetId[1]);
-          return `<a class="tweet" id="${extractedtweetId[1]}"></a>`;
-        }
-      });
-      setTimeout(() => {
-        const tweetItems = document.querySelectorAll(".tweet");
-        tweets.forEach((tweetPost, index)=>{
-          twttr.widgets.createTweet(tweetPost, tweetItems[index], {
-            align: "center",
-            follow: false,
-          });
-        })
-      }, 500)
-    };
-    // create Youtube previews :)
-    if (showRowNumbers) {
-      result = result.replace(/(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi, function (id) {
-        const extractedId = id.match(/(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/i);
-        if (extractedId.length > 1) {
-          return `
-          <iframe width="560" height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen></iframe> 
-        `;
-        }
-      });
-    }
-
+    if (showRowNumbers) result = addExtraPreviewerEmbeds(result);
     return result;
   };
 };
