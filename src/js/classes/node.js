@@ -324,21 +324,27 @@ export let Node = function(options = {}) {
   };
 
   this.getLinksInNode = function(node) {
-    let links = (node || self).body().match(/\[\[(.*?)\]\]/g);
+    const isYarnDocument = app.settings.documentType() === 'yarn';
+    let links = (node || self).body().match(isYarnDocument ? /\[\[(.*?)\]\]/g : /\-\>(.*)/g);
 
     if (links != undefined) {
       let exists = {};
+
       for (let i = links.length - 1; i >= 0; i--) {
-        links[i] = links[i].substr(2, links[i].length - 4).trim(); //.toLowerCase();
+        if(isYarnDocument) {
+          links[i] = links[i].substr(2, links[i].length - 4).trim(); //.toLowerCase();
 
-        if (links[i].indexOf('|') >= 0) {
-          links[i] = links[i].split('|')[1];
-        }
+          if (links[i].indexOf('|') >= 0) {
+            links[i] = links[i].split('|')[1];
+          }
 
-        if (exists[links[i]] != undefined) {
-          links.splice(i, 1);
+          if (exists[links[i]] != undefined) {
+            links.splice(i, 1);
+          }
+          exists[links[i]] = true;
+        } else {
+          links[i] = links[i].substr(2, links[i].length).trim();
         }
-        exists[links[i]] = true;
       }
       return links;
     } else {

@@ -46,6 +46,17 @@ export var App = function(name, version) {
     window.parent.dispatchEvent(event);
   };
 
+  this.setDocumentType = function(documentType, e) {
+    const documentTypeId = e ? e.target.value : documentType;
+    console.log("set document type", documentTypeId);
+    self.settings.documentType(documentTypeId);
+    app.updateNodeLinks();
+    const event = new CustomEvent('yarnSetDocumentType');
+    event.language = documentTypeId;
+    window.dispatchEvent(event);
+    window.parent.dispatchEvent(event);
+  };
+
   this.setMarkupLanguage = function(language, e) {
     const markupLanguage = e ? e.target.value : language;
     self.richTextFormatter = new RichTextFormatter(self);
@@ -1407,6 +1418,7 @@ export var App = function(name, version) {
 
   this.makeNodeWithName = function(newNodeName, newNodeOffset = 220) {
     const otherNodeTitles = self.getOtherNodeTitles();
+    if (app.settings.documentType() === 'ink' && newNodeName === 'END') return;
     if (
       newNodeName &&
       newNodeName.length > 0 &&

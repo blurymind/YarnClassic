@@ -30,6 +30,7 @@ export const Settings = function(app) {
   this.apply = function() {
     app.setTheme(self.theme());
     app.setLanguage(self.language());
+    app.setDocumentType(self.documentType());
     app.toggleInvertColors();
     app.setMarkupLanguage(self.markupLanguage());
     app.workspace.setThrottle(self.redrawThrottle());
@@ -61,6 +62,11 @@ export const Settings = function(app) {
   this.theme = ko
     .observable(storage.getItem('theme') || 'classic')
     .extend({ persist: 'theme' });
+
+  // Document type
+  this.documentType = ko
+      .observable(storage.getItem('documentType') || 'yarn')
+      .extend({ persist: 'documentType' });
 
   // Language
   this.language = ko

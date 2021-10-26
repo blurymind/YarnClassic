@@ -225,6 +225,7 @@ export const data = {
 
     if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
     else if (lowerFileName.endsWith('.yarn.txt')) return FILETYPE.YARN;
+    else if (lowerFileName.endsWith('.ink')) return FILETYPE.INK;
     else if (lowerFileName.endsWith('.yarn')) return FILETYPE.YARN;
     else if (lowerFileName.endsWith('.xml')) return FILETYPE.XML;
     else if (lowerFileName.endsWith('.txt')) return FILETYPE.TWEE;
@@ -262,6 +263,8 @@ export const data = {
         if ('title' in extractedNodes[i]) objects.push(extractedNodes[i]);
       }
     };
+
+    // different depending on file
     if (type == FILETYPE.JSON) {
       content = JSON.parse(content);
       if (!content) {
@@ -275,6 +278,41 @@ export const data = {
         data.documentHeader(content.header);
         pushContent(content.nodes);
       }
+    } else if (type == FILETYPE.INK) {
+      var lines = content.split(/\r?\n/);
+      console.log("PARSING INK!", lines)
+      var obj = null;
+      for (let i = 0; i < lines.length; i++) {
+        const nodeTemplate = {
+          body: '',
+          position: {x: objects.length * 160, y: objects.length * 160},// not supported by Ink
+          colorID: 0,// not supported by Ink
+          tags: '',// not supported by Ink
+        };
+        // Put any quirky outside of node ink logic in the START node (declarative stuff)
+        if(obj === null && !lines[i].trim().includes('===')){
+          obj = {...nodeTemplate, position: {x: (objects.length + 1) * 160, y: (objects.length + 1) * 160}};
+          obj.title = 'START';
+        }
+
+        if (lines[i].trim().includes('===')) {
+          if (obj !== null) {
+            objects.push(obj);
+          }
+          obj = {...nodeTemplate};
+          obj.title = lines[i].trim().replace(/===/g, '');
+        } else if (obj !== null){
+          console.log('add line', lines[i] , "to", obj.title)
+          obj.body += lines[i] + '\n';
+        }
+
+      }
+      if (obj !== null) {
+        objects.push(obj);
+      }
+      console.log("parsed ink file",objects);
+      // auto set mode
+      app.setDocumentType('ink');
     } else if (type == FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
@@ -464,6 +502,15 @@ export const data = {
         );
       } else {
         output = JSON.stringify(content, null, '\t');
+      }
+    } else if (type == FILETYPE.INK) {
+      for (let i = 0; i < content.length; i++) {
+        output += '\n' + '=== ' + content[i].title + '\n';
+        output += content[i].body;
+        var body = content[i].body;
+        if (!(body.length > 0 && body[body.length - 1] == '\n')) {
+          output += '\n';
+        }
       }
     } else if (type == FILETYPE.YARN) {
       for (let i = 0; i < content.length; i++) {

@@ -5,6 +5,7 @@ export var FILETYPE = {
   TWEE2: 'tw2',
   UNKNOWN: 'none',
   YARN: 'yarn',
+  INK: 'ink',
 };
 
 export var Utils = {

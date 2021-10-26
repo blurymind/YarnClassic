@@ -107,22 +107,27 @@
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Json
           </span>
-          <span class="item" data-bind="click: function() { app.data.trySave('yarn'); }">
+          <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('yarn'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/icon.ico" alt="Yarn Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Yarn
           </span>
-          <span class="item" data-bind="click: function() { app.data.trySave('twee'); }">
+          <span class="item" data-bind="visible: app.settings.documentType() === 'ink',click: function() { app.data.trySave('ink'); }">
+            <img style="margin:0; padding:0" width="20px" src="./public/images/inky-icon.png" alt="Ink Icon" />
+            <span class="hide-when-narrow">&nbsp;</span>
+            Save as Ink
+          </span>
+          <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('twee'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Twee
           </span>
-          <span class="item" data-bind="click: function() { app.data.trySave('tw2'); }">
+          <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('tw2'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Twee2
           </span>
-          <span class="item" data-bind="click: function() { app.data.trySave('xml'); }">
+          <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('xml'); }">
             <svg class="icon menu-icon icon-document-file-xml icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-document-file-xml"></use></svg>
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Xml
@@ -296,7 +301,7 @@
           <div class="editor-preview" id="editor-preview" onclick="app.togglePreviewMode(false)"></div>
           <div class="editor" id="editor" data-bind="
                 ace: app.editing().body,
-                aceOptions: { mode: 'yarn', theme: 'yarn', showPrintMargin: false,
+                aceOptions: { mode: app.settings.documentType(), theme: app.settings.documentType(), showPrintMargin: false,
                 enableBasicAutocompletion: true,
                 enableLiveAutocompletion: true,
                 behavioursEnabled: true,
@@ -349,7 +354,7 @@
 
     <!-- app info -->
     <div class="app-info">
-      <span class="app-title" data-bind="text:app.name"></span>
+      <span class="app-title" data-bind="text:app.settings.documentType"></span>
       <span class="app-version" data-bind="text:app.version"></span>
       <span class="file-name" data-bind="text:data.isDocumentDirty() ? data.editingName() + '*' : data.editingName(),click:app.data.trySaveCurrent"></span>
     </div>
@@ -364,6 +369,18 @@
         <h3>Settings</h3>
         <div class="settings-row">
           <div class="settings-column" id="settingsColumnA">
+            <!-- Document type-->
+            <div class="settings-item">
+              <label class="settings-label" for="documentType">Story Language syntax</label>
+              <select id="documentType" class="settings-value" data-bind="
+                options: app.ui.availableDocumentTypes,
+                optionsText: 'name',
+                optionsValue: 'id',
+                value: app.settings.documentType,
+                event: { change: app.setDocumentType }">
+              </select>
+            </div>
+
             <!-- Language -->
             <div class="settings-item">
               <label class="settings-label" for="language">Story Language</label>
@@ -515,13 +532,6 @@
     <!-- /ko -->
   </div>
 
-  <!-- Hidden fields, file dialogs, and elements -->
-  <div class="hidden">
-    <input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp" />
-    <input type="file" id="open-file" multiple="true" accept=".yarn,.txt,.xml,.json,.twee,.tw2" />
-    <input type="file" id="open-folder" webkitdirectory directory />
-    <input type="file" id="save-file" nwsaveas="filename.txt" />
-  </div>
   </div> <!-- settgins-column -->
   </div> <!-- settgins-row -->
   </div> <!-- settgins-form -->
@@ -532,7 +542,7 @@
   <!-- Hidden fields, file dialogs, and elements -->
   <div class="hidden">
     <input type="file" id="open-image" accept=".jpg,.jpeg,.png,.gif,.bmp" />
-    <input type="file" id="open-file" multiple="true" accept=".yarn,.txt,.xml,.json,.twee,.tw2" />
+    <input type="file" id="open-file" multiple="true" accept=".yarn,.ink,.txt,.xml,.json,.twee,.tw2" />
     <input type="file" id="open-folder" webkitdirectory directory />
     <input type="file" id="save-file" nwsaveas="filename.txt" />
   </div>

@@ -41,6 +41,11 @@ export const UI = function(app) {
     { id: 'dracula', name: 'Dracula' },
   ];
 
+  // Document type selector ---------------------------------------------------
+  this.availableDocumentTypes = [
+    { id: 'yarn', name: 'Yarn' },
+    { id: 'ink', name: 'Ink' },
+  ];
   // Language selector --------------------------------------------------------
   this.availableLanguages = [
     //NOTE: some are disabled due to issues with nspell - see https://github.com/YarnSpinnerTool/YarnEditor/issues/263
