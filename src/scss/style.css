@@ -1265,3 +1265,7 @@ input:focus + span + .dropdown {
   width: 100% !important;
   height: 100% !important;
 }
+
+input[type=search]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+}
