@@ -204,6 +204,35 @@ export const UI = function(app) {
     });
   };
 
+  this.nodeSearchMatches = function(node, search, matchAll = false){
+    var title = matchAll || $('.search-title input').is(':checked');
+    var body = matchAll || $('.search-body input').is(':checked');
+    var tags = matchAll || $('.search-tags input').is(':checked');
+
+    if(search.length === 0 || (!title && !body && !tags)) {
+      return {matchTitle: false, matchBody:false, matchTags:false, clearSearch:true};
+    } else {
+      var matchTitle =
+          title &&
+          node
+              .title()
+              .toLowerCase()
+              .indexOf(search) >= 0;
+      var matchBody =
+          body &&
+          node
+              .body()
+              .toLowerCase()
+              .indexOf(search) >= 0;
+      var matchTags =
+          tags &&
+          node
+              .tags()
+              .toLowerCase()
+              .indexOf(search) >= 0;
+      return {matchTitle, matchBody, matchTags, clearSearch:false};
+    }
+  };
   // openNodeListMenu
   this.openNodeListMenu = function(action) {
     const searchText =
@@ -215,15 +244,12 @@ export const UI = function(app) {
     rootMenu.innerHTML = '';
 
     app.nodes().forEach((node, i) => {
-      if (
-        node
-          .title()
-          .toLowerCase()
-          .indexOf(searchText) >= 0 ||
-        searchText.length == 0
-      ) {
+      const { matchTitle, matchBody, matchTags, clearSearch } = app.ui.nodeSearchMatches(node, searchText, true);
+
+      // show a result
+      if (clearSearch || matchTitle || matchBody|| matchTags) {
         const p = document.createElement('span');
-        p.innerHTML = node.title();
+        p.innerHTML = `${node.title()} ${matchTitle ? '(title)' : ''} ${matchBody ? '(content)' : ''} ${matchTags ? '(tags)' : ''}`;
         $(p).addClass(
           'item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]
         );
@@ -237,13 +263,7 @@ export const UI = function(app) {
             rootMenu.appendChild(p);
           }
         } else if (action == 'open') {
-          if (
-            node
-              .title()
-              .toLowerCase()
-              .indexOf(searchText) >= 0 ||
-            searchText.length == 0
-          ) {
+          if (matchTitle || matchBody|| matchTags || clearSearch) {
             p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
             p.setAttribute(
               'onmouseenter',

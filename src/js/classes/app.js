@@ -1283,38 +1283,15 @@ export var App = function(name, version) {
   };
 
   this.updateSearch = function() {
-    var search = self.$searchField.val().toLowerCase();
-    var title = $('.search-title input').is(':checked');
-    var body = $('.search-body input').is(':checked');
-    var tags = $('.search-tags input').is(':checked');
-
     var on = 1;
     var off = 0.25;
 
     for (var i = 0; i < self.nodes().length; i++) {
       var node = self.nodes()[i];
       var element = $(node.element);
-
-      if (search.length > 0 && (title || body || tags)) {
-        var matchTitle =
-          title &&
-          node
-            .title()
-            .toLowerCase()
-            .indexOf(search) >= 0;
-        var matchBody =
-          body &&
-          node
-            .body()
-            .toLowerCase()
-            .indexOf(search) >= 0;
-        var matchTags =
-          tags &&
-          node
-            .tags()
-            .toLowerCase()
-            .indexOf(search) >= 0;
-
+      var searchText = app.$searchField.val().toLowerCase();
+      const { matchTitle, matchBody, matchTags, clearSearch } = app.ui.nodeSearchMatches(node, searchText);
+      if(!clearSearch) {
         if (matchTitle || matchBody || matchTags) {
           node.active({ title: matchTitle, body: matchBody, tags: matchTags });
           element.clearQueue();
