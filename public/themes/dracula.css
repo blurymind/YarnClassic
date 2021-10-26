@@ -610,6 +610,17 @@ input.ace_search_field {
   color: #f1fa8c;
 }
 
+/* Flow related stuff */
+.ace_editor span.ace_flow.ace_declaration,
+.ace_editor span.ace_divert,
+.ace_editor span.ace_choice.ace_bullets,
+.ace_editor span.ace_choice.ace_label,
+.ace_editor span.ace_choice.ace_weaveBracket,
+.ace_editor span.ace_gather.ace_bullets,
+.ace_editor span.ace_gather.ace_label,
+.ace_editor span.ace_glue,
+.ace_editor span.ace_include,
+.ace_editor span.ace_external,
 .ace-yarn .ace_string.ace_rlink {
   color: #50fa7b;
 }

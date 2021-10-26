@@ -176,6 +176,11 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+  const onYarnSetDocumentType = cb => {
+    window.addEventListener('yarnSetDocumentType', e => {
+      cb(e);
+    });
+  };
   const onYarnEditorOpen = cb => {
     window.addEventListener('yarnEditorOpen', e => {
       cb(e);
@@ -227,6 +232,7 @@ export var Plugins = function(app) {
       onYarnSetLanguage,
       onYarnLoadedStateFromLocalStorage,
       onYarnSavedStateToLocalStorage,
+      onYarnSetDocumentType,
       onKeyUp,
       onKeyDown,
       onLoad,
