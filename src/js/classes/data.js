@@ -280,7 +280,6 @@ export const data = {
       }
     } else if (type == FILETYPE.INK) {
       var lines = content.split(/\r?\n/);
-      console.log("PARSING INK!", lines)
       var obj = null;
       for (let i = 0; i < lines.length; i++) {
         const nodeTemplate = {
@@ -310,7 +309,6 @@ export const data = {
       if (obj !== null) {
         objects.push(obj);
       }
-      console.log("parsed ink file",objects);
       // auto set mode
       app.setDocumentType('ink');
     } else if (type == FILETYPE.YARN) {
@@ -504,12 +502,19 @@ export const data = {
         output = JSON.stringify(content, null, '\t');
       }
     } else if (type == FILETYPE.INK) {
+      const startNode = content.find(node => node.title.trim() === 'START');
+      if (startNode) {
+        output += startNode.body;
+      }
       for (let i = 0; i < content.length; i++) {
-        output += '\n' + '=== ' + content[i].title + '\n';
-        output += content[i].body;
-        var body = content[i].body;
-        if (!(body.length > 0 && body[body.length - 1] == '\n')) {
-          output += '\n';
+        // The START node will contain anything that is not going in any knots
+        if (content[i].title.trim() !== 'START') {
+          output += '\n' + '=== ' + content[i].title + '\n';
+          output += content[i].body;
+          var body = content[i].body;
+          if (!(body.length > 0 && body[body.length - 1] == '\n')) {
+            output += '\n';
+          }
         }
       }
     } else if (type == FILETYPE.YARN) {
