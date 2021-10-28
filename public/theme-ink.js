@@ -1,8 +1,12 @@
-define("ace/theme/ink",["require","exports","module","ace/lib/dom"], function(require, exports, module) {
-
-exports.isDark = false;
-exports.cssClass = "ace-ink";
-exports.cssText = `
+define('ace/theme/ink', [
+  'require',
+  'exports',
+  'module',
+  'ace/lib/dom',
+], function(require, exports, module) {
+  exports.isDark = false;
+  exports.cssClass = 'ace-ink';
+  exports.cssText = `
 /* Flow related stuff in blue */
 .ace_editor span.ace_flow.ace_declaration,
 .ace_editor span.ace_divert,
@@ -37,8 +41,24 @@ exports.cssText = `
 #main.hideTags .ace_editor span.ace_tag {
     color: white;
 }
+
+/* Custom added */
+.ace_editor .ace_marker-layer .ace_selection {
+    background: rgb(181, 213, 255);
+}
+.ace_editor.ace_multiselect .ace_selection.ace_start {
+    box-shadow: 0 0 3px 0px white;
+    border-radius: 2px;
+}
+.ace_editor .ace_marker-layer .ace_selection {
+    background: rgb(181, 213, 255);
+}
+.ace_editor.ace_multiselect .ace_selection.ace_start {
+    box-shadow: 0 0 3px 0px white;
+    border-radius: 2px;
+}
 `;
 
-    var dom = require("../lib/dom");
-    dom.importCssString(exports.cssText, exports.cssClass);
+  var dom = require('../lib/dom');
+  dom.importCssString(exports.cssText, exports.cssClass);
 });
