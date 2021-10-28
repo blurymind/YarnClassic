@@ -325,13 +325,15 @@ export let Node = function(options = {}) {
 
   this.getLinksInNode = function(node) {
     const isYarnDocument = app.settings.documentType() === 'yarn';
-    let links = (node || self).body().match(isYarnDocument ? /\[\[(.*?)\]\]/g : /\-\>(.*)/g);
+    let links = (node || self)
+      .body()
+      .match(isYarnDocument ? /\[\[(.*?)\]\]/g : /\-\>(.*)/g);
 
     if (links != undefined) {
       let exists = {};
 
       for (let i = links.length - 1; i >= 0; i--) {
-        if(isYarnDocument) {
+        if (isYarnDocument) {
           links[i] = links[i].substr(2, links[i].length - 4).trim(); //.toLowerCase();
 
           if (links[i].indexOf('|') >= 0) {
@@ -360,7 +362,7 @@ export let Node = function(options = {}) {
 
   this.updateLinksFromParents = function() {
     // If title didn't change there's nothing we need to update on parents
-    if (!self.oldTitle || (self.oldTitle === self.title())) {
+    if (!self.oldTitle || self.oldTitle === self.title()) {
       return;
     }
 
@@ -376,8 +378,7 @@ export let Node = function(options = {}) {
           newBody = newBody.replace(re2, '[[' + self.title() + ']]');
           parent.body(newBody);
           self.linkedFrom.push(parent);
-        }
-        else if (parentLinks.includes(self.title())) {
+        } else if (parentLinks.includes(self.title())) {
           self.linkedFrom.push(parent);
         }
       }

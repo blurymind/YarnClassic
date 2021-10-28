@@ -284,13 +284,19 @@ export const data = {
       for (let i = 0; i < lines.length; i++) {
         const nodeTemplate = {
           body: '',
-          position: {x: objects.length * 160, y: objects.length * 160},// not supported by Ink
-          colorID: 0,// not supported by Ink
-          tags: '',// not supported by Ink
+          position: { x: objects.length * 160, y: objects.length * 160 }, // not supported by Ink
+          colorID: 0, // not supported by Ink
+          tags: '', // not supported by Ink
         };
         // Put any quirky outside of node ink logic in the START node (declarative stuff)
-        if(obj === null && !lines[i].trim().includes('===')){
-          obj = {...nodeTemplate, position: {x: (objects.length + 1) * 160, y: (objects.length + 1) * 160}};
+        if (obj === null && !lines[i].trim().includes('===')) {
+          obj = {
+            ...nodeTemplate,
+            position: {
+              x: (objects.length + 1) * 160,
+              y: (objects.length + 1) * 160,
+            },
+          };
           obj.title = 'START';
         }
 
@@ -298,13 +304,12 @@ export const data = {
           if (obj !== null) {
             objects.push(obj);
           }
-          obj = {...nodeTemplate};
+          obj = { ...nodeTemplate };
           obj.title = lines[i].trim().replace(/===/g, '');
-        } else if (obj !== null){
-          console.log('add line', lines[i] , "to", obj.title)
+        } else if (obj !== null) {
+          console.log('add line', lines[i], 'to', obj.title);
           obj.body += lines[i] + '\n';
         }
-
       }
       if (obj !== null) {
         objects.push(obj);
@@ -631,29 +636,31 @@ export const data = {
   },
 
   saveFileDialog: function(dialog, type, content) {
-    const fileName = (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
-    if(app.electron){
+    const fileName =
+      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
+    if (app.electron) {
       // console.log(app.electron)
-      app.electron.remote.dialog.showSaveDialog({
-        title: 'Saving ' + fileName,
-        filters: [{
-          name: type + ' file',
-          extensions: [type]
-        }],
-        defaultPath: fileName,
-      }).then((result) => {
-        data.saveTo(result.filePath, content);
-      }).catch((err) => {
-        console.error(err);
-      });
+      app.electron.remote.dialog
+        .showSaveDialog({
+          title: 'Saving ' + fileName,
+          filters: [
+            {
+              name: type + ' file',
+              extensions: [type],
+            },
+          ],
+          defaultPath: fileName,
+        })
+        .then(result => {
+          data.saveTo(result.filePath, content);
+        })
+        .catch(err => {
+          console.error(err);
+        });
     } else {
       var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      saveAs(
-        blob,
-        fileName
-      );
+      saveAs(blob, fileName);
     }
-
   },
 
   insertImageFileName: function() {
