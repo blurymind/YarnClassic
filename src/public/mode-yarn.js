@@ -62,7 +62,7 @@ define('ace/mode/yarn', [
   };
 
   var Mode = function() {
-    this.C = YarnHighlightRules;
+    this.HighlightRules = YarnHighlightRules;
     this.$behaviour = new CstyleBehaviour();
   };
 
