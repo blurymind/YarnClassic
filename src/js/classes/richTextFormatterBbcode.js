@@ -6,39 +6,76 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
 
   this.completableTags = Object.freeze([
     { Start: '<<', Completion: '>>', Offset: -2 },
-    { Start: '[colo', Completion: 'r=#][/color]', Offset: -9, BehaviorCompletion: 'r=#][/color', Func: () => { app.insertColorCode(); } },
-    { Start: '[b', Completion: '][/b]', BehaviorCompletion: '][/b', Offset: -4 },
-    { Start: '[i', Completion: '][/i]', BehaviorCompletion: '][/i', Offset: -4 },
-    { Start: '[img', Completion: '][/img]', BehaviorCompletion: '][/img', Offset: -6 },
-    { Start: '[u', Completion: '][/u]', BehaviorCompletion: '][/u', Offset: -4 },
-    { Start: '[url', Completion: '][/url]', BehaviorCompletion: '][/url', Offset: -6 },
+    {
+      Start: '[colo',
+      Completion: 'r=#][/color]',
+      Offset: -9,
+      BehaviorCompletion: 'r=#][/color',
+      Func: () => {
+        app.insertColorCode();
+      },
+    },
+    {
+      Start: '[b',
+      Completion: '][/b]',
+      BehaviorCompletion: '][/b',
+      Offset: -4,
+    },
+    {
+      Start: '[i',
+      Completion: '][/i]',
+      BehaviorCompletion: '][/i',
+      Offset: -4,
+    },
+    {
+      Start: '[img',
+      Completion: '][/img]',
+      BehaviorCompletion: '][/img',
+      Offset: -6,
+    },
+    {
+      Start: '[u',
+      Completion: '][/u]',
+      BehaviorCompletion: '][/u',
+      Offset: -4,
+    },
+    {
+      Start: '[url',
+      Completion: '][/url]',
+      BehaviorCompletion: '][/url',
+      Offset: -6,
+    },
   ]);
 
   this.getTagOpen = function(tag) {
     switch (tag) {
-    case 'cmd': return '<<';
-    case 'opt': return '[[';
-    case 'color': return '[color=#]';
-    default: return `[${tag}]`;
-    };
+      case 'cmd':
+        return '<<';
+      case 'opt':
+        return '[[';
+      case 'color':
+        return '[color=#]';
+      default:
+        return `[${tag}]`;
+    }
   };
 
   this.getTagClose = function(tag) {
     switch (tag) {
-    case 'cmd': return '>>';
-    case 'opt': return '|]]';
-    default: return `[/${tag}]`;
-    };
+      case 'cmd':
+        return '>>';
+      case 'opt':
+        return '|]]';
+      default:
+        return `[/${tag}]`;
+    }
   };
 
   this.identifyTag = function(text) {
-    let tag = text.lastIndexOf('[') !== -1 ?
-      text.substring(text.lastIndexOf('['), text.length) : '';
-
-    if (text.substring(text.length - 2, text.length) === '[[')
-      tag = '[[';
-    else if (text.substring(text.length - 2, text.length) === '<<')
-      tag = '<<';
+    let tag =
+      text.lastIndexOf('[') !== -1
+        ? text.substring(text.lastIndexOf('['), text.length)
+        : '';
 
     return tag;
   };
@@ -52,16 +89,18 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
     );
 
     app.editor.session.insert(selectedRange.start, tagOpen);
-    app.editor.session.insert({
-      column: selectedRange.end.column + tagOpen.length,
-      row: selectedRange.end.row,
-    }, tagClose);
+    app.editor.session.insert(
+      {
+        column: selectedRange.end.column + tagOpen.length,
+        row: selectedRange.end.row,
+      },
+      tagClose
+    );
 
     if (tag === 'color') {
       if (app.editor.getSelectedText().length === 0) {
         app.moveEditCursor(-9);
-      }
-      else {
+      } else {
         app.editor.selection.setRange({
           start: {
             row: app.editor.selection.getRange().start.row,
@@ -74,7 +113,8 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
         });
       }
       app.insertColorCode();
-    } if (tag === 'img') {
+    }
+    if (tag === 'img') {
       if (app.editor.getSelectedText().length === 0) {
         app.moveEditCursor(-6);
         app.data.triggerPasteClipboard();
@@ -87,8 +127,7 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
         start: app.editor.selection.getRange().start,
         end: {
           row: app.editor.selection.getRange().end.row,
-          column:
-            app.editor.selection.getRange().end.column - tagClose.length,
+          column: app.editor.selection.getRange().end.column - tagClose.length,
         },
       });
     }
@@ -99,7 +138,7 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
     const globalRegex = new RegExp(inPattern, 'gi');
     const localRegex = new RegExp(inPattern, 'i');
 
-    return text.replace(globalRegex, (m) => {
+    return text.replace(globalRegex, m => {
       const match = m.match(localRegex);
       const template = eval('`' + outPattern + '`');
       return match.length ? template : null;
@@ -112,9 +151,21 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
     result = self._convertTag('<b>(.*?)<\\/b>', '[b]${match[1]}[/b]', result);
     result = self._convertTag('<u>(.*?)<\\/u>', '[u]${match[1]}[/u]', result);
     result = self._convertTag('<i>(.*?)<\\/i>', '[i]${match[1]}[/i]', result);
-    result = self._convertTag('<img>(.*?)<\\/img>', '[img]${match[1]}[/img]', result);
-    result = self._convertTag('<color=#(.*?)>(.*?)<\\/color>', '[color=#${match[1]}]${match[2]}[/color]', result);
-    result = self._convertTag('<url>(.*?)<\\/url>', '[url]${match[1]}[/url]', result);
+    result = self._convertTag(
+      '<img>(.*?)<\\/img>',
+      '[img]${match[1]}[/img]',
+      result
+    );
+    result = self._convertTag(
+      '<color=#(.*?)>(.*?)<\\/color>',
+      '[color=#${match[1]}]${match[2]}[/color]',
+      result
+    );
+    result = self._convertTag(
+      '<url>(.*?)<\\/url>',
+      '[url]${match[1]}[/url]',
+      result
+    );
 
     return result;
   };
@@ -122,11 +173,16 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
   this.richTextToHtml = function(text, showRowNumbers = false) {
     let rowCounter = 1;
     let result = showRowNumbers
-      ? '<div>' + '<font color="pink">' + rowCounter + '. </font><font>' + text + '</font></div>'// TODO: style this
+      ? '<div>' +
+        '<font color="pink">' +
+        rowCounter +
+        '. </font><font>' +
+        text +
+        '</font></div>' // TODO: style this
       : text;
 
     /// Commands in preview mode
-    result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
+    result = result.replace(/<</gi, "<font color='violet'>(run:"); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
 
     /// bbcode color tags in preview mode
@@ -171,14 +227,14 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       let rowAppend = '</font><br/>';
       rowCounter += 1;
       if (showRowNumbers) {
-        rowAppend += '</div><div><font color="pink">' + rowCounter + '. </font><font>';
+        rowAppend +=
+          '</div><div><font color="pink">' + rowCounter + '. </font><font>';
       }
       return rowAppend;
     });
 
     /// other bbcode tag parsing in preview mode
     result = bbcode.parse(result);
-
 
     return result;
   };

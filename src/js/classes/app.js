@@ -1228,15 +1228,23 @@ export var App = function(name, version) {
   // TODO: move to editor class
   this.getTagBeforeCursor = function() {
     const selectionRange = self.editor.getSelectionRange();
-    const curPosition = selectionRange.end.column;
     const curLine = selectionRange.start.row;
     const curLineText = self.editor.session.getLine(curLine);
 
-    const textBeforeCursor = curLineText.substring(0, curPosition);
+    const textBeforeCursor = curLineText.substring(
+      selectionRange.start.row - 2,
+      selectionRange.start.row + 2
+    );
     if (!textBeforeCursor) {
       return '';
     }
-
+    if (app.settings.documentType() === 'ink') {
+      if (['->'].includes(textBeforeCursor.trim()))
+        return textBeforeCursor.trim();
+    } else {
+      if (['[[', '<<'].includes(textBeforeCursor.trim()))
+        return textBeforeCursor.trim();
+    }
     return self.richTextFormatter.identifyTag(textBeforeCursor);
   };
 
@@ -1301,8 +1309,13 @@ export var App = function(name, version) {
       var node = self.nodes()[i];
       var element = $(node.element);
       var searchText = app.$searchField.val().toLowerCase();
-      const { matchTitle, matchBody, matchTags, clearSearch } = app.ui.nodeSearchMatches(node, searchText);
-      if(!clearSearch) {
+      const {
+        matchTitle,
+        matchBody,
+        matchTags,
+        clearSearch,
+      } = app.ui.nodeSearchMatches(node, searchText);
+      if (!clearSearch) {
         if (matchTitle || matchBody || matchTags) {
           node.active({ title: matchTitle, body: matchBody, tags: matchTags });
           element.clearQueue();

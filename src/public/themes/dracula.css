@@ -493,10 +493,12 @@ input[type='checkbox'] {
   color: #f8f8f2;
 }
 
+.ace_editor .ace_marker-layer .ace_selection,
 .ace-yarn .ace_marker-layer .ace_selection {
   background: #44475a;
 }
 
+.ace_editor .ace_marker-layer .ace_selected-word,
 .ace-yarn .ace_marker-layer .ace_selected-word {
   background: transparent;
   border: none;
