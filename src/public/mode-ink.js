@@ -792,8 +792,6 @@ define('ace/mode/ink', [
 
   var InkMode = function() {
     this.HighlightRules = inkHighlightRules;
-    // this.C = inkHighlightRules;
-    // this.$behaviour = new CstyleBehaviour();
     this.foldingRules = new inkFoldingRules();
   };
   oop.inherits(InkMode, TextMode);
