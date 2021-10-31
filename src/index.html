@@ -364,7 +364,11 @@
       <span class="file-name" data-bind="text:data.isDocumentDirty() ? data.editingName() + '*' : data.editingName(),click:app.data.trySaveCurrent"></span>
     </div>
     <div class="title" id="addPwa">🍰Add to Homescreen📲</div>
-
+    <div class="syntax-mode-banner">
+      <img  data-bind="attr: {
+      src: app.settings.documentType() === 'ink' ? './public/images/inky-icon.png': './public/icon.png'
+      }" alt="Ink Icon" />
+    </div>
     <!-- marquee -->
     <div id="marquee"></div>
 
