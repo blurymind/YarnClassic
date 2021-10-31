@@ -149,7 +149,7 @@ const config = {
           title: 'title',
           text: 'text',
           url: 'url',
-        }
+        },
       },
     }),
     new HtmlWebPackPlugin({
@@ -172,8 +172,8 @@ const config = {
     new WorkboxPlugin.InjectManifest({
       swDest: path.resolve(__dirname, 'dist', 'sw.js'),
       exclude: [/\.map$/, /_redirects/],
-      swSrc : path.resolve(__dirname, 'src', 'sw-src.js'),
-    })
+      swSrc: path.resolve(__dirname, 'src', 'sw-src.js'),
+    }),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'src'),
