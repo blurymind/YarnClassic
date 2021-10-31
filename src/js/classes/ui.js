@@ -7,7 +7,7 @@ export const UI = function(app) {
     timer: 2500,
   });
 
-  this.dispatchEvent = function (eventName, options){
+  this.dispatchEvent = function(eventName, options) {
     const event = new CustomEvent(eventName);
     event.options = options;
     window.dispatchEvent(event);
@@ -209,33 +209,38 @@ export const UI = function(app) {
     });
   };
 
-  this.nodeSearchMatches = function(node, search, matchAll = false){
+  this.nodeSearchMatches = function(node, search, matchAll = false) {
     var title = matchAll || $('.search-title input').is(':checked');
     var body = matchAll || $('.search-body input').is(':checked');
     var tags = matchAll || $('.search-tags input').is(':checked');
 
-    if(search.length === 0 || (!title && !body && !tags)) {
-      return {matchTitle: false, matchBody:false, matchTags:false, clearSearch:true};
+    if (search.length === 0 || (!title && !body && !tags)) {
+      return {
+        matchTitle: false,
+        matchBody: false,
+        matchTags: false,
+        clearSearch: true,
+      };
     } else {
       var matchTitle =
-          title &&
-          node
-              .title()
-              .toLowerCase()
-              .indexOf(search) >= 0;
+        title &&
+        node
+          .title()
+          .toLowerCase()
+          .indexOf(search) >= 0;
       var matchBody =
-          body &&
-          node
-              .body()
-              .toLowerCase()
-              .indexOf(search) >= 0;
+        body &&
+        node
+          .body()
+          .toLowerCase()
+          .indexOf(search) >= 0;
       var matchTags =
-          tags &&
-          node
-              .tags()
-              .toLowerCase()
-              .indexOf(search) >= 0;
-      return {matchTitle, matchBody, matchTags, clearSearch:false};
+        tags &&
+        node
+          .tags()
+          .toLowerCase()
+          .indexOf(search) >= 0;
+      return { matchTitle, matchBody, matchTags, clearSearch: false };
     }
   };
   // openNodeListMenu
@@ -249,12 +254,19 @@ export const UI = function(app) {
     rootMenu.innerHTML = '';
 
     app.nodes().forEach((node, i) => {
-      const { matchTitle, matchBody, matchTags, clearSearch } = app.ui.nodeSearchMatches(node, searchText, true);
+      const {
+        matchTitle,
+        matchBody,
+        matchTags,
+        clearSearch,
+      } = app.ui.nodeSearchMatches(node, searchText, true);
 
       // show a result
-      if (clearSearch || matchTitle || matchBody|| matchTags) {
+      if (clearSearch || matchTitle || matchBody || matchTags) {
         const p = document.createElement('span');
-        p.innerHTML = `${node.title()} ${matchTitle ? '(title)' : ''} ${matchBody ? '(content)' : ''} ${matchTags ? '(tags)' : ''}`;
+        p.innerHTML = `${node.title()} ${matchTitle ? '(title)' : ''} ${
+          matchBody ? '(content)' : ''
+        } ${matchTags ? '(tags)' : ''}`;
         $(p).addClass(
           'item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]
         );
@@ -268,7 +280,7 @@ export const UI = function(app) {
             rootMenu.appendChild(p);
           }
         } else if (action == 'open') {
-          if (matchTitle || matchBody|| matchTags || clearSearch) {
+          if (matchTitle || matchBody || matchTags || clearSearch) {
             p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
             p.setAttribute(
               'onmouseenter',
@@ -307,4 +319,19 @@ export const UI = function(app) {
     $('.app-undo-redo').removeClass('app-undo-redo-alt');
     $('.app-zoom').removeClass('app-zoom-alt');
   };
+
+  this.toastMixin = Swal.mixin({
+    toast: true,
+    icon: 'success',
+    title: 'Done!',
+    animation: false,
+    position: 'bottom',
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true,
+    didOpen: toast => {
+      toast.addEventListener('mouseenter', Swal.stopTimer);
+      toast.addEventListener('mouseleave', Swal.resumeTimer);
+    },
+  });
 };
