@@ -6,7 +6,7 @@ export var inkRender = function() {
   this.emiter = emiter;
   this.story = null;
   this.log = [];
-  const a = new app.data.InkCompiler();
+  this.onRecompile = () => {};
 
   this.curStory = {
     messages: [],
@@ -14,7 +14,6 @@ export var inkRender = function() {
     tags: [],
     paragraph: '',
   };
-
   this.resetStory = () => {
     this.prevSavePoints = [];
     this.choiceHistory = [];
@@ -30,10 +29,8 @@ export var inkRender = function() {
   this.terminate = () => {
     if (!this.textAreaEl) return;
     try {
-      this.textAreaEl.innerHTML = '';
       emiter.removeAllListeners();
       this.finished = true;
-      this.resetStory();
     } catch (e) {
       console.warn(e);
     }
@@ -52,7 +49,6 @@ export var inkRender = function() {
 
   const continueStory = (choiceLabel = '', choicePath = '') => {
     const paragraph = getMessage(this.story);
-
     this.setCurStory({
       ...this.curStory,
       messages: this.log
@@ -65,11 +61,11 @@ export var inkRender = function() {
       tags: this.story.currentTags,
       choices: this.story.currentChoices,
       paragraph: choiceLabel
-        ? `<p style="text-align: right;" class="story-playtest-answer" id="${choicePath}"
-                onclick="app.openNodeByTitle('${choicePath}')">${choiceLabel} ( ${choicePath} )<p><br/>${paragraph.join(
-            '<br/><br/>'
+        ? `<p style="text-align: right;" id="${choicePath}" class="playtestLink" title="Click to open [${choicePath}] Node"
+                onclick="app.navigateToNodeDuringPlayTest('${choicePath}')">${choiceLabel} ( ${choicePath} )<p><br/>${paragraph.join(
+            '<br/>'
           )}`
-        : paragraph.join('<br/><br/>'),
+        : paragraph.join('<br/>'),
     });
 
     updateText();
@@ -108,8 +104,15 @@ export var inkRender = function() {
     btnWrapper.id = 'choiceButtons';
     btnWrapper.className = 'flex-wrap';
     // Debug tools
+    const reloadBtn = document.createElement('button');
+    reloadBtn.innerText = '🔄';
+    reloadBtn.title = 'Recompile story';
+    reloadBtn.onclick = this.onRecompile;
+    reloadBtn.className = 'storyPreviewChoiceButton';
+    btnWrapper.appendChild(reloadBtn);
     const restartBtn = document.createElement('button');
-    restartBtn.innerText = '🔄';
+    restartBtn.innerText = '🎬'; //'🔄';
+    restartBtn.title = 'Restart story';
     restartBtn.onclick = () => {
       this.resetStory();
       continueStory();
@@ -118,6 +121,7 @@ export var inkRender = function() {
     btnWrapper.appendChild(restartBtn);
     const rewindBtn = document.createElement('button');
     rewindBtn.innerText = '⏪';
+    rewindBtn.title = 'Go to previous';
     rewindBtn.disabled = this.prevSavePoints.length === 0;
     rewindBtn.onclick = () => {
       this.rewindStory();
@@ -145,25 +149,10 @@ export var inkRender = function() {
     });
   };
 
-  a.init(response => {
-    if (response.errors.length > 0 || response.warnings.length > 0) {
-      this.textAreaEl.innerHTML = `<div class="title-error"><p>Parsing failed:</p>><br/><p>${response.errors.join(
-        '</p><p>'
-      )}</p><br/><p>${response.warnings.join('</p><p>')}</p></div>`;
-      this.textAreaEl.onclick = () => {
-        app.data.goToErrorInkNode(this.inkTextData, response.errors[0]);
-        this.textAreaEl.onclick = null;
-      };
-    } else {
-      this.story = new Story(response.story);
-      console.log('STORY', this.story);
-      console.warn('Warnings', response.warnings);
-      this.textAreaEl.innerHTML = '';
-      continueStory();
-    }
-  });
-
   this.initInk = (
+    compiler,
+    onRecompile,
+    prevSession,
     inkTextData,
     startChapter,
     htmlIdToAttachTo,
@@ -172,6 +161,8 @@ export var inkRender = function() {
     playtestStyle,
     playtestVariables //TODO
   ) => {
+    this.onRecompile = onRecompile;
+    console.log('INIT INK');
     this.finished = false;
     document.getElementById(htmlIdToAttachTo).style.visibility = 'hidden';
     this.textAreaEl = document.getElementById(debugLabelId);
@@ -179,6 +170,41 @@ export var inkRender = function() {
       '<div class="opacity-pulse centered"><h2>Parsing ink</h2> <h2 class="story-animated-dots"><p>.</p><p>.</p><p>.</p></h2></div>';
 
     this.inkTextData = inkTextData;
-    a.submit(inkTextData);
+    this.compiler = compiler;
+
+    this.compiler
+      .init(response => {
+        if (response.errors.length > 0 || response.warnings.length > 0) {
+          this.textAreaEl.innerHTML = `<div class="title-error"><p>Parsing failed:</p>><br/><p>${response.errors.join(
+            '</p><p>'
+          )}</p><br/><p>${response.warnings.join('</p><p>')}</p></div>`;
+          this.textAreaEl.onclick = () => {
+            app.data.goToErrorInkNode(this.inkTextData, response.errors[0]);
+            this.textAreaEl.onclick = null;
+          };
+        } else {
+          this.story = new Story(response.story);
+          console.log('STORY', this.story);
+          console.warn('Warnings', response.warnings);
+          this.textAreaEl.innerHTML = '';
+          continueStory();
+        }
+      })
+      .then(() => {
+        if (
+          !prevSession.recompile &&
+          prevSession.story &&
+          prevSession.prevSavePoints.length !== 0
+        ) {
+          this.story = prevSession.story;
+          prevSession.childNodes.forEach(child =>
+            this.textAreaEl.appendChild(child)
+          );
+          this.prevSavePoints = prevSession.prevSavePoints;
+          continueStory();
+          return;
+        }
+        if (inkTextData) this.compiler.submit(inkTextData);
+      });
   };
 };

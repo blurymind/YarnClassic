@@ -499,6 +499,7 @@ export const data = {
           ...data.documentHeader(),
           lastSavedUnix: date,
           language: app.settings.language(),
+          documentType: app.settings.documentType(),
           markupLanguage: app.settings.markupLanguage(),
           filetypeVersion: app.settings.filetypeVersion(),
           pluginStorage: app.plugins.pluginStorage,

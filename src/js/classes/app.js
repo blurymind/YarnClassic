@@ -1640,4 +1640,19 @@ export var App = function(name, version) {
       }
     }
   };
+  this.navigateToNodeDuringPlayTest = function(nodeName, find = '') {
+    if (
+      nodeName ===
+      self
+        .editing()
+        .title()
+        .trim()
+    )
+      return;
+    self.openNodeByTitle(nodeName, find);
+    self.togglePlayMode(true);
+    // if (app.isEditorSplit) {
+    app.workspace.warpToNode(app.getFirstFoundNode(nodeName));
+    // }
+  };
 };

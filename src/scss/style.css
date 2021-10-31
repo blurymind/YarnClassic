@@ -358,7 +358,7 @@ input[type='checkbox'] {
 .inactive:hover .delete {
   opacity: 0;
 }
-
+.playtestLink:hover,
 .title-container.active>div,
 .title-container.active>div:hover {
   text-decoration: underline;
@@ -756,17 +756,33 @@ input#editorTitle {
   flex-direction: column !important;
 }
 
+.editor-take-half {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+}
 .editor-play {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left:50%;
   overflow-y: hidden !important;
 }
-
 #commandDebugLabel {
   overflow-y: auto;
   overflow-x: hidden;
   /*max-height: 80%;*/
-  width: 100%;
+  width: 50%;
   resize: none;
   font: normal arial, calibri;
+}
+.editor-play.inYarnMode{
+  left:0;
+}
+#commandDebugLabel.inYarnMode {
+  width: 100%;
 }
 .story-playtest-answer,
 .story-playtest-bubble {
