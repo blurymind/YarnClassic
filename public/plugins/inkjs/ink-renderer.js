@@ -74,10 +74,9 @@ export var inkRender = function() {
     updateText();
   };
 
-  this.prevSavePoint = '';
+  this.prevSavePoints = [];
   const getChoice = (index, label) => {
-    this.prevSavePoint = this.story.state.toJson();
-
+    this.prevSavePoints.push(this.story.state.toJson());
     const choicePath = this.story.state.currentChoices[index].sourcePath.split(
       '.'
     )[0];
@@ -87,7 +86,7 @@ export var inkRender = function() {
   this.rewindStory = () => {
     document.getElementById('choiceButtons').remove();
     this.textAreaEl.removeChild(this.textAreaEl.lastElementChild);
-    this.story.state.LoadJson(this.prevSavePoint);
+    this.story.state.LoadJson(this.prevSavePoints.pop());
     continueStory();
   };
 
@@ -118,6 +117,7 @@ export var inkRender = function() {
     btnWrapper.appendChild(restartBtn);
     const rewindBtn = document.createElement('button');
     rewindBtn.innerText = '⏪';
+    rewindBtn.disabled = this.prevSavePoints.length === 0;
     rewindBtn.onclick = () => {
       this.rewindStory();
       continueStory();
