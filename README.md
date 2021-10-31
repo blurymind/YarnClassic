@@ -2,7 +2,9 @@
 
 # Yarn 🐱 🧺
 
-Dialogue editor created for "Night in the Woods" (and other projects) by @NoelFB, @blurymind and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
+Dialogue editor created for "Night in the Woods" (and other projects) by @blurymind, @NoelFB and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
+It supports editing, syntax highlighting and testing for [Yarn](https://github.com/YarnSpinnerTool/YarnSpinner) and [InkleStudio Ink files](https://github.com/inkle/ink) syntax files.
+It can also export from Yarn to [twine](https://twinery.org/) and use [github gist](https://gist.github.com/)for cloud backup!
 
 # 🧶 Live Web APP (Use it in the browser)
 <a href="https://yarnspinnertool.github.io/YarnEditor">https://yarnspinnertool.github.io/YarnEditor/</a>
@@ -44,6 +46,11 @@ https://github.com/hylyh/bondage.js
 
 # 🐬 Features 🦄
 
+### Portability
+- YarnEditor has PWA version you can install and run when offline, which has a much smaller footprint than other editors using electron.
+- The pwa can run on mobile devices with smaller screens - you can use it on your phone and it's much easier to install.
+- There is of course also an electron version of the editor, which is slower on updates but more stable
+
 ### BBcode and HTML-ish markup styling in editor, Spellchecking, Autocompletion, and more!
 - Optional syntax autocompletion (autoclose tags)
 - preview of bbcode/html tag effects and goto in trimmed nodes
@@ -57,13 +64,16 @@ https://github.com/hylyh/bondage.js
 - Button to go back to the previous edited node. If there is no previous - save and close the current one
 ![yarn-0 3 5-newfeatures](https://user-images.githubusercontent.com/6495061/50045609-b646e900-008d-11e9-9f17-2ac6b01908f6.gif)
 
-### Language, writing and debugging tools built right into it
-- Ability to playtest yarn stories you are working on - straight inside yarn
+### Language, writing and debugging tools built right into it (Yarn and Ink)
+- Ability to playtest [Yarn](https://github.com/YarnSpinnerTool/YarnSpinner) and [Ink](https://github.com/inkle/ink) stories you are working on - straight inside the editor
 - Spellchecking of words (supported for different languages too)
 - misspelled word suggestions in the new context menu - if you have selected a misspelled word
 - Similar word suggestion for highlighted words (supported for english only)
 - Transcribe text - ability to "talk" to yarn without using hands :o (multi-language supported)
 - Yarn can also talk to you - tell you what is written (multi-language supported)
+![Screenshot](doc/inkPlaytest.gif)
+- Support for compilation and debugging of ink files via the wasm port inklecate. It catches the error and opens the knot containing it when exporting or testing!
+![Screenshot](doc/inkErrorReporting.gif)
 
 ### Load and Save your yarns from your computer, github gists or anything you can send it to on your tablet/phone
 - A variety of export formats supported - yarn, json yarn, twee, twee2, xml
