@@ -421,7 +421,10 @@ export var App = function(name, version) {
     ) {
       editorTitle.attr('class', 'title title-error');
       editorTitle.attr('title', 'Another node has the same title');
-    } else if (!RegExp('^[a-z0-9]+$', 'i').test(enteredValue)) {
+    } else if (
+      app.settings.documentType() === 'yarn' &&
+      !RegExp('^[a-z0-9]+$', 'i').test(enteredValue)
+    ) {
       editorTitle.attr('class', 'title title-error');
       editorTitle.attr(
         'title',
