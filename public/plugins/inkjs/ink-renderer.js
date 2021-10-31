@@ -16,6 +16,7 @@ export var inkRender = function() {
   };
 
   this.resetStory = () => {
+    this.prevSavePoints = [];
     this.choiceHistory = [];
     this.textAreaEl.innerHTML = '';
     this.curStory = {
