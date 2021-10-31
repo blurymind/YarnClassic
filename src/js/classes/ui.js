@@ -129,9 +129,14 @@ export const UI = function(app) {
           </ul>
         </small>
         <div>How to use <a href="https://yarnspinner.dev/docs/syntax/" target="_blank">Yarn Syntax</a></div>
+        <div>How to use <a href="https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md" target="_blank">Ink Syntax</a></div>
         <p>Runtimes:</p>
         <a href="https://github.com/YarnSpinnerTool/YarnSpinner" target="_blank">YarnSpinner (Unity3d)</a>
-        <a href="https://github.com/hylyh/bondage.js" target="_blank">BondageJs (javascript)</a>
+        <a href="https://github.com/hylyh/bondage.js" target="_blank">BondageJs (yarn javascript)</a>
+        <a href="https://github.com/inkle/ink-unity-integration" target="_blank">Ink C# (Unity3d)</a>
+        <a href="https://github.com/y-lohse/inkjs" target="_blank">InkJs (javascript)</a>
+        <a href="https://github.com/bladecoder/blade-ink" target="_blank">BladeInk (java)</a>
+        <a href="https://github.com/inkle/ink-library" target="_blank">Many more Ink parsers</a>
       </div>
       `,
       showCancelButton: true,
