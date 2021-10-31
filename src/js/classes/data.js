@@ -355,6 +355,7 @@ export const data = {
       if (obj != null) {
         objects.push(obj);
       }
+      app.setDocumentType('yarn');
     } else if (type == FILETYPE.TWEE || type == FILETYPE.TWEE2) {
       var lines = content.split('\n');
       var obj = null;
@@ -422,7 +423,9 @@ export const data = {
       }
 
       if (obj != null) objects.push(obj);
+      app.setDocumentType('yarn');
     } else if (type == FILETYPE.XML) {
+      app.setDocumentType('yarn');
       var oParser = new DOMParser();
       var xml = oParser.parseFromString(content, 'text/xml');
       content = Utils.xmlToObject(xml);
