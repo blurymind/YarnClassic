@@ -1,4 +1,5 @@
 import { yarnRender } from './bondage/renderer';
+import { inkRender } from './inkjs/ink-renderer';
 const { JSONEditor } = require('./jsoneditor/jsoneditor.min');
 
 export var Runner = function({
@@ -98,14 +99,14 @@ export var Runner = function({
     if (localVariables.runnerVariablesOpen) self.onOpenDialog();
   });
 
-  // TODO add playtesting support for ink files
+  // YARN PLAY MODE
   if (app.settings.documentType() === 'yarn') {
     this.previewStory = new yarnRender();
 
     this.gotoLastPlayNode = function() {
       if (
-          app.editing() &&
-          app.editing().title() !== self.previewStory.node.title
+        app.editing() &&
+        app.editing().title() !== self.previewStory.node.title
       ) {
         app.openNodeByTitle(self.previewStory.node.title);
       }
@@ -128,7 +129,7 @@ export var Runner = function({
       const editor = $('.editor')[0];
       const storyPreviewPlayButton = document.getElementById('storyPlayButton');
       const editorPlayPreviewer = document.getElementById('editor-play');
-      self.isEditorInPlayMode = playModeOverwrite;
+      app.isEditorInPlayMode(playModeOverwrite);
       if (playModeOverwrite) {
         //preview play mode
         editor.style.display = 'none';
@@ -142,24 +143,26 @@ export var Runner = function({
         self.previewStory.emiter.on('startedNode', function(e) {
           if (app.isEditorSplit) {
             app.workspace.warpToNode(
-                app.getFirstFoundNode(e.title.toLowerCase().trim())
+              app.getFirstFoundNode(e.title.toLowerCase().trim())
             );
           }
         });
         const localVariables = getPluginStore(self.name);
         console.log('variables', localVariables);
-        self.previewStory.initYarn(
-            JSON.parse(app.data.getSaveData('json')),
+        app.data.getSaveData('json').then(saveData => {
+          self.previewStory.initYarn(
+            JSON.parse(saveData),
             app
-                .editing()
-                .title()
-                .trim(),
+              .editing()
+              .title()
+              .trim(),
             'NVrichTextLabel',
             false,
             'commandDebugLabel',
             app.settings.playtestStyle(),
             localVariables.variables || []
-        );
+          );
+        });
       } else {
         //edit mode
         app.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
@@ -223,5 +226,84 @@ export var Runner = function({
         }
       });
     });
+  } else {
+    // INKJS PLAY MODE
+    this.previewStory = new inkRender();
+    this.togglePlayMode = function(playModeOverwrite = false) {
+      const editor = $('.editor')[0];
+      const storyPreviewPlayButton = document.getElementById('storyPlayButton');
+      const editorPlayPreviewer = document.getElementById('editor-play');
+      app.isEditorInPlayMode(playModeOverwrite);
+      if (playModeOverwrite) {
+        //preview play mode
+        editor.style.display = 'none';
+        $('.bbcode-toolbar').addClass('hidden');
+        editorPlayPreviewer.style.display = 'flex';
+        $(storyPreviewPlayButton).addClass('disabled');
+
+        self.previewStory.emiter.on('finished', function() {
+          self.togglePlayMode(false);
+          self.gotoLastPlayNode();
+        });
+        self.previewStory.emiter.on('startedNode', function(e) {
+          if (app.isEditorSplit) {
+            app.workspace.warpToNode(
+              app.getFirstFoundNode(e.title.toLowerCase().trim())
+            );
+          }
+        });
+        const localVariables = getPluginStore(self.name);
+        console.log('variables', localVariables);
+        app.data.getSaveData('ink').then(saveData => {
+          self.previewStory.initInk(
+            saveData,
+            app
+              .editing()
+              .title()
+              .trim(),
+            'NVrichTextLabel',
+            false,
+            'commandDebugLabel',
+            app.settings.playtestStyle(),
+            localVariables.variables || []
+          );
+        });
+      } else {
+        //edit mode
+        app.editor.session.setScrollTop(editorPlayPreviewer.scrollTop);
+        editorPlayPreviewer.style.display = 'none';
+        editor.style.display = 'flex';
+        $(storyPreviewPlayButton).removeClass('disabled');
+        $('.bbcode-toolbar').removeClass('hidden');
+        $('.toggle-toolbar').removeClass('hidden');
+        $('.editor-counter').removeClass('hidden');
+        self.previewStory.terminate();
+      }
+    };
+    onYarnInPreviewMode(() => self.togglePlayMode(false));
+    onYarnSavedNode(() => self.togglePlayMode(false));
+    this.advanceStoryPlayMode = function(speed = 5) {};
+
+    onYarnEditorOpen(() => {
+      createButton(self.name, {
+        iconName: 'play',
+        title: 'Preview',
+        attachTo: 'bbcodeToolbar',
+        onClick: 'togglePlayMode(true)',
+        className: 'bbcode-button bbcode-button-right',
+        id: 'storyPlayButton',
+      });
+
+      const element = document.createElement('div');
+      element.innerHTML = `
+    <div class="editor-play" id="editor-play" onpointerdown="app.plugins.${self.name}.advanceStoryPlayMode(30)" ondblclick="app.plugins.${self.name}.advanceStoryPlayMode()">
+        <p class="story-playtest-answer" id="NVrichTextLabel"></p>
+        <div id="commandDebugLabel"></div>
+    </div>
+  `;
+      document.getElementById('editorContainer').appendChild(element);
+    });
   }
+  //TODO remove this ugly hack
+  app.togglePlayMode = this.togglePlayMode;
 };

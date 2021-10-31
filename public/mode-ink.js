@@ -790,11 +790,11 @@ define('ace/mode/ink', [
   ];
   // var CstyleBehaviour = require('./behaviour/cstyle').CstyleBehaviour;
 
+  var CstyleBehaviour = require('./behaviour/cstyle').CstyleBehaviour;
   var InkMode = function() {
     this.HighlightRules = inkHighlightRules;
-    // this.C = inkHighlightRules;
-    // this.$behaviour = new CstyleBehaviour();
     this.foldingRules = new inkFoldingRules();
+    this.$behaviour = new CstyleBehaviour();
   };
   oop.inherits(InkMode, TextMode);
 
