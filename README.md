@@ -66,12 +66,12 @@ https://github.com/hylyh/bondage.js
 
 ### Language, writing and debugging tools built right into it (Yarn and Ink)
 - Ability to playtest [Yarn](https://github.com/YarnSpinnerTool/YarnSpinner) and [Ink](https://github.com/inkle/ink) stories you are working on - straight inside the editor
+![Screenshot](doc/inkPlaytest.gif)
 - Spellchecking of words (supported for different languages too)
 - misspelled word suggestions in the new context menu - if you have selected a misspelled word
 - Similar word suggestion for highlighted words (supported for english only)
 - Transcribe text - ability to "talk" to yarn without using hands :o (multi-language supported)
 - Yarn can also talk to you - tell you what is written (multi-language supported)
-![Screenshot](doc/inkPlaytest.gif)
 - Support for compilation and debugging of ink files via the wasm port inklecate. It catches the error and opens the knot containing it when exporting or testing!
 ![Screenshot](doc/inkErrorReporting.gif)
 
