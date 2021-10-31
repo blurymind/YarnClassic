@@ -13,6 +13,7 @@ export const data = {
   isDocumentDirty: ko.observable(false),
   restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
+  inkCompiler: null,
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
     return addSubPath.length > 0
@@ -481,11 +482,12 @@ export const data = {
     }
     return nodesObjects;
   },
-  getSaveData: function(type) {
+
+  getSaveData: async function(type) {
     var output = '';
     var content = data.getNodesAsObjects();
 
-    if (type == FILETYPE.JSON) {
+    if (type === FILETYPE.JSON) {
       // store useful values for later use if the file type supports it
       if (app.settings.filetypeVersion() === '2') {
         console.log('Saving as Yarn json v2 type');
@@ -506,7 +508,7 @@ export const data = {
       } else {
         output = JSON.stringify(content, null, '\t');
       }
-    } else if (type == FILETYPE.INK) {
+    } else if (type === FILETYPE.INK) {
       const startNode = content.find(node => node.title.trim() === 'START');
       if (startNode) {
         output += startNode.body;
@@ -522,7 +524,48 @@ export const data = {
           }
         }
       }
-    } else if (type == FILETYPE.YARN) {
+    } else if (type === FILETYPE.INKJSON) {
+      const inkTextFileData = await data.getSaveData('ink');
+
+      const InkJsonData = new Promise((resolve, reject) => {
+        app.ui.toastMixin.fire({
+          title: 'Ink file is compiling',
+          icon: 'info',
+          timer: 4000,
+          text: 'Please wait...',
+        });
+        data.inkCompiler
+          .init(response => {
+            if (response.errors.length > 0) {
+              Swal.fire({
+                title: 'Failed to parse ink file',
+                html: `<div class="title-error">${response.errors.join(
+                  '<br/>'
+                )}</div>`,
+                icon: 'error',
+              }).then(() =>
+                data.goToErrorInkNode(inkTextFileData, response.errors[0])
+              );
+              reject();
+            } else {
+              console.log('Warnings', response.warnings);
+
+              app.ui.toastMixin.fire({
+                animation: true,
+                title:
+                  response.warnings.length > 0
+                    ? 'Ink file compiled with some warnings'
+                    : 'Ink file compiled successfully',
+                icon: response.warnings.length > 0 ? 'warning' : 'success',
+                text: response.warnings.join('\n'),
+              });
+              resolve(JSON.stringify(response.story, null, '\t'));
+            }
+          })
+          .then(() => data.inkCompiler.submit(inkTextFileData));
+      });
+      output = await InkJsonData;
+    } else if (type === FILETYPE.YARN) {
       for (let i = 0; i < content.length; i++) {
         output += 'title: ' + content[i].title + '\n';
         output += 'tags: ' + content[i].tags + '\n';
@@ -541,14 +584,14 @@ export const data = {
         }
         output += '===\n';
       }
-    } else if (type == FILETYPE.TWEE) {
+    } else if (type === FILETYPE.TWEE) {
       for (let i = 0; i < content.length; i++) {
         var tags = '';
         if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
         output += ':: ' + content[i].title + tags + '\n';
         output += content[i].body + '\n\n';
       }
-    } else if (type == FILETYPE.TWEE2) {
+    } else if (type === FILETYPE.TWEE2) {
       for (let i = 0; i < content.length; i++) {
         var tags = '';
         if (content[i].tags.length > 0) tags = ' [' + content[i].tags + ']';
@@ -557,7 +600,7 @@ export const data = {
         output += ':: ' + content[i].title + tags + position + '\n';
         output += content[i].body + '\n\n';
       }
-    } else if (type == FILETYPE.XML) {
+    } else if (type === FILETYPE.XML) {
       output += '<nodes>\n';
       for (let i = 0; i < content.length; i++) {
         output += '\t<node>\n';
@@ -698,10 +741,11 @@ export const data = {
           (data.editingName() || '').replace(/\.[^/.]+$/, '') +
           '.' +
           editingType;
-        const yarnData = data.getSaveData(editingType);
-        cb({
-          editingName,
-          yarnData,
+        data.getSaveData(editingType).then(yarnData => {
+          cb({
+            editingName,
+            yarnData,
+          });
         });
       }
     });
@@ -826,7 +870,11 @@ export const data = {
 
   trySave: function(type) {
     data.editingType(type);
-    data.saveFileDialog($('#save-file'), type, data.getSaveData(type));
+    console.log('==SAVING==');
+    data
+      .getSaveData(type)
+      .then(saveData => data.saveFileDialog($('#save-file'), type, saveData));
+    // data.saveFileDialog($('#save-file'), type, data.getSaveData(type));
   },
 
   trySaveCurrent: function() {
@@ -835,20 +883,24 @@ export const data = {
     if (data.lastStorageHost() === 'GIST') {
       const gists = app.gists;
       gists.get(gists.file).then(gist => {
-        const yarnData = data.getSaveData(data.editingType());
-        gists.edit(gists.file, {
-          files: { [data.editingName()]: { content: yarnData } },
+        data.getSaveData(data.editingType()).then(yarnData => {
+          data.getSaveData(data.editingType());
+          gists.edit(gists.file, {
+            files: { [data.editingName()]: { content: yarnData } },
+          });
+          data.lastStorageHost('GIST');
+          data.isDocumentDirty(false);
+          app.refreshWindowTitle();
         });
-        data.lastStorageHost('GIST');
-        data.isDocumentDirty(false);
-        app.refreshWindowTitle();
       });
     } else if (!data.editingPath()) {
       if (app.gists && app.gists.options.token) {
         data.trySaveGist(app.gists);
       } else data.trySave(FILETYPE.JSON);
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
-      data.saveTo(data.editingPath(), data.getSaveData(data.editingType()));
+      data.getSaveData(data.editingType()).then(saveData => {
+        data.saveTo(data.editingPath(), saveData);
+      });
     }
   },
 
@@ -895,6 +947,70 @@ export const data = {
           app.clipboard = selectedText;
         });
       }
+    }
+  },
+  InkCompiler: function() {
+    this.ready = false;
+    this.worker = null;
+    this.init = (onComplete = () => {}) => {
+      return new Promise((resolve, reject) => {
+        this.worker = new Worker('public/inkwasm/ink.worker.js');
+        this.ready = false;
+        this.worker.onmessage = e => {
+          if (e.data === 'ready') {
+            this.ready = true;
+            resolve();
+          } else if (this.ready) {
+            onComplete(e.data);
+            resolve(e.data);
+          }
+        };
+      });
+    };
+    this.submit = text => {
+      this.worker.postMessage(text);
+    };
+    this.getInkErrorGotoNode = (inkTextFileData, inkError) => {
+      const inkErrorFind = inkError
+        .substr(inkError.lastIndexOf(':') + 1, inkError.length)
+        .trim();
+      try {
+        const inkLineNum = inkError.match(/line ([0-9]+):/)[1];
+        const clippedInkText = inkTextFileData
+          .split('\n')
+          .filter((_, i) => i < inkLineNum)
+          .join('\n');
+
+        const nodeNames = clippedInkText.match(/^===(?:[ ]+)?(.*)(?:[ ]+)?$/gm);
+        const nodeName = nodeNames[nodeNames.length - 1].match(
+          /^===(?:[ ]+)?(.*)(?:[ ]+)?$/
+        )[1];
+        console.log({
+          nodeNames,
+          inkLineNum,
+          nodeName,
+          inkError,
+          inkErrorFind,
+        });
+        return {
+          ln: inkLineNum,
+          node: nodeName,
+          find: inkErrorFind,
+        };
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    };
+  },
+  goToErrorInkNode: (inkTextFileData, error) => {
+    const errorData = data.inkCompiler.getInkErrorGotoNode(
+      inkTextFileData,
+      error
+    );
+    if (errorData) {
+      const { node, ln, find } = errorData;
+      app.openNodeByTitle(node, find);
     }
   },
 };

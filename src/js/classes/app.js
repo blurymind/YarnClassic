@@ -48,9 +48,17 @@ export var App = function(name, version) {
 
   this.setDocumentType = function(documentType, e) {
     const documentTypeId = e ? e.target.value : documentType;
-    console.log("set document type", documentTypeId);
     self.settings.documentType(documentTypeId);
     app.updateNodeLinks();
+
+    console.log('Set doc type', documentType, app.data.inkCompiler);
+    if (documentTypeId === 'ink') {
+      if (app.data.inkCompiler === null)
+        app.data.inkCompiler = new app.data.InkCompiler();
+      app.setMarkupLanguage('html'); //inkjs is using xml out of the box
+    } else {
+      app.data.inkCompiler = null;
+    }
     const event = new CustomEvent('yarnSetDocumentType');
     event.language = documentTypeId;
     window.dispatchEvent(event);
@@ -59,6 +67,7 @@ export var App = function(name, version) {
 
   this.setMarkupLanguage = function(language, e) {
     const markupLanguage = e ? e.target.value : language;
+    app.settings.markupLanguage(markupLanguage);
     self.richTextFormatter = new RichTextFormatter(self);
     self.mustRefreshNodes.notifySubscribers();
   };
@@ -106,7 +115,7 @@ export var App = function(name, version) {
   this.editingPath = ko.observable(null);
   this.$searchField = $('.search-field');
   this.isEditorInPreviewMode = false;
-  this.isEditorInPlayMode = false;
+  this.isEditorInPlayMode = ko.observable(false);
   this.isEditorSplit = false;
   this.isEditorFocused = false;
   this.editorResizeHandleOptions = {
@@ -465,11 +474,13 @@ export var App = function(name, version) {
       self.usingVisualStudioCodeExtension() &&
       self.editingVisualStudioCodeFile()
     ) {
-      window.vsCodeApi.postMessage({
-        type: 'DocumentEdit',
+      data.getSaveData(data.editingType()).then(payload => {
+        window.vsCodeApi.postMessage({
+          type: 'DocumentEdit',
 
-        // we just send the whole doc here every time...
-        payload: data.getSaveData(data.editingType()),
+          // we just send the whole doc here every time...
+          payload,
+        });
       });
     }
   };
@@ -718,7 +729,7 @@ export var App = function(name, version) {
     // one using the context menu
     if (self.editing() && self.editing() !== node) self.saveNode(false);
 
-    if (self.isEditorInPlayMode) {
+    if (self.isEditorInPlayMode()) {
       self.togglePlayMode(false);
     }
     if (self.isEditorInPreviewMode) {
@@ -1015,7 +1026,9 @@ export var App = function(name, version) {
           .toLowerCase() === nodeTitle.trim().toLowerCase()
     );
   };
-  this.openNodeByTitle = function(nodeTitle) {
+  this.openNodeByTitle = function(nodeTitle, findText = '') {
+    if (self.isEditorInPlayMode()) self.togglePlayMode();
+
     self.makeNodeWithName(nodeTitle);
     self.nodes().forEach(node => {
       if (
@@ -1025,6 +1038,7 @@ export var App = function(name, version) {
           .toLowerCase() === nodeTitle.trim().toLowerCase()
       ) {
         self.editNode(node);
+        if (findText) self.editor.find(findText);
       }
     });
   };
@@ -1107,7 +1121,7 @@ export var App = function(name, version) {
     $('#app-bg').css(cssOverwrite);
     $('.tooltip').css(cssOverwrite);
     $('.node .body').css(cssOverwrite);
-    $('.node-editor .form .editor-container .editor-preview').css(cssOverwrite);
+    $('.editor-container .editor-preview').css(cssOverwrite);
   };
 
   this.initGrid = function() {
@@ -1287,7 +1301,7 @@ export var App = function(name, version) {
     $('.app-info').show();
 
     app.ui.resetAppButtonsLocation();
-    if (self.isEditorInPlayMode) {
+    if (self.isEditorInPlayMode()) {
       self.togglePlayMode(false);
     }
     if (self.isEditorInPreviewMode) {
@@ -1431,7 +1445,12 @@ export var App = function(name, version) {
 
   this.makeNodeWithName = function(newNodeName, newNodeOffset = 220) {
     const otherNodeTitles = self.getOtherNodeTitles();
-    if (app.settings.documentType() === 'ink' && newNodeName === 'END') return;
+    if (
+      app.settings.documentType() === 'ink'
+      //   &&
+      // ['END', '->'].includes(newNodeName)
+    )
+      return;
     if (
       newNodeName &&
       newNodeName.length > 0 &&

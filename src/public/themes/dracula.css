@@ -645,7 +645,7 @@ input.ace_search_field {
   color: #f8f8f2;
 }
 
-.node-editor .form .editor-container .editor-play, .node-editor .form .editor-container .editor-preview {
+.editor-container .editor-play, .editor-container .editor-preview {
   color: red !important;
 }
 

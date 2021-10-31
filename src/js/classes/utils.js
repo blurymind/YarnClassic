@@ -6,6 +6,7 @@ export var FILETYPE = {
   UNKNOWN: 'none',
   YARN: 'yarn',
   INK: 'ink',
+  INKJSON: 'ink.json',
 };
 
 export var Utils = {

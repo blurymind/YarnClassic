@@ -725,7 +725,7 @@ input#editorTitle {
   font-family: yarnFont;
 }
 
-.node-editor .form .editor-container {
+.editor-container {
   margin-top: 2px;
   width: 100%;
   height: 100%;
@@ -734,8 +734,8 @@ input#editorTitle {
   position: relative;
 }
 
-.node-editor .form .editor-container .editor-play,
-.node-editor .form .editor-container .editor-preview {
+.editor-container .editor-play,
+.editor-container .editor-preview {
   display: none;
   max-height: 100%;
   width: 100%;
@@ -763,7 +763,7 @@ input#editorTitle {
 #commandDebugLabel {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 80%;
+  /*max-height: 80%;*/
   width: 100%;
   resize: none;
   font: normal arial, calibri;
@@ -772,9 +772,9 @@ input#editorTitle {
 .story-playtest-bubble {
   color: #000000;
   width: 90%;
-  border-radius: 24px;
-  padding: 10px;
-  margin: 7px;
+  border-radius: 17px;
+  padding: 2px 8px;
+  margin: 4px;
   background: #7df1c1;
   font: large arial, calibri;
   white-space: break-spaces;
@@ -1038,6 +1038,7 @@ input:focus + span + .dropdown {
 .storyPreviewChoiceButton {
   color: #290018;
   font-size: 1.2em;
+  margin: 3px;
 }
 
 .app-info {
@@ -1268,4 +1269,45 @@ input:focus + span + .dropdown {
 
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
+}
+
+@keyframes opacityPulse {
+  0% {opacity: 0.2;}
+  50% {opacity: 1.0;}
+  100% {opacity: 0.2;}
+}
+.opacity-pulse {
+  animation: opacityPulse 3s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+.centered {
+  transform: translate(50%, 50%);
+  position: absolute;
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.swal2-content {
+  max-height: 50vh !important;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fadeIn .5s ease-in 1 forwards;
+  opacity: 0;
+}
+.is-paused {
+  animation-play-state: paused;
+}
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
 }

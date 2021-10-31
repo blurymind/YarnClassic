@@ -117,6 +117,11 @@
             <span class="hide-when-narrow">&nbsp;</span>
             Save as Ink
           </span>
+          <span class="item" data-bind="visible: app.settings.documentType() === 'ink',click: function() { app.data.trySave('ink.json'); }">
+            <img style="margin:0; padding:0" width="20px" src="./public/images/inky-icon.png" alt="Ink Icon" />
+            <span class="hide-when-narrow">&nbsp;</span>
+            Save as Ink Json
+          </span>
           <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('twee'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
@@ -193,9 +198,9 @@
 
       <div id="editor-form" class="form">
         <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
-        <input type="text" id="editorTags" data-bind="value: app.editing().tags;" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
+        <input type="text" id="editorTags" data-bind="value: app.editing().tags, visible: !app.isEditorInPlayMode()" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
-        <div id="bbcodeToolbar" class="bbcode-toolbar">
+        <div id="bbcodeToolbar" class="bbcode-toolbar" data-bind="visible: !app.isEditorInPlayMode()">
           <button class="bbcode-button" onclick="app.openLastEditedNode()" title="Go Back To Last Edited Node" onfocus="app.togglePreviewMode(false)">
             <svg class="icon icon-arrow-left icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg>
           </button>
@@ -277,7 +282,7 @@
           </span>
         </div>
 
-        <div class="add-link" style="position: absolute;">
+        <div class="add-link" style="position: absolute;" data-bind="visible: !app.isEditorInPlayMode()">
           <div class="menu">
             <span id="add-link-title" class="title" onmouseenter="app.ui.openNodeListMenu('link')" onclick="app.ui.openNodeListMenu('link')">Add Link</span>
             <div id="add-link-dropdown" class="dropdown">
@@ -309,7 +314,7 @@
           </div>
         </div>
 
-        <div class="editor-counter hide-when-narrow">
+        <div class="editor-counter hide-when-narrow"  data-bind="visible: !app.isEditorInPlayMode()">
           <span class="hide-when-narrow">&nbsp;</span>
           Characters: <span class="character-count">0</span>
           <span class="hide-when-narrow">&nbsp;</span>
@@ -322,7 +327,7 @@
           <span class="hide-when-narrow">&nbsp;</span>
           Column Index: <span class="column-index">0</span>
         </div>
-        <div class="toggle-toolbar hide-when-narrow" id="editorFooter">
+        <div class="toggle-toolbar hide-when-narrow" id="editorFooter"  data-bind="visible: !app.isEditorInPlayMode()">
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="styled-checkbox">
             <input id="toglShowCounter" type="checkbox" data-bind="checked: app.settings.editorStatsEnabled, event: { change: app.toggleShowCounter }"></input>
