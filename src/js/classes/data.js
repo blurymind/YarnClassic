@@ -28,7 +28,15 @@ export const data = {
     data.documentHeader(null);
     app.workspace.selectedNodes = [];
     app.editing(null);
-    app.nodes([app.newNode(true).title('Start')]);
+    app.nodes([
+      app
+        .newNode(true)
+        .title(
+          app.settings.documentType() === 'ink'
+            ? data.InkGlobalScopeNodeName
+            : 'Start'
+        ),
+    ]);
     app.tags([]);
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
@@ -282,6 +290,22 @@ export const data = {
     } else if (type === FILETYPE.INK) {
       var lines = content.split(/\r?\n/);
       var obj = null;
+      const addMetaData = i => {
+        try {
+          obj.title = lines[i]
+            .split('//yarn-editor-metadata:')[0]
+            .replace(/===/g, '')
+            .trim();
+          const { x, y, colorID } = JSON.parse(
+            lines[i].split('//yarn-editor-metadata:')[1]
+          );
+          obj.position = { x: parseInt(x), y: parseInt(y) };
+          obj.colorID = colorID;
+          // console.log('OBJECT', obj);
+        } catch (e) {
+          console.warn('node metadata failed parse: ', e);
+        }
+      };
       for (let i = 0; i < lines.length; i++) {
         const nodeTemplate = {
           body: '',
@@ -290,25 +314,29 @@ export const data = {
           tags: '', // not supported by Ink
         };
         // Put any quirky outside of node ink logic in the START node (declarative stuff)
-        if (obj === null && !lines[i].trim().includes('===')) {
+        if (obj === null && !lines[i].trim().startsWith('===')) {
           obj = {
             ...nodeTemplate,
             position: {
-              x: (objects.length + 1) * 160,
-              y: (objects.length + 1) * 160,
+              x: 0,
+              y: 0,
             },
           };
-          obj.title = 'START';
+          obj.title = data.InkGlobalScopeNodeName; // START node does not support saving metadata
         }
 
-        if (lines[i].trim().includes('===')) {
+        if (lines[i].trim().startsWith('===')) {
           if (obj !== null) {
             objects.push(obj);
           }
-          obj = { ...nodeTemplate };
-          obj.title = lines[i].trim().replace(/===/g, '');
+          obj = {
+            title: lines[i].trim().replace(/===/g, ''),
+            ...nodeTemplate,
+          };
+          if (lines[i].trim().includes('//yarn-editor-metadata:')) {
+            addMetaData(i);
+          }
         } else if (obj !== null) {
-          console.log('add line', lines[i], 'to', obj.title);
           obj.body += lines[i] + '\n';
         }
       }
@@ -513,16 +541,28 @@ export const data = {
         output = JSON.stringify(content, null, '\t');
       }
     } else if (type === FILETYPE.INK) {
-      const startNode = content.find(node => node.title.trim() === 'START');
+      const startNode = content.find(
+        node => node.title.trim() === data.InkGlobalScopeNodeName
+      );
       if (startNode) {
         output += startNode.body;
       }
       for (let i = 0; i < content.length; i++) {
         // The START node will contain anything that is not going in any knots
-        if (content[i].title.trim() !== 'START') {
-          output += '\n' + '=== ' + content[i].title + '\n';
-          output += content[i].body;
-          var body = content[i].body;
+        const node = content[i];
+        if (node.title.trim() !== data.InkGlobalScopeNodeName) {
+          // populate knots
+          output +=
+            '\n' +
+            `=== ${node.title} ===` +
+            ` //yarn-editor-metadata: ${JSON.stringify({
+              x: parseInt(node.position.x),
+              y: parseInt(node.position.y),
+              colorID: parseInt(node.colorID),
+            })}` +
+            '\n';
+          output += node.body;
+          var body = node.body;
           if (!(body.length > 0 && body[body.length - 1] === '\n')) {
             output += '\n';
           }
@@ -1007,6 +1047,7 @@ export const data = {
       }
     };
   },
+  InkGlobalScopeNodeName: 'INK_GLOBAL_SCOPE',
   goToErrorInkNode: (inkTextFileData, error) => {
     const errorData = data.inkCompiler.getInkErrorGotoNode(
       inkTextFileData,

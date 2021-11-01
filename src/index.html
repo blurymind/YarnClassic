@@ -183,10 +183,10 @@
           <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }, css: { active: node.active() && node.active().tags === true}">
             <span data-bind="text: tag.text, css: tag.style"></span>
           </div>
-          <div class="colorDown" data-bind="click: node.cycleColorDown"><svg class="icon icon-arrow-left icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
-          <div class="colorUp" data-bind="click: node.cycleColorUp"><svg class="icon icon-arrow-left icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
+          <div class="colorDown" data-bind="click: node.cycleColorDown, visible: app.canEditNodeMeta(node.title())"><svg class="icon icon-arrow-left icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
+          <div class="colorUp" data-bind="click: node.cycleColorUp, visible: app.canEditNodeMeta(node.title())"><svg class="icon icon-arrow-left icon-fw icon-flip"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
           <!--<div class="icon edit" data-bind="click: function() { app.editNode(node); }"></div>-->
-          <div class="delete" data-bind="click: () => app.confirmDeleteNodes(node)"><svg class="icon icon-trash icon-fw"><use xlink:href="public/icons.svg#icon-trash"></use></svg></div>
+          <div class="delete" data-bind="click: () => app.confirmDeleteNodes(node), visible: app.canEditNodeMeta(node.title())"><svg class="icon icon-trash icon-fw"><use xlink:href="public/icons.svg#icon-trash"></use></svg></div>
           <!--<div class="resize" data-bind="click:node.toggleExpand"></div>-->
         </div>
       </div>

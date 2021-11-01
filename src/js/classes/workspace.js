@@ -696,8 +696,10 @@ export const Workspace = function(app) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
     for (let node of list) {
       if (!self.selectedNodes.includes(node)) {
-        self.selectedNodes.push(node);
-        node.setSelected(true);
+        if (app.canEditNodeMeta(node.title())) {
+          self.selectedNodes.push(node);
+          node.setSelected(true);
+        }
       }
     }
   };

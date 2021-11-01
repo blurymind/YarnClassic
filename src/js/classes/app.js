@@ -412,6 +412,12 @@ export var App = function(name, version) {
     }
   };
 
+  this.canEditNodeMeta = function(title) {
+    return (
+      app.settings.documentType() !== 'ink' ||
+      title.trim() !== data.InkGlobalScopeNodeName
+    );
+  };
   this.validateTitle = function() {
     var enteredValue = document.getElementById('editorTitle').value;
     var editorTitle = $('#editorTitle');
