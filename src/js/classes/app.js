@@ -793,7 +793,9 @@ export var App = function(name, version) {
     /// Enable autocompletion for node links (borked atm)
     const langTools = ace.require('ace/ext/language_tools');
     const nodeLinksCompleter = Utils.createAutocompleter(
-      ['string.llink', 'string.rlink'],
+      app.settings.documentType() === 'ink'
+        ? ['divert.target']
+        : ['string.llink', 'string.rlink'],
       app.getOtherNodeTitles().map(title => {
         const otherNode = self.getNodeByTitle(title);
         return {
