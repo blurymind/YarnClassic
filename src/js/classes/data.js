@@ -1029,13 +1029,6 @@ export const data = {
         const nodeName = nodeNames[nodeNames.length - 1].match(
           /^===(?:[ ]+)?(.*)(?:[ ]+)?$/
         )[1];
-        console.log({
-          nodeNames,
-          inkLineNum,
-          nodeName,
-          inkError,
-          inkErrorFind,
-        });
         return {
           ln: inkLineNum,
           node: nodeName,
