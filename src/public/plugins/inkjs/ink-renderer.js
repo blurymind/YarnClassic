@@ -12,7 +12,7 @@ export var inkRender = function() {
     messages: [],
     choices: [],
     tags: [],
-    paragraph: '',
+    paragraphEl: '',
   };
   this.resetStory = () => {
     this.prevSavePoints = [];
@@ -22,7 +22,7 @@ export var inkRender = function() {
       messages: [],
       choices: [],
       tags: [],
-      paragraph: '',
+      paragraphEl: '',
     };
     this.story.ResetState();
   };
@@ -36,8 +36,8 @@ export var inkRender = function() {
     }
   };
 
-  this.setCurStory = ({ messages, choices, tags, paragraph }) => {
-    this.curStory = { messages, choices, tags, paragraph };
+  this.setCurStory = ({ messages, choices, tags, paragraphEl }) => {
+    this.curStory = { messages, choices, tags, paragraphEl };
   };
   const getMessage = _story => {
     let message = [];
@@ -49,6 +49,27 @@ export var inkRender = function() {
 
   const continueStory = (choiceLabel = '', choicePath = '') => {
     const paragraph = getMessage(this.story);
+    const gotoFindQuery = choiceLabel.includes('"')
+      ? choiceLabel
+      : `[${choiceLabel}]`;
+
+    const paragraphEl = document.createElement('p');
+    if (choiceLabel) {
+      const paragraphElementTitle = document.createElement('p');
+      paragraphElementTitle.innerHTML = `<p style="text-align: right;" id="${choicePath}" class="playtestLink" title="Click to open [${choicePath}] Node">${choiceLabel} ( ${choicePath} )</p>`;
+      paragraphElementTitle.onclick = () =>
+        app.navigateToNodeDuringPlayTest(choicePath, gotoFindQuery);
+
+      paragraphEl.appendChild(paragraphElementTitle);
+      paragraph.forEach(p => {
+        const message = document.createElement('p');
+        message.innerHTML = `${p}<br/>`;
+        paragraphEl.appendChild(message);
+      });
+    } else {
+      paragraphEl.innerHTML = paragraph.join('<br/>');
+    }
+
     this.setCurStory({
       ...this.curStory,
       messages: this.log
@@ -60,12 +81,7 @@ export var inkRender = function() {
         : [paragraph],
       tags: this.story.currentTags,
       choices: this.story.currentChoices,
-      paragraph: choiceLabel
-        ? `<p style="text-align: right;" id="${choicePath}" class="playtestLink" title="Click to open [${choicePath}] Node"
-                onclick="app.navigateToNodeDuringPlayTest('${choicePath}')">${choiceLabel} ( ${choicePath} )<p><br/>${paragraph.join(
-            '<br/>'
-          )}`
-        : paragraph.join('<br/>'),
+      paragraphEl,
     });
 
     updateText();
@@ -89,10 +105,9 @@ export var inkRender = function() {
 
   // html update stuff
   const updateText = () => {
-    const message = this.curStory.paragraph;
-    if (message) {
-      const paragraph = document.createElement('p'); //$(`<p class="hide">${message}</p>`);
-      paragraph.innerHTML = message;
+    if (this.curStory.paragraphEl.innerHTML) {
+      const paragraph = document.createElement('p');
+      paragraph.appendChild(this.curStory.paragraphEl);
       paragraph.className =
         'story-playtest-bubble story-playtest-answer answer-post fade-in is-paused';
       this.textAreaEl.appendChild(paragraph);

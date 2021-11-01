@@ -1047,7 +1047,7 @@ export var App = function(name, version) {
           .toLowerCase() === nodeTitle.trim().toLowerCase()
       ) {
         self.editNode(node);
-        if (findText) self.editor.find(findText);
+        if (findText) setTimeout(() => self.editor.find(findText), 200);
       }
     });
   };
@@ -1647,14 +1647,6 @@ export var App = function(name, version) {
     }
   };
   this.navigateToNodeDuringPlayTest = function(nodeName, find = '') {
-    if (
-      nodeName ===
-      self
-        .editing()
-        .title()
-        .trim()
-    )
-      return;
     self.openNodeByTitle(nodeName, find);
     self.togglePlayMode(true);
     // if (app.isEditorSplit) {
