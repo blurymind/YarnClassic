@@ -266,7 +266,7 @@ export const data = {
     };
 
     // different depending on file
-    if (type == FILETYPE.JSON) {
+    if (type === FILETYPE.JSON) {
       content = JSON.parse(content);
       if (!content) {
         return;
@@ -279,7 +279,7 @@ export const data = {
         data.documentHeader(content.header);
         pushContent(content.nodes);
       }
-    } else if (type == FILETYPE.INK) {
+    } else if (type === FILETYPE.INK) {
       var lines = content.split(/\r?\n/);
       var obj = null;
       for (let i = 0; i < lines.length; i++) {
@@ -317,7 +317,7 @@ export const data = {
       }
       // auto set mode
       app.setDocumentType('ink');
-    } else if (type == FILETYPE.YARN) {
+    } else if (type === FILETYPE.YARN) {
       var lines = content.split(/\r?\n/);
       var obj = null;
       var readingBody = false;
@@ -346,7 +346,7 @@ export const data = {
           } else if (lines[i].indexOf('tags:') > -1) {
             if (obj == null) obj = {};
             obj.tags = lines[i].substr(6, lines[i].length - 6);
-          } else if (lines[i].trim() == '---') {
+          } else if (lines[i].trim() === '---') {
             readingBody = true;
             obj.body = '';
           }
@@ -356,13 +356,13 @@ export const data = {
         objects.push(obj);
       }
       app.setDocumentType('yarn');
-    } else if (type == FILETYPE.TWEE || type == FILETYPE.TWEE2) {
+    } else if (type === FILETYPE.TWEE || type === FILETYPE.TWEE2) {
       var lines = content.split('\n');
       var obj = null;
       var index = 0;
       for (var i = 0; i < lines.length; i++) {
         lines[i] = lines[i].trim();
-        if (lines[i].substr(0, 2) == '::') {
+        if (lines[i].substr(0, 2) === '::') {
           if (obj != null) objects.push(obj);
 
           obj = {};
@@ -424,13 +424,13 @@ export const data = {
 
       if (obj != null) objects.push(obj);
       app.setDocumentType('yarn');
-    } else if (type == FILETYPE.XML) {
+    } else if (type === FILETYPE.XML) {
       app.setDocumentType('yarn');
       var oParser = new DOMParser();
       var xml = oParser.parseFromString(content, 'text/xml');
       content = Utils.xmlToObject(xml);
 
-      if (content != undefined)
+      if (content !== undefined)
         for (let i = 0; i < content.length; i++) objects.push(content[i]);
     }
 
@@ -523,7 +523,7 @@ export const data = {
           output += '\n' + '=== ' + content[i].title + '\n';
           output += content[i].body;
           var body = content[i].body;
-          if (!(body.length > 0 && body[body.length - 1] == '\n')) {
+          if (!(body.length > 0 && body[body.length - 1] === '\n')) {
             output += '\n';
           }
         }
@@ -583,7 +583,7 @@ export const data = {
         output += '---\n';
         output += content[i].body;
         var body = content[i].body;
-        if (!(body.length > 0 && body[body.length - 1] == '\n')) {
+        if (!(body.length > 0 && body[body.length - 1] === '\n')) {
           output += '\n';
         }
         output += '===\n';
@@ -629,7 +629,7 @@ export const data = {
   },
 
   saveTo: function(path, content, callback = null) {
-    if (app.fs != undefined) {
+    if (app.fs) {
       app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
         data.editingPath(path);
         if (callback) callback();
