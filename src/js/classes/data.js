@@ -140,7 +140,7 @@ export const data = {
     reader.onload = function(e) {
       // fileDisplayArea.innerText = reader.result;
       var type = data.getFileType(filename);
-      if (type == FILETYPE.UNKNOWN)
+      if (type === FILETYPE.UNKNOWN)
         Swal.fire({
           title: 'Unknown filetype!',
           icon: 'error',
@@ -188,7 +188,7 @@ export const data = {
       async: false,
       success: result => {
         const type = data.getFileType(fileName);
-        if (type == FILETYPE.UNKNOWN) {
+        if (type === FILETYPE.UNKNOWN) {
           Swal.fire({
             title: 'Unknown filetype!',
             icon: 'error',
