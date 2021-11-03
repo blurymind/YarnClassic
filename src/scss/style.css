@@ -769,6 +769,7 @@ input#editorTitle {
   top: 0;
   left:50%;
   overflow-y: hidden !important;
+  -webkit-tap-highlight-color: transparent;
 }
 #commandDebugLabel {
   overflow-y: auto;
