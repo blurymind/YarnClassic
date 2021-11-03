@@ -659,6 +659,10 @@ input#editorTitle {
   color: red;
 }
 
+.title-warning {
+  color: darkorange;
+}
+
 .menu:hover .title {
   width: 100%;
 }

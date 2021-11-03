@@ -103,17 +103,20 @@ export var inkRender = function() {
     continueStory();
   };
 
-  // html update stuff
-  const updateText = () => {
-    if (this.curStory.paragraphEl.innerHTML) {
+  this.createAndAddParagraph = child => {
+    console.log('made', child);
+    if (child.innerHTML) {
       const paragraph = document.createElement('p');
-      paragraph.appendChild(this.curStory.paragraphEl);
+      paragraph.appendChild(child);
       paragraph.className =
         'story-playtest-bubble story-playtest-answer answer-post fade-in is-paused';
       this.textAreaEl.appendChild(paragraph);
       $(paragraph).removeClass('is-paused');
     }
-
+  };
+  // html update stuff
+  const updateText = () => {
+    this.createAndAddParagraph(this.curStory.paragraphEl);
     this.textAreaEl.querySelectorAll('div').forEach(n => n.remove());
     const btnWrapper = document.createElement('div');
     btnWrapper.id = 'choiceButtons';
@@ -189,21 +192,35 @@ export var inkRender = function() {
 
     this.compiler
       .init(response => {
-        if (response.errors.length > 0 || response.warnings.length > 0) {
+        this.textAreaEl.innerHTML = '';
+        if (response.errors.length > 0) {
           this.textAreaEl.innerHTML = `<div class="title-error"><p>Parsing failed:</p>><br/><p>${response.errors.join(
             '</p><p>'
           )}</p><br/><p>${response.warnings.join('</p><p>')}</p></div>`;
           this.textAreaEl.onclick = () => {
+            console.log('====>', response);
             app.data.goToErrorInkNode(this.inkTextData, response.errors[0]);
             this.textAreaEl.onclick = null;
           };
-        } else {
-          this.story = new Story(response.story);
-          console.log('STORY', this.story);
-          console.warn('Warnings', response.warnings);
-          this.textAreaEl.innerHTML = '';
-          continueStory();
+          return;
         }
+        if (response.warnings.length > 0) {
+          const warningsEl = document.createElement('p');
+          warningsEl.className = 'title-warning';
+          response.warnings.forEach(warning => {
+            const warningEl = document.createElement('p');
+            warningEl.innerText = warning;
+            warningEl.onclick = () => {
+              app.data.goToErrorInkNode(this.inkTextData, warning);
+            };
+            warningsEl.appendChild(warningEl);
+          });
+          this.createAndAddParagraph(warningsEl);
+        }
+        this.story = new Story(response.story);
+        console.log('STORY', this.story);
+        console.warn('Warnings', response.warnings);
+        continueStory();
       })
       .then(() => {
         if (

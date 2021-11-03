@@ -614,7 +614,7 @@ export const data = {
     return nodesObjects;
   },
 
-  getSaveData: async function(type) {
+  getSaveData: async function(type, getNodeFromInkLine = null) {
     var output = '';
     var content = data.getNodesAsObjects();
 
@@ -646,6 +646,13 @@ export const data = {
       );
       if (startNode) {
         output += startNode.body;
+        // Hacky test to discover Node relative to an Ink fileline (for the debugger)
+        if (
+          getNodeFromInkLine &&
+          output.split(/\r\n|\r|\n/).length > getNodeFromInkLine
+        ) {
+          return startNode;
+        }
       }
       for (let i = 0; i < content.length; i++) {
         // The START node will contain anything that is not going in any knots
@@ -665,6 +672,13 @@ export const data = {
           var body = node.body;
           if (!(body.length > 0 && body[body.length - 1] === '\n')) {
             output += '\n';
+          }
+          // Hacky test to discover Node relative to an Ink fileline (for the debugger)
+          if (
+            getNodeFromInkLine &&
+            output.split(/\r\n|\r|\n/).length > getNodeFromInkLine
+          ) {
+            return node;
           }
         }
       }
@@ -1136,24 +1150,19 @@ export const data = {
     this.submit = text => {
       this.worker.postMessage(text);
     };
-    this.getInkErrorGotoNode = (inkTextFileData, inkError) => {
+    this.getInkErrorGotoNode = async (inkTextFileData, inkError) => {
       const inkErrorFind = inkError
         .substr(inkError.lastIndexOf(':') + 1, inkError.length)
         .trim();
       try {
-        const inkLineNum = inkError.match(/line ([0-9]+):/)[1];
-        const clippedInkText = inkTextFileData
-          .split('\n')
-          .filter((_, i) => i < inkLineNum)
-          .join('\n');
-
-        const nodeNames = clippedInkText.match(/^===(?:[ ]+)?(.*)(?:[ ]+)?$/gm);
-        const nodeName = nodeNames[nodeNames.length - 1].match(
-          /^===(?:[ ]+)?(.*)(?:[ ]+)?$/
-        )[1];
+        const inkLineNum = Number(inkError.match(/line ([0-9]+):/)[1]);
+        const inkTextFileErrorNode = await data.getSaveData(
+          FILETYPE.INK,
+          inkLineNum
+        );
         return {
           ln: inkLineNum,
-          node: nodeName,
+          node: inkTextFileErrorNode.title,
           find: inkErrorFind,
         };
       } catch (e) {
@@ -1164,13 +1173,13 @@ export const data = {
   },
   InkGlobalScopeNodeName: 'INK_GLOBAL_SCOPE',
   goToErrorInkNode: (inkTextFileData, error) => {
-    const errorData = data.inkCompiler.getInkErrorGotoNode(
-      inkTextFileData,
-      error
-    );
-    if (errorData) {
-      const { node, ln, find } = errorData;
-      app.openNodeByTitle(node, find);
-    }
+    data.inkCompiler
+      .getInkErrorGotoNode(inkTextFileData, error)
+      .then(errorData => {
+        if (errorData) {
+          const { node, ln, find } = errorData;
+          app.openNodeByTitle(node, find);
+        }
+      });
   },
 };
