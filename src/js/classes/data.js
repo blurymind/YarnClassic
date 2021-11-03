@@ -33,6 +33,9 @@ export const data = {
     data.documentHeader(null);
     app.workspace.selectedNodes = [];
     app.editing(null);
+    if (editingFormat === FILETYPE.INK) {
+      app.settings.documentType('ink');
+    }
     app.nodes([
       app
         .newNode(true)
@@ -143,14 +146,29 @@ export const data = {
     });
   },
   addDocumentStateTab: function() {
-    data.appInstanceStates([
-      ...data.appInstanceStates(),
-      data.getCurrentAppState(),
-    ]);
-    console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
-    data.saveAppStateToLocalStorage();
-    data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
-    data.startNewFile('NewFile', data.editingType());
+    data.promptFileNameAndFormat(
+      ({ editingName, editingType, yarnData, checked }) => {
+        //Mutate states
+        data.appInstanceStates([
+          ...data.appInstanceStates(),
+          { ...data.getCurrentAppState() },
+        ]);
+        console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
+        data.saveAppStateToLocalStorage();
+        data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
+        if (checked) {
+          data.editingName(editingName);
+          data.editingType(editingType);
+        } else {
+          data.startNewFile(editingName, editingType);
+        }
+
+        console.log({ editingName, yarnData, editingType, checked });
+      },
+      null,
+      '📜 Name of new file',
+      ` Copy of ${data.editingName()}`
+    );
   },
   saveAppStateToLocalStorage: function(writeCurrent = true) {
     if (!data.restoreFromLocalStorage()) return;
@@ -549,6 +567,7 @@ export const data = {
       data.getNodesFromObjects(objects).forEach(node => app.nodes.push(node));
     });
 
+    data.editingType(type); // Set type when loading
     data.restoreSettingsFromDocumentHeader();
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
@@ -842,34 +861,58 @@ export const data = {
     data.openFileDialog($('#open-file'), data.openFiles);
   },
 
-  promptFileNameAndFormat: function(cb, suggestions = null) {
+  promptFileNameAndFormat: function(
+    cb,
+    suggestions = null,
+    title = '💾 Save file - enter file name',
+    showCheckBox = ''
+  ) {
+    const guessedFileName =
+      data.editingName().replace(/\.[^/.]+$/, '') +
+      '(new).' +
+      data.editingType();
     Swal.fire({
-      title: '💾 Save file - enter file name',
-      html: `<input id="swal-input1" list="select-file-name" name="select" placeholder="${data.editingName()}">
+      title,
+      html: ` <input id="swal-input1" list="select-file-name" name="select" placeholder="${guessedFileName}">
       <datalist class="form-control" id="select-file-name">    
         ${suggestions &&
           suggestions
             .map(suggestion => `<option value="${suggestion}" />`)
             .join('')}
-      </datalist>`,
+      </datalist>
+      ${
+        showCheckBox
+          ? `<br/><br/><input type="checkbox" id="swal-checkbox-checked"> ${showCheckBox}</input>`
+          : ''
+      }
+        `,
       onOpen: () => {
-        if (data.editingName() !== 'NewFile')
-          document.getElementById('swal-input1').value = data.editingName();
+        if (data.editingName() !== 'NewFile') {
+          document.getElementById('swal-input1').value = guessedFileName;
+        }
       },
       showCancelButton: true,
-      preConfirm: () => document.getElementById('swal-input1').value,
+      preConfirm: () => ({
+        name: document.getElementById('swal-input1').value,
+        checked: showCheckBox
+          ? document.getElementById('swal-checkbox-checked').checked
+          : false,
+      }),
     }).then(({ value }) => {
-      if (value && value !== '') {
-        data.editingName(value);
-        const editingType = data.editingType();
+      if (value) {
+        const { name, checked } = value;
+        const guessedNewFormat = name.split('.').pop();
+        const editingType = Object.values(FILETYPE).includes(guessedNewFormat)
+          ? guessedNewFormat
+          : data.editingType();
         const editingName =
-          (data.editingName() || '').replace(/\.[^/.]+$/, '') +
-          '.' +
-          editingType;
+          (name || '').replace(/\.[^/.]+$/, '') + '.' + editingType;
         data.getSaveData(editingType).then(yarnData => {
           cb({
             editingName,
+            editingType,
             yarnData,
+            checked,
           });
         });
       }
@@ -911,6 +954,7 @@ export const data = {
         const gistFiles = Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
+          data.editingName(editingName);
           gists.edit(gists.file, {
             files: { [editingName]: { content: yarnData } },
           });
