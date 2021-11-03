@@ -6,8 +6,9 @@ export const RichTextFormatter = function(app) {
 
   const addExtraPreviewerEmbeds = result => {
     const twRegex = /(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi;
+    const instaRegex = /((https:\/\/)?(www.)?instagram.com\/p\/[^\s\<]+)/gi;
     const ytRegex = /(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi;
-    const otherUrlPattern = `^(?!${twRegex.source}|${ytRegex.source})https?:.*$`;
+    const otherUrlPattern = `^(?!${twRegex.source}|${ytRegex.source}|${instaRegex.source})https?:.*$`;
     const combinedRegex = new RegExp(otherUrlPattern, 'gm');
     result = result.replace(combinedRegex, function(id) {
       return `
@@ -43,10 +44,22 @@ export const RichTextFormatter = function(app) {
       );
       if (extractedId.length > 1) {
         return `
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"
+        <iframe height="315" src="https://www.youtube.com/embed/${extractedId[1]}" title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen></iframe> 
+      `;
+      }
+    });
+    // create Instagram previews :)
+    result = result.replace(instaRegex, function(id) {
+      const extractedId = id.match(
+        /((?:https?:\/\/)?(?:www.)?instagram.com\/p\/([^\s\<]+)\/)/i
+      );
+      if (extractedId.length > 2) {
+        console.log('EXTRACTED', extractedId);
+        return `
+            <iframe height="540" src="http://instagram.com/p/${extractedId[2]}/embed" frameborder="0"></iframe>
       `;
       }
     });

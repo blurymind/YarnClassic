@@ -1314,6 +1314,9 @@ input:focus + span + .dropdown {
   width: 100% !important;
   height: 100% !important;
 }
+.editor-preview font > iframe {
+  display: flex;
+}
 
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
