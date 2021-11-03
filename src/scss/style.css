@@ -599,6 +599,9 @@ input#editorTitle {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.bbcode-button.rotated {
+  transform: rotate(90deg);
+}
 .bbcode-button:hover {
   background-color: #e7e7e7;
 }
@@ -951,6 +954,10 @@ input#editorTitle {
   gap: 3px;
   max-width: 71vh;
   overflow: hidden;
+  transition: max-width 150ms ease-in;
+}
+.file-tabs-buttons.collapsed{
+  max-width: 0vh;
 }
 
 .app-search {

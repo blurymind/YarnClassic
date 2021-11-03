@@ -65,8 +65,8 @@ export const Settings = function(app) {
 
   // Document type
   this.documentType = ko
-      .observable(storage.getItem('documentType') || 'yarn')
-      .extend({ persist: 'documentType' });
+    .observable(storage.getItem('documentType') || 'yarn')
+    .extend({ persist: 'documentType' });
 
   // Language
   this.language = ko
@@ -177,6 +177,14 @@ export const Settings = function(app) {
   this.lineStyle = ko
     .observable(storage.getItem('lineStyle') || 'straight')
     .extend({ persist: 'lineStyle' });
+
+  this.fileTabsVisible = ko
+    .observable(
+      storage.getItem('fileTabsVisible') !== null
+        ? storage.getItem('fileTabsVisible') === 'true'
+        : true
+    )
+    .extend({ persist: 'fileTabsVisible' });
 
   // Always open nodes in Visual Studio Code Editor
   // We don't actually show this in the settings menu; it can only be set by the VSCode extension's settings

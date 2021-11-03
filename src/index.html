@@ -168,7 +168,14 @@
 
     <!-- app-opened-documents -->
     <div class="file-tabs flex-wrap">
-      <div class="file-tabs-buttons" data-bind="foreach: { data: data.appInstanceStates, as: 'state' }">
+      <button class="bbcode-button" data-bind="click: function(){
+        app.settings.fileTabsVisible(!app.settings.fileTabsVisible())
+      },css: {
+       active: !app.settings.fileTabsVisible(), rotated: !app.settings.fileTabsVisible()
+       }, attr: { title: `${data.appInstanceStates().length} files opened`}">=</button>
+      <div class="file-tabs-buttons" data-bind="css:{
+        collapsed: !app.settings.fileTabsVisible()
+      }, foreach: { data: data.appInstanceStates, as: 'state' }">
         <button class="bbcode-button session-button" data-bind="
          click:function(data, event) {
             $root.data.loadDocumentStateTabFromIndex($index());
@@ -188,13 +195,13 @@
 <!--          },clickBubble: false">[X]</span>-->
         </button>
       </div>
-      <div class="flex-wrap" style="justify-content: space-between;">
+      <div class="flex-wrap" style="justify-content: space-between;" data-bind="visible:app.settings.fileTabsVisible()">
         <button class="bbcode-button" data-bind="click:function() {
          data.deleteDocumentStateTab($root.data.selectedAppInstanceIndex())
-         }, visible: data.appInstanceStates().length > 1">-</button>
+         }, visible: data.appInstanceStates().length > 1, attr: { title: `Close ${data.editingName()} file`}">-</button>
         <button class="bbcode-button" data-bind="click:function() {
          data.addDocumentStateTab()
-         }">+</button>
+         }" title="Open new tab">+</button>
       </div>
     </div>
 
