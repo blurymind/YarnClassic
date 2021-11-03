@@ -166,6 +166,39 @@
       </div> <!-- file menu -->
     </div> <!-- app-menu -->
 
+    <!-- app-opened-documents -->
+    <div class="file-tabs flex-wrap" >
+      <div class="file-tabs-buttons" data-bind="foreach: { data: data.appInstanceStates, as: 'state' }">
+        <button class="bbcode-button session-button" data-bind="
+         click:function(data, event) {
+            $root.data.loadDocumentStateTabFromIndex($index());
+          },
+          attr: {
+            title:
+            `${state.editingName}
+            contains ${state.nodes.length} node${state.nodes.length > 1 ? 's':''}
+            ${state.lastStorageHost} HOST
+            ${state.lastEditedUnix || ''}
+          `},
+          css: { active: $index() === $root.data.selectedAppInstanceIndex()}
+          ">
+          <span data-bind="text: state.editingName + `(${state.nodes.length})`"></span>
+<!--          <span data-bind="click:function(e){-->
+<!--            $root.data.deleteDocumentStateTab($index());-->
+<!--          },clickBubble: false">[X]</span>-->
+        </button>
+      </div>
+      <div class="flex-wrap" style="justify-content: space-between;">
+        <button class="bbcode-button" data-bind="click:function() {
+         data.deleteDocumentStateTab($root.data.selectedAppInstanceIndex())
+         }, visible: data.appInstanceStates().length > 1">-</button>
+        <button class="bbcode-button" data-bind="click:function() {
+         data.addDocumentStateTab()
+         }">+</button>
+      </div>
+
+    </div>
+
     <!-- grid bg for snap to grid functionality -->
     <canvas id="grid-canvas" class="grid-canvas"></canvas>
 

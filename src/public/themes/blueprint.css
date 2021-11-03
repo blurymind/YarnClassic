@@ -136,7 +136,7 @@
   top: 2.5%;
 }
 
-.node-editor .form .bbcode-toolbar .bbcode-button:hover {
+.bbcode-button:hover {
   background: orange;
 }
 

@@ -581,9 +581,8 @@ input#editorTitle {
   font-size: 0.8em;
 }
 
-.node-editor .form .bbcode-toolbar .bbcode-button {
+.bbcode-button {
   cursor: pointer;
-  border: none;
   text-align: center;
   border-radius: 12px;
   background-color: white;
@@ -594,8 +593,18 @@ input#editorTitle {
   transition-duration: 0.4s;
   text-decoration: none;
   display: inline-block;
-}
 
+  min-width: 20px;
+  max-width: 120px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.bbcode-button:hover {
+  background-color: #e7e7e7;
+}
+.bbcode-button.active {
+  background-color: #78c9be;
+}
 .split-editor {
   position: relative !important;
   top: 30px !important;
@@ -636,10 +645,6 @@ input#editorTitle {
   float: right;
   line-height: 22px;
   margin: 0 2px;
-}
-
-.node-editor .form .bbcode-toolbar .bbcode-button:hover {
-  background-color: #e7e7e7;
 }
 
 #edit-node-in-vscode {
@@ -927,6 +932,25 @@ input#editorTitle {
 /*-- Menu -------------------------------------------------------------- */
 .app-menu {
   z-index: 10003;
+}
+.file-tabs {
+  position: absolute;
+  bottom: 60px;
+  left: 25px;
+  min-width: 27px;
+  opacity: 0.25;
+  z-index: 10004;
+  transform: rotate(270deg);
+  transform-origin: left;
+}
+.file-tabs:hover{
+  opacity: 0.6;
+}
+.file-tabs-buttons {
+  display: flex;
+  gap: 3px;
+  max-width: 71vh;
+  overflow: hidden;
 }
 
 .app-search {
@@ -1327,6 +1351,7 @@ input[type=search]::-webkit-search-cancel-button {
 .flex-wrap {
   display: flex;
   flex-wrap: wrap;
+  gap: 3px;
 }
 
 .syntax-mode-banner {

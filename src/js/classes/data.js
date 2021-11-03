@@ -5,14 +5,19 @@ import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 
 export const data = {
+  selectedAppInstanceIndex: ko.observable(0),
+  appInstanceStates: ko.observable([]),
+  restoreFromLocalStorage: ko.observable(true),
+  // All the bellow go into appInstanceStates, which controls r/w of app states to local storage (for file tabs feature)
+  isDocumentDirty: ko.observable(false),
   editingPath: ko.observable(null),
   editingName: ko.observable('NewFile'),
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
   documentHeader: ko.observable(null),
-  isDocumentDirty: ko.observable(false),
-  restoreFromLocalStorage: ko.observable(true),
   lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
+  lastEditedUnix: ko.observable(new Date()),
+  lastSavedUnix: ko.observable(null),
   inkCompiler: null,
   editingFileFolder: function(addSubPath = '') {
     const filePath = data.editingPath() ? data.editingPath() : '';
@@ -43,7 +48,7 @@ export const data = {
     data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
-
+    data.saveAppStateToLocalStorage();
     app.ui.dispatchEvent('newYarnFileStarted');
   },
   askForFileName: function() {
@@ -61,7 +66,10 @@ export const data = {
   setNewFile: function() {
     Swal.fire({
       title: 'Create a New File?',
-      text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!`,
+      text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!
+      Path: ${data.editingPath()}
+      Storage: ${data.lastStorageHost()}
+      `,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'New file',
@@ -72,44 +80,108 @@ export const data = {
       }
     });
   },
-  saveAppStateToLocalStorage: function() {
+  loadDocumentStateTabFromIndex: function(index) {
+    console.log('ATTEMPT TO LOAD STATE', index);
+    data.selectedAppInstanceIndex(index);
+    data.loadAppStateFromLocalStorage();
+  },
+  getCurrentAppState: function() {
+    return {
+      editingPath: data.editingPath(),
+      editingName: data.editingName(),
+      documentType: app.settings.documentType(),
+      editingType: data.editingType(),
+      editingFolder: data.editingFolder(),
+      editingTitle: app.editing() ? app.editing().title() : null,
+      nodes: data.getNodesAsObjects(),
+      documentHeader: data.documentHeader(),
+      tags: app.tags(),
+      editorSelection: app.editor ? app.editor.selection.getRange() : null,
+      transform: app.workspace.transform,
+      scale: app.workspace.scale,
+      lastStorageHost: data.lastStorageHost(),
+      lastEditedUnix: data.lastEditedUnix() || '',
+      lastSavedUnix: data.lastSavedUnix(),
+      pluginStorage: app.plugins.pluginStorage,
+    };
+  },
+  deleteDocumentStateTab: function(index) {
+    Swal.fire({
+      title: 'Are you sure you want to close this file?',
+      text: `Any unsaved changes to ${data.editingName()}.${data.editingType()} will be lost!
+      Path: ${data.editingPath() || ''}
+      Storage: ${data.lastStorageHost()}
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes close',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    }).then(result => {
+      if (result.value) {
+        console.log('DELETE TAB', data.appInstanceStates(), index);
+        const mutatedState = data
+          .appInstanceStates()
+          .filter((_, i) => i !== index)
+          .map(state => ({ ...state }));
+        data.appInstanceStates([...mutatedState]);
+        data.saveAppStateToLocalStorage(false);
+
+        setTimeout(() => {
+          const nextIndex =
+            index > data.appInstanceStates().length - 1
+              ? data.appInstanceStates().length - 1
+              : index;
+          data.loadDocumentStateTabFromIndex(nextIndex);
+        }, 500);
+        console.log(
+          data.appInstanceStates(),
+          'resulting mutation',
+          mutatedState
+        ); //ok
+      }
+    });
+  },
+  addDocumentStateTab: function() {
+    data.appInstanceStates([
+      ...data.appInstanceStates(),
+      data.getCurrentAppState(),
+    ]);
+    console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
+    data.saveAppStateToLocalStorage();
+    data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
+    data.startNewFile('NewFile', data.editingType());
+  },
+  saveAppStateToLocalStorage: function(writeCurrent = true) {
     if (!data.restoreFromLocalStorage()) return;
 
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
+    data.lastEditedUnix(new Date());
     app.refreshWindowTitle();
-    // console.log('Update storage', app.plugins.pluginStorage());
-    storage.setItem(
-      'appState',
-      JSON.stringify({
-        editingPath: data.editingPath(),
-        editingName: data.editingName(),
-        editingType: data.editingType(),
-        editingFolder: data.editingFolder(),
-        editingTitle: app.editing() ? app.editing().title() : null,
-        nodes: data.getNodesAsObjects(),
-        documentHeader: data.documentHeader(),
-        tags: app.tags(),
-        editorSelection: app.editor ? app.editor.selection.getRange() : null,
-        transform: app.workspace.transform,
-        scale: app.workspace.scale,
-        lastStorageHost: data.lastStorageHost(),
-        pluginStorage: app.plugins.pluginStorage,
-      })
-    );
+    console.log('Update storage', data.appInstanceStates(), writeCurrent);
+    const updatedState = [...data.appInstanceStates()];
+    if (writeCurrent)
+      updatedState[data.selectedAppInstanceIndex()] = data.getCurrentAppState();
+    data.appInstanceStates(updatedState);
+    storage.setItem('appState', JSON.stringify(data.appInstanceStates()));
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   },
   loadAppStateFromLocalStorage: function() {
-    if (!data.restoreFromLocalStorage()) return;
+    if (!data.restoreFromLocalStorage()) return; // to ignore sometimes?
 
     const storage = app.settings.storage;
     const appState = JSON.parse(storage.getItem('appState'));
-    if (appState) {
+    const currentDocState = appState[data.selectedAppInstanceIndex()];
+    data.appInstanceStates(appState);
+    console.log('AAPP state', appState, currentDocState);
+    if (currentDocState) {
       const {
         editingPath,
         lastStorageHost,
         editingName,
         editingType,
+        documentType,
         editingFolder,
         editingTitle,
         editorSelection,
@@ -119,12 +191,17 @@ export const data = {
         transform,
         scale,
         pluginStorage,
-      } = appState;
+        lastEditedUnix,
+        lastSavedUnix,
+      } = currentDocState;
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
+      app.settings.documentType(documentType);
       data.editingFolder(editingFolder);
       data.lastStorageHost(lastStorageHost);
+      data.lastEditedUnix(lastEditedUnix);
+      data.lastSavedUnix(lastSavedUnix);
       app.nodes([]);
       data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
       app.tags(tags);

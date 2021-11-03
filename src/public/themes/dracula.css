@@ -509,7 +509,7 @@ input[type="text"] {
   background: #44475a;
 }
 
-.node-editor .form .bbcode-toolbar .bbcode-button {
+.bbcode-button {
   color: #f8f8f2;
   background: #44475a;
   border: none;
@@ -521,11 +521,14 @@ input[type="text"] {
   color: #6272a4;
 }
 
-.node-editor .form .bbcode-toolbar .bbcode-button:hover {
+.bbcode-button:hover {
   background: #6272a4;
 }
-
-.node-editor .form .bbcode-toolbar .bbcode-button:active {
+.bbcode-button.active{
+  background: #6272a4;
+  color: #0f0123;
+}
+.bbcode-button:active {
   color: #bd93f9;
 }
 
