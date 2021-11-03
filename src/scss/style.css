@@ -939,7 +939,7 @@ input#editorTitle {
   left: 25px;
   min-width: 27px;
   opacity: 0.25;
-  z-index: 10004;
+  z-index: 10002;
   transform: rotate(270deg);
   transform-origin: left;
 }
