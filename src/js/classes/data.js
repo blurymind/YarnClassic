@@ -994,12 +994,9 @@ export const data = {
   },
 
   trySave: function(type) {
-    data.editingType(type);
-    console.log('==SAVING==');
     data
       .getSaveData(type)
       .then(saveData => data.saveFileDialog($('#save-file'), type, saveData));
-    // data.saveFileDialog($('#save-file'), type, data.getSaveData(type));
   },
 
   trySaveCurrent: function() {

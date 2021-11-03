@@ -398,9 +398,11 @@
 
     <!-- app info -->
     <div class="app-info">
-      <span class="app-title" data-bind="text:app.settings.documentType"></span>
+      <span class="app-title" data-bind="text:`${app.settings.documentType()} syntax`"></span>
       <span class="app-version" data-bind="text:app.version"></span>
-      <span class="file-name" data-bind="text:data.isDocumentDirty() ? data.editingName() + '*' : data.editingName(),click:app.data.trySaveCurrent"></span>
+      <span class="file-name" data-bind="text:
+      `${data.lastStorageHost()}:${data.editingName()}@${data.editingType()} ${data.isDocumentDirty() ? '*':''}`,
+      click:app.data.trySaveCurrent"></span>
     </div>
     <div class="title" id="addPwa">🍰Add to Homescreen📲</div>
     <div class="syntax-mode-banner">
