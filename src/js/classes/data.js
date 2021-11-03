@@ -160,21 +160,25 @@ export const data = {
     data.lastEditedUnix(new Date());
     app.refreshWindowTitle();
     console.log('Update storage', data.appInstanceStates(), writeCurrent);
-    const updatedState = [...data.appInstanceStates()];
+    const updatedStates = [...data.appInstanceStates()];
     if (writeCurrent)
-      updatedState[data.selectedAppInstanceIndex()] = data.getCurrentAppState();
-    data.appInstanceStates(updatedState);
-    storage.setItem('appState', JSON.stringify(data.appInstanceStates()));
+      updatedStates[
+        data.selectedAppInstanceIndex()
+      ] = data.getCurrentAppState();
+    data.appInstanceStates(updatedStates);
+    storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   },
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return; // to ignore sometimes?
 
     const storage = app.settings.storage;
-    const appState = JSON.parse(storage.getItem('appState'));
-    const currentDocState = appState[data.selectedAppInstanceIndex()];
-    data.appInstanceStates(appState);
-    console.log('AAPP state', appState, currentDocState);
+    // Just in case clear old state's cache
+    if (storage.getItem('appState')) storage.clear(); //TODO remove later
+    const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
+    const currentDocState = appStates[data.selectedAppInstanceIndex()];
+    data.appInstanceStates(appStates);
+    console.log('AAPP state', appStates, currentDocState);
     if (currentDocState) {
       const {
         editingPath,
