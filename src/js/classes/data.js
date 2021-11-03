@@ -107,8 +107,8 @@ export const data = {
   },
   deleteDocumentStateTab: function(index) {
     Swal.fire({
-      title: 'Are you sure you want to close this file?',
-      text: `Any unsaved changes to ${data.editingName()}.${data.editingType()} will be lost!
+      title: 'Are you sure?',
+      text: `Are you sure you want to close this file? Any unsaved changes to ${data.editingName()}.${data.editingType()} will be lost!
       Path: ${data.editingPath() || ''}
       Storage: ${data.lastStorageHost()}
       `,
