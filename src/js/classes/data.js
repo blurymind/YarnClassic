@@ -5,7 +5,6 @@ import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
 
 export const data = {
-  selectedAppInstanceIndex: ko.observable(0),
   appInstanceStates: ko.observable([]),
   restoreFromLocalStorage: ko.observable(true),
   // All the bellow go into appInstanceStates, which controls r/w of app states to local storage (for file tabs feature)
@@ -85,7 +84,7 @@ export const data = {
   },
   loadDocumentStateTabFromIndex: function(index) {
     console.log('ATTEMPT TO LOAD STATE', index);
-    data.selectedAppInstanceIndex(index);
+    app.settings.selectedFileTab(index);
     data.loadAppStateFromLocalStorage();
   },
   getCurrentAppState: function() {
@@ -180,9 +179,7 @@ export const data = {
     console.log('Update storage', data.appInstanceStates(), writeCurrent);
     const updatedStates = [...data.appInstanceStates()];
     if (writeCurrent)
-      updatedStates[
-        data.selectedAppInstanceIndex()
-      ] = data.getCurrentAppState();
+      updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
     data.appInstanceStates(updatedStates);
     storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
@@ -194,7 +191,7 @@ export const data = {
     // Just in case clear old state's cache
     if (storage.getItem('appState')) storage.clear(); //TODO remove later
     const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
-    const currentDocState = appStates[data.selectedAppInstanceIndex()];
+    const currentDocState = appStates[app.settings.selectedFileTab()];
     data.appInstanceStates(appStates);
     console.log('AAPP state', appStates, currentDocState);
     if (currentDocState) {
@@ -1071,6 +1068,10 @@ export const data = {
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();
+          app.ui.toastMixin.fire({
+            title: 'Saved',
+            text: `Saved ${data.editingName()} to Gist`,
+          });
         });
       });
     } else if (!data.editingPath()) {

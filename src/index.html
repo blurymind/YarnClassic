@@ -167,7 +167,8 @@
     </div> <!-- app-menu -->
 
     <!-- app-opened-documents -->
-    <div class="file-tabs flex-wrap">
+    <div class="file-tabs">
+      <span style="border-radius: 2px; padding: 0 5px;margin-right: 5px" class="bbcode-button" data-bind="click:app.data.trySaveCurrent, text:`${data.isDocumentDirty() ? '💾':'✅'}`"></span>
       <button class="bbcode-button" data-bind="click: function(){
         app.settings.fileTabsVisible(!app.settings.fileTabsVisible())
       },css: {
@@ -187,7 +188,7 @@
             ${state.lastStorageHost} HOST
             ${state.lastEditedUnix || ''}
           `},
-          css: { active: $index() === $root.data.selectedAppInstanceIndex()}
+          css: { active: $index() == app.settings.selectedFileTab()}
           ">
           <span data-bind="text: state.editingName + `(${state.nodes.length})`"></span>
 <!--          <span data-bind="click:function(e){-->
@@ -197,7 +198,7 @@
       </div>
       <div class="flex-wrap" style="justify-content: space-between;" data-bind="visible:app.settings.fileTabsVisible()">
         <button class="bbcode-button" data-bind="click:function() {
-         data.deleteDocumentStateTab($root.data.selectedAppInstanceIndex())
+         data.deleteDocumentStateTab(app.settings.selectedFileTab())
          }, visible: data.appInstanceStates().length > 1, attr: { title: `Close ${data.editingName()} file`}">-</button>
         <button class="bbcode-button" data-bind="click:function() {
          data.addDocumentStateTab()

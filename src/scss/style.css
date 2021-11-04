@@ -943,20 +943,25 @@ input#editorTitle {
 .file-tabs {
   position: absolute;
   bottom: 60px;
-  left: 25px;
+  left: 27px;
   min-width: 27px;
-  opacity: 0.25;
+  opacity: 0.3;
   z-index: 10002;
   transform: rotate(270deg);
   transform-origin: left;
+  display: flex;
+  gap: 3px;
+}
+.file-tabs .bbcode-button{
+  max-width: 200px;
 }
 .file-tabs:hover{
-  opacity: 0.6;
+  opacity: 0.9;
 }
 .file-tabs-buttons {
   display: flex;
   gap: 3px;
-  max-width: 71vh;
+  max-width: 61vh;
   overflow: hidden;
   transition: max-width 150ms ease-in;
 }

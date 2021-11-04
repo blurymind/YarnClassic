@@ -186,6 +186,10 @@ export const Settings = function(app) {
     )
     .extend({ persist: 'fileTabsVisible' });
 
+  this.selectedFileTab = ko
+    .observable(storage.getItem('selectedFileTab') || 0)
+    .extend({ persist: 'selectedFileTab' });
+
   // Always open nodes in Visual Studio Code Editor
   // We don't actually show this in the settings menu; it can only be set by the VSCode extension's settings
   this.alwaysOpenNodesInVisualStudioCodeEditor = ko
