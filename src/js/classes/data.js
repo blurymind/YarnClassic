@@ -649,6 +649,7 @@ export const data = {
   getSaveData: async function(
     type,
     getNodeFromInkLine = null,
+    useInclude = false,
     content = data.getNodesAsObjects()
   ) {
     var output = '';
@@ -680,35 +681,40 @@ export const data = {
         node => node.title.trim() === data.InkGlobalScopeNodeName
       );
       if (startNode) {
-        // we need to also add any INCLUDE lines that may be in the body
-        const includeInks = startNode.body
-          .split(/\r\n|\r|\n/)
-          .filter(line => line.trim().startsWith('INCLUDE '));
-        output += startNode.body
-          .split(/\r\n|\r|\n/)
-          .filter(line => !line.trim().startsWith('INCLUDE '))
-          .join('\n');
+        if (useInclude) {
+          // we need to also add any INCLUDE lines that may be in the body
+          const includeInks = startNode.body
+            .split(/\r\n|\r|\n/)
+            .filter(line => line.trim().startsWith('INCLUDE '));
+          output += startNode.body
+            .split(/\r\n|\r|\n/)
+            .filter(line => !line.trim().startsWith('INCLUDE '))
+            .join('\n');
 
-        for (const includeInk of includeInks) {
-          const includeName = includeInk.trim().split('INCLUDE ');
-          if (includeName.length > 1) {
-            const found = data
-              .appInstanceStates()
-              .find(
-                state =>
-                  state.editingType === FILETYPE.INK &&
-                  state.editingName === includeName[1]
-              );
+          for (const includeInk of includeInks) {
+            const includeName = includeInk.trim().split('INCLUDE ');
+            if (includeName.length > 1) {
+              const found = data
+                .appInstanceStates()
+                .find(
+                  state =>
+                    state.editingType === FILETYPE.INK &&
+                    state.editingName === includeName[1]
+                );
 
-            if (found) {
-              const moreSaveData = await data.getSaveData(
-                FILETYPE.INK,
-                null,
-                found.nodes
-              );
-              output += moreSaveData + '\n';
+              if (found) {
+                const moreSaveData = await data.getSaveData(
+                  FILETYPE.INK,
+                  null,
+                  useInclude,
+                  found.nodes
+                );
+                output += moreSaveData + '\n';
+              }
             }
           }
+        } else {
+          output += startNode.body;
         }
 
         // Hacky test to discover Node relative to an Ink fileline (for the debugger)
@@ -748,7 +754,7 @@ export const data = {
         }
       }
     } else if (type === FILETYPE.INKJSON) {
-      const inkTextFileData = await data.getSaveData('ink');
+      const inkTextFileData = await data.getSaveData('ink', null, true);
 
       const InkJsonData = new Promise((resolve, reject) => {
         app.ui.toastMixin.fire({
