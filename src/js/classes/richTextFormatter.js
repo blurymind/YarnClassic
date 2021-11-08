@@ -7,7 +7,7 @@ export const RichTextFormatter = function(app) {
   const addExtraPreviewerEmbeds = result => {
     const twRegex = /(https?:\/\/twitter.com\/[^\s\<]+\/[^\s\<]+\/[^\s\<]+)/gi;
     const instaRegex = /((https:\/\/)?(www.)?instagram.com\/p\/[^\s\<]+)/gi;
-    const ytRegex = /(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/gi;
+    const ytRegex = /(?:http(?:s?):\/\/|)(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?(?:\?t=[0-9]+)?/gi;
     const otherUrlPattern = `^(?!${twRegex.source}|${ytRegex.source}|${instaRegex.source})https?:.*$`;
     const combinedRegex = new RegExp(otherUrlPattern, 'gm');
     result = result.replace(combinedRegex, function(id) {
@@ -40,7 +40,7 @@ export const RichTextFormatter = function(app) {
     // create Youtube previews :)
     result = result.replace(ytRegex, function(id) {
       const extractedId = id.match(
-        /(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11})/i
+        /(?:https\:.*|)(?:www.|)youtu(?:.*\/v\/|.*v\=|\.be\/)([A-Za-z0-9_\-]{11}(?:\?t=[0-9]+)?)/i
       );
       if (extractedId.length > 1) {
         return `
