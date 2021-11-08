@@ -42,7 +42,8 @@ export const data = {
           app.settings.documentType() === 'ink'
             ? data.InkGlobalScopeNodeName
             : 'Start'
-        ),
+        )
+        .body(app.settings.documentType() === 'ink' ? '' : 'Empty text'),
     ]);
     app.tags([]);
     app.updateNodeLinks();
@@ -383,6 +384,7 @@ export const data = {
         data.documentHeader(content.header);
         pushContent(content.nodes);
       }
+      app.setDocumentType('yarn'); //TODO try to store both ink and yarn in json
     } else if (type === FILETYPE.INK) {
       var lines = content.split(/\r?\n/);
       var obj = null;
@@ -611,9 +613,12 @@ export const data = {
     return nodesObjects;
   },
 
-  getSaveData: async function(type, getNodeFromInkLine = null) {
+  getSaveData: async function(
+    type,
+    getNodeFromInkLine = null,
+    content = data.getNodesAsObjects()
+  ) {
     var output = '';
-    var content = data.getNodesAsObjects();
 
     if (type === FILETYPE.JSON) {
       // store useful values for later use if the file type supports it
@@ -642,7 +647,37 @@ export const data = {
         node => node.title.trim() === data.InkGlobalScopeNodeName
       );
       if (startNode) {
-        output += startNode.body;
+        // we need to also add any INCLUDE lines that may be in the body
+        const includeInks = startNode.body
+          .split(/\r\n|\r|\n/)
+          .filter(line => line.trim().startsWith('INCLUDE '));
+        output += startNode.body
+          .split(/\r\n|\r|\n/)
+          .filter(line => !line.trim().startsWith('INCLUDE '))
+          .join('\n');
+
+        for (const includeInk of includeInks) {
+          const includeName = includeInk.trim().split('INCLUDE ');
+          if (includeName.length > 1) {
+            const found = data
+              .appInstanceStates()
+              .find(
+                state =>
+                  state.editingType === FILETYPE.INK &&
+                  state.editingName === includeName[1]
+              );
+
+            if (found) {
+              const moreSaveData = await data.getSaveData(
+                FILETYPE.INK,
+                null,
+                found.nodes
+              );
+              output += moreSaveData + '\n';
+            }
+          }
+        }
+
         // Hacky test to discover Node relative to an Ink fileline (for the debugger)
         if (
           getNodeFromInkLine &&
