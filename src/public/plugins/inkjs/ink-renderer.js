@@ -221,6 +221,23 @@ export var inkRender = function() {
         console.log('STORY', this.story);
         console.warn('Warnings', response.warnings);
         continueStory();
+
+        //Try to restart story from specific chapter when there is no start chapter specified in the global scope
+        if (
+          this.story.currentText === '' &&
+          this.story.currentChoices.length === 0
+        ) {
+          if (startChapter !== app.data.InkGlobalScopeNodeName) {
+            this.compiler.submit(`-> ${startChapter}\n` + inkTextData);
+          } else {
+            const firstFoundNode = inkTextData
+              .split('\n')
+              .find(line => line.includes('==='));
+            this.compiler.submit(
+              `-> ${firstFoundNode.split('===')[1]}\n` + inkTextData
+            );
+          }
+        }
       })
       .then(() => {
         if (
