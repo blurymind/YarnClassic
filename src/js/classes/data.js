@@ -572,8 +572,20 @@ export const data = {
     app.workspace.warpToNodeByIdx(0);
     data.isDocumentDirty(false);
 
+    data.addGlobalScopeToInkDoc();
     // Callback for embedding in other webapps
     data.dispatchEventDataLoaded();
+  },
+  addGlobalScopeToInkDoc: function() {
+    if (
+      app.settings.documentType() === 'ink' &&
+      !app.getOtherNodeTitles().includes(data.InkGlobalScopeNodeName)
+    ) {
+      app
+        .newNode(true)
+        .title(data.InkGlobalScopeNodeName)
+        .x(-400);
+    }
   },
   getNodeFromObject: function(object) {
     return new Node({

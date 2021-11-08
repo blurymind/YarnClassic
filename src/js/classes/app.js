@@ -49,16 +49,18 @@ export var App = function(name, version) {
   this.setDocumentType = function(documentType, e) {
     const documentTypeId = e ? e.target.value : documentType;
     self.settings.documentType(documentTypeId);
-    app.updateNodeLinks();
-
     console.log('Set doc type', documentType, app.data.inkCompiler);
     if (documentTypeId === 'ink') {
       if (app.data.inkCompiler === null)
         app.data.inkCompiler = new app.data.InkCompiler();
+      data.addGlobalScopeToInkDoc();
       app.setMarkupLanguage('html'); //inkjs is using xml out of the box
     } else {
       app.data.inkCompiler = null;
     }
+
+    app.updateNodeLinks();
+
     const event = new CustomEvent('yarnSetDocumentType');
     event.language = documentTypeId;
     window.dispatchEvent(event);

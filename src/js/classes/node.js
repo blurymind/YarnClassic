@@ -22,7 +22,7 @@ export let Node = function(options = {}) {
   this.index = ko.observable(globalNodeIndex++);
   this.title = ko.observable(options.title || app.getUniqueTitle());
   this.tags = ko.observable(options.tags || '');
-  this.body = ko.observable(options.body || 'Empty Text');
+  this.body = ko.observable(options.body || '');
   this.active = ko.observable(options.active || true);
   this.width = 200;
   this.height = 200;
