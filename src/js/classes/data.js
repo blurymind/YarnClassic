@@ -145,26 +145,27 @@ export const data = {
       }
     });
   },
+  addDocumentState: function({ editingName, editingType, yarnData, checked }) {
+    //Mutate states
+    data.appInstanceStates([
+      ...data.appInstanceStates(),
+      { ...data.getCurrentAppState() }, //this is pretty slow
+    ]);
+    console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
+    data.saveAppStateToLocalStorage();
+    data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
+    if (checked) {
+      data.editingName(editingName);
+      data.editingType(editingType);
+    } else {
+      data.startNewFile(editingName, editingType);
+    }
+
+    console.log({ editingName, yarnData, editingType, checked });
+  },
   addDocumentStateTab: function() {
     data.promptFileNameAndFormat(
-      ({ editingName, editingType, yarnData, checked }) => {
-        //Mutate states
-        data.appInstanceStates([
-          ...data.appInstanceStates(),
-          { ...data.getCurrentAppState() },
-        ]);
-        console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
-        data.saveAppStateToLocalStorage();
-        data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
-        if (checked) {
-          data.editingName(editingName);
-          data.editingType(editingType);
-        } else {
-          data.startNewFile(editingName, editingType);
-        }
-
-        console.log({ editingName, yarnData, editingType, checked });
-      },
+      data.addDocumentState,
       null,
       '📜 Name of new file',
       ` Copy of ${data.editingName()}`
@@ -240,23 +241,11 @@ export const data = {
     }
   },
   readFile: function(file, filename, clearNodes) {
-    // Read approach that works for webapps
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      // fileDisplayArea.innerText = reader.result;
-      var type = data.getFileType(filename);
-      if (type === FILETYPE.UNKNOWN)
-        Swal.fire({
-          title: 'Unknown filetype!',
-          icon: 'error',
-        });
-      else {
-        data.editingPath(file.path);
-        data.editingType(type);
-        data.loadData(reader.result, type, clearNodes);
-      }
-    };
-    reader.readAsText(file);
+    data.getFileData(file, filename).then(result => {
+      data.editingPath(file.path);
+      data.editingType(result.type);
+      data.loadData(result.data, result.type, clearNodes);
+    });
   },
 
   setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
@@ -306,12 +295,44 @@ export const data = {
       },
     });
   },
-  openFiles: function(file, filename) {
-    const files = document.getElementById('open-file').files;
-    Object.entries(files).forEach(([key, value]) => {
-      if (key === '0') data.openFile(value, value.name);
-      else data.appendFile(value, value.name);
+  getFileData: function(file, filename) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const type = data.getFileType(filename);
+        if (type === FILETYPE.UNKNOWN) {
+          Swal.fire({
+            title: 'Unknown filetype!',
+            icon: 'error',
+          });
+          reject();
+        } else {
+          resolve({
+            file,
+            type,
+            data: reader.result,
+            name: file.name,
+          });
+        }
+      };
+      reader.readAsText(file);
     });
+  },
+  openFiles: async function(file, filename) {
+    const files = document.getElementById('open-file').files;
+
+    for (const file of Object.values(files)) {
+      const fileData = await data.getFileData(file, file.name);
+      console.log('FILEDATA', fileData);
+      const editingName = fileData.name;
+      const editingType = fileData.type;
+      data.addDocumentState({
+        editingName,
+        editingType,
+        yarnData: fileData.data,
+      });
+      data.loadData(fileData.data, editingType, true);
+    }
   },
   openFolder: function(e, foldername) {
     editingFolder = foldername;
@@ -416,7 +437,7 @@ export const data = {
           obj = {
             ...nodeTemplate,
             position: {
-              x: 0,
+              x: -400,
               y: 0,
             },
           };
