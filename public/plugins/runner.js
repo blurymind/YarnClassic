@@ -271,7 +271,7 @@ export var Runner = function({
           const localVariables = getPluginStore(self.name);
           console.log('VARIABLES::::', localVariables);
 
-          app.data.getSaveData('ink').then(saveData => {
+          app.data.getSaveData('ink', null, true).then(saveData => {
             const onRecompile = () => {
               self.prevSession = { ...self.prevSession, recompile: true };
               self.togglePlayMode(true);
