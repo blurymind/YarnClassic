@@ -600,7 +600,9 @@ export const data = {
   addGlobalScopeToInkDoc: function() {
     if (
       app.settings.documentType() === 'ink' &&
-      !app.getOtherNodeTitles().includes(data.InkGlobalScopeNodeName)
+      !app
+        .nodes()
+        .find(node => node.title().trim() === data.InkGlobalScopeNodeName)
     ) {
       app
         .newNode(true)
