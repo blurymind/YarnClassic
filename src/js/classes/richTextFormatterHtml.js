@@ -28,7 +28,11 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
             : '{ '
           : '<<';
       case 'opt':
-        return app.settings.documentType() === 'ink' ? '-> ' : '[[';
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? '-> '
+            : '* ['
+          : '[[';
       case 'color':
         return '<color=#>';
       default:
@@ -45,7 +49,11 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
             : ' }'
           : '>>';
       case 'opt':
-        return app.settings.documentType() === 'ink' ? '' : '|]]';
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? ''
+            : ']'
+          : '|]]';
       default:
         return `</${tag}>`;
     }
