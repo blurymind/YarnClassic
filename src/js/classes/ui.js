@@ -1,3 +1,5 @@
+import { data } from './data';
+
 export const UI = function(app) {
   const self = this;
   this.notification = Swal.mixin({
@@ -278,9 +280,16 @@ export const UI = function(app) {
 
         if (action == 'link') {
           if (node.title() !== app.editing().title()) {
+            if (
+              app.settings.documentType() === 'ink' &&
+              node.title().trim() === data.InkGlobalScopeNodeName
+            )
+              return;
             p.setAttribute(
               'onclick',
-              "app.insertTextAtCursor('[[" + node.title() + "]]')"
+              app.settings.documentType() === 'ink'
+                ? "app.insertTextAtCursor('-> " + node.title() + "')"
+                : "app.insertTextAtCursor('[[" + node.title() + "]]')"
             );
             rootMenu.appendChild(p);
           }

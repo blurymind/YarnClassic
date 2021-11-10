@@ -22,9 +22,13 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
   this.getTagOpen = function(tag) {
     switch (tag) {
       case 'cmd':
-        return '<<';
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? '~ '
+            : '{ '
+          : '<<';
       case 'opt':
-        return '[[';
+        return app.settings.documentType() === 'ink' ? '-> ' : '[[';
       case 'color':
         return '<color=#>';
       default:
@@ -35,9 +39,13 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
   this.getTagClose = function(tag) {
     switch (tag) {
       case 'cmd':
-        return '>>';
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? ''
+            : ' }'
+          : '>>';
       case 'opt':
-        return '|]]';
+        return app.settings.documentType() === 'ink' ? '' : '|]]';
       default:
         return `</${tag}>`;
     }

@@ -792,7 +792,7 @@ export var App = function(name, version) {
       clickoutFiresChange: true,
     });
 
-    /// Enable autocompletion for node links (borked atm)
+    /// Enable autocompletion for node links
     const langTools = ace.require('ace/ext/language_tools');
     const nodeLinksCompleter = Utils.createAutocompleter(
       app.settings.documentType() === 'ink'
@@ -1491,9 +1491,14 @@ export var App = function(name, version) {
   };
 
   this.getOtherNodeTitles = function() {
-    var result = [];
+    const result = [];
     self.nodes().forEach(node => {
       if (!self.editing() || node.title() !== self.editing().title()) {
+        if (
+          app.settings.documentType() === 'ink' &&
+          node.title().trim() === data.InkGlobalScopeNodeName
+        )
+          return;
         result.push(node.title().trim());
       }
     });
