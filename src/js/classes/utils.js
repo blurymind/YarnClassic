@@ -287,17 +287,6 @@ export var Utils = {
                 structure: {
                   name: 'Structure',
                   items: {
-                    knot: {
-                      name: 'Knot',
-                      callback: () => {
-                        app.insertTextAtCursor(
-                          `=== knotName ===
-This is the content of the knot.
--> END
-`
-                        );
-                      },
-                    },
                     stitch: {
                       name: 'Stitch',
                       callback: () => {
