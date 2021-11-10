@@ -284,100 +284,117 @@ export var Utils = {
             options.items.inkHelp = {
               name: 'Ink snippets',
               items: {
-                knot: {
-                  name: 'Knot',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      `=== knotName ===
+                structure: {
+                  name: 'Structure',
+                  items: {
+                    knot: {
+                      name: 'Knot',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          `=== knotName ===
 This is the content of the knot.
 -> END
 `
-                    );
-                  },
-                },
-                stitch: {
-                  name: 'Stitch',
-                  callback: () => {
-                    app.insertTextAtCursor(`= stitchName
+                        );
+                      },
+                    },
+                    stitch: {
+                      name: 'Stitch',
+                      callback: () => {
+                        app.insertTextAtCursor(`= stitchName
 This is the content of the stitch that should be embedded within a knot.
 -> END`);
+                      },
+                    },
+                    end: {
+                      name: 'Ending indicator',
+                      callback: () => {
+                        app.insertTextAtCursor('-> END');
+                      },
+                    },
                   },
                 },
-                end: {
-                  name: 'Ending indicator',
-                  callback: () => {
-                    app.insertTextAtCursor('-> END');
+                choices: {
+                  name: 'Choices',
+                  items: {
+                    basicChoice: {
+                      name: 'Basic choice',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          '* This is a choice that can only be chosen once'
+                        );
+                      },
+                    },
+                    stickyChoice: {
+                      name: 'Sticky choice',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          '+ This is a sticky choice - the player can choose it more than once'
+                        );
+                      },
+                    },
+                    choiceWithoutPrinting: {
+                      name: 'Choice without printing',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          "* [A choice where the content isn't printed after choosing]"
+                        );
+                      },
+                    },
+                    choiceWithoutMixedOutput: {
+                      name: 'Choice without mixed output',
+                      callback: () => {
+                        app.insertTextAtCursor('* Try [it] this example!');
+                      },
+                    },
                   },
                 },
-                sep1: '---------',
-                basicChoice: {
-                  name: 'Basic choice',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      '* This is a choice that can only be chosen once'
-                    );
+                variables: {
+                  name: 'Variables',
+                  items: {
+                    globalVariable: {
+                      name: 'Global variable',
+                      callback: () => {
+                        app.insertTextAtCursor('VAR myNumber = 5');
+                      },
+                    },
+                    temporaryVariable: {
+                      name: 'Temporary variable',
+                      callback: () => {
+                        app.insertTextAtCursor('temp myTemporaryValue = 5');
+                      },
+                    },
+                    modifyVariable: {
+                      name: 'Modify variable',
+                      callback: () => {
+                        app.insertTextAtCursor('~ myNumber = myNumber + 1');
+                      },
+                    },
                   },
                 },
-                stickyChoice: {
-                  name: 'Sticky choice',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      '+ This is a sticky choice - the player can choose it more than once'
-                    );
-                  },
-                },
-                choiceWithoutPrinting: {
-                  name: 'Choice without printing',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      "* [A choice where the content isn't printed after choosing]"
-                    );
-                  },
-                },
-                choiceWithoutMixedOutput: {
-                  name: 'Choice without mixed output',
-                  callback: () => {
-                    app.insertTextAtCursor('* Try [it] this example!');
-                  },
-                },
-                sep2: '---------',
-                globalVariable: {
-                  name: 'Global variable',
-                  callback: () => {
-                    app.insertTextAtCursor('VAR myNumber = 5');
-                  },
-                },
-                temporaryVariable: {
-                  name: 'Temporary variable',
-                  callback: () => {
-                    app.insertTextAtCursor('temp myTemporaryValue = 5');
-                  },
-                },
-                modifyVariable: {
-                  name: 'Modify variable',
-                  callback: () => {
-                    app.insertTextAtCursor('~ myNumber = myNumber + 1');
-                  },
-                },
-                sep3: '---------',
-                inlineCondition: {
-                  name: 'Inline condition',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      '{yourVariable: This is written if yourVariable is true|Otherwise this is written}\n'
-                    );
-                  },
-                },
-                multilineCondition: {
-                  name: 'Multiline condition',
-                  callback: () => {
-                    app.insertTextAtCursor(
-                      '{yourVariable:\n' +
-                        '    This is written if yourVariable is true.\n' +
-                        '  - else:\n' +
-                        '    Otherwise this is written.\n' +
-                        '}'
-                    );
+                conditions: {
+                  name: 'Conditions',
+                  items: {
+                    inlineCondition: {
+                      name: 'Inline condition',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          '{yourVariable: This is written if yourVariable is true|Otherwise this is written}\n'
+                        );
+                      },
+                    },
+                    multilineCondition: {
+                      name: 'Multiline condition',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          '{yourVariable:\n' +
+                            '    This is written if yourVariable is true.\n' +
+                            '  - else:\n' +
+                            '    Otherwise this is written.\n' +
+                            '}'
+                        );
+                      },
+                    },
                   },
                 },
               },
