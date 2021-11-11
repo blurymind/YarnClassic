@@ -281,101 +281,7 @@ export var Utils = {
             },
           };
           if (app.settings.documentType() === 'ink') {
-            options.items.code = {
-              name: 'Code',
-              items: {
-                equal: {
-                  name: '== (equal)',
-                  callback: () => app.insertTextAtCursor('=='),
-                },
-                notEqual: {
-                  name: '!= (not equal)',
-                  callback: () => app.insertTextAtCursor('!='),
-                },
-                tag: {
-                  name: '# (tag)',
-                  callback: () => app.insertTextAtCursor('#'),
-                },
-                list: {
-                  name: 'LIST',
-                  callback: () => app.insertTextAtCursor('LIST '),
-                },
-                listFunc: {
-                  name: 'List functions',
-                  items: {
-                    count: {
-                      name: 'count',
-                      callback: () => app.insertTextAtCursor('LIST_COUNT()'),
-                    },
-                    min: {
-                      name: 'min',
-                      callback: () => app.insertTextAtCursor('LIST_MIN()'),
-                    },
-                    max: {
-                      name: 'max',
-                      callback: () => app.insertTextAtCursor('LIST_MAX()'),
-                    },
-                    rand: {
-                      name: 'random',
-                      callback: () => app.insertTextAtCursor('LIST_RANDOM()'),
-                    },
-                  },
-                },
-                variable: {
-                  name: 'VAR',
-                  callback: () => app.insertTextAtCursor('VAR '),
-                },
-                plusEq: {
-                  name: '+= (plus equal)',
-                  callback: () => app.insertTextAtCursor('+='),
-                },
-                else: {
-                  name: '- else',
-                  callback: () => app.insertTextAtCursor('- else'),
-                },
-                or: {
-                  name: '|',
-                  callback: () => app.insertTextAtCursor('|'),
-                },
-              },
-            };
-
-            options.items.end = {
-              name: '-> END',
-              callback: () => app.insertTextAtCursor('-> END'),
-            };
-            options.items.star = {
-              name: '* (choice)',
-              callback: () => app.insertTextAtCursor('* '),
-            };
-
-            options.items.gather = {
-              name: '- (gather)',
-              callback: () => app.insertTextAtCursor('-'),
-            };
-
-            options.items.stitch = {
-              name: '= (stitch)',
-              callback: () => app.insertTextAtCursor('= '),
-            };
-            options.items.glue = {
-              name: '<> (glue)',
-              callback: () => app.insertTextAtCursor('<>'),
-            };
-            options.items.nested = {
-              name: 'Nested',
-              items: {
-                gather2: {
-                  name: '-- (gather)',
-                  callback: () => app.insertTextAtCursor('-- '),
-                },
-                star2: {
-                  name: '** (choice)',
-                  callback: () => app.insertTextAtCursor('** '),
-                },
-              },
-            };
-            options.items.inkHelp = {
+            options.items.inkSnips = {
               name: 'Ink snippets',
               items: {
                 structure: {
@@ -432,6 +338,45 @@ This is the content of the stitch that should be embedded within a knot.
                     },
                   },
                 },
+                variableText: {
+                  name: 'Variable text',
+                  items: {
+                    shuffle: {
+                      name: '~Shuffle (rand) text',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          'I tossed the coin. {~Heads|Tails}.'
+                        );
+                      },
+                    },
+                    cycle: {
+                      name: '&Cycle text',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          'It was {&Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday} today.'
+                        );
+                      },
+                    },
+                    sequence: {
+                      name: 'Sequence text',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          'The radio hissed into life. {"Three!"|"Two!"|"One!"|There was the white noise racket of an explosion.|But it was just static.}\n' +
+                            '\n' +
+                            "{I bought a coffee with my five-pound note.|I bought a second coffee for my friend.|I didn't have enough money to buy any more coffee.}"
+                        );
+                      },
+                    },
+                    onceOnly: {
+                      name: '!Once only text',
+                      callback: () => {
+                        app.insertTextAtCursor(
+                          'He told me a joke. {!I laughed politely.|I smiled.|I grimaced.|I promised myself to not react again.}\n'
+                        );
+                      },
+                    },
+                  },
+                },
                 variables: {
                   name: 'Variables',
                   items: {
@@ -482,6 +427,113 @@ This is the content of the stitch that should be embedded within a knot.
                 },
               },
             };
+            options.items.code = {
+              name: 'Code',
+              items: {
+                equal: {
+                  name: '== (equal)',
+                  callback: () => app.insertTextAtCursor('== '),
+                },
+                notEqual: {
+                  name: '!= (not equal)',
+                  callback: () => app.insertTextAtCursor('!= '),
+                },
+                tag: {
+                  name: '# (tag)',
+                  callback: () => app.insertTextAtCursor('# '),
+                },
+                list: {
+                  name: 'LIST',
+                  callback: () => app.insertTextAtCursor('LIST = '),
+                },
+                listFunc: {
+                  name: 'List functions',
+                  items: {
+                    count: {
+                      name: 'count',
+                      callback: () => app.insertTextAtCursor('LIST_COUNT()'),
+                    },
+                    min: {
+                      name: 'min',
+                      callback: () => app.insertTextAtCursor('LIST_MIN()'),
+                    },
+                    max: {
+                      name: 'max',
+                      callback: () => app.insertTextAtCursor('LIST_MAX()'),
+                    },
+                    rand: {
+                      name: 'random',
+                      callback: () => app.insertTextAtCursor('LIST_RANDOM()'),
+                    },
+                  },
+                },
+                variable: {
+                  name: 'VAR',
+                  callback: () => app.insertTextAtCursor('VAR = '),
+                },
+                temp: {
+                  name: '~ temp',
+                  callback: () => app.insertTextAtCursor('~ temp = '),
+                },
+                plusEq: {
+                  name: '+= (plus equal)',
+                  callback: () => app.insertTextAtCursor('+= '),
+                },
+                else: {
+                  name: '- else',
+                  callback: () => app.insertTextAtCursor('- else:\n'),
+                },
+                or: {
+                  name: '|',
+                  callback: () => app.insertTextAtCursor('|'),
+                },
+                rand: {
+                  name: '~',
+                  callback: () => app.insertTextAtCursor('~'),
+                },
+              },
+            };
+
+            options.items.end = {
+              name: '-> END',
+              callback: () => app.insertTextAtCursor('-> END'),
+            };
+            options.items.star = {
+              name: '* (choice)',
+              callback: () => app.insertTextAtCursor('* '),
+            };
+
+            options.items.gather = {
+              name: '- (gather)',
+              callback: () => app.insertTextAtCursor('-'),
+            };
+
+            options.items.stitch = {
+              name: '= (stitch)',
+              callback: () => app.insertTextAtCursor('= '),
+            };
+            options.items.glue = {
+              name: '<> (glue)',
+              callback: () => app.insertTextAtCursor('<>'),
+            };
+            options.items.comment = {
+              name: '// (comment)',
+              callback: () => app.insertTextAtCursor('// '),
+            };
+            options.items.nested = {
+              name: 'Nested',
+              items: {
+                gather2: {
+                  name: '-- (gather)',
+                  callback: () => app.insertTextAtCursor('-- '),
+                },
+                star2: {
+                  name: '** (choice)',
+                  callback: () => app.insertTextAtCursor('** '),
+                },
+              },
+            };
+
             options.items.inkDoc = {
               name: 'How to use ink',
               callback: () =>
