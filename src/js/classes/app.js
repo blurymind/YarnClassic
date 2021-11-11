@@ -1250,6 +1250,7 @@ export var App = function(name, version) {
       self.editor.focus();
     }
     self.updateEditorStats();
+    self.editor.focus();
   };
 
   // TODO: move to editor class
