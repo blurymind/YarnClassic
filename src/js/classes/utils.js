@@ -281,6 +281,71 @@ export var Utils = {
             },
           };
           if (app.settings.documentType() === 'ink') {
+            options.items.code = {
+              name: 'Code',
+              items: {
+                equal: {
+                  name: '== (equal)',
+                  callback: () => app.insertTextAtCursor('=='),
+                },
+                tag: {
+                  name: '# (tag)',
+                  callback: () => app.insertTextAtCursor('#'),
+                },
+                list: {
+                  name: 'LIST',
+                  callback: () => app.insertTextAtCursor('LIST '),
+                },
+                variable: {
+                  name: 'VAR',
+                  callback: () => app.insertTextAtCursor('VAR'),
+                },
+                else: {
+                  name: '- else',
+                  callback: () => app.insertTextAtCursor('- else'),
+                },
+                or: {
+                  name: '|',
+                  callback: () => app.insertTextAtCursor('|'),
+                },
+              },
+            };
+
+            options.items.end = {
+              name: '-> END',
+              callback: () => app.insertTextAtCursor('-> END'),
+            };
+            options.items.star = {
+              name: '* (choice)',
+              callback: () => app.insertTextAtCursor('* '),
+            };
+
+            options.items.gather = {
+              name: '- (gather)',
+              callback: () => app.insertTextAtCursor('-'),
+            };
+
+            options.items.stitch = {
+              name: '= (stitch)',
+              callback: () => app.insertTextAtCursor('= '),
+            };
+            options.items.glue = {
+              name: '<> (glue)',
+              callback: () => app.insertTextAtCursor('<>'),
+            };
+            options.items.nested = {
+              name: 'Nested',
+              items: {
+                gather2: {
+                  name: '-- (gather)',
+                  callback: () => app.insertTextAtCursor('-- '),
+                },
+                star2: {
+                  name: '** (choice)',
+                  callback: () => app.insertTextAtCursor('** '),
+                },
+              },
+            };
             options.items.inkHelp = {
               name: 'Ink snippets',
               items: {
@@ -387,6 +452,16 @@ This is the content of the stitch that should be embedded within a knot.
                   },
                 },
               },
+            };
+            options.items.inkDoc = {
+              name: 'How to use ink',
+              callback: () =>
+                window
+                  .open(
+                    'https://github.com/inkle/ink/blob/master/Documentation/WritingWithInk.md',
+                    '_blank'
+                  )
+                  .focus(),
             };
           }
         }
