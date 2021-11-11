@@ -288,6 +288,10 @@ export var Utils = {
                   name: '== (equal)',
                   callback: () => app.insertTextAtCursor('=='),
                 },
+                notEqual: {
+                  name: '!= (not equal)',
+                  callback: () => app.insertTextAtCursor('!='),
+                },
                 tag: {
                   name: '# (tag)',
                   callback: () => app.insertTextAtCursor('#'),
@@ -296,9 +300,34 @@ export var Utils = {
                   name: 'LIST',
                   callback: () => app.insertTextAtCursor('LIST '),
                 },
+                listFunc: {
+                  name: 'List functions',
+                  items: {
+                    count: {
+                      name: 'count',
+                      callback: () => app.insertTextAtCursor('LIST_COUNT()'),
+                    },
+                    min: {
+                      name: 'min',
+                      callback: () => app.insertTextAtCursor('LIST_MIN()'),
+                    },
+                    max: {
+                      name: 'max',
+                      callback: () => app.insertTextAtCursor('LIST_MAX()'),
+                    },
+                    rand: {
+                      name: 'random',
+                      callback: () => app.insertTextAtCursor('LIST_RANDOM()'),
+                    },
+                  },
+                },
                 variable: {
                   name: 'VAR',
-                  callback: () => app.insertTextAtCursor('VAR'),
+                  callback: () => app.insertTextAtCursor('VAR '),
+                },
+                plusEq: {
+                  name: '+= (plus equal)',
+                  callback: () => app.insertTextAtCursor('+='),
                 },
                 else: {
                   name: '- else',
