@@ -500,10 +500,14 @@ This is the content of the stitch that should be embedded within a knot.
                   name: 'Animation',
                   callback: () =>
                     app.ui.insertTextAtCursorWithParams(
-                      '> Animation: animation=%0, wait=%1',
+                      '> Animation: animation=%0.%1, wait=%2, keepDirection=%3, repeat=%4, count=%5',
                       [
-                        { name: 'Animation', default: '$PLAYER.stand.right' },
-                        { name: 'wait', default: false },
+                        { name: 'Actor', default: '$PLAYER' },
+                        { name: 'Animation', default: 'stand.right' },
+                        { name: 'Wait', default: false },
+                        { name: 'Keep direction', default: false },
+                        { name: 'Repeat', default: 'SPRITE_DEFINED' }, //TODO make it ['SPRITE_DEFINED', 'YOYO'] }
+                        { name: 'Count', default: -1 },
                       ]
                     ),
                 },
