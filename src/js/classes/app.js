@@ -422,12 +422,19 @@ export var App = function(name, version) {
   };
   this.sanitiseNodeTitle = function() {
     if (app.settings.documentType() === 'ink') {
-      app.editing().title(
-        app
+      if (
+        !app
           .editing()
           .title()
-          .replace(/[ ]/g, '_')
-      );
+          .startsWith('function ')
+      ) {
+        app.editing().title(
+          app
+            .editing()
+            .title()
+            .replace(/[ ]/g, '_')
+        );
+      }
     }
   };
   this.validateTitle = function() {
