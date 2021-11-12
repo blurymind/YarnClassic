@@ -493,7 +493,52 @@ This is the content of the stitch that should be embedded within a knot.
                 },
               },
             };
-
+            options.items.bladeCoder = {
+              name: 'BladeCoder',
+              items: {
+                animation: {
+                  name: 'Animation',
+                  callback: () =>
+                    app.ui.insertTextAtCursorWithParams(
+                      '> Animation: animation=%0, wait=%1',
+                      [
+                        { name: 'Animation', default: '$PLAYER.stand.right' },
+                        { name: 'wait', default: false },
+                      ]
+                    ),
+                },
+                goto: {
+                  name: 'Goto',
+                  callback: () =>
+                    app.ui.insertTextAtCursorWithParams(
+                      '> Goto: actor=%0, target=%1',
+                      [
+                        { name: 'Actor', default: '$PLAYER' },
+                        { name: 'target', default: 'target' },
+                      ]
+                    ),
+                },
+                wait: {
+                  name: 'Wait',
+                  callback: () =>
+                    app.ui.insertTextAtCursorWithParams('> Wait: time=%0', [
+                      { name: 'Time', default: 0.8 },
+                    ]),
+                },
+                setActorAttr: {
+                  name: 'Set Actor Attribute',
+                  callback: () =>
+                    app.ui.insertTextAtCursorWithParams(
+                      '> SetActorAttr: actor=%0, talkAnimation=%1, visible=%2',
+                      [
+                        { name: 'Actor', default: '$PLAYER' },
+                        { name: 'Talk animation' },
+                        { name: 'Visible', default: true },
+                      ]
+                    ),
+                },
+              },
+            };
             options.items.end = {
               name: '-> END',
               callback: () => app.insertTextAtCursor('-> END'),

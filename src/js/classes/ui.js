@@ -348,4 +348,51 @@ export const UI = function(app) {
       toast.addEventListener('mouseleave', Swal.resumeTimer);
     },
   });
+
+  this.insertTextAtCursorWithParams = function(template = '', params = []) {
+    const html = params
+      .map((param, i) => {
+        if (typeof param.default === 'boolean') {
+          return `<div class="flex-wrap"><span>${param.name} :</span><input type="checkbox" id="swal-input${i}" class="swal2-input"> </div>`;
+        }
+        if (typeof param.default === 'number') {
+          return `<div class="flex-wrap"><span>${param.name} :</span><input type="number" step=0.01 id="swal-input${i}" class="swal2-input"> </div>`;
+        }
+        return `<div class="flex-wrap"><span>${param.name} :</span> <input id="swal-input${i}" class="swal2-input" style="flex:1"></div>`;
+      })
+      .join('\n');
+    Swal.fire({
+      title: 'Snippet properties',
+      html,
+      preConfirm: function() {
+        return new Promise(function(resolve) {
+          resolve(
+            params.map((param, i) =>
+              typeof param.default === 'boolean'
+                ? $(`#swal-input${i}`).is(':checked')
+                : $(`#swal-input${i}`).val()
+            )
+          );
+        });
+      },
+      onOpen: function() {
+        $('#swal-input0').focus();
+        params.forEach((param, i) => {
+          if (param.default === undefined) return;
+          if (typeof param.default === 'boolean') {
+            $(`#swal-input${i}`)[0].checked = param.default;
+          } else $(`#swal-input${i}`)[0].value = param.default;
+          console.log($(`#swal-input${i}`));
+        });
+      },
+    }).then(function(result) {
+      if (!result.value) return;
+      let output = template;
+      result.value.forEach((value, i) => {
+        if (value === undefined) return;
+        output = output.replace(`%${i}`, value);
+      });
+      app.insertTextAtCursor(output);
+    });
+  };
 };
