@@ -237,7 +237,7 @@
     <div id="node-editor" class="node-editor">
 
       <div id="editor-form" class="form">
-        <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" placeholder="Title">
+        <input type="text" id="editorTitle" class="title" oninput="app.validateTitle()" data-bind="value: app.editing().title;" onfocus="app.togglePreviewMode(true)" onblur="app.sanitiseNodeTitle()" placeholder="Title">
         <input type="text" id="editorTags" data-bind="value: app.editing().tags, visible: !app.isEditorInPlayMode() && app.settings.documentType() === 'yarn'" onfocus="app.togglePreviewMode(true)" placeholder="Tags(use spaces)">
 
         <div id="bbcodeToolbar" class="bbcode-toolbar">

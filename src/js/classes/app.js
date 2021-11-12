@@ -420,6 +420,16 @@ export var App = function(name, version) {
       title.trim() !== data.InkGlobalScopeNodeName
     );
   };
+  this.sanitiseNodeTitle = function() {
+    if (app.settings.documentType() === 'ink') {
+      app.editing().title(
+        app
+          .editing()
+          .title()
+          .replace(/[ ]/g, '_')
+      );
+    }
+  };
   this.validateTitle = function() {
     var enteredValue = document.getElementById('editorTitle').value;
     var editorTitle = $('#editorTitle');
