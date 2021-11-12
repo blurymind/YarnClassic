@@ -496,6 +496,10 @@ This is the content of the stitch that should be embedded within a knot.
             options.items.bladeCoder = {
               name: 'BladeCoder',
               items: {
+                player: {
+                  name: '$PLAYER>',
+                  callback: () => app.insertTextAtCursor('$PLAYER> '),
+                },
                 animation: {
                   name: 'Animation',
                   callback: () =>
@@ -528,6 +532,17 @@ This is the content of the stitch that should be embedded within a knot.
                     app.ui.insertTextAtCursorWithParams('> Wait: time=%0', [
                       { name: 'Time', default: 0.8 },
                     ]),
+                },
+                playSound: {
+                  name: 'Play Sound',
+                  callback: () =>
+                    app.ui.insertTextAtCursorWithParams(
+                      '> PlaySound: sound=%0, stop=%1',
+                      [
+                        { name: 'Sound', default: 'yawn' },
+                        { name: 'Stop', default: false },
+                      ]
+                    ),
                 },
                 setActorAttr: {
                   name: 'Set Actor Attribute',
