@@ -40,7 +40,7 @@
     ]
   },
   "build": {
-    "productName": "Yarn Editor",
+    "productName": "Yarn Classic",
     "fileAssociations": {
       "ext": "yarn",
       "name": "Yarn File",

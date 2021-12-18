@@ -1,6 +1,6 @@
 ![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
 
-# Yarn 🐱 🧺
+# Yarn Classic 🐱 🧺
 
 Dialogue editor created for "Night in the Woods" (and other projects) by @blurymind, @NoelFB and @infinite_ammo with contributions from @seiyria and @beeglebug. It is heavily inspired by and based on the amazing Twine software: http://twinery.org/
 It supports editing, syntax highlighting and testing for [Yarn](https://github.com/YarnSpinnerTool/YarnSpinner) and [InkleStudio Ink files](https://github.com/inkle/ink) syntax files.
@@ -28,8 +28,8 @@ alt="Yarn web app"  height="480" border="10" /></a>
 You can see planned features, vote for features or see how you can contribute at the roadmap here:
 https://trello.com/b/ZXhhOzDl/yarn-roadmap
 
-# 🎮 Game engines that bundle Yarn editor
-There are a few game engines that have YarnEditor bundled with their IDE. That means that you can use it straight in those engines, without need to save files and open files and so on. It's directly integratedin their workflow!
+# 🎮 Game engines that bundle Yarn Classic
+There are a few game engines that have Yarn Classic bundled with their IDE. That means that you can use it straight in those engines, without need to save files and open files and so on. It's directly integratedin their workflow!
 
 - Gdevelop : A full-featured, open-source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up using an intuitive and powerful event-based system.
 https://github.com/4ian/GDevelop
@@ -47,7 +47,7 @@ https://github.com/hylyh/bondage.js
 # 🐬 Features 🦄
 
 ### Portability
-- YarnEditor has PWA version you can install and run when offline, which has a much smaller footprint than other editors using electron.
+- Yarn Classic has PWA version you can install and run when offline, which has a much smaller footprint than other editors using electron.
 - The pwa can run on mobile devices with smaller screens - you can use it on your phone and it's much easier to install.
 - There is of course also an electron version of the editor, which is slower on updates but more stable
 
