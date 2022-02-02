@@ -39,7 +39,11 @@ export var App = function(name, version) {
 
   this.setLanguage = function(language, e) {
     const languageId = e ? e.target.value : language;
-    load_dictionary(self.settings.language().split('-')[0]);
+    
+    // No point in loading dictionary if spell check is disabled
+    if (self.settings.spellcheckEnabled())
+      load_dictionary(self.settings.language().split('-')[0]);
+    
     const event = new CustomEvent('yarnSetLanguage');
     event.language = languageId;
     window.dispatchEvent(event);
