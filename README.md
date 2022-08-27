@@ -6,6 +6,8 @@ To learn more about Yarn Spinner 2, please see the [Yarn Spinner documentation](
 
 If you have an existing project thats using Yarn Spinner 1, we have a [tutorial on how to migrate your Yarn scripts](https://docs.yarnspinner.dev/getting-started/upgrading-yarn-scripts).
 
+To learn more, please join the friendly [Yarn Spinner Discord community](https://discord.gg/yarnspinner)!
+
 ---
 
 ![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
