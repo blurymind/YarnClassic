@@ -1,3 +1,13 @@
+# 🚨 This project is deprecated.
+
+This project **does not work** with the current version of Yarn Spinner. Instead, use the [Yarn Spinner Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=SecretLab.yarn-spinner).
+
+To learn more about Yarn Spinner 2, please see the [Yarn Spinner documentation](https://docs.yarnspinner.dev). Yarn Spinner 2 is free and open source, and contains fantastic improvements over Yarn Spinner 1!
+
+If you have an existing project thats using Yarn Spinner 1, we have a [tutorial on how to migrate your Yarn scripts](https://docs.yarnspinner.dev/getting-started/upgrading-yarn-scripts).
+
+---
+
 ![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
 
 # Yarn Classic 🐱 🧺
