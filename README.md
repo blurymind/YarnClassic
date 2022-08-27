@@ -54,6 +54,19 @@ https://github.com/YarnSpinnerTool/YarnSpinner
 - Bondagejs : A Javascript-based parser for the Yarn dialogue tree markup language. Ideal if your game engine uses html5 technologies to run (Gdevelop and ctjs use it).
 https://github.com/hylyh/bondage.js
 
+- GDYarn : A Yarn runtime for Godot engine - completely written in Gdscript
+https://github.com/kyperbelt/GDYarn
+
+- Chatterbox : Yarn runtime implementation for Game maker 2+
+https://github.com/JujuAdams/Chatterbox
+
+# Other implementations of Yarn Editor
+- Crochet : Fork of YarnEditor
+https://github.com/FaultyFunctions/Crochet/
+
+- YarnSpinner Loom vscode extension : implementation of YarnEditor as a vscode extension
+https://marketplace.visualstudio.com/items?itemName=TranquilMarmot.yarn-spinner-loom
+
 # 🐬 Features 🦄
 
 ### Portability
