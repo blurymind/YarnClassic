@@ -1,13 +1,15 @@
-# 🚨 This project is deprecated.
+# 🚨 This project is going through planned refactoring and re-evaluation of goals.
 
-This project **does not work** with the current version of Yarn Spinner. Instead, use the [Yarn Spinner Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=SecretLab.yarn-spinner).
+This project's playtesting and syntaxt highlighting is not fully compatible with Yarn Spinner 2. Please use the [Yarn Spinner Extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=SecretLab.yarn-spinner) if you need those features and have vscode instead.
 
 To learn more about Yarn Spinner 2, please see the [Yarn Spinner documentation](https://docs.yarnspinner.dev). Yarn Spinner 2 is free and open source, and contains fantastic improvements over Yarn Spinner 1!
-
-If you have an existing project thats using Yarn Spinner 1, we have a [tutorial on how to migrate your Yarn scripts](https://docs.yarnspinner.dev/getting-started/upgrading-yarn-scripts).
-
 To learn more, please join the friendly [Yarn Spinner Discord community](https://discord.gg/yarnspinner)!
 
+This project's future goals are changing!
+- While the vscode extension is going to be used by professional developers, this version will remain to target the casual user. It has a much smaller footprint and can run on anything from the browser or as an installed PWA. We will take steps to continue that trend and slim it down (no more electron, as the pwa api of chromium now supports all that it needs)
+- Ability to save your work in the cloud will remain and be improved, so you can edit your work from a smartphone or a tablet on the go, or on a desktop computer.
+- Electron version is going to be deprecated in favor of the PWA version. You can still install the PWA version on your computer or mobile device by clicking on the "Add to home screen" button on the bottom. The PWA version will be on par feature wise with electron and have a smaller footprint on the user's computer. This will also make the project easier to maintain.
+- Extensibility will be improved by introducing a new extension api. The code needs to be simplified and organised a bit.
 ---
 
 ![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
