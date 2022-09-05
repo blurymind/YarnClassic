@@ -26,9 +26,9 @@ It can also export from Yarn to [twine](https://twinery.org/) and use [github gi
 <a href="https://yarnspinnertool.github.io/YarnEditor"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png"
 alt="Yarn web app"  height="480" border="10" /></a>
 
-# 📲 Install the Web App on your mobile device
+# 📲 Install the App on your compuer or mobile device
 1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor">https://yarnspinnertool.github.io/YarnEditor/</a>
-<br/> with your smartphone or tablet
+<br/> with your web browser (chrome, chromium, opera, brave, or edge - any chromium based browser ideally)
 2. Open the web browser's menu and select "Add to home screen"
 3. When you run Yarn from the home screen, it will work in full screen mode, even when you are offline!
 <br/>
@@ -36,7 +36,7 @@ alt="Yarn web app"  height="480" border="10" /></a>
 alt="Yarn web app"  height="480" border="10" /></a>
 
 #  💻 Install it on your desktop
- Grab Win64, Linux and MacOS electron builds at https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
+ Please follow the steps for the PWA version of the app, as the electron one will be deprecated later this year
 
 # 🚧 Roadmap
 You can see planned features, vote for features or see how you can contribute at the roadmap here:
