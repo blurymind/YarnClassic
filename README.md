@@ -12,7 +12,7 @@ This project's future goals are changing!
 - Extensibility will be improved by introducing a new extension api. The code needs to be simplified and organised a bit.
 ---
 
-![Build](https://github.com/YarnSpinnerTool/YarnEditor/workflows/Build/badge.svg)
+![Build](https://github.com/blurymind/YarnClassic/workflows/Build/badge.svg)
 
 # Yarn Classic 🐱 🧺
 
@@ -21,18 +21,18 @@ It supports editing, syntax highlighting and testing for [Yarn](https://github.c
 It can also export from Yarn to [twine](https://twinery.org/) and use [github gist](https://gist.github.com/)for cloud backup!
 
 # 🧶 Live Web APP (Use it in the browser)
-<a href="https://yarnspinnertool.github.io/YarnEditor">https://yarnspinnertool.github.io/YarnEditor/</a>
+<a href="https://blurymind.github.io/YarnClassic">https://blurymind.github.io/YarnClassic/</a>
 <br/>
-<a href="https://yarnspinnertool.github.io/YarnEditor"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnWebApp.png"
+<a href="https://blurymind.github.io/YarnClassic/"><img src="https://raw.githubusercontent.com/blurymind/YarnClassic/master/doc/yarnWebApp.png"
 alt="Yarn web app"  height="480" border="10" /></a>
 
 # 📲 Install the App on your compuer or mobile device
-1. Visit <a href="https://yarnspinnertool.github.io/YarnEditor">https://yarnspinnertool.github.io/YarnEditor/</a>
+1. Visit <a href="https://blurymind.github.io/YarnClassic/">https://blurymind.github.io/YarnClassic/</a>
 <br/> with your web browser (chrome, chromium, opera, brave, or edge - any chromium based browser ideally)
 2. Open the web browser's menu and select "Add to home screen"
 3. When you run Yarn from the home screen, it will work in full screen mode, even when you are offline!
 <br/>
-<a href="https://yarnspinnertool.github.io/YarnEditor"><img src="https://raw.githubusercontent.com/YarnSpinnerTool/YarnEditor/master/doc/yarnMobile.jpeg"
+<a href="https://blurymind.github.io/YarnClassic/"><img src="https://raw.githubusercontent.com/blurymind/YarnClassic/master/doc/yarnMobile.jpeg"
 alt="Yarn web app"  height="480" border="10" /></a>
 
 #  💻 Install it on your desktop
@@ -109,9 +109,6 @@ https://marketplace.visualstudio.com/items?itemName=TranquilMarmot.yarn-spinner-
 
 ### Customization!
 - Support for different themes (you can make your own too)
-
-# Electron Builds
-Win64, Linux and MacOS builds available at: https://github.com/YarnSpinnerTool/YarnEditor/releases/latest
 
 # ⚙️ Compile and run web app on localhost:
 Make sure you have nodejs installed. Then from the root folder
