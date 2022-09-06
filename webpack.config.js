@@ -112,7 +112,7 @@ const config = {
     new CssUrlRelativePlugin(),
     new WebpackPwaManifest({
       filename: 'manifest.json',
-      // start_url: 'YarnEditor/.',
+      // start_url: 'YarnClassic/.',
       inject: true,
       fingerprints: false,
       name: 'Yarn Story Editor',
@@ -142,7 +142,7 @@ const config = {
         //     accept: ['image/*']
         //   }]
         // }
-        action: '/YarnEditor/',
+        action: '/YarnClassic/',
         method: 'GET',
         enctype: 'application/x-www-form-urlencoded',
         params: {
@@ -165,7 +165,7 @@ const config = {
     //   swDest: path.resolve(__dirname, 'dist', 'sw.js'),
     //   exclude: [/\.map$/, /_redirects/],
     //   runtimeCaching: [{
-    //     urlPattern: /https:\/\/yarnspinnertool\.github\.io\/YarnEditor\//,
+    //     urlPattern: /https:\/\/yarnspinnertool\.github\.io\/YarnClassic\//,
     //     handler: 'NetworkFirst' //CacheFirst
     //   }],
     // }),
