@@ -125,7 +125,11 @@ const config = {
       icons: [
         {
           src: path.resolve('src/public/icon.png'),
-          sizes: [96, 128, 144, 192, 512], // multiple sizes, 192 and 144 needed by pwa
+          sizes: [96, 128, 192, 512], // multiple sizes, 192 needed by pwa
+        },
+        {
+          src: path.resolve('src/public/icon.png'),
+          sizes: [96, 128, 192, 512], // multiple sizes, 192 and 144 needed by pwa
           purpose: 'maskable'
         },
         {
