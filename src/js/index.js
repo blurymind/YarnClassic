@@ -1,4 +1,7 @@
-import '../scss/index.scss';
+import '../scss/jquery.contextMenu.css';
+import '../scss/normalize.css';
+import '../scss/spectrum.css';
+import '../scss/style.css';
 
 import { Utils } from './classes/utils';
 

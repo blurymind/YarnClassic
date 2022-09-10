@@ -30,7 +30,7 @@ const config = {
         loader: 'babel-loader',
       },
       {
-        test: /\.(css|scss)$/,
+        test: /\.(css)$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
@@ -39,7 +39,7 @@ const config = {
             },
           },
           'css-loader',
-          'sass-loader',
+          // 'sass-loader',
         ],
       },
       {
