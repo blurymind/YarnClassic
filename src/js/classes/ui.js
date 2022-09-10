@@ -50,7 +50,7 @@ export const UI = function(app) {
   ];
   // Language selector --------------------------------------------------------
   this.availableLanguages = [
-    //NOTE: some are disabled due to issues with nspell - see https://github.com/YarnSpinnerTool/YarnEditor/issues/263
+    //NOTE: some are disabled due to issues with nspell - see https://github.com/blurymind/YarnClassic/issues/263
     // { name: 'Afrikaans', id: 'af-ZA' },
     // { name: 'Bahasa Indonesia', id: 'id-ID' },
     // { name: 'Bahasa Melayu', id: 'ms-MY' },
@@ -152,7 +152,7 @@ export const UI = function(app) {
           <div style="text-align: justify">
             <div><a href="https://github.com/YarnSpinnerTool" target="_blank">Yarn</a> was created by <a href="https://github.com/AlecHolowka" target="_blank">Alec Holowka</a></div>
             <br>
-            <a href="https://github.com/YarnSpinnerTool/YarnEditor/graphs/contributors" target="_blank">Top contributors:</a>
+            <a href="https://github.com/blurymind/YarnClassic/graphs/contributors" target="_blank">Top contributors:</a>
             <small>
               <ul>
                 <li><a href="https://github.com/blurymind" target="_blank">Todor Imreorov</a></li>
@@ -160,7 +160,7 @@ export const UI = function(app) {
                 <li><a href="https://github.com/FaultyFunctions" target="_blank">@FaultyFunctions</a></li>
               </ul>
             </small>
-            <a href="https://github.com/YarnSpinnerTool/YarnEditor/issues/new" target="_blank">Report a Bug</a>
+            <a href="https://github.com/blurymind/YarnClassic/issues/new" target="_blank">Report a Bug</a>
           </div>
           `,
           showCancelButton: false,

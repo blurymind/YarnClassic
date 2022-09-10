@@ -65,10 +65,10 @@ https://github.com/kyperbelt/GDYarn
 https://github.com/JujuAdams/Chatterbox
 
 # Other implementations of Yarn Editor
-- Crochet : Fork of YarnEditor
+- Crochet : Fork of YarnClassic
 https://github.com/FaultyFunctions/Crochet/
 
-- YarnSpinner Loom vscode extension : implementation of YarnEditor as a vscode extension
+- YarnSpinner Loom vscode extension : implementation of YarnClassic as a vscode extension
 https://marketplace.visualstudio.com/items?itemName=TranquilMarmot.yarn-spinner-loom
 
 # 🐬 Features 🦄
@@ -153,23 +153,23 @@ Games built using Yarn.
 
 A short hike: https://store.steampowered.com/app/1055540/A_Short_Hike/
 
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/ash.png)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/games/ash.png)
 
 Night in the woods: https://store.steampowered.com/app/481510/Night_in_the_Woods/
 
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/nitw.jpg)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/games/nitw.jpg)
 
 Lost Constellation: http://finji.itch.io/lost-constellation
 
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/lostC.png)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/games/lostC.png)
 
 Knights and Bikes: https://store.steampowered.com/app/592480/Knights_And_Bikes/
 
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/kab.jpeg)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/games/kab.jpeg)
 
 Far From Noise by George Batchelor (@georgebatch): https://store.steampowered.com/app/706130/Far_from_Noise/
 
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/games/ffn.jpg)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/games/ffn.jpg)
 
 YarnTest: http://hayley.zone/bondage.js/
 
@@ -179,7 +179,7 @@ Test drive your Yarn files here ^
 
 Node connections work similar to Twine.
 [[ask question|question]] leads to "question" node.
-![Screenshot](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/doc/nodes.png)
+![Screenshot](https://github.com/blurymind/YarnClassic/raw/master/doc/nodes.png)
 
 
 # How to Import Twine Files
@@ -202,4 +202,4 @@ https://github.com/YarnSpinnerTool/YarnSpinner
 
 Yarn logo/icon created by @Mr_Alistair.
 
-![Icon](https://github.com/YarnSpinnerTool/YarnEditor/raw/master/src/public/icon.png)
+![Icon](https://github.com/blurymind/YarnClassic/raw/master/src/public/icon.png)

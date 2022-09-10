@@ -8,16 +8,16 @@ There are many ways you can send your contributions to Yarn. You can either **re
 
 ### Reporting bugs and opening issues
 
-Please [report bugs](https://github.com/YarnSpinnerTool/YarnEditor/issues) and open issues generously. Don't be afraid that your idea is silly, or you're reporting a duplicate. We're happy to hear from you. Seriously.
+Please [report bugs](https://github.com/blurymind/YarnClassic/issues) and open issues generously. Don't be afraid that your idea is silly, or you're reporting a duplicate. We're happy to hear from you. Seriously.
 
 > ***Please Note:*** Yarn is written by volunteers. If you encounter a problem while using it, we'll do our best to help you, but the authors cannot offer any support.
 
 ### Submitting a pull request
 
-* [Fork](https://github.com/YarnSpinnerTool/YarnEditor/fork) and clone the repository
+* [Fork](https://github.com/blurymind/YarnClassic/fork) and clone the repository
 * Create a new branch: git checkout -b my-branch-name
 * Make your changes
-* Push to your fork and [submit a pull request](https://github.com/YarnSpinnerTool/YarnEditor/compare)
+* Push to your fork and [submit a pull request](https://github.com/blurymind/YarnClassic/compare)
 * Pat your self on the back and wait for your pull request to be reviewed.
 
 If you're unfamiliar with how pull requests work, [GitHub's documentation on them](https://help.github.com/articles/using-pull-requests/) is very good.
