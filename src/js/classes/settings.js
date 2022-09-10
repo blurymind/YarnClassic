@@ -60,7 +60,7 @@ export const Settings = function(app) {
 
   // Theme
   this.theme = ko
-    .observable(storage.getItem('theme') || 'classic')
+    .observable(storage.getItem('theme') || 'dracula')
     .extend({ persist: 'theme' });
 
   // Document type
