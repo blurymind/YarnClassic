@@ -72,7 +72,7 @@ define('ace/mode/yarn', [
   (function() {
     this.type = 'text';
     this.getNextLineIndent = function(state, line, tab) {
-      return '';
+      return this.$getIndent(line); //automatic indentation of new line. Return '' to disable it
     };
     this.$id = 'ace/mode/yarn';
   }.call(Mode.prototype));
