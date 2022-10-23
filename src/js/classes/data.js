@@ -815,6 +815,66 @@ export const data = {
         }
         output += '===\n';
       }
+    } else if (type === FILETYPE.RENPY) {
+      for (let i = 0; i < content.length; i++) {
+        output += '\nlabel ' + content[i].title + ':\n';
+        const body = content[i].body;
+        if (!(body.length > 0 && body[body.length - 1] === '\n')) {
+          output += '\n';
+        }
+        let isMenu = false;
+        let isIfElse = false;
+        let parsedBodyContent = '';
+        body.split('\n').forEach(line => {
+          const trimmedLine = line.trim();
+          const tabs = isIfElse ? '\t\t':'\t';
+          if(trimmedLine.startsWith('[[')) {
+            const option = trimmedLine.replace(/[\[\[]|[\]\]]]/g,'').split('|');
+            if(option.length > 1){
+              if(!isMenu){
+                parsedBodyContent += `${tabs}menu:\n`;
+                isMenu = true;
+              }
+              parsedBodyContent += `${tabs}\t"${option[0].trim()}":\n${tabs}\t\tjump ${option[1].trim()}\n`;
+            } else {
+              parsedBodyContent += `${tabs}jump ${option[0].trim()}\n`;
+            }
+          } else if(trimmedLine.startsWith('<<if')){ // TODO make in and else if one check
+            const conditional = trimmedLine.replace(/\<\<\|$|\>\>|if/g, '').split(/==|!=|>|</g).filter(Boolean);
+            const operator = trimmedLine.substring(2, trimmedLine.length - 2).match(/(>|==|!=|<)/);
+            parsedBodyContent += conditional.length > 1 && operator ? `\tif ${conditional[0].trim()} ${operator[0]} ${conditional[1].trim()}:\n` : `\t# ${trimmedLine}\n`;
+            isIfElse = true;
+          } else if(trimmedLine.startsWith('<<elseif')){
+            const conditional = trimmedLine.replace(/\<\<\|$|\>\>|elseif/g, '').split(/==|!=|>|</g).filter(Boolean);
+            const operator = trimmedLine.substring(2, trimmedLine.length - 2).match(/(>|==|!=|<)/);
+            parsedBodyContent += conditional.length > 1 && operator ? `\telif ${conditional[0].trim()} ${operator[0]} ${conditional[1].trim()}:\n` : `\t# ${trimmedLine}\n`;
+            isIfElse = true;
+          } else if(trimmedLine.startsWith('<<else')){
+            parsedBodyContent +=  '\telse:\n';
+            isIfElse = true;
+          }  else if(trimmedLine.startsWith('<<endif')){
+            parsedBodyContent +=  '\n';
+            isIfElse = false;
+          } else if(trimmedLine.startsWith('<<set')){
+            const set = trimmedLine.replace(/[\<\>\$]|set /g, '').split('=');
+            console.log({set});
+            parsedBodyContent += set.length > 1 ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n` : `${tabs}#$ ${set[0].trim()} = 0:\n`;
+          } else if(trimmedLine.startsWith('<<')){
+            parsedBodyContent += `${tabs} ${trimmedLine.replace(/[\<\>]/g, '')}\n`;
+          } else if(trimmedLine.startsWith('\\')){
+            parsedBodyContent += `${tabs}"${trimmedLine}"\n`;
+          } else if(trimmedLine.length > 0){
+            // dialogue line in renpy may look like this:
+            // e mad "I'm a little upset at you."
+            // e "I'm a little upset at you."
+            // or "I'm a little upset at you."
+            // We infer the author is passing character and/or emotion, because they added quotes, don't add quotes automatically
+            parsedBodyContent += trimmedLine.endsWith('"')? `${tabs}${trimmedLine}\n`: `${tabs}"${trimmedLine}"\n`;
+          }
+          isMenu = false;
+        });
+        output += parsedBodyContent + '\n';
+      }
     } else if (type === FILETYPE.TWEE) {
       for (let i = 0; i < content.length; i++) {
         var tags = '';
@@ -849,6 +909,8 @@ export const data = {
       }
       output += '</nodes>\n';
     }
+
+    console.log("Exporter Output", output);
 
     data.isDocumentDirty(false);
     app.refreshWindowTitle();

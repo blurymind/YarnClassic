@@ -116,27 +116,32 @@
           <span class="item" data-bind="visible: app.settings.documentType() === 'ink',click: function() { app.data.trySave('ink'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/inky-icon.png" alt="Ink Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
-            Save as Ink
+            Export as Ink
           </span>
           <span class="item" data-bind="visible: app.settings.documentType() === 'ink',click: function() { app.data.trySave('ink.json'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/inky-icon.png" alt="Ink Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
-            Save as Ink Json
+            Export as Ink Json
+          </span>
+          <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('rpy'); }">
+            <img style="margin:0; padding:0" width="20px" src="./public/images/renpy-128.png" alt="Renpy Icon" />
+            <span class="hide-when-narrow">&nbsp;</span>
+            Export as Renpy Rpy
           </span>
           <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('twee'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
-            Save as Twee
+            Export as Twee
           </span>
           <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('tw2'); }">
             <img style="margin:0; padding:0" width="20px" src="./public/images/twine-favicon-152.png" alt="Twine Icon" />
             <span class="hide-when-narrow">&nbsp;</span>
-            Save as Twee2
+            Export as Twee2
           </span>
           <span class="item" data-bind="visible: app.settings.documentType() === 'yarn',click: function() { app.data.trySave('xml'); }">
             <svg class="icon menu-icon icon-document-file-xml icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-document-file-xml"></use></svg>
             <span class="hide-when-narrow">&nbsp;</span>
-            Save as Xml
+            Export as Xml
           </span>
           <span id="gistTryOpen" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
             <svg class="icon menu-icon icon-github icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-github"></use></svg>

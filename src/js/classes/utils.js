@@ -7,6 +7,7 @@ export var FILETYPE = {
   YARN: 'yarn',
   INK: 'ink',
   INKJSON: 'ink.json',
+  RENPY: 'rpy',
 };
 
 export var Utils = {
