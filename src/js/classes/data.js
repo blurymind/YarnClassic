@@ -861,8 +861,8 @@ export const data = {
             parsedBodyContent += set.length > 1 ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n` : `${tabs}#$ ${set[0].trim()} = 0:\n`;
           } else if(trimmedLine.startsWith('<<')){
             parsedBodyContent += `${tabs} ${trimmedLine.replace(/[\<\>]/g, '')}\n`;
-          } else if(trimmedLine.startsWith('\\')){
-            parsedBodyContent += `${tabs}"${trimmedLine}"\n`;
+          } else if(trimmedLine.startsWith('//')){
+            parsedBodyContent += `#${tabs}${trimmedLine.substring(2)}\n`;
           } else if(trimmedLine.length > 0){
             // dialogue line in renpy may look like this:
             // e mad "I'm a little upset at you."
