@@ -1060,17 +1060,16 @@ export var App = function(name, version) {
     if (self.isEditorInPlayMode()) self.togglePlayMode();
 
     self.makeNodeWithName(nodeTitle);
-    self.nodes().forEach(node => {
-      if (
-        node
-          .title()
-          .trim()
-          .toLowerCase() === nodeTitle.trim().toLowerCase()
-      ) {
-        self.editNode(node);
-        if (findText) setTimeout(() => self.editor.find(findText), 200);
-      }
-    });
+    const nodeWithTitle = self.nodes()
+      .find(node => node
+        .title()
+        .trim()
+        .toLowerCase() === nodeTitle.trim().toLowerCase());
+
+    if (nodeWithTitle) {
+      self.editNode(nodeWithTitle, true);
+      if (findText) setTimeout(() => self.editor.find(findText), 200);
+    }
   };
 
   this.openLastEditedNode = function() {
