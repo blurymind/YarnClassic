@@ -327,7 +327,7 @@ This is the content of the stitch that should be embedded within a knot.
                       name: 'Choice without printing',
                       callback: () => {
                         app.insertTextAtCursor(
-                          '* [A choice where the content isn\'t printed after choosing]'
+                          "* [A choice where the content isn't printed after choosing]"
                         );
                       },
                     },
@@ -364,7 +364,7 @@ This is the content of the stitch that should be embedded within a knot.
                         app.insertTextAtCursor(
                           'The radio hissed into life. {"Three!"|"Two!"|"One!"|There was the white noise racket of an explosion.|But it was just static.}\n' +
                             '\n' +
-                            '{I bought a coffee with my five-pound note.|I bought a second coffee for my friend.|I didn\'t have enough money to buy any more coffee.}'
+                            "{I bought a coffee with my five-pound note.|I bought a second coffee for my friend.|I didn't have enough money to buy any more coffee.}"
                         );
                       },
                     },

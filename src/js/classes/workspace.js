@@ -928,15 +928,15 @@ export const Workspace = function(app) {
       node.moveTo(
         app.settings.snapGridEnabled()
           ? self.stepify(
-            Math.cos(i * 0.5) * (600 + i * 30),
-            app.settings.gridSize()
-          )
+              Math.cos(i * 0.5) * (600 + i * 30),
+              app.settings.gridSize()
+            )
           : Math.cos(i * 0.5) * (600 + i * 30),
         app.settings.snapGridEnabled()
           ? self.stepify(
-            Math.sin(i * 0.5) * (600 + i * 30),
-            app.settings.gridSize()
-          )
+              Math.sin(i * 0.5) * (600 + i * 30),
+              app.settings.gridSize()
+            )
           : Math.cos(i * 0.5) * (600 + i * 30)
       );
     });

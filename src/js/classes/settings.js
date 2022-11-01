@@ -39,9 +39,9 @@ export const Settings = function(app) {
       file:
         self.gistFile() !== null
           ? self
-            .gistFile()
-            .split('/')
-            .pop()
+              .gistFile()
+              .split('/')
+              .pop()
           : null,
     });
   };

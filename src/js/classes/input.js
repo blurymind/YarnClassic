@@ -55,13 +55,13 @@ export const Input = function(app) {
       if (app.inWorkspace()) {
         if (self.isDragging) {
           switch (e.button) {
-          case MouseButton.Left:
-            app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
-            break;
+            case MouseButton.Left:
+              app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
+              break;
 
-          case MouseButton.Middle:
-            app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
-            break;
+            case MouseButton.Middle:
+              app.workspace.onDragStart({ x: e.pageX, y: e.pageY });
+              break;
           }
         }
       } else if (app.inEditor() && e.button === MouseButton.Right) {
@@ -206,47 +206,47 @@ export const Input = function(app) {
 
       if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
         switch (e.keyCode) {
-        case Key.S:
-          app.data.trySave(FILETYPE.JSON);
-          break; // ctrl+shift+s
-        case Key.A:
-          app.data.tryAppend();
-          break; // ctrl+shift+a
+          case Key.S:
+            app.data.trySave(FILETYPE.JSON);
+            break; // ctrl+shift+s
+          case Key.A:
+            app.data.tryAppend();
+            break; // ctrl+shift+a
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
-        case Key.S:
-          app.data.trySaveCurrent();
-          break; // ctrl+alt+s
+          case Key.S:
+            app.data.trySaveCurrent();
+            break; // ctrl+alt+s
         }
       } else if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.C: // ctrl+c
-          app.nodeClipboard = app.cloneNodeArray(
-            app.workspace.getSelectedNodes()
-          );
-          break;
-        case Key.D:
-          app.workspace.deselectAll();
-          break; // ctrl+d
-        case Key.O:
-          app.data.tryOpenFile();
-          break; // ctrl+o
-        case Key.S:
-          app.data.trySaveCurrent();
-          break; // ctrl+s
-        case Key.X: // ctrl+x
-          const selected = app.workspace.getSelectedNodes();
-          app.nodeClipboard = app.cloneNodeArray(selected);
-          app.deleteNodes(selected);
-          break;
-        case Key.Y:
-          app.historyDirection('redo');
-          break; // ctrl+y
-        case Key.Z:
-          app.historyDirection('undo');
-          break; // ctrl+z
+          case Key.C: // ctrl+c
+            app.nodeClipboard = app.cloneNodeArray(
+              app.workspace.getSelectedNodes()
+            );
+            break;
+          case Key.D:
+            app.workspace.deselectAll();
+            break; // ctrl+d
+          case Key.O:
+            app.data.tryOpenFile();
+            break; // ctrl+o
+          case Key.S:
+            app.data.trySaveCurrent();
+            break; // ctrl+s
+          case Key.X: // ctrl+x
+            const selected = app.workspace.getSelectedNodes();
+            app.nodeClipboard = app.cloneNodeArray(selected);
+            app.deleteNodes(selected);
+            break;
+          case Key.Y:
+            app.historyDirection('redo');
+            break; // ctrl+y
+          case Key.Z:
+            app.historyDirection('undo');
+            break; // ctrl+z
         }
       } else {
         // Delete
@@ -277,12 +277,12 @@ export const Input = function(app) {
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.A:
-          app.workspace.selectAll();
-          break; // ctrl+a
-        case Key.V:
-          app.pasteNodes();
-          break; // ctrl+v
+          case Key.A:
+            app.workspace.selectAll();
+            break; // ctrl+a
+          case Key.V:
+            app.pasteNodes();
+            break; // ctrl+v
         }
       } else {
         if (e.keyCode === Key.Enter || e.key === 'Enter') {
@@ -299,24 +299,24 @@ export const Input = function(app) {
 
       if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
-        case Key.C:
-          self.clipboard = app.editor.getSelectedText();
-          break;
-        case Key.X:
-          document.execCommand('copy');
-          app.clipboard = app.editor.getSelectedText();
-          app.insertTextAtCursor('');
-          break;
-        case Key.S:
-          app.data.trySaveCurrent();
-          break;
+          case Key.C:
+            self.clipboard = app.editor.getSelectedText();
+            break;
+          case Key.X:
+            document.execCommand('copy');
+            app.clipboard = app.editor.getSelectedText();
+            app.insertTextAtCursor('');
+            break;
+          case Key.S:
+            app.data.trySaveCurrent();
+            break;
         }
       } else {
         switch (e.keyCode) {
-        case Key.Escape:
-          app.saveNode();
-          app.closeEditor();
-          break;
+          case Key.Escape:
+            app.saveNode();
+            app.closeEditor();
+            break;
         }
       }
     });
@@ -327,10 +327,10 @@ export const Input = function(app) {
 
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
         switch (e.keyCode) {
-        case Key.Enter:
-          app.saveNode();
-          app.closeEditor();
-          break; //ctrl+alt+enter closes/saves an open node
+          case Key.Enter:
+            app.saveNode();
+            app.closeEditor();
+            break; //ctrl+alt+enter closes/saves an open node
         }
       }
     });
@@ -340,9 +340,9 @@ export const Input = function(app) {
       if (!app.ui.settingsDialogVisible()) return;
 
       switch (e.keyCode) {
-      case Key.Escape:
-        app.ui.closeSettingsDialog();
-        break;
+        case Key.Escape:
+          app.ui.closeSettingsDialog();
+          break;
       }
     });
 

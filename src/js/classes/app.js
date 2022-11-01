@@ -346,25 +346,25 @@ export var App = function(name, version) {
       const message = event.data;
 
       switch (message.type) {
-      // sent whenever the temporary file that's open gets changed
-      case 'UpdateNode':
-        // find the node that was being edited... we check originalNodeTitle here
-        // since it's possible that the user changed the node's title in the editor
-        self.nodes().forEach(node => {
-          if (
-            node.title().trim() === message.payload.originalNodeTitle.trim()
-          ) {
-            node.title(message.payload.title);
-            node.tags(message.payload.tags);
-            node.body(message.payload.body);
+        // sent whenever the temporary file that's open gets changed
+        case 'UpdateNode':
+          // find the node that was being edited... we check originalNodeTitle here
+          // since it's possible that the user changed the node's title in the editor
+          self.nodes().forEach(node => {
+            if (
+              node.title().trim() === message.payload.originalNodeTitle.trim()
+            ) {
+              node.title(message.payload.title);
+              node.tags(message.payload.tags);
+              node.body(message.payload.body);
 
-            // re-send the document back to the extension so it updates its underlying text document
-            self.setYarnDocumentIsDirty();
-          }
-        });
-        break;
-      default:
-        break;
+              // re-send the document back to the extension so it updates its underlying text document
+              self.setYarnDocumentIsDirty();
+            }
+          });
+          break;
+        default:
+          break;
       }
     });
 
@@ -629,8 +629,8 @@ export var App = function(name, version) {
     const selected = Array.isArray(toDelete)
       ? [...toDelete]
       : node && node.selected
-        ? [...self.workspace.getSelectedNodes()]
-        : [toDelete];
+      ? [...self.workspace.getSelectedNodes()]
+      : [toDelete];
 
     if (selected.length) {
       Swal.fire({
@@ -741,8 +741,8 @@ export var App = function(name, version) {
     });
   };
 
-  this.editNode = function(node, includeInactive = false) {
-    if (!includeInactive && !node.active()) {
+  this.editNode = function(node) {
+    if (!node.active()) {
       return;
     }
 
@@ -1038,7 +1038,7 @@ export var App = function(name, version) {
       });
     } else {
       console.error(
-        'Tried to open node in Visual Studio Code text editor but we\'re not in the Visual Studio Code extension'
+        "Tried to open node in Visual Studio Code text editor but we're not in the Visual Studio Code extension"
       );
     }
   };

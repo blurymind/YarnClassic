@@ -49,41 +49,41 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
 
   this.getTagOpen = function(tag) {
     switch (tag) {
-    case 'cmd':
-      return app.settings.documentType() === 'ink'
-        ? app.editor.getSelectedText().length === 0
-          ? '~ '
-          : '{ '
-        : '<<';
-    case 'opt':
-      return app.settings.documentType() === 'ink'
-        ? app.editor.getSelectedText().length === 0
-          ? '-> '
-          : '* ['
-        : '[[';
-    case 'color':
-      return '[color=#]';
-    default:
-      return `[${tag}]`;
+      case 'cmd':
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? '~ '
+            : '{ '
+          : '<<';
+      case 'opt':
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? '-> '
+            : '* ['
+          : '[[';
+      case 'color':
+        return '[color=#]';
+      default:
+        return `[${tag}]`;
     }
   };
 
   this.getTagClose = function(tag) {
     switch (tag) {
-    case 'cmd':
-      return app.settings.documentType() === 'ink'
-        ? app.editor.getSelectedText().length === 0
-          ? ''
-          : ' }'
-        : '>>';
-    case 'opt':
-      return app.settings.documentType() === 'ink'
-        ? app.editor.getSelectedText().length === 0
-          ? ''
-          : ']'
-        : '|]]';
-    default:
-      return `[/${tag}]`;
+      case 'cmd':
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? ''
+            : ' }'
+          : '>>';
+      case 'opt':
+        return app.settings.documentType() === 'ink'
+          ? app.editor.getSelectedText().length === 0
+            ? ''
+            : ']'
+          : '|]]';
+      default:
+        return `[/${tag}]`;
     }
   };
 
@@ -198,7 +198,7 @@ export const BbcodeRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       : text;
 
     /// Commands in preview mode
-    result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
+    result = result.replace(/<</gi, "<font color='violet'>(run:"); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
 
     /// bbcode color tags in preview mode
