@@ -910,7 +910,7 @@ export const data = {
       output += '</nodes>\n';
     }
 
-    console.log("Exporter Output", output);
+    console.log('Exporter Output', output);
 
     data.isDocumentDirty(false);
     app.refreshWindowTitle();
@@ -1030,10 +1030,10 @@ export const data = {
             .join('')}
       </datalist>
       ${
-        showCheckBox
-          ? `<br/><br/><input type="checkbox" id="swal-checkbox-checked"> ${showCheckBox}</input>`
-          : ''
-      }
+  showCheckBox
+    ? `<br/><br/><input type="checkbox" id="swal-checkbox-checked"> ${showCheckBox}</input>`
+    : ''
+}
         `,
       onOpen: () => {
         if (data.editingName() !== 'NewFile') {

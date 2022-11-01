@@ -21,41 +21,41 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
 
   this.getTagOpen = function(tag) {
     switch (tag) {
-      case 'cmd':
-        return app.settings.documentType() === 'ink'
-          ? app.editor.getSelectedText().length === 0
-            ? '~ '
-            : '{ '
-          : '<<';
-      case 'opt':
-        return app.settings.documentType() === 'ink'
-          ? app.editor.getSelectedText().length === 0
-            ? '-> '
-            : '* ['
-          : '[[';
-      case 'color':
-        return '<color=#>';
-      default:
-        return `<${tag}>`;
+    case 'cmd':
+      return app.settings.documentType() === 'ink'
+        ? app.editor.getSelectedText().length === 0
+          ? '~ '
+          : '{ '
+        : '<<';
+    case 'opt':
+      return app.settings.documentType() === 'ink'
+        ? app.editor.getSelectedText().length === 0
+          ? '-> '
+          : '* ['
+        : '[[';
+    case 'color':
+      return '<color=#>';
+    default:
+      return `<${tag}>`;
     }
   };
 
   this.getTagClose = function(tag) {
     switch (tag) {
-      case 'cmd':
-        return app.settings.documentType() === 'ink'
-          ? app.editor.getSelectedText().length === 0
-            ? ''
-            : ' }'
-          : '>>';
-      case 'opt':
-        return app.settings.documentType() === 'ink'
-          ? app.editor.getSelectedText().length === 0
-            ? ''
-            : ']'
-          : '|]]';
-      default:
-        return `</${tag}>`;
+    case 'cmd':
+      return app.settings.documentType() === 'ink'
+        ? app.editor.getSelectedText().length === 0
+          ? ''
+          : ' }'
+        : '>>';
+    case 'opt':
+      return app.settings.documentType() === 'ink'
+        ? app.editor.getSelectedText().length === 0
+          ? ''
+          : ']'
+        : '|]]';
+    default:
+      return `</${tag}>`;
     }
   };
 
@@ -182,7 +182,7 @@ export const HtmlRichTextFormatter = function(app, addExtraPreviewerEmbeds) {
       : text;
 
     /// <<command>>
-    result = result.replace(/<</gi, "<font color='violet'>(run:"); // TODO: style this
+    result = result.replace(/<</gi, '<font color=\'violet\'>(run:'); // TODO: style this
     result = result.replace(/>>/gi, ')</font>');
 
     /// <color=#...></color>  and  &lt;color=#...&gt;&lt;/color&gt;

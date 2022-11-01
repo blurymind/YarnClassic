@@ -198,7 +198,7 @@ export const UI = function(app) {
     Swal.fire({
       title: 'Are you sure?',
       text:
-        "Markup on all nodes will be modified. This can rarely result in broken texts. This operation can't be undone.",
+        'Markup on all nodes will be modified. This can rarely result in broken texts. This operation can\'t be undone.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, convert it!',
@@ -288,8 +288,8 @@ export const UI = function(app) {
             p.setAttribute(
               'onclick',
               app.settings.documentType() === 'ink'
-                ? "app.insertTextAtCursor('-> " + node.title() + "')"
-                : "app.insertTextAtCursor('[[" + node.title() + "]]')"
+                ? 'app.insertTextAtCursor(\'-> ' + node.title() + '\')'
+                : 'app.insertTextAtCursor(\'[[' + node.title() + ']]\')'
             );
             rootMenu.appendChild(p);
           }
