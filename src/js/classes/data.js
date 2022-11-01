@@ -195,7 +195,7 @@ export const data = {
     const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
     const currentDocState = appStates[app.settings.selectedFileTab()];
     data.appInstanceStates(appStates);
-    console.log('AAPP state', appStates, currentDocState);
+    console.log('APP state', appStates, currentDocState);
     if (currentDocState) {
       const {
         editingPath,

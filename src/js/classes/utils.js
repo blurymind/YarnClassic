@@ -192,7 +192,7 @@ export var Utils = {
     }
   },
 
-  // Creates the context medu for ace-editor
+  // Creates the context menu for ace-editor
   getEditorContextMenu: function(gotoRegex) {
     return {
       selector: '.node-editor .form .editor',

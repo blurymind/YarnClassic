@@ -1277,8 +1277,8 @@ export var App = function(name, version) {
     const curLineText = self.editor.session.getLine(curLine);
 
     const textBeforeCursor = curLineText.substring(
-      selectionRange.start.row - 2,
-      selectionRange.start.row + 2
+      selectionRange.start.column - 2,
+      selectionRange.start.column + 2
     );
     if (!textBeforeCursor) {
       return '';
@@ -1287,7 +1287,7 @@ export var App = function(name, version) {
       if (['->'].includes(textBeforeCursor.trim()))
         return textBeforeCursor.trim();
     } else {
-      if (['[[', '<<'].includes(textBeforeCursor.trim()))
+      if (['[[', '<<'].includes(textBeforeCursor.trim()) || textBeforeCursor.includes('|'))
         return textBeforeCursor.trim();
     }
     return self.richTextFormatter.identifyTag(textBeforeCursor);
