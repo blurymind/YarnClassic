@@ -817,7 +817,7 @@ export const data = {
       }
     } else if (type === FILETYPE.RENPY) {
       for (let i = 0; i < content.length; i++) {
-        output += '\nlabel ' + content[i].title + ':\n';
+        output += '\nlabel ' + content[i].title.replace(/[ ]/g, '_') + ':\n';
         const body = content[i].body;
         if (!(body.length > 0 && body[body.length - 1] === '\n')) {
           output += '\n';
