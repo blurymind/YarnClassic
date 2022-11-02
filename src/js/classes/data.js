@@ -1136,6 +1136,16 @@ export const data = {
     }
   },
 
+  openGist: function(content, name) {
+    const type = data.getFileType(name);
+    data.loadData(content, type, true);
+    data.isDocumentDirty(false);
+    data.lastStorageHost('GIST');
+    data.editingPath(null);
+    data.editingName(name);
+    app.refreshWindowTitle();
+  },
+
   tryOpenGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
       gists.get(gists.file).then(gist => {
@@ -1156,13 +1166,7 @@ export const data = {
         }).then(({ value }) => {
           if (value) {
             const content = gistFiles[value].content;
-            const type = data.getFileType(value);
-            data.loadData(content, type, true);
-            data.isDocumentDirty(false);
-            data.lastStorageHost('GIST');
-            data.editingPath(null);
-            data.editingName(value);
-            app.refreshWindowTitle();
+            data.openGist(content, value);
           }
         });
       });

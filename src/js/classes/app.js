@@ -375,6 +375,20 @@ export var App = function(name, version) {
     event.app = this;
     window.dispatchEvent(event);
     window.parent.dispatchEvent(event);
+
+    // Attempt loading a public gist file, if it's present in the url params
+    const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
+    const gistId = urlParams.get('gist');
+    const fileName = urlParams.get('fileName');
+    if(gistId && fileName){
+      //TODO move to data class fetchFromUrl(url, cb)
+      fetch('https://api.github.com/gists/' + gistId)
+        .then(data=>data.json())
+        .then(content=>{
+          const gistFileContents = content.files[fileName].content;
+          data.openGist(gistFileContents, fileName);
+        });
+    }
   };
 
   this.limitNodesUpdate = function(fn) {
