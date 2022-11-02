@@ -817,7 +817,8 @@ export const data = {
       }
     } else if (type === FILETYPE.RENPY) {
       for (let i = 0; i < content.length; i++) {
-        output += '\nlabel ' + content[i].title.replace(/[ ]/g, '_') + ':\n';
+        const nodeType = content[i].tags.includes('screen') ? 'screen' : 'label';
+        output += `\n${nodeType} ` + content[i].title.replace(/[ ]/g, '_') + ':\n';
         const body = content[i].body;
         if (!(body.length > 0 && body[body.length - 1] === '\n')) {
           output += '\n';
@@ -825,10 +826,14 @@ export const data = {
         let isMenu = false;
         let isIfElse = false;
         let parsedBodyContent = '';
+
+        const isRenpyFormattedBody = content[i].tags.includes('renpy');
         body.split('\n').forEach(line => {
           const trimmedLine = line.trim();
           const tabs = isIfElse ? '\t\t':'\t';
-          if(trimmedLine.startsWith('[[')) {
+          if(isRenpyFormattedBody) { // if a renpy tag is present, don't try to convert the content, instead use the original
+            parsedBodyContent += `${tabs}${line}\n`;
+          } else if(trimmedLine.startsWith('[[')) {
             const option = trimmedLine.replace(/[\[\[]|[\]\]]]/g,'').split('|');
             if(option.length > 1){
               if(!isMenu){
@@ -860,16 +865,20 @@ export const data = {
             console.log({set});
             parsedBodyContent += set.length > 1 ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n` : `${tabs}#$ ${set[0].trim()} = 0:\n`;
           } else if(trimmedLine.startsWith('<<')){
-            parsedBodyContent += `${tabs} ${trimmedLine.replace(/[\<\>]/g, '')}\n`;
+            parsedBodyContent += `${tabs}${trimmedLine.replace(/[\<\>]/g, '')}\n`;
           } else if(trimmedLine.startsWith('//')){
-            parsedBodyContent += `#${tabs}${trimmedLine.substring(2)}\n`;
+            parsedBodyContent += `${tabs}#${trimmedLine.substring(2)}\n`;
           } else if(trimmedLine.length > 0){
             // dialogue line in renpy may look like this:
             // e mad "I'm a little upset at you."
             // e "I'm a little upset at you."
             // or "I'm a little upset at you."
             // We infer the author is passing character and/or emotion, because they added quotes, don't add quotes automatically
-            parsedBodyContent += trimmedLine.endsWith('"')? `${tabs}${trimmedLine}\n`: `${tabs}"${trimmedLine}"\n`;
+            if(trimmedLine.endsWith('"')){
+              parsedBodyContent += `${tabs}${trimmedLine}\n`;
+            } else {
+              parsedBodyContent += `${tabs}"${trimmedLine}"\n`;
+            }
           }
           isMenu = false;
         });

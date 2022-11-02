@@ -1,0 +1,64 @@
+{
+	"header": {
+		"lastSavedUnix": "2022-11-02T18:02:33.452Z",
+		"language": "en-GB",
+		"documentType": "yarn",
+		"markupLanguage": "bbcode",
+		"filetypeVersion": "2",
+		"pluginStorage": {
+			"Runner": {}
+		}
+	},
+	"nodes": [
+		{
+			"title": "livingRoom",
+			"tags": "",
+			"body": "// standard character text\nmc.c happy \"there's nothing interesting on tv today\"\n\n// standard narrator text\nHe couldn't find anything interesting on tv\n\n// wrap commands like this\n<<hide screen advance_time_button>>\n\n// To create a menu with two options, you need each option to be on a new line, followed by the question\nPlay some video games instead?\n[[yes|playsVideoGames]]\n[[no|gets up]]",
+			"position": {
+				"x": -274,
+				"y": -1469
+			},
+			"colorID": 0
+		},
+		{
+			"title": "playsVideoGames",
+			"tags": "",
+			"body": "mc \"I will play some video games\"\nSome time passes by",
+			"position": {
+				"x": -279,
+				"y": -1688
+			},
+			"colorID": 0
+		},
+		{
+			"title": "gets up",
+			"tags": "",
+			"body": "mc \"I am borded, let's do something else\"",
+			"position": {
+				"x": -42,
+				"y": -1461
+			},
+			"colorID": 0
+		},
+		{
+			"title": "MapUI()",
+			"tags": "screen renpy",
+			"body": "// if you put a screen tag in the node, it will be interpreted as a screen instead of a label\nimagebutton:\n    xpos 618\n    ypos 570\n    idle \"BG/house1_idle.png\"\n    hover \"BG/house1_hover.png\"\n    action Call(\"call_livingRoomUI\")",
+			"position": {
+				"x": -510,
+				"y": -1468
+			},
+			"colorID": 0
+		},
+		{
+			"title": "call_livingRoomUI",
+			"tags": "renpy",
+			"body": "// if you put a renpy tag in the node, the text in the body will be interpreted as is, without trying to be converted to rpy\n$ current_location = \"livingRoom\"\n  scene bg house_room\n  call screen LivingRoomUI\n  return",
+			"position": {
+				"x": -514,
+				"y": -1687
+			},
+			"colorID": 0
+		}
+	]
+}
