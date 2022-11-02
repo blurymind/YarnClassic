@@ -65,17 +65,17 @@
   background-color: #343746;
 }
 
-.menu .dropdown .item:hover {
+.app-menu .menu .dropdown .item:hover {
   background: #44475a;
   color: #f8f8f2;
 }
 
-.menu .dropdown .item:active {
+.app-menu .menu .dropdown .item:active {
   background: #44475a;
   color: #f8f8f2;
 }
 
-.menu:active .title {
+.app-menu .menu:active .title {
   background: #282a36;
   color: #f8f8f2;
 }
@@ -150,8 +150,6 @@
 .app-search .dropdown .item {
   display: block;
   box-sizing: border-box;
-  background: #343746;
-  color: #f8f8f2;
   padding: 7px;
 }
 
@@ -261,43 +259,6 @@ input#nodeSearchInput::-moz-placeholder {
 .node .colorDown {
   background: #282a36;
   color: #f8f8f2;
-}
-
-.title-style-1 {
-  background-color: #343746;
-  color: #f8f8f2;
-}
-.title-style-2 {
-  background-color: #ff5555;
-  color: #191A21;
-}
-.title-style-3 {
-  background-color: #ffb86c;
-  color: #191A21;
-}
-.title-style-4 {
-  background-color: #f1fa8c;
-  color: #191A21;
-}
-.title-style-5 {
-  background-color: #50fa7b;
-  color: #191A21;
-}
-.title-style-6 {
-  background-color: #8be9fd;
-  color: #191A21;
-}
-.title-style-7 {
-  background-color: #bd93f9;
-  color: #191A21;
-}
-.title-style-8 {
-  background-color: #ff79c6;
-  color: #191A21;
-}
-.title-style-9 {
-  background-color: #f8f8f2;
-  color: #191A21;
 }
 
 .conditionbounds {
@@ -821,4 +782,68 @@ input.sp-input {
 
 .grid-canvas {
   color: #191A21;
+}
+
+.title-style-1 {
+  background-color: #343746;
+  color: #f8f8f2;
+}
+.title-style-1:hover{
+  background-color: #45495e;
+}
+.title-style-2 {
+  background-color: #ff5555;
+  color: #191A21;
+}
+.title-style-2:hover {
+  background-color: rgba(255, 85, 85, 0.69);
+}
+.title-style-3 {
+  background-color: #ffb86c;
+  color: #191A21;
+}
+.title-style-3:hover {
+  background-color: rgba(255, 184, 108, 0.76);
+}
+.title-style-4 {
+  background-color: #f1fa8c;
+  color: #191A21;
+}
+.title-style-4:hover {
+  background-color: rgba(241, 250, 140, 0.72);
+}
+.title-style-5 {
+  background-color: #50fa7b;
+  color: #191A21;
+}
+.title-style-5:hover {
+  background-color: rgba(80, 250, 123, 0.71);
+}
+.title-style-6 {
+  background-color: #8be9fd;
+  color: #191A21;
+}
+.title-style-6:hover {
+  background-color: rgba(139, 233, 253, 0.73);
+}
+.title-style-7 {
+  background-color: #bd93f9;
+  color: #191A21;
+}
+.title-style-7:hover {
+  background-color: rgba(189, 147, 249, 0.78);
+}
+.title-style-8 {
+  background-color: #ff79c6;
+  color: #191A21;
+}
+.title-style-8:hover {
+  background-color: rgba(255, 121, 198, 0.7);
+}
+.title-style-9 {
+  background-color: #f8f8f2;
+  color: #191A21;
+}
+.title-style-9:hover {
+  background-color: rgba(248, 248, 242, 0.79);
 }

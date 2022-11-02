@@ -250,6 +250,58 @@ export const UI = function(app) {
       return { matchTitle, matchBody, matchTags, clearSearch: false };
     }
   };
+
+  this.findMatchingNodes = function(searchText){
+    const found = {
+      matchTitle:[],
+      matchBody:[],
+      matchTags:[],
+      foundNodes: false,
+    };
+    app.nodes().forEach(node=>{
+      const {
+        matchTitle,
+        matchBody,
+        matchTags,
+      } = app.ui.nodeSearchMatches(node, searchText, true);
+      if (matchTitle) found.matchTitle.push(node);
+      if (matchBody) found.matchBody.push(node);
+      if (matchTags) found.matchTags.push(node);
+    });
+    found.foundNodes = found.matchTitle.length > 0 || found.matchBody.length > 0 || found.matchTags.length > 0;
+    return found;
+  };
+
+  this.createSearchMenuLine = function(node, action, rootMenu, match = 'title') {
+    const p = document.createElement('div');
+    p.innerHTML = `${node.title()} ${match ? `(${match})` : ''}`;
+    $(p).addClass(
+      'item ' + node.titleStyles[node.colorID()]
+    );
+    if (action == 'link') {
+      if (node.title() !== app.editing().title()) {
+        if (
+          app.settings.documentType() === 'ink' &&
+          node.title().trim() === data.InkGlobalScopeNodeName
+        )
+          return;
+        p.setAttribute(
+          'onclick',
+          app.settings.documentType() === 'ink'
+            ? "app.insertTextAtCursor('-> " + node.title() + "')"
+            : "app.insertTextAtCursor('[[" + node.title() + "]]')"
+        );
+        rootMenu.appendChild(p);
+      }
+    } else if (action == 'open') {
+      p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
+      p.setAttribute(
+        'onmouseenter',
+        `app.workspace.warpToNodeByIdx(${app.nodes.indexOf(node)})`
+      );
+      rootMenu.appendChild(p);
+    }
+  };
   // openNodeListMenu
   this.openNodeListMenu = function(action) {
     const searchText =
@@ -260,51 +312,31 @@ export const UI = function(app) {
     const rootMenu = document.getElementById(action + 'HelperMenu');
     rootMenu.innerHTML = '';
 
-    app.nodes().forEach((node, i) => {
-      const {
-        matchTitle,
-        matchBody,
-        matchTags,
-        clearSearch,
-      } = app.ui.nodeSearchMatches(node, searchText, true);
+    const listAllNodes = () => {
+      app.nodes().forEach(node => {
+        this.createSearchMenuLine(node, action, rootMenu,'');
+      });
+    };
 
-      // show a result
-      if (clearSearch || matchTitle || matchBody || matchTags) {
-        const p = document.createElement('span');
-        p.innerHTML = `${node.title()} ${matchTitle ? '(title)' : ''} ${
-          matchBody ? '(content)' : ''
-        } ${matchTags ? '(tags)' : ''}`;
-        $(p).addClass(
-          'item ' + app.nodes()[i].titleStyles[app.nodes()[i].colorID()]
-        );
-
-        if (action == 'link') {
-          if (node.title() !== app.editing().title()) {
-            if (
-              app.settings.documentType() === 'ink' &&
-              node.title().trim() === data.InkGlobalScopeNodeName
-            )
-              return;
-            p.setAttribute(
-              'onclick',
-              app.settings.documentType() === 'ink'
-                ? "app.insertTextAtCursor('-> " + node.title() + "')"
-                : "app.insertTextAtCursor('[[" + node.title() + "]]')"
-            );
-            rootMenu.appendChild(p);
-          }
-        } else if (action == 'open') {
-          if (matchTitle || matchBody || matchTags || clearSearch) {
-            p.setAttribute('onclick', `app.openNodeByTitle("${node.title()}")`);
-            p.setAttribute(
-              'onmouseenter',
-              `app.workspace.warpToNodeByIdx(${app.nodes.indexOf(node)})`
-            );
-            rootMenu.appendChild(p);
-          }
-        }
-      }
-    });
+    // If there's no search query or nothing is found, simply return all nodes
+    if (!searchText) {
+      listAllNodes();
+      return;
+    }
+    const found = this.findMatchingNodes(searchText);
+    if (!found.foundNodes) {
+      listAllNodes();
+    } else {
+      found.matchTitle.forEach(node => {
+        this.createSearchMenuLine(node, action, rootMenu,'title');
+      });
+      found.matchTags.forEach(node => {
+        this.createSearchMenuLine(node, action, rootMenu,'tags');
+      });
+      found.matchBody.forEach(node => {
+        this.createSearchMenuLine(node, action, rootMenu,'body');
+      });
+    }
   };
 
   this.checkAndMoveAppButtons = function() {
