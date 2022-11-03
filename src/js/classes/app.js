@@ -755,8 +755,8 @@ export var App = function(name, version) {
     });
   };
 
-  this.editNode = function(node) {
-    if (!node.active()) {
+  this.editNode = function(node, dontOpenInactive = true) {
+    if (!dontOpenInactive && !node.active()) {
       return;
     }
 
