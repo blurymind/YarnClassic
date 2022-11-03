@@ -229,6 +229,14 @@ input[type='checkbox'] {
   transition: border 0.25s;
 }
 
+/* for a focus effect when warping to node */
+.node {
+  outline-width: 1px;
+  outline-style: solid;
+  outline-color: transparent;
+  outline-offset: 50px;
+}
+
 .node .title {
   box-sizing: border-box;
   width: 100%;

@@ -748,7 +748,14 @@ export const Workspace = function(app) {
   //
   // Moves the viewport to focus the specified node
   this.warpToNode = function(node) {
-    node && self.warpToXY(node.x() || node.createX, node.y() || node.createY);
+    if (!node) return;
+    var element = $(node.element);
+    self.warpToXY(node.x() || node.createX, node.y() || node.createY);
+    element.clearQueue();
+    element.transition({ outlineColor: 'pink', outlineWidth: 2, outlineOffset: 0 }, 500);
+    setTimeout(()=> {
+      element.transition({ outlineColor: 'transparent',outlineWidth: 1, outlineOffset: 50 }, 300);
+    }, 700)
   };
 
   // warpToXY
