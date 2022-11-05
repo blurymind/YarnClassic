@@ -1434,9 +1434,9 @@ export var App = function(name, version) {
   };
 
   this.updateTagsRepository = function() {
-    if (!self.mustUpdateTags) return;
+    if (!app.mustUpdateTags) return;
 
-    self.mustUpdateTags = false;
+    app.mustUpdateTags = false;
 
     const findFirstFreeId = () => {
       const usedIds = self.tags().map(tag => tag.id);
