@@ -35,6 +35,24 @@ alt="Yarn web app"  height="480" border="10" /></a>
 <a href="https://blurymind.github.io/YarnClassic/"><img src="https://raw.githubusercontent.com/blurymind/YarnClassic/master/doc/yarnMobile.jpeg"
 alt="Yarn web app"  height="480" border="10" /></a>
 
+#  📁 Supported formats:
+- <img src="https://github.com/blurymind/YarnClassic/raw/master/src/public/icon.png" width=24px> yarn 1 format open/save (json and yarn) <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=yarnExample.json">Example</a> (playtesting supported)
+- <img src="https://github.com/blurymind/YarnClassic/raw/master/src/public/images/inky-icon.png" width=24px> ink format open/save <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=inkSample.ink">Example</a> (playtesting supported)
+- <img src="https://github.com/blurymind/YarnClassic/raw/master/src/public/images/renpy-128.png" width=24px> renpy format save <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=exportAsRenpyExample.json">Example</a>
+- <img src="https://github.com/blurymind/YarnClassic/raw/master/src/public/images/twine-favicon-152.png" width=24px> twine (twee/twee2) open/save <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=yarnExample.json">Example</a>
+- <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=bbcodeTags.yarn">bbcode</a> and <a href="https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=htmlTags.yarn">html/xml</a> tag styling support
+
+# Ability to save to the cloud (gist)
+- Examples are hosted on gist https://gist.github.com/blurymind/1252aaa8f74a394b3ac5695107f16e51 to make a share link you do:
+
+https://blurymind.github.io/YarnClassic/?gist=gistIdHere&fileName=yourFilename.ext
+
+with gistId=1252aaa8f74a394b3ac5695107f16e51 and fileName=yarnExample.json in that gist, you do:
+
+https://blurymind.github.io/YarnClassic/?gist=1252aaa8f74a394b3ac5695107f16e51&fileName=yarnExample.json
+
+Just replace this with your private or public gist and the file in it you want to share - to create a link
+
 #  💻 Install it on your desktop
  Please follow the steps for the PWA version of the app, as the electron one will be deprecated later this year
 
