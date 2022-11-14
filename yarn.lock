@@ -6308,10 +6308,10 @@ knockout-ace@^1.0.1:
   resolved "https://registry.npmjs.org/knockout-ace/-/knockout-ace-1.0.1.tgz"
   integrity sha1-CrSwL22ThPP9xdxJpxJK9wHmPyI=
 
-knockout@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.npmjs.org/knockout/-/knockout-3.3.0.tgz"
-  integrity sha1-UFAqTi8f4r36DlKEPN/LvUO8N0w=
+knockout@3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/knockout/-/knockout-3.5.0.tgz#6d3e19bf53b1dc4d8de81c97a5ba9672443dc292"
+  integrity sha512-vBUF/IsBDzaejHkNpiquKdc5uPrImXuQ4Mb9lEfNNJ5cyHGI8ThDupR+h3eMFZhfmPE/brfwcIAn/fm0yOvJUg==
 
 last-call-webpack-plugin@^3.0.0:
   version "3.0.0"
