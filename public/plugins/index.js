@@ -216,6 +216,8 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+  // Todo these are not being cached by the PWA - needs fixing
+  // Todo these should also be optional when building - exclude for build-tiny
   // plugin initiation
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin({
