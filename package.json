@@ -19,7 +19,7 @@
     "copy-web-app": "cd dist && copyfiles *.html ../electron/app && copyfiles **/* ../electron/app && copyfiles **/*/** ../electron/app && copyfiles **/*/**/* ../electron/app",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "dev": "npm run copy-version && cross-env NODE_ENV=dev webpack-dev-server --open --config webpack.config.js",
+    "dev": "export NODE_OPTIONS=--openssl-legacy-provider && npm run copy-version && cross-env NODE_ENV=dev webpack-dev-server --open --config webpack.config.js",
     "format": "npm run lint -- --fix",
     "lint": "eslint src/js",
     "start": "npm run dev",
