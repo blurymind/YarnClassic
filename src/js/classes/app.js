@@ -794,6 +794,7 @@ export var App = function(name, version) {
     self.editor.setOptions({
       scrollPastEnd: 0.5,
     });
+    self.editor.focus();
     self.editor.navigateFileEnd();
 
     /// set color picker
