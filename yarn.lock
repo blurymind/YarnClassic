@@ -6303,11 +6303,6 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-knockout-ace@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/knockout-ace/-/knockout-ace-1.0.1.tgz"
-  integrity sha1-CrSwL22ThPP9xdxJpxJK9wHmPyI=
-
 knockout@3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/knockout/-/knockout-3.3.0.tgz"
