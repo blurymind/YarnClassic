@@ -23,7 +23,7 @@
     "format": "npm run lint -- --fix",
     "lint": "eslint src/js",
     "start": "npm run dev",
-    "start-pwa": "npm run build && cd dist && copyfiles manifest.json ../src  && copyfiles sw.js ../src && npm run dev",
+    "start-pwa": "export NODE_OPTIONS=--openssl-legacy-provider && npm run build && cd dist && copyfiles manifest.json ../src  && copyfiles sw.js ../src && npm run dev",
     "update-version": "node ./scripts/copy-version.js --update"
   },
   "dependencies": {
