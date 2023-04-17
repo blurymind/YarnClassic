@@ -258,7 +258,7 @@ export const UI = function(app) {
       matchTags:[],
       foundNodes: false,
     };
-    app.nodes().forEach(node=>{
+    [...app.nodes()].reverse().forEach(node=>{
       const {
         matchTitle,
         matchBody,
@@ -313,7 +313,7 @@ export const UI = function(app) {
     rootMenu.innerHTML = '';
 
     const listAllNodes = () => {
-      app.nodes().forEach(node => {
+      [...app.nodes()].reverse().forEach(node => {
         this.createSearchMenuLine(node, action, rootMenu,'');
       });
     };
