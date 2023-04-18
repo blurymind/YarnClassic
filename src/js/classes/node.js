@@ -76,8 +76,8 @@ export let Node = function(options = {}) {
       self.y(self.createY);
     } else {
       let parent = $(self.element).parent();
-      self.x(-parent.offset().left + $(window).width() / 2 - 100);
-      self.y(-parent.offset().top + $(window).height() / 2 - 100);
+      self.x((-parent.offset().left + $(window).width() / 2 - 100) / app.workspace.scale);
+      self.y((-parent.offset().top + $(window).height() / 2 - 100) / app.workspace.scale);
     }
 
     app.workspace.bringToFront(self.element);
