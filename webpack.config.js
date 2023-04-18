@@ -35,7 +35,7 @@ const config = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              hmr: true,
+              hmr: IS_DEV,
             },
           },
           'css-loader',
