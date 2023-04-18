@@ -697,6 +697,7 @@ export const Workspace = function(app) {
     for (let node of list) {
       if (!self.selectedNodes.includes(node)) {
         if (app.canEditNodeMeta(node.title())) {
+          if(app.input.isScreenTouched && app.input.isDragging) return; // dont select when touch-dragging
           self.selectedNodes.push(node);
           node.setSelected(true);
         }

@@ -45,7 +45,7 @@ export const Input = function(app) {
   // Keeps track of mouse/touch events
   this.trackMouseEvents = function() {
     $(document).on('pointerdown', e => {
-      self.isDragging = e.target.className === 'nodes';
+      self.isDragging = e.target.className === 'nodes' || (e.target.className === 'body' && (self.isMiddleButtonDown || app.workspace.selectedNodes.length === 0));
       self.mouse.x = e.pageX;
       self.mouse.y = e.pageY;
 
