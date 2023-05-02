@@ -358,7 +358,8 @@ input[type='checkbox'] {
 .inactive:hover {
   border: 1px solid #fff;
   cursor: default;
-  pointer-events: none;
+  /* disallow opening inactive nodes */
+  /*pointer-events: none;*/
 }
 .inactive .edit,
 .inactive .delete,
