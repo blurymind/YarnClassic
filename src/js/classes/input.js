@@ -56,7 +56,7 @@ export const Input = function(app) {
         if (self.isDragging) {
           switch (e.button) {
             case MouseButton.Left:
-              app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
+              if (e.target.className === 'nodes') app.workspace.onMarqueeStart({ x: e.pageX, y: e.pageY });
               break;
 
             case MouseButton.Middle:
