@@ -712,7 +712,7 @@ export const Workspace = function(app) {
     const list = Array.isArray(nodes) ? nodes : [nodes];
     for (let node of list) {
       const index = self.selectedNodes.indexOf(node);
-      if (index >= 0) {
+      if (node.active() && index >= 0) {
         self.selectedNodes.splice(index, 1);
         node.setSelected(false);
       }
