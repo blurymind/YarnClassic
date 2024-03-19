@@ -1,6 +1,6 @@
 import { yarnRender } from './bondage/renderer';
 import { inkRender } from './inkjs/ink-renderer';
-const { JSONEditor } = require('./jsoneditor/jsoneditor.min');
+const { JSONEditor } = require('./jsoneditor/jsoneditor');
 
 export var Runner = function({
   app,
@@ -30,32 +30,9 @@ export var Runner = function({
       onOpen: () => {
         // create the editor
         require('./jsoneditor/size-overrides.css');
-        editor = new JSONEditor(document.getElementById('jsoneditor'), {
-          // theme: 'bootstrap2',
-          schema: {
-            type: 'array',
-            format: 'table',
-            title: 'Playtest values',
-            uniqueItems: true,
-            items: {
-              type: 'object',
-              title: 'Variable',
-              format: 'grid',
-              properties: {
-                key: {
-                  type: 'string',
-                  default: 'myVar',
-                },
-                value: {
-                  type: 'string',
-                  default: 'true',
-                },
-              },
-            },
-          },
-        });
+        editor = new JSONEditor({id: 'jsoneditor'});
         const localVariables = getPluginStore(self.name);
-
+        console.log({editor})
         // set json
         editor.setValue(
           typeof localVariables.variables !== 'object'

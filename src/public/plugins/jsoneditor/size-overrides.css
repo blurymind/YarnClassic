@@ -1,9 +1,3 @@
-div.jsoneditor-tree {
-    min-height: 50vh;
-    max-height: 70vh;
-    overflow: auto;
-}
-
 @media only screen and (max-width: 600px) {
     .swal2-popup{
         padding: 2px !important;
@@ -25,11 +19,67 @@ div.jsoneditor-tree {
     /*    max-width: 100px;*/
     /*}*/
 }
-.form-control > input {
-    max-width: 100px;
+
+.table {
+    width: 100%;
 }
-.je-table{
+.table-editable {
+    width: 100%;
+    position: relative;
+}
+
+.table-header {
+    position: sticky;
+    top: 0;
+    background-color: #007;
+    color: aqua;
+}
+
+.table-footer {
+    position: sticky;
+    bottom: 0;
+    background-color: #007;
+    color: aqua;
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.table-editable .glyphicon {
+    font-size: 20px;
+}
+
+.table-remove {
+    color: #700;
+    cursor: pointer;
+    text-align: center;
+}
+
+.cell {
+    width: 180px;
+    max-width: 180px;
+    text-align: left;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+.table-remove:hover {
+    color: #f00;
+}
+
+.table-up:hover,
+.table-down:hover {
+    color: #00f;
+}
+
+.table-add {
+    width: 120px;
+    color: #070;
+    cursor: pointer;
+    text-align: center;
+}
+
+.table-add:hover {
+    color: #0b0;
+}
+
+.hide {
+    display: none;
 }
