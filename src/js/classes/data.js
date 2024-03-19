@@ -179,7 +179,7 @@ export const data = {
     data.isDocumentDirty(true);
     data.lastEditedUnix(new Date());
     app.refreshWindowTitle();
-    console.log('Update storage', data.appInstanceStates(), writeCurrent);
+    // console.log('Update storage', data.appInstanceStates(), writeCurrent);
     const updatedStates = [...data.appInstanceStates()];
     if (writeCurrent)
       updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
