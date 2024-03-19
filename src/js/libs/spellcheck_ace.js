@@ -37,6 +37,16 @@ function load_dictionary(dicLanguage) {
     dicData = data;
   })
     .fail(function() {
+      const cachedAffData = sessionStorage.getItem('affData');
+      const cachedDicData = sessionStorage.getItem('dicData')
+      if (cachedAffData && cachedDicData) {
+        console.info(
+          `${dicLanguage} found in sessionStorage. Loading dictionary from cache...`
+        );
+        dictionary = new nspell(cachedAffData, cachedDicData);
+        contents_modified = true;
+        return;
+      }
       console.error(
         `${dicLanguage} not found locally. Loading dictionary from server instead...`
       );
@@ -49,7 +59,8 @@ function load_dictionary(dicLanguage) {
         $.get(affPath, function(data) {
           affData = data;
         }).done(function() {
-          console.log('Dictionary loaded from server');
+          sessionStorage.setItem('affData', affData);
+          sessionStorage.setItem('dicData', dicData)
           dictionary = new nspell(affData, dicData);
           contents_modified = true;
         });
