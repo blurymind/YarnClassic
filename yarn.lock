@@ -5534,10 +5534,10 @@ ini@^1.3.4, ini@^1.3.5, ini@~1.3.0:
   resolved "https://registry.npmjs.org/ini/-/ini-1.3.5.tgz"
   integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
 
-inkjs@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/inkjs/-/inkjs-2.0.0.tgz"
-  integrity sha512-rYKIPfY0GygxabFl04fFqQa8iisN1KY+4j+SOxLYVbirIzLL/t1BmO6Z7DuW8/PnRYRzsWu/wnjL+ZpJ0BxyAg==
+inkjs@^2.2.0:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/inkjs/-/inkjs-2.2.2.tgz#a50df426badc564b526d9f91def9b0ec16938e43"
+  integrity sha512-SSI054diwSr7rwe6cIMAR8eJu3WVhrwhLEYVsgR0OjqE2Jt22mG1zej236fXSM7ofzQWsQfFfvfeDa881RjKpQ==
 
 inquirer@^3.0.6:
   version "3.3.0"

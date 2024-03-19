@@ -1,5 +1,6 @@
 /* eslint-disable jquery/no-ajax */
 const path = require('path');
+const inkjs = require('inkjs');
 const saveAs = require('file-saver');
 import { Node } from './node';
 import { Utils, FILETYPE } from './utils';
@@ -790,6 +791,7 @@ export const data = {
                 icon: response.warnings.length > 0 ? 'warning' : 'success',
                 text: response.warnings.join('\n'),
               });
+              console.log({responseStory: response.story})
               resolve(JSON.stringify(response.story, null, '\t'));
             }
           })
@@ -918,8 +920,6 @@ export const data = {
       }
       output += '</nodes>\n';
     }
-
-    console.log("Exporter Output", output);
 
     data.isDocumentDirty(false);
     app.refreshWindowTitle();
@@ -1282,25 +1282,35 @@ export const data = {
     }
   },
   InkCompiler: function() {
+    this.errors = [];
+    this.warnings = [];
+    this.errorHandler = (message, type) =>{
+      var issueRegex = /^(ERROR|RUNTIME ERROR): ('([^']+)' )?line (\d+): (.*)/;
+      let issueMatches = message.match(issueRegex);
+
+      var warningRegex = /^(WARNING|RUNTIME WARNING|TODO): ('([^']+)' )?line (\d+): (.*)/;
+      let warningMatches = message.match(warningRegex);
+
+      if(issueMatches) this.errors.push(message);
+      else if(warningMatches) this.warnings.push(message);
+    }
+    this.compilerOptions = new inkjs.CompilerOptions(null,[],false, this.errorHandler);
     this.ready = false;
     this.worker = null;
-    this.init = (onComplete = () => {}) => {
+    this.onComplete = () => {}
+    this.init = (onComplete = () => {}) => {//todo remove all instances of this promise
+      this.onComplete = onComplete;
       return new Promise((resolve, reject) => {
-        this.worker = new Worker('public/inkwasm/ink.worker.js');
-        this.ready = false;
-        this.worker.onmessage = e => {
-          if (e.data === 'ready') {
-            this.ready = true;
-            resolve();
-          } else if (this.ready) {
-            onComplete(e.data);
-            resolve(e.data);
-          }
-        };
+        resolve();
       });
     };
+
     this.submit = text => {
-      this.worker.postMessage(text);
+      this.errors = [];
+      this.warnings = [];
+      const Output = new inkjs.Compiler(text, this.compilerOptions).Compile().ToJson();
+      const newOutput = {story: JSON.parse(Output), warnings: this.warnings, errors: this.errors}
+      this.onComplete(newOutput)
     };
     this.getInkErrorGotoNode = async (inkTextFileData, inkError) => {
       const inkErrorFind = inkError
