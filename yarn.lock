@@ -9434,11 +9434,6 @@ split-string@^3.0.1, split-string@^3.0.2:
   dependencies:
     extend-shallow "^3.0.0"
 
-spoken@^1.1.17:
-  version "1.1.17"
-  resolved "https://registry.npmjs.org/spoken/-/spoken-1.1.17.tgz"
-  integrity sha512-cERSTzRpvxCLCAAXEaO0Nt8ksXiDNxqNFwW2WnxFkkXaXLIdFc/GXIzG3OWzAZ4Nre+1UsPLgMrFXWZg3t+G0w==
-
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
