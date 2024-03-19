@@ -1,7 +1,7 @@
 import { Runner } from './runner';
-import { Transcribe } from './transcribe';
+// import { Transcribe } from './transcribe'; 
 
-const PLUGINS = [Runner, Transcribe];
+const PLUGINS = [Runner];
 
 export var Plugins = function(app) {
   const self = this;
