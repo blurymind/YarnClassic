@@ -192,7 +192,10 @@ export const data = {
 
     const storage = app.settings.storage;
     // Just in case clear old state's cache
-    if (storage.getItem('appState')) storage.clear(); //TODO remove later
+    if (storage.getItem('appState')) {
+      console.log("--- storage.clear() ---")
+      storage.clear(); //TODO remove later
+    }
     const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
     const currentDocState = appStates[app.settings.selectedFileTab()];
     data.appInstanceStates(appStates);
@@ -225,15 +228,20 @@ export const data = {
       data.lastEditedUnix(lastEditedUnix);
       data.lastSavedUnix(lastSavedUnix);
       // app.nodes([]);
+      console.log("--- app.getNodesFromObjects ---", {prev: app.nodes(), next: nodes})
       app.nodes(data.getNodesFromObjects(nodes));
       app.tags(tags);
+      console.log("--- app.updateNodeLinks ---")
       app.updateNodeLinks();
+      console.log("--- app.workspace.setTranslation ---")
       app.workspace.setTranslation(transform.x, transform.y);
+      console.log("--- app.workspace.setZoom ---")
       app.workspace.setZoom(scale * 4);
       if (editingTitle) {
         app.editNode(app.nodes().find(node => node.title() === editingTitle));
         if (editorSelection) app.editor.selection.setRange(editorSelection);
       }
+      console.log("--- app.plugins.pluginStorage ---")
       app.plugins.pluginStorage = pluginStorage;
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
@@ -633,9 +641,9 @@ export const data = {
   getNodesFromObjects: function(objects) {
     const appNodes = [];
     if (!objects) return [];
-    objects.forEach(object => {
-      appNodes.push(data.getNodeFromObject(object));
-    });
+    for (let i = 0; i < objects.length; i++) {
+      appNodes.push(data.getNodeFromObject(objects[i]))
+    }
     return appNodes;
   },
 
