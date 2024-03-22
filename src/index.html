@@ -221,12 +221,12 @@
     <!-- foreach loop  of the nodes -->
     <div class="nodes">
       <div class="nodes-holder" data-bind="foreach: { data: app.nodes, as: 'node' }">
-        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}, attr: { title: '[ ' + node.title() + ' ]\n' + node.body() }">
-          <div class="title-container" data-bind="css: { active: node.active() && node.active().title === true}">
+        <div class="node" data-bind="nodeBind: true, css: { inactive: !node.active()}">
+          <div class="title-container" data-bind="css: { active: node.active() && node.active().title === true} , attr: { title: node.title }">
             <div class="title" data-bind="text: node.title, css: 'title ' + node.titleStyles[node.colorID()]"></div>
           </div>
-          <div class="body" data-bind="html: node.clippedBody, css: { active: node.active() && node.active().body === true}"></div>
-          <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }, css: { active: node.active() && node.active().tags === true}">
+          <div class="body" data-bind="html: node.clippedBody, attr: { title: '[ ' + node.title() + ' ]\n' + node.body() }, css: { active: node.active() && node.active().body === true}"></div>
+          <div class="tags" data-bind="visible:node.clippedTags, foreach: { data: node.clippedTags, as: 'tag' }, css: { active: node.active() && node.active().tags === true}, attr: { title: node.tags() }">
             <span data-bind="text: tag.text, css: tag.style"></span>
           </div>
           <div class="colorDown" data-bind="click: node.cycleColorDown, visible: app.canEditNodeMeta(node.title())"><svg class="icon icon-arrow-left icon-fw"><use xlink:href="public/icons.svg#icon-arrow-left"></use></svg></div>
