@@ -224,8 +224,8 @@ export const data = {
       data.lastStorageHost(lastStorageHost);
       data.lastEditedUnix(lastEditedUnix);
       data.lastSavedUnix(lastSavedUnix);
-      app.nodes([]);
-      data.getNodesFromObjects(nodes).forEach(node => app.nodes.push(node));
+      // app.nodes([]);
+      app.nodes(data.getNodesFromObjects(nodes));
       app.tags(tags);
       app.updateNodeLinks();
       app.workspace.setTranslation(transform.x, transform.y);
