@@ -1338,6 +1338,7 @@ export var App = function(name, version) {
     $('#node-editor-background').transition({ opacity: 0 }, 250);
     $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
       self.editing(null);
+      self.editor = null;
     });
 
     self.isEditorSplit = false;
@@ -1436,7 +1437,6 @@ export var App = function(name, version) {
 
   this.updateTagsRepository = Utils.debounce(function() {
     if (!app.mustUpdateTags) return;
-    // console.log("--- updateTagsRepository")
     app.mustUpdateTags = false;
 
     const findFirstFreeId = () => {
