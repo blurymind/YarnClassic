@@ -1434,9 +1434,9 @@ export var App = function(name, version) {
     }
   };
 
-  this.updateTagsRepository = function() {
+  this.updateTagsRepository = Utils.debounce(function() {
     if (!app.mustUpdateTags) return;
-
+    // console.log("--- updateTagsRepository")
     app.mustUpdateTags = false;
 
     const findFirstFreeId = () => {
@@ -1470,7 +1470,7 @@ export var App = function(name, version) {
     while (i--) {
       if (self.tags()[i].count === 0) self.tags().splice(i, 1);
     }
-  };
+  }, 500);
 
   this.makeNewNodesFromLinks = function() {
     if (!self.settings.createNodesEnabled())
