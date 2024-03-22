@@ -240,7 +240,7 @@ export const data = {
           app.editNode(newNodes.find(node => node.title() === editingTitle));
           if (editorSelection) app.editor.selection.setRange(editorSelection);
         }
-        console.log("--- app.nodes(newNodes) ---")
+        console.log("--- app.nodes(newNodes) ---", newNodes.length)
         app.nodes(newNodes);
         console.log("--- app.updateNodeLinks ---")
         app.updateNodeLinks();
