@@ -33,6 +33,7 @@ export const Settings = function(app) {
     app.setDocumentType(self.documentType());
     app.toggleInvertColors();
     app.setMarkupLanguage(self.markupLanguage());
+    console.log("redraw throttle:", self.redrawThrottle())
     app.workspace.setThrottle(self.redrawThrottle());
     app.setGistCredentials({
       token: self.gistToken(),
@@ -75,7 +76,7 @@ export const Settings = function(app) {
 
   // Redraw throttle
   this.redrawThrottle = ko
-    .observable(parseInt(storage.getItem('redrawThrottle') || '50'))
+    .observable(parseInt(storage.getItem('redrawThrottle') || '130'))
     .extend({ persist: 'redrawThrottle' });
 
   this.gistToken = ko

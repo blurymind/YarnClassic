@@ -35,12 +35,20 @@ export let Node = function(options = {}) {
   this.createY = options.y || null;
   this.undoManager = null;
 
+  // const elementIsVisibleInViewport = function ({ top, left, bottom, right }, partiallyVisible = false) {
+  //   const { innerHeight, innerWidth } = window;
+  //   return partiallyVisible
+  //     ? ((top > 0 && top < innerHeight) ||
+  //         (bottom > 0 && bottom < innerHeight)) &&
+  //         ((left > 0 && left < innerWidth) || (right > 0 && right < innerWidth))
+  //     : top >= 0 && left >= 0 && bottom <= innerHeight && right <= innerWidth;
+  // };
+
   // clippedTags
   //
   // Returns an array of tags objects with id, style and count
   this.clippedTags = ko.computed(function() {
     app.updateTagsRepository();
-
     return Utils.uniqueSplit(self.tags(), ' ')
       .map(tag => app.tags().find(e => e.text === tag))
       .filter(item => item);
