@@ -1337,8 +1337,10 @@ export var App = function(name, version) {
     self.editing().undoManager = self.editor.session.getUndoManager();
     $('#node-editor-background').transition({ opacity: 0 }, 250);
     $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
+      self.editor.destroy()
       self.editing(null);
       self.editor = null;
+      this.emPicker = null;
     });
 
     self.isEditorSplit = false;
