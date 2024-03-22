@@ -219,6 +219,7 @@ export const data = {
         lastEditedUnix,
         lastSavedUnix,
       } = currentDocState;
+      app.tags(tags);
       data.editingPath(editingPath);
       data.editingName(editingName);
       data.editingType(editingType);
@@ -227,26 +228,27 @@ export const data = {
       data.lastStorageHost(lastStorageHost);
       data.lastEditedUnix(lastEditedUnix);
       data.lastSavedUnix(lastSavedUnix);
-      // app.nodes([]);
-      console.log("--- app.getNodesFromObjects ---", {prev: app.nodes(), next: nodes})
-      app.nodes(data.getNodesFromObjects(nodes));
-      app.tags(tags);
-      console.log("--- app.updateNodeLinks ---")
-      app.updateNodeLinks();
-      console.log("--- app.workspace.setTranslation ---")
-      app.workspace.setTranslation(transform.x, transform.y);
-      console.log("--- app.workspace.setZoom ---")
-      app.workspace.setZoom(scale * 4);
-      if (editingTitle) {
-        app.editNode(app.nodes().find(node => node.title() === editingTitle));
-        if (editorSelection) app.editor.selection.setRange(editorSelection);
-      }
-      console.log("--- app.plugins.pluginStorage ---")
-      app.plugins.pluginStorage = pluginStorage;
       data.documentHeader(documentHeader);
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
       app.ui.dispatchEvent('yarnLoadedStateFromLocalStorage');
+      console.log("--- app.plugins.pluginStorage ---")
+      app.plugins.pluginStorage = pluginStorage;
+      
+      data.getNodesFromObjectsAsync(nodes).then(newNodes=> {
+        if (editingTitle) {
+          app.editNode(newNodes.find(node => node.title() === editingTitle));
+          if (editorSelection) app.editor.selection.setRange(editorSelection);
+        }
+        console.log("--- app.nodes(newNodes) ---")
+        app.nodes(newNodes);
+        console.log("--- app.updateNodeLinks ---")
+        app.updateNodeLinks();
+        console.log("--- app.workspace.setTranslation ---")
+        app.workspace.setTranslation(transform.x, transform.y);
+        console.log("--- app.workspace.setZoom ---")
+        app.workspace.setZoom(scale * 4);
+      });
     }
   },
   readFile: function(file, filename, clearNodes) {
@@ -645,6 +647,12 @@ export const data = {
       appNodes.push(data.getNodeFromObject(objects[i]))
     }
     return appNodes;
+  },
+  getNodesFromObjectsAsync: async function(objects) {
+    if (!objects) return [];
+    const promises = objects.map(object => new Promise((resolve)=>resolve(data.getNodeFromObject(object))))
+    const result = await Promise.all(promises);
+    return result;
   },
 
   getNodesAsObjects: function() {
