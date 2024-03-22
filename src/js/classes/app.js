@@ -1360,7 +1360,7 @@ export var App = function(name, version) {
     });
   };
 
-  this.updateSearch = function() {
+  this.updateSearch = Utils.debounce(function() {
     var on = 1;
     var off = 0.25;
 
@@ -1390,7 +1390,7 @@ export var App = function(name, version) {
         element.transition({ opacity: on }, 500);
       }
     }
-  };
+  }, 600);
 
   this.trimBodyLinks = function(body) {
     var re = /\[\[(.+?)\|\s*(.+?)\s*\]\]/g;
