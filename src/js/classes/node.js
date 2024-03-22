@@ -1,7 +1,7 @@
 import { Utils } from './utils';
 
 let globalNodeIndex = 0;
-const ClipNodeTextLength = 1024;
+const ClipNodeTextLength = 225;
 
 export let Node = function(options = {}) {
   const self = this;
