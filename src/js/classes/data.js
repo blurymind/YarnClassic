@@ -172,7 +172,7 @@ export const data = {
       ` Copy of ${data.editingName()}`
     );
   },
-  saveAppStateToLocalStorage: function(writeCurrent = true) {
+  saveAppStateToLocalStorage: Utils.debounce(function(writeCurrent = true) {
     if (!data.restoreFromLocalStorage()) return;
 
     const storage = app.settings.storage;
@@ -186,7 +186,7 @@ export const data = {
     data.appInstanceStates(updatedStates);
     storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
-  },
+  }, 700),
   loadAppStateFromLocalStorage: function() {
     if (!data.restoreFromLocalStorage()) return; // to ignore sometimes?
 
