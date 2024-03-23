@@ -1078,7 +1078,8 @@ export const data = {
   ) {
     const guessedFileName =
       data.editingName().replace(/\.[^/.]+$/, '') +
-      '(new).' +
+      // '(new).' +
+      '.' +
       data.editingType();
     Swal.fire({
       title,
@@ -1098,6 +1099,12 @@ export const data = {
       onOpen: () => {
         if (data.editingName() !== 'NewFile') {
           document.getElementById('swal-input1').value = guessedFileName;
+          document
+            .getElementById('swal-input1')
+            .addEventListener('focus', ev => {
+              ev.target.value = '';
+              ev.target.showPicker();
+            });
         }
       },
       showCancelButton: true,
