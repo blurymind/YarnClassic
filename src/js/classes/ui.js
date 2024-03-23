@@ -251,33 +251,39 @@ export const UI = function(app) {
     }
   };
 
-  this.findMatchingNodes = function(searchText){
+  this.findMatchingNodes = function(searchText) {
     const found = {
-      matchTitle:[],
-      matchBody:[],
-      matchTags:[],
+      matchTitle: [],
+      matchBody: [],
+      matchTags: [],
       foundNodes: false,
     };
-    [...app.nodes()].reverse().forEach(node=>{
-      const {
-        matchTitle,
-        matchBody,
-        matchTags,
-      } = app.ui.nodeSearchMatches(node, searchText, true);
+    [...app.nodes()].reverse().forEach(node => {
+      const { matchTitle, matchBody, matchTags } = app.ui.nodeSearchMatches(
+        node,
+        searchText,
+        true
+      );
       if (matchTitle) found.matchTitle.push(node);
       if (matchBody) found.matchBody.push(node);
       if (matchTags) found.matchTags.push(node);
     });
-    found.foundNodes = found.matchTitle.length > 0 || found.matchBody.length > 0 || found.matchTags.length > 0;
+    found.foundNodes =
+      found.matchTitle.length > 0 ||
+      found.matchBody.length > 0 ||
+      found.matchTags.length > 0;
     return found;
   };
 
-  this.createSearchMenuLine = function(node, action, rootMenu, match = 'title') {
+  this.createSearchMenuLine = function(
+    node,
+    action,
+    rootMenu,
+    match = 'title'
+  ) {
     const p = document.createElement('div');
     p.innerHTML = `${node.title()} ${match ? `(${match})` : ''}`;
-    $(p).addClass(
-      'item ' + node.titleStyles[node.colorID()]
-    );
+    $(p).addClass('item ' + node.titleStyles[node.colorID()]);
     if (action == 'link') {
       if (node.title() !== app.editing().title()) {
         if (
@@ -314,7 +320,7 @@ export const UI = function(app) {
 
     const listAllNodes = () => {
       [...app.nodes()].reverse().forEach(node => {
-        this.createSearchMenuLine(node, action, rootMenu,'');
+        this.createSearchMenuLine(node, action, rootMenu, '');
       });
     };
 
@@ -328,13 +334,13 @@ export const UI = function(app) {
       listAllNodes();
     } else {
       found.matchTitle.forEach(node => {
-        this.createSearchMenuLine(node, action, rootMenu,'title');
+        this.createSearchMenuLine(node, action, rootMenu, 'title');
       });
       found.matchTags.forEach(node => {
-        this.createSearchMenuLine(node, action, rootMenu,'tags');
+        this.createSearchMenuLine(node, action, rootMenu, 'tags');
       });
       found.matchBody.forEach(node => {
-        this.createSearchMenuLine(node, action, rootMenu,'body');
+        this.createSearchMenuLine(node, action, rootMenu, 'body');
       });
     }
   };

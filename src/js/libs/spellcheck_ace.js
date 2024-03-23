@@ -38,7 +38,7 @@ function load_dictionary(dicLanguage) {
   })
     .fail(function() {
       const cachedAffData = sessionStorage.getItem('affData');
-      const cachedDicData = sessionStorage.getItem('dicData')
+      const cachedDicData = sessionStorage.getItem('dicData');
       if (cachedAffData && cachedDicData) {
         console.info(
           `${dicLanguage} found in sessionStorage. Loading dictionary from cache...`
@@ -60,7 +60,7 @@ function load_dictionary(dicLanguage) {
           affData = data;
         }).done(function() {
           sessionStorage.setItem('affData', affData);
-          sessionStorage.setItem('dicData', dicData)
+          sessionStorage.setItem('dicData', dicData);
           dictionary = new nspell(affData, dicData);
           contents_modified = true;
         });

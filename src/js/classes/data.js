@@ -193,7 +193,7 @@ export const data = {
     const storage = app.settings.storage;
     // Just in case clear old state's cache
     if (storage.getItem('appState')) {
-      console.log("--- storage.clear() ---")
+      console.log('--- storage.clear() ---');
       storage.clear(); //TODO remove later
     }
     const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
@@ -232,21 +232,21 @@ export const data = {
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
       app.ui.dispatchEvent('yarnLoadedStateFromLocalStorage');
-      console.log("--- app.plugins.pluginStorage ---")
+      console.log('--- app.plugins.pluginStorage ---');
       app.plugins.pluginStorage = pluginStorage;
-      
-      data.getNodesFromObjectsAsync(nodes).then(newNodes=> {
+
+      data.getNodesFromObjectsAsync(nodes).then(newNodes => {
         if (editingTitle) {
           app.editNode(newNodes.find(node => node.title() === editingTitle));
           if (editorSelection) app.editor.selection.setRange(editorSelection);
         }
-        console.log("--- app.nodes(newNodes) ---", newNodes.length)
+        console.log('--- app.nodes(newNodes) ---', newNodes.length);
         app.nodes(newNodes);
-        console.log("--- app.updateNodeLinks ---")
+        console.log('--- app.updateNodeLinks ---');
         app.updateNodeLinks();
-        console.log("--- app.workspace.setTranslation ---")
+        console.log('--- app.workspace.setTranslation ---');
         app.workspace.setTranslation(transform.x, transform.y);
-        console.log("--- app.workspace.setZoom ---")
+        console.log('--- app.workspace.setZoom ---');
         app.workspace.setZoom(scale * 4);
       });
     }
@@ -644,13 +644,15 @@ export const data = {
     const appNodes = [];
     if (!objects) return [];
     for (let i = 0; i < objects.length; i++) {
-      appNodes.push(data.getNodeFromObject(objects[i]))
+      appNodes.push(data.getNodeFromObject(objects[i]));
     }
     return appNodes;
   },
   getNodesFromObjectsAsync: async function(objects) {
     if (!objects) return [];
-    const promises = objects.map(object => new Promise((resolve)=>resolve(data.getNodeFromObject(object))))
+    const promises = objects.map(
+      object => new Promise(resolve => resolve(data.getNodeFromObject(object)))
+    );
     const result = await Promise.all(promises);
     return result;
   },
@@ -807,7 +809,7 @@ export const data = {
                 icon: response.warnings.length > 0 ? 'warning' : 'success',
                 text: response.warnings.join('\n'),
               });
-              console.log({responseStory: response.story})
+              console.log({ responseStory: response.story });
               resolve(JSON.stringify(response.story, null, '\t'));
             }
           })
@@ -835,8 +837,11 @@ export const data = {
       }
     } else if (type === FILETYPE.RENPY) {
       for (let i = 0; i < content.length; i++) {
-        const nodeType = content[i].tags.includes('screen') ? 'screen' : 'label';
-        output += `\n${nodeType} ` + content[i].title.replace(/[ ]/g, '_') + ':\n';
+        const nodeType = content[i].tags.includes('screen')
+          ? 'screen'
+          : 'label';
+        output +=
+          `\n${nodeType} ` + content[i].title.replace(/[ ]/g, '_') + ':\n';
         const body = content[i].body;
         if (!(body.length > 0 && body[body.length - 1] === '\n')) {
           output += '\n';
@@ -848,13 +853,16 @@ export const data = {
         const isRenpyFormattedBody = content[i].tags.includes('renpy');
         body.split('\n').forEach(line => {
           const trimmedLine = line.trim();
-          const tabs = isIfElse ? '\t\t':'\t';
-          if(isRenpyFormattedBody) { // if a renpy tag is present, don't try to convert the content, instead use the original
+          const tabs = isIfElse ? '\t\t' : '\t';
+          if (isRenpyFormattedBody) {
+            // if a renpy tag is present, don't try to convert the content, instead use the original
             parsedBodyContent += `${tabs}${line}\n`;
-          } else if(trimmedLine.startsWith('[[')) {
-            const option = trimmedLine.replace(/[\[\[]|[\]\]]]/g,'').split('|');
-            if(option.length > 1){
-              if(!isMenu){
+          } else if (trimmedLine.startsWith('[[')) {
+            const option = trimmedLine
+              .replace(/[\[\[]|[\]\]]]/g, '')
+              .split('|');
+            if (option.length > 1) {
+              if (!isMenu) {
                 parsedBodyContent += `${tabs}menu:\n`;
                 isMenu = true;
               }
@@ -862,37 +870,64 @@ export const data = {
             } else {
               parsedBodyContent += `${tabs}jump ${option[0].trim()}\n`;
             }
-          } else if(trimmedLine.startsWith('<<if')){ // TODO make in and else if one check
-            const conditional = trimmedLine.replace(/\<\<\|$|\>\>|if/g, '').split(/==|!=|>|</g).filter(Boolean);
-            const operator = trimmedLine.substring(2, trimmedLine.length - 2).match(/(>|==|!=|<)/);
-            parsedBodyContent += conditional.length > 1 && operator ? `\tif ${conditional[0].trim()} ${operator[0]} ${conditional[1].trim()}:\n` : `\t# ${trimmedLine}\n`;
+          } else if (trimmedLine.startsWith('<<if')) {
+            // TODO make in and else if one check
+            const conditional = trimmedLine
+              .replace(/\<\<\|$|\>\>|if/g, '')
+              .split(/==|!=|>|</g)
+              .filter(Boolean);
+            const operator = trimmedLine
+              .substring(2, trimmedLine.length - 2)
+              .match(/(>|==|!=|<)/);
+            parsedBodyContent +=
+              conditional.length > 1 && operator
+                ? `\tif ${conditional[0].trim()} ${
+                    operator[0]
+                  } ${conditional[1].trim()}:\n`
+                : `\t# ${trimmedLine}\n`;
             isIfElse = true;
-          } else if(trimmedLine.startsWith('<<elseif')){
-            const conditional = trimmedLine.replace(/\<\<\|$|\>\>|elseif/g, '').split(/==|!=|>|</g).filter(Boolean);
-            const operator = trimmedLine.substring(2, trimmedLine.length - 2).match(/(>|==|!=|<)/);
-            parsedBodyContent += conditional.length > 1 && operator ? `\telif ${conditional[0].trim()} ${operator[0]} ${conditional[1].trim()}:\n` : `\t# ${trimmedLine}\n`;
+          } else if (trimmedLine.startsWith('<<elseif')) {
+            const conditional = trimmedLine
+              .replace(/\<\<\|$|\>\>|elseif/g, '')
+              .split(/==|!=|>|</g)
+              .filter(Boolean);
+            const operator = trimmedLine
+              .substring(2, trimmedLine.length - 2)
+              .match(/(>|==|!=|<)/);
+            parsedBodyContent +=
+              conditional.length > 1 && operator
+                ? `\telif ${conditional[0].trim()} ${
+                    operator[0]
+                  } ${conditional[1].trim()}:\n`
+                : `\t# ${trimmedLine}\n`;
             isIfElse = true;
-          } else if(trimmedLine.startsWith('<<else')){
-            parsedBodyContent +=  '\telse:\n';
+          } else if (trimmedLine.startsWith('<<else')) {
+            parsedBodyContent += '\telse:\n';
             isIfElse = true;
-          }  else if(trimmedLine.startsWith('<<endif')){
-            parsedBodyContent +=  '\n';
+          } else if (trimmedLine.startsWith('<<endif')) {
+            parsedBodyContent += '\n';
             isIfElse = false;
-          } else if(trimmedLine.startsWith('<<set')){
+          } else if (trimmedLine.startsWith('<<set')) {
             const set = trimmedLine.replace(/[\<\>\$]|set /g, '').split('=');
-            console.log({set});
-            parsedBodyContent += set.length > 1 ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n` : `${tabs}#$ ${set[0].trim()} = 0:\n`;
-          } else if(trimmedLine.startsWith('<<')){
-            parsedBodyContent += `${tabs}${trimmedLine.replace(/[\<\>]/g, '')}\n`;
-          } else if(trimmedLine.startsWith('//')){
+            console.log({ set });
+            parsedBodyContent +=
+              set.length > 1
+                ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n`
+                : `${tabs}#$ ${set[0].trim()} = 0:\n`;
+          } else if (trimmedLine.startsWith('<<')) {
+            parsedBodyContent += `${tabs}${trimmedLine.replace(
+              /[\<\>]/g,
+              ''
+            )}\n`;
+          } else if (trimmedLine.startsWith('//')) {
             parsedBodyContent += `${tabs}#${trimmedLine.substring(2)}\n`;
-          } else if(trimmedLine.length > 0){
+          } else if (trimmedLine.length > 0) {
             // dialogue line in renpy may look like this:
             // e mad "I'm a little upset at you."
             // e "I'm a little upset at you."
             // or "I'm a little upset at you."
             // We infer the author is passing character and/or emotion, because they added quotes, don't add quotes automatically
-            if(trimmedLine.endsWith('"')){
+            if (trimmedLine.endsWith('"')) {
               parsedBodyContent += `${tabs}${trimmedLine}\n`;
             } else {
               parsedBodyContent += `${tabs}"${trimmedLine}"\n`;
@@ -1300,21 +1335,27 @@ export const data = {
   InkCompiler: function() {
     this.errors = [];
     this.warnings = [];
-    this.errorHandler = (message, type) =>{
+    this.errorHandler = (message, type) => {
       var issueRegex = /^(ERROR|RUNTIME ERROR): ('([^']+)' )?line (\d+): (.*)/;
       let issueMatches = message.match(issueRegex);
 
       var warningRegex = /^(WARNING|RUNTIME WARNING|TODO): ('([^']+)' )?line (\d+): (.*)/;
       let warningMatches = message.match(warningRegex);
 
-      if(issueMatches) this.errors.push(message);
-      else if(warningMatches) this.warnings.push(message);
-    }
-    this.compilerOptions = new inkjs.CompilerOptions(null,[],false, this.errorHandler);
+      if (issueMatches) this.errors.push(message);
+      else if (warningMatches) this.warnings.push(message);
+    };
+    this.compilerOptions = new inkjs.CompilerOptions(
+      null,
+      [],
+      false,
+      this.errorHandler
+    );
     this.ready = false;
     this.worker = null;
-    this.onComplete = () => {}
-    this.init = (onComplete = () => {}) => {//todo remove all instances of this promise
+    this.onComplete = () => {};
+    this.init = (onComplete = () => {}) => {
+      //todo remove all instances of this promise
       this.onComplete = onComplete;
       return new Promise((resolve, reject) => {
         resolve();
@@ -1324,9 +1365,15 @@ export const data = {
     this.submit = text => {
       this.errors = [];
       this.warnings = [];
-      const Output = new inkjs.Compiler(text, this.compilerOptions).Compile().ToJson();
-      const newOutput = {story: JSON.parse(Output), warnings: this.warnings, errors: this.errors}
-      this.onComplete(newOutput)
+      const Output = new inkjs.Compiler(text, this.compilerOptions)
+        .Compile()
+        .ToJson();
+      const newOutput = {
+        story: JSON.parse(Output),
+        warnings: this.warnings,
+        errors: this.errors,
+      };
+      this.onComplete(newOutput);
     };
     this.getInkErrorGotoNode = async (inkTextFileData, inkError) => {
       const inkErrorFind = inkError

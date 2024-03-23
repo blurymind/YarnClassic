@@ -380,11 +380,11 @@ export var App = function(name, version) {
     const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
     const gistId = urlParams.get('gist');
     const fileName = urlParams.get('fileName');
-    if(gistId && fileName){
+    if (gistId && fileName) {
       //TODO move to data class fetchFromUrl(url, cb)
       fetch('https://api.github.com/gists/' + gistId)
-        .then(data=>data.json())
-        .then(content=>{
+        .then(data => data.json())
+        .then(content => {
           const gistFileContents = content.files[fileName].content;
           data.openGist(gistFileContents, fileName);
         });
@@ -1075,11 +1075,13 @@ export var App = function(name, version) {
     if (self.isEditorInPlayMode()) self.togglePlayMode();
 
     self.makeNodeWithName(nodeTitle);
-    const nodeWithTitle = self.nodes()
-      .find(node => node
-        .title()
-        .trim()
-        .toLowerCase() === nodeTitle.trim().toLowerCase());
+    const nodeWithTitle = self.nodes().find(
+      node =>
+        node
+          .title()
+          .trim()
+          .toLowerCase() === nodeTitle.trim().toLowerCase()
+    );
 
     if (nodeWithTitle) {
       self.editNode(nodeWithTitle, true);
@@ -1301,7 +1303,10 @@ export var App = function(name, version) {
       if (['->'].includes(textBeforeCursor.trim()))
         return textBeforeCursor.trim();
     } else {
-      if (['[[', '<<'].includes(textBeforeCursor.trim()) || textBeforeCursor.includes('|'))
+      if (
+        ['[[', '<<'].includes(textBeforeCursor.trim()) ||
+        textBeforeCursor.includes('|')
+      )
         return textBeforeCursor.trim();
     }
     return self.richTextFormatter.identifyTag(textBeforeCursor);
@@ -1338,7 +1343,7 @@ export var App = function(name, version) {
     $('#node-editor-background').transition({ opacity: 0 }, 250);
     $('#node-editor').transition({ y: '-100', opacity: 0 }, 250, function(e) {
       self.editing(null);
-      self.editor.destroy()
+      self.editor.destroy();
       self.editor = null;
       this.emPicker = null;
     });

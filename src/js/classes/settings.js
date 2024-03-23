@@ -33,7 +33,7 @@ export const Settings = function(app) {
     app.setDocumentType(self.documentType());
     app.toggleInvertColors();
     app.setMarkupLanguage(self.markupLanguage());
-    console.log("redraw throttle:", self.redrawThrottle())
+    console.log('redraw throttle:', self.redrawThrottle());
     app.workspace.setThrottle(self.redrawThrottle());
     app.setGistCredentials({
       token: self.gistToken(),

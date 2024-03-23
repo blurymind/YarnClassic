@@ -697,7 +697,7 @@ export const Workspace = function(app) {
     for (let node of list) {
       if (node.active() && !self.selectedNodes.includes(node)) {
         if (app.canEditNodeMeta(node.title())) {
-          if(app.input.isScreenTouched && app.input.isDragging) return; // dont select when touch-dragging
+          if (app.input.isScreenTouched && app.input.isDragging) return; // dont select when touch-dragging
           self.selectedNodes.push(node);
           node.setSelected(true);
         }
@@ -753,10 +753,16 @@ export const Workspace = function(app) {
     var element = $(node.element);
     self.warpToXY(node.x() || node.createX, node.y() || node.createY);
     element.clearQueue();
-    element.transition({ outlineColor: 'pink', outlineWidth: 2, outlineOffset: 0 }, 500);
-    setTimeout(()=> {
-      element.transition({ outlineColor: 'transparent',outlineWidth: 1, outlineOffset: 50 }, 300);
-    }, 700)
+    element.transition(
+      { outlineColor: 'pink', outlineWidth: 2, outlineOffset: 0 },
+      500
+    );
+    setTimeout(() => {
+      element.transition(
+        { outlineColor: 'transparent', outlineWidth: 1, outlineOffset: 50 },
+        300
+      );
+    }, 700);
   };
 
   // warpToXY

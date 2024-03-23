@@ -67,7 +67,7 @@
           editor.gotoLine(0);
         }
       }
-    }
+    },
   };
 
   ko.aceEditors = {
@@ -80,6 +80,6 @@
     },
     get: function(id) {
       return instances_by_id[id];
-    }
+    },
   };
 })();

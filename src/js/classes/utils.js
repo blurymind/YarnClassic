@@ -624,13 +624,13 @@ This is the content of the stitch that should be embedded within a knot.
       },
     };
   },
-  debounce: function(fun, mil){
-    var timer; 
-    return function(){
-        clearTimeout(timer); 
-        timer = setTimeout(function(){
-            fun(); 
-        }, mil); 
+  debounce: function(fun, mil) {
+    var timer;
+    return function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        fun();
+      }, mil);
     };
-}
+  },
 };

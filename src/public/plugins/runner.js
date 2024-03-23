@@ -30,9 +30,9 @@ export var Runner = function({
       onOpen: () => {
         // create the editor
         require('./jsoneditor/size-overrides.css');
-        editor = new JSONEditor({id: 'jsoneditor'});
+        editor = new JSONEditor({ id: 'jsoneditor' });
         const localVariables = getPluginStore(self.name);
-        console.log({editor})
+        console.log({ editor });
         // set json
         editor.setValue(
           typeof localVariables.variables !== 'object'

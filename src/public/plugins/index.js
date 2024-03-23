@@ -1,5 +1,5 @@
 import { Runner } from './runner';
-// import { Transcribe } from './transcribe'; 
+// import { Transcribe } from './transcribe';
 
 const PLUGINS = [Runner];
 
