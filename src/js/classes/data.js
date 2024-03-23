@@ -1199,6 +1199,8 @@ export const data = {
 
   tryOpenGist: function(gists) {
     if (gists && gists.file && gists.file.length > 0) {
+      const previouslyOpenedGist =
+        data.lastStorageHost() === 'GIST' ? data.editingName() : '';
       gists.get(gists.file).then(gist => {
         const gistFiles = gist.body.files;
         const inputOptions = {};
@@ -1212,6 +1214,7 @@ export const data = {
           inputAttributes: {
             autocomplete: 'off',
           },
+          inputValue: previouslyOpenedGist,
           inputPlaceholder: 'Select a file from the gist',
           showCancelButton: true,
         }).then(({ value }) => {
