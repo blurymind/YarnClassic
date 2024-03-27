@@ -253,7 +253,7 @@ export var Plugins = function(app) {
     onKeyUp,
     onKeyDown,
     onLoad,
-  }
+  };
   // Todo these are not being cached by the PWA - needs fixing
   // Todo these should also be optional when building - exclude for build-tiny
   // plugin initiation
@@ -265,37 +265,41 @@ export var Plugins = function(app) {
   });
 
   // register plugins stored on a gist - todo cache all this
-  app.gists.get('2ff124dc94f936e8f7d96632f559aecb').then(gist => {
-    const gistFiles = gist.body.files;
-    console.log({ gistFiles });
-    Object.values(gistFiles).forEach(gistFile => {
-      if (gistFile.language === 'JavaScript') {
-        console.log({ gistFile });
-        try {
-          importModuleWeb(gistFile.content, gistFile.filename).then(
-            importedPlugin => {
-              const newPlugin = importedPlugin(pluginApiMethods);
-              newPlugin.name = newPlugin.name || gistFile.filename;
-              console.log({ newPlugin }, 'loaded from ', gistFile.raw_url);
-              if ('dependencies' in newPlugin) {
-                newPlugin.dependencies.forEach(dependency => {
-                  const scriptEle = document.createElement('script');
-                  scriptEle.setAttribute('src', dependency);
-                  document.body.appendChild(scriptEle);
-                  scriptEle.addEventListener('load', () => {
-                    console.log('File loaded', dependency);
-                  });
+  if (app.settings.gistPluginsFile() !== null) {
+    app.gists.get(app.settings.gistPluginsFile()).then(gist => {
+      const gistFiles = gist.body.files;
+      console.log({ gistFiles });
+      Object.values(gistFiles).forEach(gistFile => {
+        if (gistFile.language === 'JavaScript') {
+          console.log({ gistFile });
+          try {
+            importModuleWeb(gistFile.content, gistFile.filename).then(
+              importedPlugin => {
+                const newPlugin = importedPlugin(pluginApiMethods);
+                newPlugin.name = newPlugin.name || gistFile.filename;
+                console.log({ newPlugin }, 'loaded from ', gistFile.raw_url);
+                if ('dependencies' in newPlugin) {
+                  newPlugin.dependencies.forEach(dependency => {
+                    const scriptEle = document.createElement('script');
+                    scriptEle.setAttribute('src', dependency);
+                    document.body.appendChild(scriptEle);
+                    scriptEle.addEventListener('load', () => {
+                      console.log('File loaded', dependency);
+                    });
 
-                  scriptEle.addEventListener('error', ev => {
-                    console.log('Error on loading file', ev);
+                    scriptEle.addEventListener('error', ev => {
+                      console.log('Error on loading file', ev);
+                    });
                   });
-                });
+                }
+                registerPlugin(newPlugin);
               }
-              registerPlugin(newPlugin);
-            }
-          );
-        } catch (e) {console.error(gistFile.filename, "Plugin failed to load", e)}
-      }
+            );
+          } catch (e) {
+            console.error(gistFile.filename, 'Plugin failed to load', e);
+          }
+        }
+      });
     });
-  });
+  }
 };

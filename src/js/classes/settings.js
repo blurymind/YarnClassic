@@ -45,6 +45,14 @@ export const Settings = function(app) {
               .pop()
           : null,
     });
+    app.setGistPluginsFile(
+      self.gistPluginsFile() !== null
+        ? self
+            .gistPluginsFile()
+            .split('/')
+            .pop()
+        : null
+    );
   };
 
   this.validateGridSize = function() {
@@ -86,6 +94,10 @@ export const Settings = function(app) {
   this.gistFile = ko
     .observable(storage.getItem('gistFile'))
     .extend({ persist: 'gistFile' });
+
+  this.gistPluginsFile = ko
+    .observable(storage.getItem('gistPluginsFile'))
+    .extend({ persist: 'gistPluginsFile' });
 
   // Spellcheck enabled
   this.spellcheckEnabled = ko

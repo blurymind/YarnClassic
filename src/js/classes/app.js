@@ -74,6 +74,11 @@ export var App = function(name, version) {
     self.mustRefreshNodes.notifySubscribers();
   };
 
+  this.setGistPluginsFile = function(gistFile, e) {
+    const newValue = e ? e.target.value : gistFile;
+    app.settings.gistPluginsFile(newValue);
+  };
+
   this.setFiletypeVersion = function(typeVersion, e) {
     const filetypeVersion = e ? e.target.value : typeVersion;
     self.filetypeVersion = filetypeVersion;

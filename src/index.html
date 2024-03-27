@@ -582,6 +582,16 @@
                 event: { change: app.workspace.updateArrows }">
               </select>
             </div>
+
+            <div class="settings-item">
+              <label class="settings-label" for="throttle-threshold">External Plugins Gist ID</label>
+              <div class="slidecontainer settings-value">
+                <input type="input" class="settings-value" placeholder="Load plugins from a gist" data-bind="value: app.settings.gistPluginsFile, event: { change: app.setGistPluginsFile }">
+              </div>
+              <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
+              <button data-bind="click: function () { window.open('https://gist.github.com/2ff124dc94f936e8f7d96632f559aecb','_blank','resizable=yes') }">Examples</button>
+            </div> <!-- settgins-item -->
+
           </div> <!-- settgins-column -->
         </div> <!-- settgins-row -->
       </div> <!-- settgins-form -->
