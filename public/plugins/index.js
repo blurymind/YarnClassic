@@ -3,6 +3,24 @@ import { Runner } from './runner';
 
 const PLUGINS = [Runner];
 
+async function importModuleWeb(
+  script,
+  modulePath,
+  { forceUpdate } = { forceUpdate: false }
+) {
+  const { AsyncFunction, cache } = globalThis.__import__ || {
+    AsyncFunction: Object.getPrototypeOf(async function() {}).constructor,
+    cache: new Map(),
+  };
+  // Build new AsyncFunction and evaluate it
+  const fn = new AsyncFunction('module', 'importModuleWeb', script);
+  const module = { exports: {}, filename: modulePath }; // module-API
+
+  // Execute user code
+  await fn(module, importModuleWeb);
+  return module.exports;
+}
+
 export var Plugins = function(app) {
   const self = this;
   const registerPlugin = plugin => {
@@ -216,32 +234,72 @@ export var Plugins = function(app) {
       cb(e);
     });
   };
+
+  const pluginApiMethods = {
+    app,
+    createButton,
+    createToggle,
+    getPluginStore,
+    setPluginStore,
+    addSettingsItem,
+    onYarnLoadedData,
+    onYarnEditorOpen,
+    onYarnInPreviewMode,
+    onYarnSavedNode,
+    onYarnSetLanguage,
+    onYarnLoadedStateFromLocalStorage,
+    onYarnSavedStateToLocalStorage,
+    onYarnSetDocumentType,
+    onKeyUp,
+    onKeyDown,
+    onLoad,
+  };
   // Todo these are not being cached by the PWA - needs fixing
   // Todo these should also be optional when building - exclude for build-tiny
   // plugin initiation
   PLUGINS.forEach(plugin => {
-    const initializedPlugin = new plugin({
-      app,
-      createButton,
-      createToggle,
-      getPluginStore,
-      setPluginStore,
-      addSettingsItem,
-      onYarnLoadedData,
-      onYarnEditorOpen,
-      onYarnInPreviewMode,
-      onYarnSavedNode,
-      onYarnSetLanguage,
-      onYarnLoadedStateFromLocalStorage,
-      onYarnSavedStateToLocalStorage,
-      onYarnSetDocumentType,
-      onKeyUp,
-      onKeyDown,
-      onLoad,
-    });
-
+    const initializedPlugin = new plugin(pluginApiMethods);
     window.addEventListener('DOMContentLoaded', e => {
       registerPlugin(initializedPlugin);
     });
   });
+
+  // register plugins stored on a gist - todo cache all this
+  if (app.settings.gistPluginsFile() !== null) {
+    app.gists.get(app.settings.gistPluginsFile()).then(gist => {
+      const gistFiles = gist.body.files;
+      console.log({ gistFiles });
+      Object.values(gistFiles).forEach(gistFile => {
+        if (gistFile.language === 'JavaScript') {
+          console.log({ gistFile });
+          try {
+            importModuleWeb(gistFile.content, gistFile.filename).then(
+              importedPlugin => {
+                const newPlugin = importedPlugin(pluginApiMethods);
+                newPlugin.name = newPlugin.name || gistFile.filename;
+                console.log({ newPlugin }, 'loaded from ', gistFile.raw_url);
+                if ('dependencies' in newPlugin) {
+                  newPlugin.dependencies.forEach(dependency => {
+                    const scriptEle = document.createElement('script');
+                    scriptEle.setAttribute('src', dependency);
+                    document.body.appendChild(scriptEle);
+                    scriptEle.addEventListener('load', () => {
+                      console.log('File loaded', dependency);
+                    });
+
+                    scriptEle.addEventListener('error', ev => {
+                      console.log('Error on loading file', ev);
+                    });
+                  });
+                }
+                registerPlugin(newPlugin);
+              }
+            );
+          } catch (e) {
+            console.error(gistFile.filename, 'Plugin failed to load', e);
+          }
+        }
+      });
+    });
+  }
 };
