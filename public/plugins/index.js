@@ -273,33 +273,41 @@ export var Plugins = function(app) {
         if (gistFile.language === 'JavaScript') {
           console.log({ gistFile });
           try {
-            importModuleWeb(gistFile.content, gistFile.filename).then(
-              importedPlugin => {
-                const newPlugin = importedPlugin(pluginApiMethods);
-                newPlugin.name = newPlugin.name || gistFile.filename;
-                console.log({ newPlugin }, 'loaded from ', gistFile.raw_url);
-                if ('dependencies' in newPlugin) {
-                  newPlugin.dependencies.forEach(dependency => {
-                    const scriptEle = document.createElement('script');
-                    scriptEle.setAttribute('src', dependency);
-                    document.body.appendChild(scriptEle);
-                    scriptEle.addEventListener('load', () => {
-                      console.log('File loaded', dependency);
-                    });
+            app.gists
+              .getContentOrRaw(gistFile.content, gistFile.raw_url)
+              .then(content => {
+                importModuleWeb(content, gistFile.filename).then(
+                  importedPlugin => {
+                    const newPlugin = importedPlugin(pluginApiMethods);
+                    newPlugin.name = newPlugin.name || gistFile.filename;
+                    console.log(
+                      { newPlugin },
+                      'loaded from ',
+                      gistFile.raw_url
+                    );
+                    if ('dependencies' in newPlugin) {
+                      newPlugin.dependencies.forEach(dependency => {
+                        const scriptEle = document.createElement('script');
+                        scriptEle.setAttribute('src', dependency);
+                        document.body.appendChild(scriptEle);
+                        scriptEle.addEventListener('load', () => {
+                          console.log('File loaded', dependency);
+                        });
 
-                    scriptEle.addEventListener('error', ev => {
-                      console.log('Error on loading file', ev);
-                    });
-                  });
-                }
-                registerPlugin(newPlugin);
-              }
-            );
-          } catch (e) {
-            console.error(gistFile.filename, 'Plugin failed to load', e);
+                        scriptEle.addEventListener('error', ev => {
+                          console.log('Error on loading file', ev);
+                        });
+                      });
+                    }
+                    registerPlugin(newPlugin);
+                  }
+                  );
+                });
+            } catch (e) {
+              console.error(gistFile.filename, 'Plugin failed to load', e);
+            }
           }
-        }
+        });
       });
-    });
-  }
+    }
 };
