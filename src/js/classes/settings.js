@@ -21,34 +21,48 @@ const getCloudStorage = function(type = 'gist', credentials) {
           headers: {
             Accept: 'application/vnd.github+json',
             Authorization: `Bearer ${credentials.token}`,
-            'X-GitHub-Api-Version': '2022-11-28'
+            'X-GitHub-Api-Version': '2022-11-28',
           },
         })
-          .then(data => data.json())
+          .then(data => {
+            console.log('GOT -- ', { data });
+            return data.json();
+          })
           .then(content => {
             console.log('NEW from get::', { content });
             return { body: content };
           });
       },
-      edit: (gistId, fileName, content) => {
-        console.log({gistId, fileName, content, credentials})
-        return fetch(
-          'https://api.github.com/gists/' + gistId,
-          {
-            method: 'POST',
-            headers: {
-              Accept: 'application/vnd.github+json',
-              Authorization: `Bearer ${credentials.token}`,
-              'X-GitHub-Api-Version': '2022-11-28'
-            },
-            body: JSON.stringify({
-              description: 'upload data from api',
-              public: false,
-              files: { [fileName]: { content } }
-            }),
+      getContentOrRaw: (content, rawUrl) => {
+        // sometimes github comes back empty handed for content, but has raw_url
+        return new Promise((resolve, reject) => {
+          if (!content && rawUrl) {
+            fetch(rawUrl)
+              .then(data => data.text())
+              .then(rawContent => {
+                resolve(rawContent);
+              });
+          } else {
+            resolve(content);
           }
-        ).then(res => res.json());
-      }
+        });
+      },
+      edit: (gistId, fileName, content) => {
+        console.log({ gistId, fileName, content, credentials });
+        return fetch('https://api.github.com/gists/' + gistId, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${credentials.token}`,
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+          body: JSON.stringify({
+            description: 'upload data from api',
+            public: false,
+            files: { [fileName]: { content } },
+          }),
+        }).then(res => res.json());
+      },
     };
   } else if (type === 'github') {
     // todo implement

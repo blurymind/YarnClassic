@@ -402,9 +402,10 @@ export const data = {
       }
     };
 
+    console.log('OPENING::', { content });
     // different depending on file
     if (type === FILETYPE.JSON) {
-      content = JSON.parse(content);
+      content = JSON.parse(content); // todo this can fail, show error
       if (!content) {
         return;
       }
@@ -1207,9 +1208,9 @@ export const data = {
       const previouslyOpenedGist =
         data.lastStorageHost() === 'GIST' ? data.editingName() : '';
       gists.get(gists.file).then(gist => {
-        console.log("GOT", gist)
+        console.log('GOT', gist);
         const gistFiles = gist.body.files;
-        console.log({gistFiles})
+        console.log({ gistFiles });
         const inputOptions = {};
         Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
@@ -1225,11 +1226,12 @@ export const data = {
           inputPlaceholder: 'Select a file from the gist',
           showCancelButton: true,
         }).then(({ value }) => {
-          console.log("GOT data from gist", {value, gistFiles})
           if (value) {
             const content = gistFiles[value].content;
-            console.log({content})
-            data.openGist(content, value);
+            const rawUrl = gistFiles[value].raw_url;
+            gists.getContentOrRaw(content, rawUrl).then(content => {
+              data.openGist(content, value);
+            });
           }
         });
       });
