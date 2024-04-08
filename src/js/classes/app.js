@@ -85,11 +85,11 @@ export var App = function(name, version) {
   };
 
   this.setGistCredentials = function(gist, e) {
+    console.log("SET CREDENTIALS")
     const { token, file } = gist;
-    const Gists = require('gists');
-    const gists = new Gists({ token });
-    self.gists = gists;
+    self.gists = self.settings.cloudStorage("gist", {token, file});
     self.gists.file = file;
+    self.gists.token = token;
   };
 
   // Ideally this dependencies should be injected by index.js

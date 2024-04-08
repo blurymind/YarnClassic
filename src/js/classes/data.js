@@ -1171,9 +1171,7 @@ export const data = {
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
           data.editingName(editingName);
-          gists.edit(gists.file, {
-            files: { [editingName]: { content: yarnData } },
-          });
+          gists.edit(gists.file, editingName, yarnData);
           Swal.fire(
             'Saved!',
             `The Yarn has been saved to gist ${gists.file}`,
@@ -1209,7 +1207,9 @@ export const data = {
       const previouslyOpenedGist =
         data.lastStorageHost() === 'GIST' ? data.editingName() : '';
       gists.get(gists.file).then(gist => {
+        console.log("GOT", gist)
         const gistFiles = gist.body.files;
+        console.log({gistFiles})
         const inputOptions = {};
         Object.keys(gistFiles).forEach(key => {
           inputOptions[key] = key;
@@ -1225,8 +1225,10 @@ export const data = {
           inputPlaceholder: 'Select a file from the gist',
           showCancelButton: true,
         }).then(({ value }) => {
+          console.log("GOT data from gist", {value, gistFiles})
           if (value) {
             const content = gistFiles[value].content;
+            console.log({content})
             data.openGist(content, value);
           }
         });
@@ -1274,9 +1276,7 @@ export const data = {
       gists.get(gists.file).then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
-          gists.edit(gists.file, {
-            files: { [data.editingName()]: { content: yarnData } },
-          });
+          gists.edit(gists.file, data.editingName(), yarnData);
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();

@@ -3212,7 +3212,7 @@ debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.9:
   dependencies:
     ms "2.0.0"
 
-debug@^3.0.0, debug@^3.1.0, debug@^3.1.1, debug@^3.2.5, debug@^3.2.6:
+debug@^3.0.0, debug@^3.1.0, debug@^3.1.1, debug@^3.2.5:
   version "3.2.6"
   resolved "https://registry.npmjs.org/debug/-/debug-3.2.6.tgz"
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
@@ -4767,13 +4767,6 @@ get-value@^2.0.3, get-value@^2.0.6:
   resolved "https://registry.npmjs.org/get-value/-/get-value-2.0.6.tgz"
   integrity sha1-3BXKHGcjh8p2vTesCjlbogQqLCg=
 
-get-value@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/get-value/-/get-value-3.0.1.tgz"
-  integrity sha512-mKZj9JLQrwMBtj5wxi6MH8Z5eSKaERpAwjg43dPtlGI1ZVEgH/qC7T8/6R2OBSUA+zzHBZgICsVJaEIV2tKTDA==
-  dependencies:
-    isobject "^3.0.1"
-
 gh-pages@^2.0.1:
   version "2.2.0"
   resolved "https://registry.npmjs.org/gh-pages/-/gh-pages-2.2.0.tgz"
@@ -4803,25 +4796,6 @@ gifwrap@^0.9.2:
   dependencies:
     image-q "^4.0.0"
     omggif "^1.0.10"
-
-gists@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/gists/-/gists-2.0.0.tgz"
-  integrity sha512-EVSWDpq2/H9ITsXsjdPo9+i2MI9U4E6DirXwR7/t6Mqgnynlh9ta6RMyezIINVNhkXZTCttmiSISd7JNkI2rQw==
-  dependencies:
-    github-base "^1.0.0"
-
-github-base@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/github-base/-/github-base-1.0.0.tgz"
-  integrity sha512-5A9OOCQWK80v+bjVRzdK0M/5UtERN9vx9TkJMlkiJA24wu/+lrQLsq5MPQIrSONrSWwt83eAPtBcuQOc2FyK8A==
-  dependencies:
-    get-value "^3.0.1"
-    needle "^2.2.2"
-    paged-request "^1.0.2"
-    parse-link-header "^1.0.1"
-    qs "^6.5.1"
-    use "^3.1.0"
 
 glob-parent@^3.1.0:
   version "3.1.0"
@@ -5304,7 +5278,7 @@ husky@^2.7.0:
     run-node "^1.0.0"
     slash "^3.0.0"
 
-iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.24, iconv-lite@^0.4.4:
+iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.24:
   version "0.4.24"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
   integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
@@ -7055,15 +7029,6 @@ natural-compare@^1.4.0:
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-needle@^2.1.1, needle@^2.2.2:
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/needle/-/needle-2.5.0.tgz"
-  integrity sha512-o/qITSDR0JCyCKEQ1/1bnUXMmznxabbwi/Y4WwJElf+evwJNFNwIDMCCt5IigFVxgeGBJESLohGtIS9gEzo1fA==
-  dependencies:
-    debug "^3.2.6"
-    iconv-lite "^0.4.4"
-    sax "^1.2.4"
-
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.npmjs.org/negotiator/-/negotiator-0.6.2.tgz"
@@ -7601,13 +7566,6 @@ package-json@^6.3.0:
     registry-url "^5.0.0"
     semver "^6.2.0"
 
-paged-request@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/paged-request/-/paged-request-1.0.2.tgz"
-  integrity sha512-2NXKpT0pWoVo31LQhGOfsqD8wViifq6Ml28H8WrqY0GbMvltvpDPx1YZ6jMeVXNbywjECdEhmC2/uFFS1MdMFQ==
-  dependencies:
-    needle "^2.1.1"
-
 pako@^1.0.0, pako@^1.0.5, pako@~1.0.5:
   version "1.0.11"
   resolved "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz"
@@ -7710,13 +7668,6 @@ parse-json@^5.0.0:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
     lines-and-columns "^1.1.6"
-
-parse-link-header@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/parse-link-header/-/parse-link-header-1.0.1.tgz"
-  integrity sha1-vt/g0hGK64S+deewJUGeyKYRQKc=
-  dependencies:
-    xtend "~4.0.1"
 
 parse-passwd@^1.0.0:
   version "1.0.0"
@@ -8443,11 +8394,6 @@ qs@6.7.0:
   version "6.7.0"
   resolved "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
-
-qs@^6.5.1:
-  version "6.5.2"
-  resolved "https://registry.npmjs.org/qs/-/qs-6.5.2.tgz"
-  integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
 query-string@^4.1.0:
   version "4.3.4"
