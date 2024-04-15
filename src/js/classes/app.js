@@ -16,6 +16,7 @@ import { UI } from './ui';
 import { data } from './data';
 import { Utils } from './utils';
 import { RichTextFormatter } from './richTextFormatter';
+import { StorageJs } from './storage.js';
 
 // TODO: refactoring proposals
 //
@@ -87,9 +88,9 @@ export var App = function(name, version) {
   this.setGistCredentials = function(gist, e) {
     console.log("SET CREDENTIALS")
     const { token, file } = gist;
-    self.gists = self.settings.cloudStorage("gist", {token, file});
-    self.gists.file = file;
-    self.gists.token = token;
+    self.gists = StorageJs("gist", {token, file});
+    // self.gists.file = file;
+    // self.gists.token = token;
   };
 
   // Ideally this dependencies should be injected by index.js
