@@ -7,6 +7,12 @@ export const StorageJs = (type= 'gist', credentials) => {
       },
       token: credentials.token,
       file: credentials.file,
+      filesInGist: {},
+      getFilesInGist: function(fileKey){
+        if(!fileKey) return this.filesInGist;
+        if (fileKey in this.filesInGist) return this.filesInGist[fileKey]
+        console.error(`${fileKey} not found in gist`, this.filesInGist)
+      },
       test: function(){ console.log("CRED",this.file); return this.testing},
       get: function(gistId){
         return fetch('https://api.github.com/gists/' + gistId, {
@@ -23,8 +29,19 @@ export const StorageJs = (type= 'gist', credentials) => {
           })
           .then(content => {
             console.log('NEW from get::', { content });
-            return { body: content };
+            this.filesInGist = content.files;
+            const inputOptions = {};
+            Object.keys(this.filesInGist).forEach(key => {
+              inputOptions[key] = key;
+            });
+            return { body: content, filesInGist: this.filesInGist, inputOptions, fileList: Object.keys(this.filesInGist) };
           });
+      },
+      hasGistSettings: function(){
+        return this.file && this.file.length > 0
+      },
+      getGistFile: function(){
+        return this.get(this.file);
       },
       getContentOrRaw: function(content, rawUrl) {
         // sometimes github comes back empty handed for content, but has raw_url
@@ -56,6 +73,9 @@ export const StorageJs = (type= 'gist', credentials) => {
           }),
         }).then(res => res.json());
       },
+      editGistFile: function(fileName, content){
+        return this.edit(this.file, fileName, content)
+      }
     };
   } else if (type === 'github') {
     // todo implement

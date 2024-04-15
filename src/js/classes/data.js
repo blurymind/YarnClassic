@@ -1166,8 +1166,8 @@ export const data = {
   },
 
   trySaveGist: function(gists) {
-    if (gists && gists.file && gists.file.length > 0) {
-      gists.get(gists.file).then(gist => {
+    if (gists.hasGistSettings()) {
+      gists.getGistFile().then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
@@ -1204,17 +1204,10 @@ export const data = {
   },
 
   tryOpenGist: function(gists) {
-    if (gists && gists.file && gists.file.length > 0) {
+    if (gists.hasGistSettings()) {
       const previouslyOpenedGist =
         data.lastStorageHost() === 'GIST' ? data.editingName() : '';
-      gists.get(gists.file).then(gist => {
-        console.log('GOT', gist);
-        const gistFiles = gist.body.files;
-        console.log({ gistFiles });
-        const inputOptions = {};
-        Object.keys(gistFiles).forEach(key => {
-          inputOptions[key] = key;
-        });
+      gists.getGistFile().then(({inputOptions, filesInGist}) => {
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -1227,8 +1220,8 @@ export const data = {
           showCancelButton: true,
         }).then(({ value }) => {
           if (value) {
-            const content = gistFiles[value].content;
-            const rawUrl = gistFiles[value].raw_url;
+            const content = filesInGist[value].content;
+            const rawUrl = filesInGist[value].raw_url;
             gists.getContentOrRaw(content, rawUrl).then(content => {
               data.openGist(content, value);
             });
@@ -1275,10 +1268,10 @@ export const data = {
 
     if (data.lastStorageHost() === 'GIST') {
       const gists = app.gists;
-      gists.get(gists.file).then(gist => {
+      gists.getGistFile().then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
-          gists.edit(gists.file, data.editingName(), yarnData);
+          gists.editGistFile(data.editingName(), yarnData);
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();
