@@ -1267,11 +1267,11 @@ export const data = {
     if (!data.isDocumentDirty()) return;
 
     if (data.lastStorageHost() === 'GIST') {
-      const gists = app.gists;
-      gists.getGistFile().then(gist => {
+      const storage = app.storage;
+      storage.getGistFile().then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
-          gists.editGistFile(data.editingName(), yarnData);
+          storage.editGistFile(data.editingName(), yarnData);
           data.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();
@@ -1282,8 +1282,8 @@ export const data = {
         });
       });
     } else if (!data.editingPath()) {
-      if (app.gists && app.gists.options.token) {
-        data.trySaveGist(app.gists);
+      if (app.storage && app.storage.options.token) {
+        data.trySaveGist(app.storage);
       } else data.trySave(FILETYPE.JSON);
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.getSaveData(data.editingType()).then(saveData => {

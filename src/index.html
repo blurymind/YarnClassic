@@ -143,12 +143,12 @@
             <span class="hide-when-narrow">&nbsp;</span>
             Export as Xml
           </span>
-          <span id="gistTryOpen" class="item" data-bind="click: function() { app.data.tryOpenGist(app.gists);}">
+          <span id="gistTryOpen" class="item" data-bind="click: function() { app.data.tryOpenGist(app.storage);}">
             <svg class="icon menu-icon icon-github icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-github"></use></svg>
             <span class="hide-when-narrow">&nbsp;</span>
             Open Gist
           </span>
-          <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.gists);}">
+          <span id="gistTrySave" class="item" data-bind="click: function() { app.data.trySaveGist(app.storage);}">
             <svg class="icon menu-icon icon-save-gist icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-save-gist"></use></svg>
             <span class="hide-when-narrow">&nbsp;</span>
             Save to Gist

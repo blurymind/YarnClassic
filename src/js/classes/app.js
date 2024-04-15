@@ -88,7 +88,7 @@ export var App = function(name, version) {
   this.setGistCredentials = function(gist, e) {
     console.log("SET CREDENTIALS")
     const { token, file } = gist;
-    self.gists = StorageJs("gist", {token, file});
+    self.storage = StorageJs("gist", {token, file});
     // self.gists.file = file;
     // self.gists.token = token;
   };
