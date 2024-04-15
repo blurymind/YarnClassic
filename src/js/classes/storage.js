@@ -1,20 +1,19 @@
-export const StorageJs = (type= 'gist', credentials) => {
+export const StorageJs = (type = 'gist', credentials) => {
   if (type === 'gist') {
     return {
-      testing: 123,
-      setTesting: function(newVal){
-        this.testing = newVal
+      lastStorageHost: 'GIST', // or LOCAL
+      setLastStorageHost: function(newHost) {
+        this.lastStorageHost = newHost;
       },
       token: credentials.token,
       file: credentials.file,
       filesInGist: {},
-      getFilesInGist: function(fileKey){
-        if(!fileKey) return this.filesInGist;
-        if (fileKey in this.filesInGist) return this.filesInGist[fileKey]
-        console.error(`${fileKey} not found in gist`, this.filesInGist)
+      getFilesInGist: function(fileKey) {
+        if (!fileKey) return this.filesInGist;
+        if (fileKey in this.filesInGist) return this.filesInGist[fileKey];
+        console.error(`${fileKey} not found in gist`, this.filesInGist);
       },
-      test: function(){ console.log("CRED",this.file); return this.testing},
-      get: function(gistId){
+      getGist: function(gistId) {
         return fetch('https://api.github.com/gists/' + gistId, {
           method: 'GET',
           headers: {
@@ -34,14 +33,20 @@ export const StorageJs = (type= 'gist', credentials) => {
             Object.keys(this.filesInGist).forEach(key => {
               inputOptions[key] = key;
             });
-            return { body: content, filesInGist: this.filesInGist, inputOptions, fileList: Object.keys(this.filesInGist) };
+            this.setLastStorageHost('GIST');
+            return {
+              body: content,
+              filesInGist: this.filesInGist,
+              inputOptions,
+              fileList: Object.keys(this.filesInGist),
+            };
           });
       },
-      hasGistSettings: function(){
-        return this.file && this.file.length > 0
+      hasGistSettings: function() {
+        return this.file && this.file.length > 0;
       },
-      getGistFile: function(){
-        return this.get(this.file);
+      getGistFile: function() {
+        return this.getGist(this.file);
       },
       getContentOrRaw: function(content, rawUrl) {
         // sometimes github comes back empty handed for content, but has raw_url
@@ -57,7 +62,7 @@ export const StorageJs = (type= 'gist', credentials) => {
           }
         });
       },
-      edit: function(gistId, fileName, content) {
+      editGist: function(gistId, fileName, content) {
         console.log({ gistId, fileName, content, credentials });
         return fetch('https://api.github.com/gists/' + gistId, {
           method: 'POST',
@@ -71,11 +76,14 @@ export const StorageJs = (type= 'gist', credentials) => {
             public: false,
             files: { [fileName]: { content } },
           }),
-        }).then(res => res.json());
+        }).then(res => {
+          this.setLastStorageHost('GIST');
+          return res.json();
+        });
       },
-      editGistFile: function(fileName, content){
-        return this.edit(this.file, fileName, content)
-      }
+      editGistFile: function(fileName, content) {
+        return this.editGist(this.file, fileName, content);
+      },
     };
   } else if (type === 'github') {
     // todo implement
@@ -113,4 +121,4 @@ export const StorageJs = (type= 'gist', credentials) => {
     // return { getFile, setFile, credentials, setCredentials };
   }
   return { getFile: () => {}, setFile: () => {}, credentials, setCredentials };
-}
+};

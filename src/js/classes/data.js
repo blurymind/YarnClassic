@@ -1172,7 +1172,7 @@ export const data = {
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
           data.editingName(editingName);
-          gists.edit(gists.file, editingName, yarnData);
+          gists.editGist(gists.file, editingName, yarnData);
           Swal.fire(
             'Saved!',
             `The Yarn has been saved to gist ${gists.file}`,
