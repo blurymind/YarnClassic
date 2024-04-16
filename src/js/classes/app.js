@@ -89,8 +89,6 @@ export var App = function(name, version) {
     console.log("SET CREDENTIALS")
     const { token, file } = gist;
     self.storage = StorageJs("gist", {token, file});
-    // self.gists.file = file;
-    // self.gists.token = token;
   };
 
   // Ideally this dependencies should be injected by index.js
