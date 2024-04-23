@@ -20,6 +20,7 @@ export const Settings = function(app) {
   ko.extenders.persist = function(target, option) {
     target.subscribe(function(newValue) {
       storage.setItem(option, newValue);
+      app.storage.db.save(option, newValue)
     });
     return target;
   };

@@ -184,10 +184,11 @@ export const data = {
     if (writeCurrent)
       updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
     data.appInstanceStates(updatedStates);
-    storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
+    //storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
+    app.storage.db.save('appStates', JSON.stringify(data.appInstanceStates()))
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   }, 700),
-  loadAppStateFromLocalStorage: function() {
+  loadAppStateFromLocalStorage: async function() {
     if (!data.restoreFromLocalStorage()) return; // to ignore sometimes?
 
     const storage = app.settings.storage;
@@ -196,7 +197,11 @@ export const data = {
       console.log('--- storage.clear() ---');
       storage.clear(); //TODO remove later
     }
-    const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
+    
+    const appStatesData = await app.storage.db.getDbValue('appStates');
+    //const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
+    const appStates = JSON.parse(appStatesData); // appStateS <- new key
+
     const currentDocState = appStates[app.settings.selectedFileTab()];
     data.appInstanceStates(appStates);
     console.log('APP state', appStates, currentDocState);

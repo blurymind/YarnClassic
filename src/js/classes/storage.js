@@ -1,3 +1,44 @@
+const idb =  require('idb');
+/////////// Persist via DB api ////////////////
+const DBStorage = function(dbName = 'my-db', objectStoreName = 'preferences') {
+  // requires https://unpkg.com/idb@5/build/iife/index-min.js
+  return {
+    dbName,
+    objectStoreName,
+    db: undefined,
+    save: async function(key, value) {
+      const tx = this.db.transaction(this.objectStoreName, 'readwrite');
+      const store = tx.objectStore(this.objectStoreName);
+      store.put({ key, value });
+      return tx.complete;
+    },
+    load: async function(valueKey) {
+      const tx = this.db.transaction(this.objectStoreName, 'readonly');
+      const store = tx.objectStore(this.objectStoreName);
+      const data = await store.get(valueKey);
+      return data && data.value;
+    },
+    openDatabase: function() {
+      return idb.openDB(dbName, 1, {
+        upgrade: db => {
+          db.createObjectStore(this.objectStoreName, { keyPath: 'key' });
+        },
+      });
+    },
+    getDb: function() {
+      return this.openDatabase().then(_db => {
+        this.db = _db;
+        return _db;
+      });
+    },
+    getDbValue: function(key = this.dbName) {
+      return this.getDb().then(_db => {
+        return this.load(key);
+      });
+    },
+  };
+};
+
 export const FILETYPE = {
   JSON: 'json',
   XML: 'xml',
@@ -28,6 +69,8 @@ export const getFileType = filename => {
 export const StorageJs = (type = 'gist', credentials) => {
   if (type === 'gist') {
     return {
+      db:
+        DBStorage('yarn-DB', 'Yarn-persistence'),
       getFileType,
       FILETYPE,
       lastStorageHost: 'GIST', // or LOCAL
