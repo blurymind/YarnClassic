@@ -209,15 +209,18 @@ export const Input = function(app) {
     $(document).on('keydown', e => {
       if (!app.inWorkspace()) return;
 
-      if ((e.metaKey || e.ctrlKey)) {
+      if (e.metaKey || e.ctrlKey) {
         switch (e.keyCode) {
           case Key.S:
             e.preventDefault();
             app.data.trySaveCurrent();
             break; // ctrl+s
           case Key.A:
-            app.data.tryAppend();
-            break; // ctrl+a
+            if (e.shiftKey) {
+              e.preventDefault();
+              app.data.tryAppend();
+              break;
+            } // ctrl+shift+a
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.altKey) {
