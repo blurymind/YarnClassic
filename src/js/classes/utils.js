@@ -1,14 +1,4 @@
-export var FILETYPE = {
-  JSON: 'json',
-  XML: 'xml',
-  TWEE: 'twee',
-  TWEE2: 'tw2',
-  UNKNOWN: 'none',
-  YARN: 'yarn',
-  INK: 'ink',
-  INKJSON: 'ink.json',
-  RENPY: 'rpy',
-};
+import {FILETYPE} from './storage'
 
 export var Utils = {
   createAutocompleter: function(
@@ -612,14 +602,14 @@ This is the content of the stitch that should be embedded within a knot.
           }
         }
         // add option to add path of local image file between img tags
-        if (app.getTagBeforeCursor().match(/\[img/g)) {
-          options.items['Choose image'] = {
-            name: 'Choose image',
-            callback: () => {
-              app.data.insertImageFileName();
-            },
-          };
-        }
+        // if (app.getTagBeforeCursor().match(/\[img/g)) {
+        //   options.items['Choose image'] = {
+        //     name: 'Choose image',
+        //     callback: () => {
+        //       app.data.insertImageFileName();
+        //     },
+        //   };
+        // }
         return options;
       },
     };

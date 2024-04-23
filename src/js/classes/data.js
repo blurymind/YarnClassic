@@ -1,9 +1,9 @@
 /* eslint-disable jquery/no-ajax */
 const path = require('path');
 const inkjs = require('inkjs');
-const saveAs = require('file-saver');
 import { Node } from './node';
-import { Utils, FILETYPE } from './utils';
+import { Utils } from './utils';
+import {getFileType, FILETYPE} from './storage'
 
 export const data = {
   appInstanceStates: ko.observable([]),
@@ -292,7 +292,7 @@ export const data = {
       url: filePath,
       async: false,
       success: result => {
-        const type = data.getFileType(fileName);
+        const type = getFileType(fileName);
         if (type === FILETYPE.UNKNOWN) {
           Swal.fire({
             title: 'Unknown filetype!',
@@ -306,11 +306,12 @@ export const data = {
       },
     });
   },
+  // todo move to storage.js
   getFileData: function(file, filename) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = function(e) {
-        const type = data.getFileType(filename);
+        const type = getFileType(filename);
         if (type === FILETYPE.UNKNOWN) {
           Swal.fire({
             title: 'Unknown filetype!',
@@ -329,22 +330,7 @@ export const data = {
       reader.readAsText(file);
     });
   },
-  openFiles: async function(file, filename) {
-    const files = document.getElementById('open-file').files;
-
-    for (const file of Object.values(files)) {
-      const fileData = await data.getFileData(file, file.name);
-      console.log('FILEDATA', fileData);
-      const editingName = fileData.name;
-      const editingType = fileData.type;
-      data.addDocumentState({
-        editingName,
-        editingType,
-        yarnData: fileData.data,
-      });
-      data.loadData(fileData.data, editingType, true);
-    }
-  },
+  
   openFolder: function(e, foldername) {
     editingFolder = foldername;
     Swal.fire({
@@ -356,21 +342,6 @@ export const data = {
 
   appendFile: function(file, filename) {
     data.readFile(file, filename, false);
-  },
-
-  getFileType: function(filename) {
-    const lowerFileName = filename.toLowerCase();
-
-    if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
-    else if (lowerFileName.endsWith('.yarn.txt')) return FILETYPE.YARN;
-    else if (lowerFileName.endsWith('.ink')) return FILETYPE.INK;
-    else if (lowerFileName.endsWith('.yarn')) return FILETYPE.YARN;
-    else if (lowerFileName.endsWith('.xml')) return FILETYPE.XML;
-    else if (lowerFileName.endsWith('.txt')) return FILETYPE.TWEE;
-    else if (lowerFileName.endsWith('.tw2')) return FILETYPE.TWEE2;
-    else if (lowerFileName.endsWith('.twee')) return FILETYPE.TWEE2;
-
-    return FILETYPE.UNKNOWN;
   },
 
   dispatchEventDataLoaded: function() {
@@ -978,97 +949,16 @@ export const data = {
     return output;
   },
 
-  saveTo: function(path, content, callback = null) {
-    if (app.fs) {
-      app.fs.writeFile(path, content, { encoding: 'utf-8' }, function(err) {
-        data.editingPath(path);
-        if (callback) callback();
-        if (err) {
-          Swal.fire({
-            title: 'Error Saving Data to ' + path + ': ' + err,
-            icon: 'error',
-          });
-        } else {
-          app.ui.notification.fire({
-            title: 'Saved!',
-            icon: 'success',
-          });
-          app.ui.dispatchEvent('yarnSavedData');
-          data.setNewFileStats(path, path, 'LOCAL');
-        }
-      });
-    }
-  },
-
-  openFileDialog: function(dialog, callback) {
-    dialog.bind('change', function(e) {
-      // make callback
-      callback(e.currentTarget.files[0], dialog.val());
-
-      // replace input field with a new identical one, with the value cleared
-      // (html can't edit file field values)
-      var saveas = '';
-      var accept = '';
-      if (dialog.attr('nwsaveas') != undefined)
-        saveas = 'nwsaveas="' + dialog.attr('nwsaveas') + '"';
-      if (dialog.attr('accept') != undefined)
-        saveas = 'accept="' + dialog.attr('accept') + '"';
-
-      dialog
-        .parent()
-        .append(
-          '<input type="file" id="' +
-            dialog.attr('id') +
-            '" ' +
-            accept +
-            ' ' +
-            saveas +
-            '>'
-        );
-      dialog.unbind('change');
-      dialog.remove();
-    });
-
-    dialog.trigger('click');
-  },
-
-  saveFileDialog: function(dialog, type, content) {
-    const fileName =
-      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
-    if (app.electron) {
-      // console.log(app.electron)
-      app.electron.remote.dialog
-        .showSaveDialog({
-          title: 'Saving ' + fileName,
-          filters: [
-            {
-              name: type + ' file',
-              extensions: [type],
-            },
-          ],
-          defaultPath: fileName,
-        })
-        .then(result => {
-          data.saveTo(result.filePath, content);
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    } else {
-      var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      saveAs(blob, fileName);
-    }
-  },
-
-  insertImageFileName: function() {
-    data.openFileDialog($('#open-image'), function(e, path) {
-      app.insertTextAtCursor(e.path ? e.path : e.name);
-    });
-  },
-
   tryOpenFile: function() /// Refactor to send signal to the main process
   {
-    data.openFileDialog($('#open-file'), data.openFiles);
+  app.storage.openLocalFile().then(yarnData=>{
+    data.addDocumentState({
+      editingName: app.storage.fileName,
+      editingType: app.storage.fileType,
+      yarnData,
+    });
+    data.loadData(yarnData, app.storage.fileType, true)
+  })
   },
 
   promptFileNameAndFormat: function(
@@ -1194,7 +1084,7 @@ export const data = {
   },
 
   openGist: function(content, name) {
-    const type = data.getFileType(name);
+    const type = getFileType(name);
     data.loadData(content, type, true);
     data.isDocumentDirty(false);
     data.lastStorageHost('GIST');
@@ -1238,29 +1128,19 @@ export const data = {
     }
   },
 
-  tryOpenFolder: function() {
-    data.openFileDialog($('#open-folder'), data.openFolder);
-  },
-
   tryAppend: function() {
-    data.openFileDialog($('#open-file'), data.appendFile);
-  },
-
-  save: function() {
-    if (app.editingVisualStudioCodeFile()) {
-      // if we're editing a file in the VSCode extension, it handles
-      // saving the file on its end so we do nothing here
-      return;
-    }
-
-    if (data.editingPath()) data.trySaveCurrent();
-    else data.trySave(FILETYPE.JSON);
+    app.storage.openLocalFile().then(yarnData=>{
+      data.loadData(yarnData, app.storage.fileType, false);
+    })
   },
 
   trySave: function(type) {
-    data
-      .getSaveData(type)
-      .then(saveData => data.saveFileDialog($('#save-file'), type, saveData));
+    const fileName =
+    (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
+    app.storage.saveAsFile(fileName, data.getSaveData).then(result=>{
+      data.setNewFileStats(result.chosenFileName, '', 'LOCAL');
+      data.editingType(result.type);
+    });
   },
 
   trySaveCurrent: function() {
@@ -1282,12 +1162,13 @@ export const data = {
         });
       });
     } else if (!data.editingPath()) {
-      if (app.storage && app.storage.options.token) {
-        data.trySaveGist(app.storage);
-      } else data.trySave(FILETYPE.JSON);
+      // file access api (web + electron)
+      data.getSaveData(data.editingType()).then(saveData => {
+        app.storage.saveToCurrentFile(saveData, data.editingName());
+      });
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.getSaveData(data.editingType()).then(saveData => {
-        data.saveTo(data.editingPath(), saveData);
+        // this only works with electron. We need to use file access api instead 
       });
     }
   },

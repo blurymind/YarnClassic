@@ -1,4 +1,17 @@
-const getFileType = filename => {
+export const FILETYPE = {
+  JSON: 'json',
+  XML: 'xml',
+  TWEE: 'twee',
+  TWEE2: 'tw2',
+  UNKNOWN: 'none',
+  YARN: 'yarn',
+  INK: 'ink',
+  INKJSON: 'ink.json',
+  RENPY: 'rpy',
+};
+export const getFileType = filename => {
+  if(!filename) return FILETYPE.UNKNOWN; 
+
   const lowerFileName = filename.toLowerCase();
   if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
   else if (lowerFileName.endsWith('.yarn.txt')) return FILETYPE.YARN;
@@ -11,25 +24,70 @@ const getFileType = filename => {
 
   return FILETYPE.UNKNOWN;
 };
-const FILETYPE = {
-  JSON: 'json',
-  XML: 'xml',
-  TWEE: 'twee',
-  TWEE2: 'tw2',
-  UNKNOWN: 'none',
-  YARN: 'yarn',
-  INK: 'ink',
-  INKJSON: 'ink.json',
-  RENPY: 'rpy',
-};
+
 
 export const StorageJs = (type = 'gist', credentials) => {
+
   if (type === 'gist') {
     return {
-      lastStorageHost: 'GIST', // or LOCAL
       getFileType,
+      FILETYPE,
+      lastStorageHost: 'GIST', // or LOCAL
       fileType: FILETYPE.UNKNOWN,// same as editingFormat?
       fileHandle: undefined,
+      writable: undefined,
+      saveAsFile: async function(suggestedName, getContent){
+        return new Promise(async (resolve, reject) =>{
+          const fileHandle = await window.showSaveFilePicker({
+            suggestedName,
+            types: [
+              {
+                description: 'Yarn editor files',
+                accept: {
+                  'text/plain': Object.values(FILETYPE).map(item=>`.${item}`),
+                },
+              },
+            ],
+          });
+          this.fileHandle = fileHandle;
+          const chosenFileName = fileHandle.name;
+          const type = getFileType(chosenFileName);
+          this.fileType = type;
+          const content = await getContent(type);
+          const writable = await fileHandle.createWritable();
+          this.writable = writable;
+          await writable.write(content);
+          await writable.close();
+  
+          console.log({fileHandle,writable})
+          resolve({type, content, chosenFileName, fileHandle, writable})
+        })
+      },
+      downloadContent: function(content, fileName){
+        const file = new File([content], fileName, {
+          type: 'text/plain',
+        })
+        const link = document.createElement('a')
+        const url = URL.createObjectURL(file)
+      
+        link.href = url
+        link.download = file.name
+        document.body.appendChild(link)
+        link.click()
+      
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      },
+      saveToCurrentFile: async function(content, fileName){
+        console.log({writable: this.writable, handle: this.fileHandle})
+        if(this.fileHandle) {
+          const writable = await this.fileHandle.createWritable();
+          await writable.write(content);
+          await writable.close();
+        } else {
+          this.downloadContent(content, fileName)
+        }
+      },
       openFileOrFiles: async function(multiple = false) {
         // https://developer.chrome.com/docs/capabilities/web-apis/file-system-access
         // Feature detection. The API needs to be supported
@@ -49,10 +107,11 @@ export const StorageJs = (type = 'gist', credentials) => {
         if (supportsFileSystemAccess) {
           try {
             // Show the file picker, optionally allowing multiple files.
-            this.fileHandle = await showOpenFilePicker({ multiple });
+            const files = await showOpenFilePicker({ multiple });
             if (!multiple) {
               // Only one file is requested.
-              fileOrFiles = this.fileHandle[0];
+              this.fileHandle = files[0];
+              fileOrFiles = files[0]
               console.log({ fileOrFiles });
             }
           } catch (err) {
@@ -98,13 +157,9 @@ export const StorageJs = (type = 'gist', credentials) => {
         return this.openFileOrFiles().then(file => {
           this.fileType = getFileType(file.name);
           this.fileName = file.name;
-          this.fileHandle = file;
           this.lastStorageHost = 'LOCAL';
           return file.text();
         });
-      },
-      saveLocalFile: function(type, content){
-        console.log({type,content})
       },
       setLastStorageHost: function(newHost) {
         this.lastStorageHost = newHost;
