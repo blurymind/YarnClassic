@@ -10,7 +10,7 @@ export const FILETYPE = {
   RENPY: 'rpy',
 };
 export const getFileType = filename => {
-  if(!filename) return FILETYPE.UNKNOWN; 
+  if (!filename) return FILETYPE.UNKNOWN;
 
   const lowerFileName = filename.toLowerCase();
   if (lowerFileName.endsWith('.json')) return FILETYPE.JSON;
@@ -25,26 +25,24 @@ export const getFileType = filename => {
   return FILETYPE.UNKNOWN;
 };
 
-
 export const StorageJs = (type = 'gist', credentials) => {
-
   if (type === 'gist') {
     return {
       getFileType,
       FILETYPE,
       lastStorageHost: 'GIST', // or LOCAL
-      fileType: FILETYPE.UNKNOWN,// same as editingFormat?
+      fileType: FILETYPE.UNKNOWN, // same as editingFormat?
       fileHandle: undefined,
       writable: undefined,
-      saveAsFile: async function(suggestedName, getContent){
-        return new Promise(async (resolve, reject) =>{
+      saveAsFile: async function(suggestedName, getContent) {
+        return new Promise(async (resolve, reject) => {
           const fileHandle = await window.showSaveFilePicker({
             suggestedName,
             types: [
               {
                 description: 'Yarn editor files',
                 accept: {
-                  'text/plain': Object.values(FILETYPE).map(item=>`.${item}`),
+                  'text/plain': Object.values(FILETYPE).map(item => `.${item}`),
                 },
               },
             ],
@@ -58,34 +56,34 @@ export const StorageJs = (type = 'gist', credentials) => {
           this.writable = writable;
           await writable.write(content);
           await writable.close();
-  
-          console.log({fileHandle,writable})
-          resolve({type, content, chosenFileName, fileHandle, writable})
-        })
+
+          console.log({ fileHandle, writable });
+          resolve({ type, content, chosenFileName, fileHandle, writable });
+        });
       },
-      downloadContent: function(content, fileName){
+      downloadContent: function(content, fileName) {
         const file = new File([content], fileName, {
           type: 'text/plain',
-        })
-        const link = document.createElement('a')
-        const url = URL.createObjectURL(file)
-      
-        link.href = url
-        link.download = file.name
-        document.body.appendChild(link)
-        link.click()
-      
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
+        });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(file);
+
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
       },
-      saveToCurrentFile: async function(content, fileName){
-        console.log({writable: this.writable, handle: this.fileHandle})
-        if(this.fileHandle) {
+      saveToCurrentFile: async function(content, fileName) {
+        console.log({ writable: this.writable, handle: this.fileHandle });
+        if (this.fileHandle) {
           const writable = await this.fileHandle.createWritable();
           await writable.write(content);
           await writable.close();
         } else {
-          this.downloadContent(content, fileName)
+          this.downloadContent(content, fileName);
         }
       },
       openFileOrFiles: async function(multiple = false) {
@@ -111,7 +109,7 @@ export const StorageJs = (type = 'gist', credentials) => {
             if (!multiple) {
               // Only one file is requested.
               this.fileHandle = files[0];
-              fileOrFiles = files[0]
+              fileOrFiles = files[0];
               console.log({ fileOrFiles });
             }
           } catch (err) {
@@ -217,7 +215,7 @@ export const StorageJs = (type = 'gist', credentials) => {
                 this.fileName = file.name;
                 this.fileHandle = file;
                 this.lastStorageHost = 'GIST';
-                return file.text()
+                return file.text();
               })
               .then(rawContent => {
                 resolve(rawContent);

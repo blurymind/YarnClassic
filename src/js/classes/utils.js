@@ -1,5 +1,3 @@
-import {FILETYPE} from './storage'
-
 export var Utils = {
   createAutocompleter: function(
     allowedTokens,

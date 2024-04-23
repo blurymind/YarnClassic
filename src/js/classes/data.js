@@ -3,7 +3,7 @@ const path = require('path');
 const inkjs = require('inkjs');
 import { Node } from './node';
 import { Utils } from './utils';
-import {getFileType, FILETYPE} from './storage'
+import { getFileType, FILETYPE } from './storage';
 
 export const data = {
   appInstanceStates: ko.observable([]),
@@ -330,7 +330,7 @@ export const data = {
       reader.readAsText(file);
     });
   },
-  
+
   openFolder: function(e, foldername) {
     editingFolder = foldername;
     Swal.fire({
@@ -951,14 +951,14 @@ export const data = {
 
   tryOpenFile: function() /// Refactor to send signal to the main process
   {
-  app.storage.openLocalFile().then(yarnData=>{
-    data.addDocumentState({
-      editingName: app.storage.fileName,
-      editingType: app.storage.fileType,
-      yarnData,
+    app.storage.openLocalFile().then(yarnData => {
+      data.addDocumentState({
+        editingName: app.storage.fileName,
+        editingType: app.storage.fileType,
+        yarnData,
+      });
+      data.loadData(yarnData, app.storage.fileType, true);
     });
-    data.loadData(yarnData, app.storage.fileType, true)
-  })
   },
 
   promptFileNameAndFormat: function(
@@ -1097,7 +1097,7 @@ export const data = {
     if (gists.hasGistSettings()) {
       const previouslyOpenedGist =
         data.lastStorageHost() === 'GIST' ? data.editingName() : '';
-      gists.getGistFile().then(({inputOptions, filesInGist}) => {
+      gists.getGistFile().then(({ inputOptions, filesInGist }) => {
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -1129,15 +1129,15 @@ export const data = {
   },
 
   tryAppend: function() {
-    app.storage.openLocalFile().then(yarnData=>{
+    app.storage.openLocalFile().then(yarnData => {
       data.loadData(yarnData, app.storage.fileType, false);
-    })
+    });
   },
 
   trySave: function(type) {
     const fileName =
-    (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
-    app.storage.saveAsFile(fileName, data.getSaveData).then(result=>{
+      (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
+    app.storage.saveAsFile(fileName, data.getSaveData).then(result => {
       data.setNewFileStats(result.chosenFileName, '', 'LOCAL');
       data.editingType(result.type);
     });
@@ -1168,7 +1168,7 @@ export const data = {
       });
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.getSaveData(data.editingType()).then(saveData => {
-        // this only works with electron. We need to use file access api instead 
+        // this only works with electron. We need to use file access api instead
       });
     }
   },
