@@ -1,4 +1,4 @@
-const idb =  require('idb');
+const idb = require('idb');
 /////////// Persist via DB api ////////////////
 const DBStorage = function(dbName = 'my-db', objectStoreName = 'preferences') {
   // requires https://unpkg.com/idb@5/build/iife/index-min.js
@@ -32,6 +32,8 @@ const DBStorage = function(dbName = 'my-db', objectStoreName = 'preferences') {
       });
     },
     getDbValue: function(key = this.dbName) {
+      if (this.db) return this.load(key);
+
       return this.getDb().then(_db => {
         return this.load(key);
       });
@@ -69,8 +71,7 @@ export const getFileType = filename => {
 export const StorageJs = (type = 'gist', credentials) => {
   if (type === 'gist') {
     return {
-      db:
-        DBStorage('yarn-DB', 'Yarn-persistence'),
+      db: DBStorage('yarn-DB', 'Yarn-persistence'),
       getFileType,
       FILETYPE,
       lastStorageHost: 'GIST', // or LOCAL
