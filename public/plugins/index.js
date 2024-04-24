@@ -266,7 +266,7 @@ export var Plugins = function(app) {
 
   // register plugins stored on a gist - todo cache all this
   if (app.settings.gistPluginsFile() !== null) {
-    app.storage.getGist(app.settings.gistPluginsFile()).then(({fileList}) => {
+    app.data.storage.getGist(app.settings.gistPluginsFile()).then(({fileList}) => {
       console.log({ fileList });
       fileList.forEach(gistFile => {
         if (gistFile.language === 'JavaScript') {
