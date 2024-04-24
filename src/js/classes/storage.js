@@ -1,6 +1,9 @@
 const idb = require('idb');
 /////////// Persist via DB api ////////////////
-const DBStorage = function(dbName = 'my-db', objectStoreName = 'preferences') {
+export const DBStorage = function(
+  dbName = 'my-db',
+  objectStoreName = 'preferences'
+) {
   // requires https://unpkg.com/idb@5/build/iife/index-min.js
   return {
     dbName,
@@ -25,16 +28,9 @@ const DBStorage = function(dbName = 'my-db', objectStoreName = 'preferences') {
         },
       });
     },
-    getDb: function() {
+    getDbValue: function(key = this.dbName) {
       return this.openDatabase().then(_db => {
         this.db = _db;
-        return _db;
-      });
-    },
-    getDbValue: function(key = this.dbName) {
-      if (this.db) return this.load(key);
-
-      return this.getDb().then(_db => {
         return this.load(key);
       });
     },
@@ -68,10 +64,9 @@ export const getFileType = filename => {
   return FILETYPE.UNKNOWN;
 };
 
-export const StorageJs = (type = 'gist', credentials) => {
+export const StorageJs = (type = 'gist') => {
   if (type === 'gist') {
     return {
-      db: DBStorage('yarn-DB', 'Yarn-persistence'),
       getFileType,
       FILETYPE,
       lastStorageHost: 'GIST', // or LOCAL
@@ -206,8 +201,13 @@ export const StorageJs = (type = 'gist', credentials) => {
       setLastStorageHost: function(newHost) {
         this.lastStorageHost = newHost;
       },
-      token: credentials.token,
-      file: credentials.file,
+      token: undefined,
+      gistId: undefined,
+      setCredentials: function(token, gistId){
+        //console.log("using gist credentials", {token, gistId})
+        this.token = token
+        this.gistId = gistId
+      },
       filesInGist: {},
       getFilesInGist: function(fileKey) {
         if (!fileKey) return this.filesInGist;
@@ -244,10 +244,10 @@ export const StorageJs = (type = 'gist', credentials) => {
           });
       },
       hasGistSettings: function() {
-        return this.file && this.file.length > 0;
+        return this.gistId && this.gistId.length > 0;
       },
       getGistFile: function() {
-        return this.getGist(this.file);
+        return this.getGist(this.gistId);
       },
       getContentOrRaw: function(content, rawUrl) {
         // sometimes github comes back empty handed for content, but has raw_url
@@ -270,12 +270,12 @@ export const StorageJs = (type = 'gist', credentials) => {
         });
       },
       editGist: function(gistId, fileName, content) {
-        console.log({ gistId, fileName, content, credentials });
+        console.log({ gistId, fileName, content });
         return fetch('https://api.github.com/gists/' + gistId, {
           method: 'POST',
           headers: {
             Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${credentials.token}`,
+            Authorization: `Bearer ${this.token}`,
             'X-GitHub-Api-Version': '2022-11-28',
           },
           body: JSON.stringify({
@@ -289,7 +289,7 @@ export const StorageJs = (type = 'gist', credentials) => {
         });
       },
       editGistFile: function(fileName, content) {
-        return this.editGist(this.file, fileName, content);
+        return this.editGist(this.gistId, fileName, content);
       },
       FILETYPE,
     };

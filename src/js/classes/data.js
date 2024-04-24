@@ -3,9 +3,11 @@ const path = require('path');
 const inkjs = require('inkjs');
 import { Node } from './node';
 import { Utils } from './utils';
-import { getFileType, FILETYPE } from './storage';
+import { getFileType, FILETYPE, DBStorage, StorageJs } from './storage';
 
 export const data = {
+  db: DBStorage('yarn-DB', 'Yarn-persistence'),
+  storage: StorageJs("gist"),
   appInstanceStates: ko.observable([]),
   restoreFromLocalStorage: ko.observable(true),
   // All the bellow go into appInstanceStates, which controls r/w of app states to local storage (for file tabs feature)
@@ -185,7 +187,7 @@ export const data = {
       updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
     data.appInstanceStates(updatedStates);
     //storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
-    app.storage.db.save('appStates', JSON.stringify(data.appInstanceStates()))
+    data.db.save('appStates', JSON.stringify(data.appInstanceStates()))
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   }, 700),
   loadAppStateFromLocalStorage: async function() {
@@ -198,7 +200,7 @@ export const data = {
       storage.clear(); //TODO remove later
     }
     
-    const appStatesData = await app.storage.db.getDbValue('appStates');
+    const appStatesData = await data.db.getDbValue('appStates');
     //const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
     const appStates = JSON.parse(appStatesData); // appStateS <- new key
 
@@ -956,13 +958,13 @@ export const data = {
 
   tryOpenFile: function() /// Refactor to send signal to the main process
   {
-    app.storage.openLocalFile().then(yarnData => {
+    data.storage.openLocalFile().then(yarnData => {
       data.addDocumentState({
-        editingName: app.storage.fileName,
-        editingType: app.storage.fileType,
+        editingName: data.storage.fileName,
+        editingType: data.storage.fileType,
         yarnData,
       });
-      data.loadData(yarnData, app.storage.fileType, true);
+      data.loadData(yarnData, data.storage.fileType, true);
     });
   },
 
@@ -1061,13 +1063,13 @@ export const data = {
   },
 
   trySaveGist: function(gists) {
-    if (gists.hasGistSettings()) {
-      gists.getGistFile().then(gist => {
+    if (data.storage.hasGistSettings()) {
+      data.storage.getGistFile().then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         console.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
           data.editingName(editingName);
-          gists.editGist(gists.file, editingName, yarnData);
+          data.storage.editGist(gists.file, editingName, yarnData);
           Swal.fire(
             'Saved!',
             `The Yarn has been saved to gist ${gists.file}`,
@@ -1099,10 +1101,10 @@ export const data = {
   },
 
   tryOpenGist: function(gists) {
-    if (gists.hasGistSettings()) {
+    if (data.storage.hasGistSettings()) {
       const previouslyOpenedGist =
         data.lastStorageHost() === 'GIST' ? data.editingName() : '';
-      gists.getGistFile().then(({ inputOptions, filesInGist }) => {
+        data.storage.getGistFile().then(({ inputOptions, filesInGist }) => {
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -1117,7 +1119,7 @@ export const data = {
           if (value) {
             const content = filesInGist[value].content;
             const rawUrl = filesInGist[value].raw_url;
-            gists.getContentOrRaw(content, rawUrl).then(content => {
+            data.storage.getContentOrRaw(content, rawUrl).then(content => {
               data.openGist(content, value);
             });
           }
@@ -1134,15 +1136,15 @@ export const data = {
   },
 
   tryAppend: function() {
-    app.storage.openLocalFile().then(yarnData => {
-      data.loadData(yarnData, app.storage.fileType, false);
+    data.storage.openLocalFile().then(yarnData => {
+      data.loadData(yarnData, data.storage.fileType, false);
     });
   },
 
   trySave: function(type) {
     const fileName =
       (data.editingName() || '').replace(/\.[^/.]+$/, '') + '.' + type;
-    app.storage.saveAsFile(fileName, data.getSaveData).then(result => {
+    data.storage.saveAsFile(fileName, data.getSaveData).then(result => {
       data.setNewFileStats(result.chosenFileName, '', 'LOCAL');
       data.editingType(result.type);
     });
@@ -1152,7 +1154,7 @@ export const data = {
     if (!data.isDocumentDirty()) return;
 
     if (data.lastStorageHost() === 'GIST') {
-      const storage = app.storage;
+      const storage = data.storage;
       storage.getGistFile().then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
@@ -1169,7 +1171,7 @@ export const data = {
     } else if (!data.editingPath()) {
       // file access api (web + electron)
       data.getSaveData(data.editingType()).then(saveData => {
-        app.storage.saveToCurrentFile(saveData, data.editingName());
+        data.storage.saveToCurrentFile(saveData, data.editingName());
       });
     } else if (data.editingPath().length > 0 && data.editingType().length > 0) {
       data.getSaveData(data.editingType()).then(saveData => {

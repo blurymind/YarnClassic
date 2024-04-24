@@ -88,7 +88,7 @@ export var App = function(name, version) {
   this.setGistCredentials = function(gist, e) {
     console.log("SET CREDENTIALS")
     const { token, file } = gist;
-    self.storage = StorageJs("gist", {token, file});
+    data.storage.setCredentials(token, file);
   };
 
   // Ideally this dependencies should be injected by index.js
