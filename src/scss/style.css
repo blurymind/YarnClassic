@@ -996,6 +996,9 @@ input#editorTitle {
   border-radius: 50%;
   opacity: 0.7;
 }
+#nodeSearchInput {
+  border-radius: 3px;
+}
 #nodeSearchInput:not(:focus) + #nodeSearchClear:not(:active){
   visibility: hidden;
 }
@@ -1009,12 +1012,16 @@ input:focus + span + .dropdown {
 }
 
 .menu .dropdown {
+  position: absolute;
   clear: left;
   overflow: auto;
   max-height: 0px;
+  min-width: 200px;
+  max-width: 350px;
   transition: max-height 0.5s;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  border-radius: 3px;
 }
 
 .menu .dropdown::-webkit-scrollbar {
