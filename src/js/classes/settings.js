@@ -56,6 +56,25 @@ export const Settings = function(app) {
     );
   };
 
+  this.pasteFromClipboard = function(koItem){
+    if(koItem && koItem.length > 0) return;
+    if(!navigator.clipboard) return;
+    navigator.clipboard
+    .readText()
+    .then(
+      (clipText) => {
+        console.log("clipboard", clipText)
+        if(clipText && clipText.length > 5) koItem(clipText)
+      },
+    );
+  }
+  this.guessGistToken = function() {
+    self.pasteFromClipboard(self.gistToken);
+  }
+  this.guessGistFile = function() {
+    self.pasteFromClipboard(self.gistFile);
+  }
+
   this.validateGridSize = function() {
     if (self.gridSize() < 20) {
       self.gridSize(20);
