@@ -507,16 +507,18 @@
             <div class="settings-item">
               <label class="settings-label" for="throttle-threshold">Token</label>
               <div class="slidecontainer settings-value">
-                <input type="password" placeholder=" Github token (enable gists)" data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken, focus: app.settings.guessGistToken }">
+                <input type="password" placeholder=" Github token (enable gists)" data-bind="value: app.settings.gistToken, event: { change: app.workspace.setGistToken }">
               </div>
+              <button data-bind="click:app.settings.guessGistToken">Paste</button>
               <button data-bind="click: function () { window.open('https://github.com/settings/tokens/new?scopes=gist&description=Yarn%20Gist%20Token','_blank','resizable=yes') }">New</button>
             </div> <!-- settgins-item -->
 
             <div class="settings-item">
               <label class="settings-label" for="throttle-threshold">Gist ID</label>
               <div class="slidecontainer settings-value">
-                <input type="input" class="settings-value" placeholder="gist.github.com/you/(gist id)" data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile, focus: app.settings.guessGistFile }">
+                <input type="input" class="settings-value" placeholder="gist.github.com/you/(gist id)" data-bind="value: app.settings.gistFile, event: { change: app.workspace.setGistFile }">
               </div>
+              <button data-bind="click:app.settings.guessGistFile">Paste</button>
               <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
             </div> <!-- settgins-item -->
 
