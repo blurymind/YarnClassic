@@ -1373,13 +1373,12 @@ export var App = function(name, version) {
   };
 
   this.updateSearch = Utils.debounce(function() {
-    var on = 1;
-    var off = 0.25;
-
+    const on = 1;
+    const off = 0.25;
+    const searchText = app.$searchField.val().toLowerCase();
     for (var i = 0; i < self.nodes().length; i++) {
       var node = self.nodes()[i];
-      var element = $(node.element);
-      var searchText = app.$searchField.val().toLowerCase();
+      var element = $(node.element);      
       const {
         matchTitle,
         matchBody,

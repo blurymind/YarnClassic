@@ -18,8 +18,11 @@
     <!-- search form -->
     <div class="app-search">
       <form class="menu" autocomplete="off" onkeypress="return event.keyCode != 13;">
-        <input id="nodeSearchInput" type="search" class="search-field" placeholder="Search" autocomplete="off" oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
-
+        <span class="app-search-field">
+          <input id="nodeSearchInput" type="search" class="search-field" placeholder="Search" autocomplete="off" oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
+          <button id="nodeSearchClear" data-bind="click: app.clearSearch">×</button> 
+        </span>
+ 
         <span>
           <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 

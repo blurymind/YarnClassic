@@ -987,7 +987,18 @@ input#editorTitle {
 .app-search {
   z-index: 10004;
 }
-
+.app-search-field {
+  position: relative;
+}
+#nodeSearchClear {
+  position: absolute;
+  right: 1px;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+#nodeSearchInput:not(:focus) + #nodeSearchClear:not(:active){
+  visibility: hidden;
+}
 .menu:hover .dropdown {
   max-height: var(--menu-dropdown-max-height);
 }
