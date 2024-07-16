@@ -1012,7 +1012,6 @@ input:focus + span + .dropdown {
 }
 
 .menu .dropdown {
-  position: absolute;
   clear: left;
   overflow: auto;
   max-height: 0px;
@@ -1026,6 +1025,10 @@ input:focus + span + .dropdown {
 
 .menu .dropdown::-webkit-scrollbar {
   display: none;
+}
+
+.absolute {
+  position: absolute;
 }
 
 .menu .dropdown .item {
