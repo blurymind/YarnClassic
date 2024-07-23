@@ -25,7 +25,7 @@ export var Plugins = function(app) {
   const self = this;
   const registerPlugin = plugin => {
     app.plugins[plugin.name] = plugin;
-    // console.log('attaching plugin', plugin, app.plugins);
+    // app.log('attaching plugin', plugin, app.plugins);
   };
 
   const getPluginStore = pluginName => {
@@ -267,10 +267,10 @@ export var Plugins = function(app) {
   // register plugins stored on a gist - todo cache all this
   if (app.settings.gistPluginsFile() !== null) {
     app.data.storage.getGist(app.settings.gistPluginsFile()).then(({fileList}) => {
-      console.log({ fileList });
+      app.log({ fileList });
       fileList.forEach(gistFile => {
         if (gistFile.language === 'JavaScript') {
-          console.log({ gistFile });
+          app.log({ gistFile });
           try {
             app.storage
               .getContentOrRaw(gistFile.content, gistFile.raw_url)
@@ -279,7 +279,7 @@ export var Plugins = function(app) {
                   importedPlugin => {
                     const newPlugin = importedPlugin(pluginApiMethods);
                     newPlugin.name = newPlugin.name || gistFile.filename;
-                    console.log(
+                    app.log(
                       { newPlugin },
                       'loaded from ',
                       gistFile.raw_url
@@ -290,11 +290,11 @@ export var Plugins = function(app) {
                         scriptEle.setAttribute('src', dependency);
                         document.body.appendChild(scriptEle);
                         scriptEle.addEventListener('load', () => {
-                          console.log('File loaded', dependency);
+                          app.log('File loaded', dependency);
                         });
 
                         scriptEle.addEventListener('error', ev => {
-                          console.log('Error on loading file', ev);
+                          app.log('Error on loading file', ev);
                         });
                       });
                     }

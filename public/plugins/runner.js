@@ -32,7 +32,7 @@ export var Runner = function({
         require('./jsoneditor/size-overrides.css');
         editor = new JSONEditor({ id: 'jsoneditor' });
         const localVariables = getPluginStore(self.name);
-        console.log({ editor });
+        app.log({ editor });
         // set json
         editor.setValue(
           typeof localVariables.variables !== 'object'
@@ -131,7 +131,7 @@ export var Runner = function({
             }
           });
           const localVariables = getPluginStore(self.name);
-          console.log('variables', localVariables);
+          app.log('variables', localVariables);
           app.data.getSaveData('json').then(saveData => {
             self.previewStory.initYarn(
               JSON.parse(saveData),
@@ -246,7 +246,7 @@ export var Runner = function({
             }
           });
           const localVariables = getPluginStore(self.name);
-          console.log('VARIABLES::::', localVariables);
+          app.log('VARIABLES::::', localVariables);
 
           app.data.getSaveData('ink', null, true).then(saveData => {
             const onRecompile = () => {
