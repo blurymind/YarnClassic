@@ -62,7 +62,7 @@ export const RichTextFormatter = function(app) {
         /((?:https?:\/\/)?(?:www.)?instagram.com\/p\/([^\s\<]+)\/)/i
       );
       if (extractedId.length > 2) {
-        console.log('EXTRACTED', extractedId);
+        app.log('EXTRACTED', extractedId);
         return `
             <iframe height="540" src="http://instagram.com/p/${extractedId[2]}/embed" frameborder="0"></iframe>
       `;

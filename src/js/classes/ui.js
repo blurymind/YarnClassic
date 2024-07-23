@@ -14,7 +14,7 @@ export const UI = function(app) {
     event.options = options;
     window.dispatchEvent(event);
     window.parent.dispatchEvent(event);
-    // console.log('Dispatched event', eventName, event);
+    // app.log('Dispatched event', eventName, event);
   };
 
   this.settingsDialogVisible = ko.observable(false);
@@ -420,7 +420,7 @@ export const UI = function(app) {
           if (typeof param.default === 'boolean') {
             $(`#swal-input${i}`)[0].checked = param.default;
           } else $(`#swal-input${i}`)[0].value = param.default;
-          console.log($(`#swal-input${i}`));
+          app.log($(`#swal-input${i}`));
         });
       },
     }).then(function(result) {

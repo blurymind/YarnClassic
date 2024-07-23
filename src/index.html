@@ -525,6 +525,10 @@
               <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
             </div> <!-- settgins-item -->
 
+            <div class="settings-item">
+              <label class="settings-label" for="developmentMode"><svg class="icon icon-sweat-emoji icon-fw icon-lg icon-sweat-emoji"><use xlink:href="public/icons.svg#icon-sweat-emoji"></use></svg> Development mode</label>
+              <input id="developmentMode" type="checkbox" checked="true" data-bind="checked: app.settings.developmentModeEnabled">
+            </div>
 
           </div> <!-- settgins-column -->
           <div class="settings-column"  id="settingsColumnB">
@@ -596,6 +600,11 @@
               <button data-bind="click: function () { window.open('https://gist.github.com/','_blank','resizable=yes') }">New</button>
               <button data-bind="click: function () { window.open('https://gist.github.com/2ff124dc94f936e8f7d96632f559aecb','_blank','resizable=yes') }">Examples</button>
             </div> <!-- settgins-item -->
+
+            <div class="settings-item">
+              <label class="settings-label" for="restoreSession"><svg class="icon icon-save icon-fw icon-lg settings-icon"><use xlink:href="public/icons.svg#icon-save"></use></svg> Restore previous session</label>
+              <input id="restoreSession" type="checkbox" checked="true" data-bind="checked: app.settings.restoreSessionEnabled">
+            </div>
 
           </div> <!-- settgins-column -->
         </div> <!-- settgins-row -->

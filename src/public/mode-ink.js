@@ -820,7 +820,7 @@ define('ace/mode/ink', [
   /// set context menu
   $.contextMenu(app.utils.getEditorContextMenu(/->/g));
 
-  console.log('ink', InkMode);
+  app.log('ink', InkMode);
   app.editor.setOptions({
     enableBasicAutocompletion: app.settings.autocompleteSuggestionsEnabled(),
     enableLiveAutocompletion: app.settings.autocompleteSuggestionsEnabled(),

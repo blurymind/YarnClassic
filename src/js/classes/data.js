@@ -9,7 +9,6 @@ export const data = {
   db: DBStorage('yarn-DB', 'Yarn-persistence'),
   storage: StorageJs("gist"),
   appInstanceStates: ko.observable([]),
-  restoreFromLocalStorage: ko.observable(true),
   // All the bellow go into appInstanceStates, which controls r/w of app states to local storage (for file tabs feature)
   isDocumentDirty: ko.observable(false),
   editingPath: ko.observable(null),
@@ -87,7 +86,7 @@ export const data = {
     });
   },
   loadDocumentStateTabFromIndex: function(index) {
-    console.log('ATTEMPT TO LOAD STATE', index);
+    app.log('ATTEMPT TO LOAD STATE', index);
     app.settings.selectedFileTab(index);
     data.loadAppStateFromLocalStorage();
   },
@@ -125,7 +124,7 @@ export const data = {
       reverseButtons: true,
     }).then(result => {
       if (result.value) {
-        console.log('DELETE TAB', data.appInstanceStates(), index);
+        app.log('DELETE TAB', data.appInstanceStates(), index);
         const mutatedState = data
           .appInstanceStates()
           .filter((_, i) => i !== index)
@@ -140,7 +139,7 @@ export const data = {
               : index;
           data.loadDocumentStateTabFromIndex(nextIndex);
         }, 500);
-        console.log(
+        app.log(
           data.appInstanceStates(),
           'resulting mutation',
           mutatedState
@@ -154,7 +153,7 @@ export const data = {
       ...data.appInstanceStates(),
       { ...data.getCurrentAppState() }, //this is pretty slow
     ]);
-    console.log('DOCUMENT TAB ADDED', data.appInstanceStates());
+    app.log('DOCUMENT TAB ADDED', data.appInstanceStates());
     data.saveAppStateToLocalStorage();
     data.loadDocumentStateTabFromIndex(data.appInstanceStates().length - 1);
     if (checked) {
@@ -164,7 +163,7 @@ export const data = {
       data.startNewFile(editingName, editingType);
     }
 
-    console.log({ editingName, yarnData, editingType, checked });
+    app.log({ editingName, yarnData, editingType, checked });
   },
   addDocumentStateTab: function() {
     data.promptFileNameAndFormat(
@@ -175,13 +174,13 @@ export const data = {
     );
   },
   saveAppStateToLocalStorage: Utils.debounce(function(writeCurrent = true) {
-    if (!data.restoreFromLocalStorage()) return;
+    if (!app.settings.restoreSessionEnabled()) return;
 
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
     data.lastEditedUnix(new Date());
     app.refreshWindowTitle();
-    // console.log('Update storage', data.appInstanceStates(), writeCurrent);
+    // app.log('Update storage', data.appInstanceStates(), writeCurrent);
     const updatedStates = [...data.appInstanceStates()];
     if (writeCurrent)
       updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
@@ -191,12 +190,10 @@ export const data = {
     app.ui.dispatchEvent('yarnSavedStateToLocalStorage');
   }, 700),
   loadAppStateFromLocalStorage: async function() {
-    if (!data.restoreFromLocalStorage()) return; // to ignore sometimes?
-
     const storage = app.settings.storage;
     // Just in case clear old state's cache
     if (storage.getItem('appState')) {
-      console.log('--- storage.clear() ---');
+      app.log('--- storage.clear() ---');
       storage.clear(); //TODO remove later
     }
     
@@ -206,7 +203,7 @@ export const data = {
 
     const currentDocState = appStates[app.settings.selectedFileTab()];
     data.appInstanceStates(appStates);
-    console.log('APP state', appStates, currentDocState);
+    app.log('APP state', appStates, currentDocState);
     if (currentDocState) {
       const {
         editingPath,
@@ -226,6 +223,10 @@ export const data = {
         lastEditedUnix,
         lastSavedUnix,
       } = currentDocState;
+      app.pluginStorage = pluginStorage;
+
+      if (!app.settings.restoreSessionEnabled()) return; // to ignore sometimes?
+
       app.tags(tags);
       data.editingPath(editingPath);
       data.editingName(editingName);
@@ -239,21 +240,19 @@ export const data = {
       data.isDocumentDirty(true);
       app.refreshWindowTitle();
       app.ui.dispatchEvent('yarnLoadedStateFromLocalStorage');
-      console.log('--- app.plugins.pluginStorage ---');
-      app.plugins.pluginStorage = pluginStorage;
-
+      app.log('--- app.plugins.pluginStorage ---');
       data.getNodesFromObjectsAsync(nodes).then(newNodes => {
         if (editingTitle) {
           app.editNode(newNodes.find(node => node.title() === editingTitle));
           if (editorSelection) app.editor.selection.setRange(editorSelection);
         }
-        console.log('--- app.nodes(newNodes) ---', newNodes.length);
+        app.log('--- app.nodes(newNodes) ---', newNodes.length);
         app.nodes(newNodes);
-        console.log('--- app.updateNodeLinks ---');
+        app.log('--- app.updateNodeLinks ---');
         app.updateNodeLinks();
-        console.log('--- app.workspace.setTranslation ---');
+        app.log('--- app.workspace.setTranslation ---');
         app.workspace.setTranslation(transform.x, transform.y);
-        console.log('--- app.workspace.setZoom ---');
+        app.log('--- app.workspace.setZoom ---');
         app.workspace.setZoom(scale * 4);
       });
     }
@@ -267,7 +266,7 @@ export const data = {
   },
 
   setNewFileStats: function(fileName, filePath, lastStorageHost = 'LOCAL') {
-    console.log('Updated save data', fileName, filePath);
+    app.log('Updated save data', fileName, filePath);
     data.editingName(fileName.replace(/^.*[\\\/]/, ''));
     data.isDocumentDirty(false);
     data.editingPath(filePath);
@@ -362,7 +361,7 @@ export const data = {
   restoreSettingsFromDocumentHeader: function() {
     if (data.documentHeader() !== null) {
       const documentHeader = data.documentHeader();
-      console.log('Apply settings from file header:', documentHeader);
+      app.log('Apply settings from file header:', documentHeader);
       if ('markupLanguage' in documentHeader)
         app.settings.markupLanguage(documentHeader.markupLanguage);
       if ('language' in documentHeader)
@@ -380,7 +379,7 @@ export const data = {
       }
     };
 
-    console.log('OPENING::', { content });
+    app.log('OPENING::', { content });
     // different depending on file
     if (type === FILETYPE.JSON) {
       content = JSON.parse(content); // todo this can fail, show error
@@ -410,7 +409,7 @@ export const data = {
           );
           obj.position = { x: parseInt(x), y: parseInt(y) };
           obj.colorID = colorID;
-          // console.log('OBJECT', obj);
+          // app.log('OBJECT', obj);
         } catch (e) {
           console.warn('node metadata failed parse: ', e);
         }
@@ -657,7 +656,7 @@ export const data = {
     if (type === FILETYPE.JSON) {
       // store useful values for later use if the file type supports it
       if (app.settings.filetypeVersion() === '2') {
-        console.log('Saving as Yarn json v2 type');
+        app.log('Saving as Yarn json v2 type');
         const date = new Date();
         data.documentHeader({
           ...data.documentHeader(),
@@ -777,7 +776,7 @@ export const data = {
               );
               reject();
             } else {
-              console.log('Warnings', response.warnings);
+              app.log('Warnings', response.warnings);
 
               app.ui.toastMixin.fire({
                 animation: true,
@@ -788,7 +787,7 @@ export const data = {
                 icon: response.warnings.length > 0 ? 'warning' : 'success',
                 text: response.warnings.join('\n'),
               });
-              console.log({ responseStory: response.story });
+              app.log({ responseStory: response.story });
               resolve(JSON.stringify(response.story, null, '\t'));
             }
           })
@@ -888,7 +887,7 @@ export const data = {
             isIfElse = false;
           } else if (trimmedLine.startsWith('<<set')) {
             const set = trimmedLine.replace(/[\<\>\$]|set /g, '').split('=');
-            console.log({ set });
+            app.log({ set });
             parsedBodyContent +=
               set.length > 1
                 ? `${tabs}$ ${set[0].trim()} = ${set[1].trim()}\n`
@@ -1050,8 +1049,8 @@ export const data = {
             text: yarnData,
             file: [file],
           })
-          .then(() => console.log('Successful share'))
-          .catch(error => console.log('Error sharing', error));
+          .then(() => app.log('Successful share'))
+          .catch(error => app.log('Error sharing', error));
       } else {
         Swal.fire({
           title:
@@ -1066,7 +1065,7 @@ export const data = {
     if (data.storage.hasGistSettings()) {
       data.storage.getGistFile().then(gist => {
         const gistFiles = Object.keys(gist.body.files);
-        console.log(gistFiles);
+        app.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
           data.editingName(editingName);
           data.storage.editGist(gists.file, editingName, yarnData);
@@ -1202,7 +1201,7 @@ export const data = {
           })
           .catch(err => {
             app.clipboard = app.editor.getSelectedText();
-            console.log('No clipboard access', err, 'using local instead');
+            app.log('No clipboard access', err, 'using local instead');
           });
       }
       // execCommand("paste") will not work on web browsers, due to security

@@ -47,10 +47,16 @@ export var App = function(name, version) {
     window.parent.dispatchEvent(event);
   };
 
+  this.log = function(message){
+    if(self.settings.developmentModeEnabled()){
+      console.log(message)
+    }
+  };
+
   this.setDocumentType = function(documentType, e) {
     const documentTypeId = e ? e.target.value : documentType;
     self.settings.documentType(documentTypeId);
-    console.log('Set doc type', documentType, app.data.inkCompiler);
+    self.log('Set doc type', documentType, app.data.inkCompiler);
     if (documentTypeId === 'ink') {
       if (app.data.inkCompiler === null)
         app.data.inkCompiler = new app.data.InkCompiler();
@@ -86,7 +92,7 @@ export var App = function(name, version) {
   };
 
   this.setGistCredentials = function(gist, e) {
-    console.log("SET CREDENTIALS")
+    self.log("SET CREDENTIALS")
     const { token, file } = gist;
     data.storage.setCredentials(token, file);
   };
@@ -206,7 +212,7 @@ export var App = function(name, version) {
     let deferredPrompt;
     const addBtn = $('#addPwa')[0];
     addBtn.style.display = 'none';
-    // addBtn.addEventListener('click', (e) => {console.log(e)});
+    // addBtn.addEventListener('click', (e) => {self.log(e)});
     window.addEventListener('beforeinstallprompt', e => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
@@ -221,10 +227,10 @@ export var App = function(name, version) {
         // Wait for the user to respond to the prompt
         deferredPrompt.userChoice.then(choiceResult => {
           if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the A2HS prompt');
+            self.log('User accepted the A2HS prompt');
             addBtn.style.display = 'none';
           } else {
-            console.log('User dismissed the A2HS prompt');
+            self.log('User dismissed the A2HS prompt');
           }
           deferredPrompt = null;
         });
@@ -847,7 +853,7 @@ export var App = function(name, version) {
       }),
       'Node Link'
     );
-    // console.log(langTools);
+    // self.log(langTools);
     langTools.setCompleters([
       nodeLinksCompleter,
       langTools.keyWordCompleter,

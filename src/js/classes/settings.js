@@ -63,7 +63,7 @@ export const Settings = function(app) {
     .readText()
     .then(
       (clipText) => {
-        console.log("clipboard", clipText)
+        app.log("clipboard", clipText)
         if(clipText && clipText.length > 5) koItem(clipText)
       },
     );
@@ -172,6 +172,22 @@ export const Settings = function(app) {
         : false
     )
     .extend({ persist: 'snapGridEnabled' });
+
+    this.restoreSessionEnabled = ko
+    .observable(
+      storage.getItem('restoreSessionEnabled') !== null
+        ? storage.getItem('restoreSessionEnabled') === 'true'
+        : false
+    )
+    .extend({ persist: 'restoreSessionEnabled' });
+
+    this.developmentModeEnabled = ko
+    .observable(
+      storage.getItem('developmentModeEnabled') !== null
+        ? storage.getItem('developmentModeEnabled') === 'true'
+        : false
+    )
+    .extend({ persist: 'developmentModeEnabled' });
 
   // Grid size
   this.gridSize = ko
