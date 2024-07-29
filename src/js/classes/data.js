@@ -82,6 +82,8 @@ export const data = {
     }).then(result => {
       if (result.value) {
         data.askForFileName();
+      } else {
+        data.startNewFile('NewFile');
       }
     });
   },
@@ -174,8 +176,6 @@ export const data = {
     );
   },
   saveAppStateToLocalStorage: Utils.debounce(function(writeCurrent = true) {
-    if (!app.settings.restoreSessionEnabled()) return;
-
     const storage = app.settings.storage;
     data.isDocumentDirty(true);
     data.lastEditedUnix(new Date());
@@ -196,14 +196,20 @@ export const data = {
       app.log('--- storage.clear() ---');
       storage.clear(); //TODO remove later
     }
-    
     const appStatesData = await data.db.getDbValue('appStates');
-    //const appStates = JSON.parse(storage.getItem('appStates')); // appStateS <- new key
     const appStates = JSON.parse(appStatesData); // appStateS <- new key
 
     const currentDocState = appStates[app.settings.selectedFileTab()];
+    if(app.settings.restoreSessionEnabled() === false) {
+      if (currentDocState) {
+        app.pluginStorage = currentDocState.pluginStorage;
+      }
+      app.settings.selectedFileTab(0)
+      data.startNewFile();
+      return;
+    }
     data.appInstanceStates(appStates);
-    app.log('APP state', appStates, currentDocState);
+    app.log('APP state', appStates, currentDocState);    
     if (currentDocState) {
       const {
         editingPath,
@@ -224,8 +230,6 @@ export const data = {
         lastSavedUnix,
       } = currentDocState;
       app.pluginStorage = pluginStorage;
-
-      if (!app.settings.restoreSessionEnabled()) return; // to ignore sometimes?
 
       app.tags(tags);
       data.editingPath(editingPath);
@@ -1062,16 +1066,17 @@ export const data = {
   },
 
   trySaveGist: function(gists) {
+    console.log({gists})
     if (data.storage.hasGistSettings()) {
       data.storage.getGistFile().then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         app.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
           data.editingName(editingName);
-          data.storage.editGist(gists.file, editingName, yarnData);
+          data.storage.editGist(data.storage.gistId, editingName, yarnData);
           Swal.fire(
             'Saved!',
-            `The Yarn has been saved to gist ${gists.file}`,
+            `The Yarn has been saved to gist ${data.storage.gistId}`,
             'success'
           );
           data.lastStorageHost('GIST');
