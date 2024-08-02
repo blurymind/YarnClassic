@@ -264,17 +264,19 @@ export var Plugins = function(app) {
     });
   });
 
+  console.log("Get plugins:", app.settings.gistPluginsFile())
   // register plugins stored on a gist - todo cache all this
   if (app.settings.gistPluginsFile() !== null) {
-    app.data.storage.getGist(app.settings.gistPluginsFile()).then(({fileList}) => {
-      app.log({ fileList });
-      fileList.forEach(gistFile => {
+    app.data.storage.getGist(app.settings.gistPluginsFile()).then(({filesInGist}) => {
+      console.log({ filesInGist });
+      Object.values(filesInGist).forEach(gistFile => {
         if (gistFile.language === 'JavaScript') {
-          app.log({ gistFile });
+          console.log({ gistFile });
           try {
             app.storage
               .getContentOrRaw(gistFile.content, gistFile.raw_url)
               .then(content => {
+                console.log({content})
                 importModuleWeb(content, gistFile.filename).then(
                   importedPlugin => {
                     const newPlugin = importedPlugin(pluginApiMethods);
