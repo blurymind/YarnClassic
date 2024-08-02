@@ -270,13 +270,14 @@ export var Plugins = function(app) {
     app.data.storage.getGist(app.settings.gistPluginsFile()).then(({filesInGist}) => {
       console.log({ filesInGist });
       Object.values(filesInGist).forEach(gistFile => {
+        console.log({ gistFile });
         if (gistFile.language === 'JavaScript') {
-          console.log({ gistFile });
+          
           try {
-            app.storage
+            app.data.storage
               .getContentOrRaw(gistFile.content, gistFile.raw_url)
               .then(content => {
-                console.log({content})
+                console.log({content})//doesnt resolve?
                 importModuleWeb(content, gistFile.filename).then(
                   importedPlugin => {
                     const newPlugin = importedPlugin(pluginApiMethods);
@@ -292,11 +293,11 @@ export var Plugins = function(app) {
                         scriptEle.setAttribute('src', dependency);
                         document.body.appendChild(scriptEle);
                         scriptEle.addEventListener('load', () => {
-                          app.log('File loaded', dependency);
+                          console.log('File loaded', dependency);
                         });
 
                         scriptEle.addEventListener('error', ev => {
-                          app.log('Error on loading file', ev);
+                          console.log('Error on loading file', ev);
                         });
                       });
                     }
