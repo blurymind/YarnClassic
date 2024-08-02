@@ -411,7 +411,7 @@
       <span class="app-title" data-bind="text:`${app.settings.documentType()} syntax`"></span>
       <span class="app-version" data-bind="text:app.version"></span>
       <span class="file-name" data-bind="text:
-      `${data.lastStorageHost()}:${data.editingName()}@${data.editingType()} ${data.isDocumentDirty() ? '*':''}`,
+      `${app.settings.lastStorageHost()}:${data.editingName()}@${data.editingType()} ${data.isDocumentDirty() ? '*':''}`,
       click:app.data.trySaveCurrent"></span>
     </div>
     <div class="title" id="addPwa">🍰Add to Homescreen📲</div>
@@ -632,6 +632,30 @@
   <div class="templates">
   </div>
   <link id="theme-stylesheet" rel="stylesheet" href="./public/themes/dracula.css">
+
+  <script>
+    document.body.addEventListener(
+      "error",
+      (event) => {
+        console.error('ERROR', event)
+        if (event.target && event.target.tagName === "SCRIPT" && event.target.src.startsWith("https://blurymind.github.io/YarnClassic/")) {
+          // if (confirm(`The App has updated and needs to be reloaded to clear cache. Reload? ${event.target.tagName}`) == true) {
+            console.log("RELOAD and clear cache");
+            caches.open("workbox-precache-v2-https://blurymind.github.io/YarnClassic/").then((cache) => {
+              cache.keys().then((keys) => {
+                console.log("Cache keys", keys);
+                keys.forEach(request => {
+                  cache.delete(request);
+                });
+                window.location.href = window.location.href.replace(/#.*$/, '');
+              })
+            });
+          // }
+        }
+      },
+      true
+    );
+  </script>
 </body>
 
 </html>

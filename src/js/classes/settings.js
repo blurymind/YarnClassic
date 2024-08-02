@@ -115,6 +115,14 @@ export const Settings = function(app) {
     .observable(storage.getItem('gistFile'))
     .extend({ persist: 'gistFile' });
 
+  this.lastEditedGist = ko
+    .observable(storage.getItem('lastEditedGist'))
+    .extend({ persist: 'lastEditedGist' });
+
+  this.lastStorageHost = ko
+    .observable(storage.getItem('lastStorageHost'))
+    .extend({ persist: 'lastStorageHost' });
+
   this.gistPluginsFile = ko
     .observable(storage.getItem('gistPluginsFile'))
     .extend({ persist: 'gistPluginsFile' });

@@ -16,7 +16,6 @@ export const data = {
   editingType: ko.observable('json'),
   editingFolder: ko.observable(null),
   documentHeader: ko.observable(null),
-  lastStorageHost: ko.observable('LOCAL'), // GIST | LOCAL
   lastEditedUnix: ko.observable(new Date()),
   lastSavedUnix: ko.observable(null),
   inkCompiler: null,
@@ -50,7 +49,6 @@ export const data = {
     app.tags([]);
     app.updateNodeLinks();
     app.workspace.warpToNodeByIdx(0);
-    data.lastStorageHost('LOCAL');
     data.isDocumentDirty(true);
     app.refreshWindowTitle();
     data.saveAppStateToLocalStorage();
@@ -73,7 +71,7 @@ export const data = {
       title: 'Create a New File?',
       text: `Any unsaved progress to ${data.editingName()}.${data.editingType()} will be lost!
       Path: ${data.editingPath()}
-      Storage: ${data.lastStorageHost()}
+      Storage: ${app.settings.lastStorageHost()}
       `,
       icon: 'warning',
       showCancelButton: true,
@@ -106,7 +104,7 @@ export const data = {
       editorSelection: app.editor ? app.editor.selection.getRange() : null,
       transform: app.workspace.transform,
       scale: app.workspace.scale,
-      lastStorageHost: data.lastStorageHost(),
+      lastStorageHost: app.settings.lastStorageHost(),
       lastEditedUnix: data.lastEditedUnix() || '',
       lastSavedUnix: data.lastSavedUnix(),
       pluginStorage: app.plugins.pluginStorage,
@@ -117,7 +115,7 @@ export const data = {
       title: 'Are you sure?',
       text: `Are you sure you want to close this file? Any unsaved changes to ${data.editingName()}.${data.editingType()} will be lost!
       Path: ${data.editingPath() || ''}
-      Storage: ${data.lastStorageHost()}
+      Storage: ${app.settings.lastStorageHost()}
       `,
       icon: 'warning',
       showCancelButton: true,
@@ -213,7 +211,6 @@ export const data = {
     if (currentDocState) {
       const {
         editingPath,
-        lastStorageHost,
         editingName,
         editingType,
         documentType,
@@ -237,7 +234,6 @@ export const data = {
       data.editingType(editingType);
       app.settings.documentType(documentType);
       data.editingFolder(editingFolder);
-      data.lastStorageHost(lastStorageHost);
       data.lastEditedUnix(lastEditedUnix);
       data.lastSavedUnix(lastSavedUnix);
       data.documentHeader(documentHeader);
@@ -274,7 +270,7 @@ export const data = {
     data.editingName(fileName.replace(/^.*[\\\/]/, ''));
     data.isDocumentDirty(false);
     data.editingPath(filePath);
-    data.lastStorageHost(lastStorageHost);
+    app.settings.lastStorageHost(lastStorageHost);
     app.refreshWindowTitle();
   },
   openFile: function(file, filename) {
@@ -1079,7 +1075,7 @@ export const data = {
             `The Yarn has been saved to gist ${data.storage.gistId}`,
             'success'
           );
-          data.lastStorageHost('GIST');
+          app.settings.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();
         }, gistFiles);
@@ -1098,17 +1094,19 @@ export const data = {
     const type = getFileType(name);
     data.loadData(content, type, true);
     data.isDocumentDirty(false);
-    data.lastStorageHost('GIST');
+    app.settings.lastStorageHost('GIST');
     data.editingPath(null);
     data.editingName(name);
+    app.settings.lastEditedGist(name);
     app.refreshWindowTitle();
   },
 
   tryOpenGist: function(gists) {
     if (data.storage.hasGistSettings()) {
+      console.log({edit:data.editingName(), last: app.settings.lastEditedGist(), lastHost: app.settings.lastStorageHost()})
       const previouslyOpenedGist =
-        data.lastStorageHost() === 'GIST' ? data.editingName() : '';
-        data.storage.getGistFile().then(({ inputOptions, filesInGist }) => {
+        app.settings.lastStorageHost() === 'GIST' ? app.settings.lastEditedGist() : '';
+        data.storage.getGistFile(app.ui.openSettingsDialog).then(({ inputOptions, filesInGist }) => {
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -1157,13 +1155,13 @@ export const data = {
   trySaveCurrent: function() {
     if (!data.isDocumentDirty()) return;
 
-    if (data.lastStorageHost() === 'GIST') {
+    if (app.settings.lastStorageHost() === 'GIST') {
       const storage = data.storage;
       storage.getGistFile().then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
           storage.editGistFile(data.editingName(), yarnData);
-          data.lastStorageHost('GIST');
+          app.settings.lastStorageHost('GIST');
           data.isDocumentDirty(false);
           app.refreshWindowTitle();
           app.ui.toastMixin.fire({

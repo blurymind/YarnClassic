@@ -487,13 +487,13 @@ export var App = function(name, version) {
 
   this.refreshWindowTitle = function() {
     let title = '';
-    if (data.lastStorageHost() === 'LOCAL') {
+    if (app.settings.lastStorageHost() === 'LOCAL') {
       title =
         'Yarn - ' +
         (data.editingPath() || data.editingName()) +
         ' ' +
         (data.isDocumentDirty() ? '*' : '');
-    } else if (data.lastStorageHost() === 'GIST') {
+    } else if (app.settings.lastStorageHost() === 'GIST') {
       title =
         'Gist - ' +
         (data.editingPath() || data.editingName()) +

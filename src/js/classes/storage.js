@@ -214,8 +214,9 @@ export const StorageJs = (type = 'gist') => {
         if (fileKey in this.filesInGist) return this.filesInGist[fileKey];
         console.error(`${fileKey} not found in gist`, this.filesInGist);
       },
-      getGist: function(gistId) {
-        return fetch('https://api.github.com/gists/' + gistId, {
+      getGist: function(gistId, onFail = () => {}) {
+        const fetchAddress = `https://api.github.com/gists/${gistId}`;
+        return fetch(fetchAddress, {
           method: 'GET',
           headers: {
             Accept: 'application/vnd.github+json',
@@ -225,6 +226,15 @@ export const StorageJs = (type = 'gist') => {
         })
           .then(data => {
             console.log('GOT -- ', { data });
+            if(data.ok === false) {
+              const GistStatusHints = {
+                401: "Is your Gist Token valid?",
+                404: `Is your Gist ID online?\n\naddress:\n${fetchAddress}`
+              }
+              alert(`Failed to get:\n${fetchAddress}...\n\nSTATUS: ${data.status}\n${data.status in GistStatusHints ? GistStatusHints[data.status] : ""}`)
+              if (data.status in GistStatusHints) onFail(data.status);
+              if (data.status === 404) window.open(fetchAddress, '_blank').focus();
+            }
             return data.json();
           })
           .then(content => {
@@ -246,8 +256,8 @@ export const StorageJs = (type = 'gist') => {
       hasGistSettings: function() {
         return this.gistId && this.gistId.length > 0;
       },
-      getGistFile: function() {
-        return this.getGist(this.gistId);
+      getGistFile: function(onFail = () => {}) {
+        return this.getGist(this.gistId, onFail);
       },
       getContentOrRaw: function(content, rawUrl) {
         // sometimes github comes back empty handed for content, but has raw_url
