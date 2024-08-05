@@ -1,7 +1,7 @@
 import { Runner } from './runner';
-// import { Transcribe } from './transcribe';
+import { PluginEditor } from './plugin-editor';
 
-const PLUGINS = [Runner];
+const PLUGINS = [Runner, PluginEditor];
 
 async function importModuleWeb(
   script,

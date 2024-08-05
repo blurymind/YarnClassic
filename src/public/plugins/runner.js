@@ -66,13 +66,16 @@ export var Runner = function({
       setterKey: 'setPlaytestStyle',
       settingsColumn: 'A',
     });
-    // create a button in the file menu
-    createButton(self.name, {
-      name: 'Playtest variables',
-      attachTo: 'fileMenuDropdown',
-      onClick: 'onOpenDialog()',
-      iconName: 'cog',
-    });
+    if(app.settings.developmentModeEnabled()) {
+      // create a button in the file menu
+      createButton(self.name, {
+        name: 'Playtest variables',
+        attachTo: 'fileMenuDropdown',
+        onClick: 'onOpenDialog()',
+        iconName: 'cog',
+      });
+    };
+
     const localVariables = getPluginStore(self.name);
     if (localVariables.runnerVariablesOpen) self.onOpenDialog();
   });
