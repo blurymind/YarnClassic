@@ -180,8 +180,11 @@ export const data = {
     app.refreshWindowTitle();
     // app.log('Update storage', data.appInstanceStates(), writeCurrent);
     const updatedStates = [...data.appInstanceStates()];
-    if (writeCurrent)
-      updatedStates[app.settings.selectedFileTab()] = data.getCurrentAppState();
+    if (writeCurrent) {
+      const tabIndex = app.settings.selectedFileTab() != null && app.settings.selectedFileTab() < updatedStates.length ? app.settings.selectedFileTab(): 0;
+      updatedStates[tabIndex] = data.getCurrentAppState();
+    }
+    console.log({updatedStates, tab: app.settings.selectedFileTab(), new: data.getCurrentAppState()})
     data.appInstanceStates(updatedStates);
     //storage.setItem('appStates', JSON.stringify(data.appInstanceStates()));
     data.db.save('appStates', JSON.stringify(data.appInstanceStates()))
@@ -195,6 +198,10 @@ export const data = {
       storage.clear(); //TODO remove later
     }
     const appStatesData = await data.db.getDbValue('appStates');
+    if(!appStatesData){
+      console.warn("failed to load persisted state")
+      return;
+    }
     const appStates = JSON.parse(appStatesData); // appStateS <- new key
 
     const currentDocState = appStates[app.settings.selectedFileTab()];
