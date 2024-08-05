@@ -264,52 +264,65 @@ export var Plugins = function(app) {
     });
   });
 
+  const dbStorage = app.data.db;
+  const cachedPlugins = {};
+  const loadPluginsFromCacheOrGist = (plugins, shouldCache = true) => {
+    plugins.forEach(gistFile => {
+      console.log({ gistFile });
+    
+      if (gistFile.language === 'JavaScript') {
+        try {
+          app.data.storage
+            .getContentOrRaw(gistFile.content, gistFile.raw_url)
+            .then(content => {
+              console.log({content})//doesnt resolve?
+              importModuleWeb(content, gistFile.filename).then(
+                importedPlugin => {
+                  const newPlugin = importedPlugin(pluginApiMethods);
+                  newPlugin.name = newPlugin.name || gistFile.filename;
+                  app.log(
+                    { newPlugin },
+                    'loaded from ',
+                    gistFile.raw_url
+                  );
+                  cachedPlugins[gistFile.filename] = { ...gistFile, content };
+                  if (shouldCache) dbStorage.save("cachedPlugins", cachedPlugins);
+                  if ('dependencies' in newPlugin) {
+                    newPlugin.dependencies.forEach(dependency => {
+                      const scriptEle = document.createElement('script');
+                      scriptEle.setAttribute('src', dependency);
+                      document.body.appendChild(scriptEle);
+                      scriptEle.addEventListener('load', () => {
+                        console.log('File loaded', dependency);
+                      });
+
+                      scriptEle.addEventListener('error', ev => {
+                        console.log('Error on loading file', ev);
+                      });
+                    });
+                  }
+                  registerPlugin(newPlugin);
+                }
+              );
+            }); 
+          } catch (e) {
+            console.error(gistFile.filename, 'Plugin failed to load', e);
+          }
+        }
+      });
+  }
+  
+  dbStorage.getDbValue('cachedPlugins').then(cachedPluginsFromStorage => {
+    console.log({cachedPluginsFromStorage})
+    // console.log({cachedPluginsFromStorageParsed: JSON.parse(cachedPluginsFromStorage)})
+  });
   console.log("Get plugins:", app.settings.gistPluginsFile())
   // register plugins stored on a gist - todo cache all this
   if (app.settings.gistPluginsFile() !== null) {
     app.data.storage.getGist(app.settings.gistPluginsFile()).then(({filesInGist}) => {
       console.log({ filesInGist });
-      Object.values(filesInGist).forEach(gistFile => {
-        console.log({ gistFile });
-        if (gistFile.language === 'JavaScript') {
-          
-          try {
-            app.data.storage
-              .getContentOrRaw(gistFile.content, gistFile.raw_url)
-              .then(content => {
-                console.log({content})//doesnt resolve?
-                importModuleWeb(content, gistFile.filename).then(
-                  importedPlugin => {
-                    const newPlugin = importedPlugin(pluginApiMethods);
-                    newPlugin.name = newPlugin.name || gistFile.filename;
-                    app.log(
-                      { newPlugin },
-                      'loaded from ',
-                      gistFile.raw_url
-                    );
-                    if ('dependencies' in newPlugin) {
-                      newPlugin.dependencies.forEach(dependency => {
-                        const scriptEle = document.createElement('script');
-                        scriptEle.setAttribute('src', dependency);
-                        document.body.appendChild(scriptEle);
-                        scriptEle.addEventListener('load', () => {
-                          console.log('File loaded', dependency);
-                        });
-
-                        scriptEle.addEventListener('error', ev => {
-                          console.log('Error on loading file', ev);
-                        });
-                      });
-                    }
-                    registerPlugin(newPlugin);
-                  }
-                  );
-                });
-            } catch (e) {
-              console.error(gistFile.filename, 'Plugin failed to load', e);
-            }
-          }
-        });
-      });
-    }
+      
+      loadPluginsFromCacheOrGist(Object.values(filesInGist));
+    });
+  }
 };
