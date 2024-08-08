@@ -1418,3 +1418,14 @@ input[type=search]::-webkit-search-cancel-button {
   max-width: 50vw;
   z-index: -9999;
 }
+
+.button-group-rounded {
+  border-radius: 17px;
+  gap: 0;
+  display: flex;
+  overflow: hidden;
+  font-size: 1.4rem;
+}
+.button-group-rounded > :not(.active) {
+  opacity: 0.5;
+}
