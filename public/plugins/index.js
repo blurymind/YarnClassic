@@ -1,7 +1,7 @@
 import { Runner } from './runner';
-// import { Transcribe } from './transcribe';
+import { PluginEditor } from './plugin-editor';
 
-const PLUGINS = [Runner];
+const PLUGINS = [Runner, PluginEditor];
 
 async function importModuleWeb(
   script,
@@ -235,6 +235,37 @@ export var Plugins = function(app) {
     });
   };
 
+  const dbStorage = app.data.db;
+  const getVloatilePlugins = () => dbStorage.getDbValue('volatilePlugins');
+  const setVloatilePlugins = value => dbStorage.save('volatilePlugins', value);
+  const setVloatilePlugin = (key, value) => {
+    getVloatilePlugins().then(prev => {
+      prev = prev || {};
+      dbStorage.save('volatilePlugins', {
+        ...prev,
+        [key]: { ...prev[key], ...value },
+      });
+    });
+  };
+
+  const getGistPluginFiles = () => {
+    return new Promise((resolve, reject) => {
+      if (!app.settings.gistPluginsFile()) reject();
+      app.data.storage
+        .getGist(app.settings.gistPluginsFile())
+        .then(({ filesInGist }) => {
+          const promises = Object.values(filesInGist)
+            .filter(gistFile => gistFile.language === 'JavaScript')
+            .map(gistFile => {
+              return app.data.storage
+                .getContentOrRaw(gistFile.content, gistFile.raw_url)
+                .then(content => ({ ...gistFile, content }));
+            });
+          resolve(Promise.all(promises));
+        });
+    });
+  };
+
   const pluginApiMethods = {
     app,
     createButton,
@@ -253,10 +284,13 @@ export var Plugins = function(app) {
     onKeyUp,
     onKeyDown,
     onLoad,
+    getVloatilePlugins,
+    setVloatilePlugin,
+    setVloatilePlugins,
+    getGistPluginFiles
   };
-  // Todo these are not being cached by the PWA - needs fixing
-  // Todo these should also be optional when building - exclude for build-tiny
-  // plugin initiation
+
+  // built in plugin initiation
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin(pluginApiMethods);
     window.addEventListener('DOMContentLoaded', e => {
@@ -264,52 +298,95 @@ export var Plugins = function(app) {
     });
   });
 
-  console.log("Get plugins:", app.settings.gistPluginsFile())
-  // register plugins stored on a gist - todo cache all this
-  if (app.settings.gistPluginsFile() !== null) {
-    app.data.storage.getGist(app.settings.gistPluginsFile()).then(({filesInGist}) => {
-      console.log({ filesInGist });
-      Object.values(filesInGist).forEach(gistFile => {
-        console.log({ gistFile });
-        if (gistFile.language === 'JavaScript') {
-          
-          try {
-            app.data.storage
-              .getContentOrRaw(gistFile.content, gistFile.raw_url)
-              .then(content => {
-                console.log({content})//doesnt resolve?
-                importModuleWeb(content, gistFile.filename).then(
-                  importedPlugin => {
-                    const newPlugin = importedPlugin(pluginApiMethods);
-                    newPlugin.name = newPlugin.name || gistFile.filename;
-                    app.log(
-                      { newPlugin },
-                      'loaded from ',
-                      gistFile.raw_url
-                    );
-                    if ('dependencies' in newPlugin) {
-                      newPlugin.dependencies.forEach(dependency => {
-                        const scriptEle = document.createElement('script');
-                        scriptEle.setAttribute('src', dependency);
-                        document.body.appendChild(scriptEle);
-                        scriptEle.addEventListener('load', () => {
-                          console.log('File loaded', dependency);
-                        });
+  dbStorage.getDbValue('volatilePlugins').then(volatilePlugins => {
+    // load builtin plugins
+    const builtInVolatilePlugins = {};
+    const builtInPlugins = {}; // so we can revert the volatile one to the built in one as fallback
+    const onLoadBuiltInPlugins = () => {
+      PLUGINS.forEach(plugin => {
+        const builtInPlugin = {
+          filename: `${plugin.name}.js`,
+          content: `
+        module.exports = ${plugin.toString()}`,
+          type: 'builtin',
+          language: 'JavaScript',
+        };
+        console.log({ builtInPlugin });
 
-                        scriptEle.addEventListener('error', ev => {
-                          console.log('Error on loading file', ev);
-                        });
-                      });
-                    }
-                    registerPlugin(newPlugin);
-                  }
-                  );
-                });
-            } catch (e) {
-              console.error(gistFile.filename, 'Plugin failed to load', e);
-            }
-          }
-        });
+        builtInPlugins[plugin.name] = builtInPlugin;
+        if (volatilePlugins && plugin.name in volatilePlugins) {
+          return; // use the mutated volatile plugin when available
+        }
+
+        builtInVolatilePlugins[plugin.name] = builtInPlugin;
       });
+      dbStorage.save('builtinVolatilePlugins', builtInVolatilePlugins);
+    };
+
+    const loadPluginWithDependencies = (content, filename) => {
+      importModuleWeb(content, filename).then(importedPlugin => {
+        const newPlugin = importedPlugin(pluginApiMethods);
+        console.log({ importedPlugin, newPlugin });
+        newPlugin.name = newPlugin.name || filename;
+
+        if ('dependencies' in newPlugin) {
+          newPlugin.dependencies.forEach(dependency => {
+            const scriptEle = document.createElement('script');
+            scriptEle.setAttribute('src', dependency);
+            document.body.appendChild(scriptEle);
+            scriptEle.addEventListener('load', () => {
+              console.log('File loaded', dependency);
+            });
+
+            scriptEle.addEventListener('error', ev => {
+              console.log('Error on loading file', ev);
+            });
+          });
+        }
+        registerPlugin(newPlugin);
+      });
+    };
+
+    const volatileGistPlugins = {};
+    const loadPluginsFromCacheOrGist = () => {
+      getGistPluginFiles().then(plugins =>
+        plugins.forEach(gistFile => {
+          console.log({ gistFile });
+          if (!(gistFile.filename in volatilePlugins)) {
+            loadPluginWithDependencies(content, gistFile.filename);
+
+            volatileGistPlugins[gistFile.filename] = gistFile;
+            setVloatilePlugin(
+              gistFile.filename,
+              volatileGistPlugins[gistFile.filename]
+            );
+          } else {
+            // do not set volatilePlugin from gist if its already in cache
+          }
+        })
+      );
+    };
+
+    const onLoadPluginsFromVolatile = () => {
+      Object.values(volatilePlugins).forEach(volatilePlugin => {
+        if (volatilePlugin.type === 'builtin') return; // todo for now built in ones dont
+
+        importModuleWeb(volatilePlugin.content, volatilePlugin.name).then(
+          importedPlugin => {
+            const initializedPlugin = new importedPlugin(pluginApiMethods);
+            console.log({ importedPlugin, initializedPlugin });
+            window.addEventListener('DOMContentLoaded', e => {
+              registerPlugin(initializedPlugin);
+            });
+          }
+        );
+      });
+    };
+
+    if (app.settings.gistPluginsFile() !== null) {
+      loadPluginsFromCacheOrGist(); // writes gist data to volatile cache
     }
+    onLoadBuiltInPlugins();
+    onLoadPluginsFromVolatile();
+  });
 };
