@@ -7,7 +7,7 @@ const editorOptions = {
   tabSize: 2,
   enableBasicAutocompletion: true,
   enableLiveAutocompletion: true,
-}
+};
 export var PluginEditor = function({
   app,
   createButton,
@@ -33,7 +33,9 @@ export var PluginEditor = function({
   this.editingFile = '';
   this.volatilePlugins = {};
   this.gistPluginFiles = {};
+  this.mode = 'edit';
   this.onSetPluginEditMode = mode => {
+    this.mode = mode;
     setPluginStore(self.name, 'pluginEditMode', mode);
     document
       .querySelectorAll('#edit-plugin-mode > button')
@@ -48,7 +50,7 @@ export var PluginEditor = function({
     document.getElementById('plugin-output-previewer').style.display =
       mode === 'test' ? 'block' : 'none';
 
-      this.onSetEditingFile()
+    this.onSetEditingFile();
   };
   this.onOpenPluginEditor = async () => {
     // ace-editor
@@ -69,27 +71,23 @@ export var PluginEditor = function({
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
         beautify.beautify(this.editor.session);
-        
-        
 
         getGistPluginFiles().then(gistPluginFiles => {
           const gistPluginFile = gistPluginFiles.find(
             item => item.filename == fileName
           );
           console.log({ gistPluginFile }, this.differ.getEditors());
-          fileContents = this.editor.getValue()
+          fileContents = this.editor.getValue();
           this.differ
-            .getEditors().left
-            .getSession()
+            .getEditors()
+            .left.getSession()
             .setValue(fileContents);
 
-          // beautify.beautify(this.differ
-          //   .getEditors().left.session);
-
           this.differ
-            .getEditors().right
-            .getSession()
+            .getEditors()
+            .right.getSession()
             .setValue(gistPluginFile.content);
+          this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
         });
       });
     };
@@ -176,15 +174,15 @@ export var PluginEditor = function({
 
         const onChangeFromDiffDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
-            content: this.differ
-            .getEditors().left.getValue(),
+            content: this.differ.getEditors().left.getValue(),
           });
         }, 600);
         this.differ
-        .getEditors().left
-        .getSession().on('change', function() {
-          onChangeFromDiffDebounced();
-        });
+          .getEditors()
+          .left.getSession()
+          .on('change', function() {
+            onChangeFromDiffDebounced();
+          });
 
         // initialize data on both editor and differ
         this.onSetEditingFile();
