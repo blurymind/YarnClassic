@@ -72,23 +72,25 @@ export var PluginEditor = function({
         this.editor.clearSelection();
         beautify.beautify(this.editor.session);
 
-        getGistPluginFiles().then(gistPluginFiles => {
-          const gistPluginFile = gistPluginFiles.find(
-            item => item.filename == fileName
-          );
-          console.log({ gistPluginFile }, this.differ.getEditors());
-          fileContents = this.editor.getValue();
-          this.differ
-            .getEditors()
-            .left.getSession()
-            .setValue(fileContents);
+        if (this.mode === 'commit') {
+          getGistPluginFiles().then(gistPluginFiles => {
+            const gistPluginFile = gistPluginFiles.find(
+              item => item.filename == fileName
+            );
+            console.log({ gistPluginFile }, this.differ.getEditors());
+            fileContents = this.editor.getValue();
+            this.differ
+              .getEditors()
+              .left.getSession()
+              .setValue(fileContents);
 
-          this.differ
-            .getEditors()
-            .right.getSession()
-            .setValue(gistPluginFile.content);
-          this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
-        });
+            this.differ
+              .getEditors()
+              .right.getSession()
+              .setValue(gistPluginFile.content);
+            this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
+          });
+        }
       });
     };
 
