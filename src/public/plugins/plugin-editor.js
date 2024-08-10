@@ -198,13 +198,13 @@ export var PluginEditor = function ({
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit">Edit</button>
+        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit" style="width:90px;border-right: 1px solid #f0f8ff14;">Edit</button>
 
             <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test">Test</button>
+        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test" style="width:90px;border-right: 1px solid #f0f8ff14">Test</button>
 
         <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
+        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit" style="width:107px">Commit</button> 
           </div>
         </div>
         `.replaceAll('\n', ''),
@@ -219,7 +219,7 @@ export var PluginEditor = function ({
         </div>
         
         <div>
-          <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%;">
+          <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%; border: none;">
             Write to previewer
           </textarea>
         </div>
