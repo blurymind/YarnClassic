@@ -21,7 +21,7 @@ const EXAMPLE = `
       const k = kaboom({
         canvas: document.querySelector("#kaboom"),
       })
-      k.loadSprite("bean", "public/images/pixel.png")
+      k.loadSprite("bean", "public/icon.png")
     }
   }
 }
@@ -235,7 +235,7 @@ export var PluginEditor = function ({
             padding-right: 9px;
             border-radius: 0.9rem;"
             onclick="app.plugins.${self.name
-            }.onDownloadPreview()"
+        }.onDownloadPreview()"
           >
             Download
           </button>
@@ -245,7 +245,7 @@ export var PluginEditor = function ({
      
 
         `,
-      showConfirmButton: false ,
+      showConfirmButton: false,
       focusConfirm: false,
       customClass: 'swal-wide',
       width: `${window.innerWidth - 20}px`,
@@ -257,6 +257,10 @@ export var PluginEditor = function ({
         } else {
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
+      },
+      onAfterClose: () => {
+        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       onOpen: () => {
         // EDITOR
@@ -306,10 +310,6 @@ export var PluginEditor = function ({
 
         // initialize data on both editor and differ
         this.onSetEditingFile();
-      },
-      onAfterClose: () => {
-        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
-        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
