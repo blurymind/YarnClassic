@@ -8,6 +8,8 @@ async function importModuleWeb(
   modulePath,
   { forceUpdate } = { forceUpdate: false }
 ) {
+  if(!script.startsWith("export.module")) return Promise.reject( `${modulePath} Not a module`);
+
   const { AsyncFunction, cache } = globalThis.__import__ || {
     AsyncFunction: Object.getPrototypeOf(async function() {}).constructor,
     cache: new Map(),
@@ -371,7 +373,6 @@ export var Plugins = function(app) {
     const onLoadPluginsFromVolatile = () => {
       Object.values(volatilePlugins).forEach(volatilePlugin => {
         if (volatilePlugin.type === 'builtin') return; // todo for now built in ones dont
-
         importModuleWeb(volatilePlugin.content, volatilePlugin.name).then(
           importedPlugin => {
             const initializedPlugin = new importedPlugin(pluginApiMethods);
