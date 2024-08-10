@@ -219,3 +219,7 @@ a:hover {
 .grid-canvas {
   color: grey;
 }
+
+button {
+  background: #99ebe4;
+}

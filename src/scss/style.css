@@ -1435,3 +1435,9 @@ input[type=search]::-webkit-search-cancel-button {
 .button-group-rounded > button {
   border-radius: 0;
 }
+
+input,
+button {
+  outline: none;
+  border: 0;
+}
