@@ -57,13 +57,13 @@ const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
     </style>
   </head>
   <body>
-    ${modules.map(item => `<script src="${item}"></script>`)}
     ${html}
-  </body>
-  <script type="module">
+    ${modules.map(item => `<script src="${item}"></script>`)}
+    <script type="module">
     const run = ${script};
     run();
   </script>
+  </body>
 `
 const editorOptions = {
   mode: 'ace/mode/javascript',
@@ -199,27 +199,32 @@ export var PluginEditor = function ({
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
         }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit">Edit</button>
-            <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
+
             <button onclick="app.plugins.${self.name
         }.onSetPluginEditMode('test')" id="edit-plugin-mode-test">Test</button>
+
+        <button onclick="app.plugins.${self.name
+        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
           </div>
         </div>
         `.replaceAll('\n', ''),
       html: `
-      <div id="js-editor-wrapper">
+      <div style="overflow:hidden;">
+        <div id="js-editor-wrapper">
         <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
+        </div>
+
+        <div style="position: relative;">
+            <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
+        </div>
+        
+        <div>
+          <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%;">
+            Write to previewer
+          </textarea>
+        </div>
       </div>
 
-      <div style="position: relative;">
-          <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
-      </div>
-      
-      <div>
-        <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%;">
-          Write to previewer
-        </textarea>
-      </div>
         `,
       focusConfirm: false,
       customClass: 'swal-wide',
@@ -246,7 +251,7 @@ export var PluginEditor = function ({
           onChangeDebounced();
         });
         const localVariables = getPluginStore(self.name);
-        this.onSetPluginEditMode(localVariables.pluginEditMode || 'commit');
+        this.onSetPluginEditMode(localVariables.pluginEditMode || 'edit');
 
         setPluginStore(self.name, 'pluginEditorOpen', true);
 
