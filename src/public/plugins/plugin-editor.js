@@ -12,23 +12,58 @@ const removeStyleSheet = (path, root = document) => {
   if (el) root.getElementById(path).remove()
 }
 
-const ExampleOutputFunction = `
-// To render here, the script needs to be a function that returns modules, body and script
-// Example:
+const EXAMPLE = `
 () => {
   return {
-    modules: [],
-    body: "<div></div>",
+    modules: ["https://unpkg.com/kaboom@0.5.1/dist/kaboom.js"],
+    body: "<canvas id='kaboom'></canvas>",
     script: () => {
-      console.log("VOALA")
+      const k = kaboom({
+        canvas: document.querySelector("#kaboom"),
+      })
+      k.loadSprite("bean", "public/images/pixel.png")
     }
   }
 }
 `
+const getExampleOutputFunction = (error = "") => `
+<head>
+<style>
+  body,
+  head {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+<textarea style="height: 70vh; width: 100%;">
+${error}
+
+// To render here, the script needs to be a function that returns modules, body and script
+// Example:
+${EXAMPLE}
+</textarea>
+<body>
+`
 const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
-  <head> ${modules.map(item => `<link as="script" href="${item}">`)}</head>
-  <body>${html}</body>
-  <script>${script}</script>
+  <head>
+    <style>
+      body,
+      head {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    ${modules.map(item => `<script src="${item}"></script>`)}
+    ${html}
+  </body>
+  <script type="module">
+    const run = ${script};
+    run();
+  </script>
 `
 const editorOptions = {
   mode: 'ace/mode/javascript',
@@ -126,26 +161,22 @@ export var PluginEditor = function ({
               try {
                 const data = extension();
                 if (!data) {
-                  document.getElementById('plugin-output-previewer').value = `The function needs to return an object..
-                  ${ExampleOutputFunction}
-                `
+
+                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
                   return;
                 }
-                document.getElementById('plugin-output-previewer').value = getPreviewHtml(data.modules || [], data.body, data.script)
+                document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script)
               } catch (e) {
-                document.getElementById('plugin-output-previewer').value = `${e.toString()}
-                SEE CONSOLE LOGS
-                ${ExampleOutputFunction}
-                `;
+                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+                SEE CONSOLE LOGS`)
+                  ;
               }
               return
             }
-            document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
+            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
           } catch (e) {
-            document.getElementById('plugin-output-previewer').value = `${e.toString()}
-            SEE CONSOLE LOGS
-            ${ExampleOutputFunction}
-            `;
+            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+            SEE CONSOLE LOGS`);
             console.error(e)
           }
         }
@@ -185,7 +216,7 @@ export var PluginEditor = function ({
       </div>
       
       <div>
-        <textarea id="plugin-output-previewer" style="height: 70vh; width: 100%;">
+        <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%;">
           Write to previewer
         </textarea>
       </div>
