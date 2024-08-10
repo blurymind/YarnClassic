@@ -12,23 +12,58 @@ const removeStyleSheet = (path, root = document) => {
   if (el) root.getElementById(path).remove()
 }
 
-const ExampleOutputFunction = `
-// To render here, the script needs to be a function that returns modules, body and script
-// Example:
+const EXAMPLE = `
 () => {
   return {
-    modules: [],
-    body: "<div></div>",
+    modules: ["https://unpkg.com/kaboom@0.5.1/dist/kaboom.js"],
+    body: "<canvas id='kaboom'></canvas>",
     script: () => {
-      console.log("VOALA")
+      const k = kaboom({
+        canvas: document.querySelector("#kaboom"),
+      })
+      k.loadSprite("bean", "public/images/pixel.png")
     }
   }
 }
 `
+const getExampleOutputFunction = (error = "") => `
+<head>
+<style>
+  body,
+  head {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+</head>
+<body>
+<textarea style="height: 70vh; width: 100%;">
+${error}
+
+// To render here, the script needs to be a function that returns modules, body and script
+// Example:
+${EXAMPLE}
+</textarea>
+<body>
+`
 const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
-  <head> ${modules.map(item => `<link as="script" href="${item}">`)}</head>
-  <body>${html}</body>
-  <script>${script}</script>
+  <head>
+    <style>
+      body,
+      head {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    ${html}
+    ${modules.map(item => `<script src="${item}"></script>`)}
+    <script type="module">
+    const run = ${script};
+    run();
+  </script>
+  </body>
 `
 const editorOptions = {
   mode: 'ace/mode/javascript',
@@ -114,7 +149,7 @@ export var PluginEditor = function ({
             this.differ
               .getEditors()
               .right.getSession()
-              .setValue(gistPluginFile.content);
+              .setValue(gistPluginFile ? gistPluginFile.content : `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`);
             this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
           });
         }
@@ -126,26 +161,22 @@ export var PluginEditor = function ({
               try {
                 const data = extension();
                 if (!data) {
-                  document.getElementById('plugin-output-previewer').value = `The function needs to return an object..
-                  ${ExampleOutputFunction}
-                `
+
+                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
                   return;
                 }
-                document.getElementById('plugin-output-previewer').value = getPreviewHtml(data.modules || [], data.body, data.script)
+                document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script)
               } catch (e) {
-                document.getElementById('plugin-output-previewer').value = `${e.toString()}
-                SEE CONSOLE LOGS
-                ${ExampleOutputFunction}
-                `;
+                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+                SEE CONSOLE LOGS`)
+                  ;
               }
               return
             }
-            document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
+            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
           } catch (e) {
-            document.getElementById('plugin-output-previewer').value = `${e.toString()}
-            SEE CONSOLE LOGS
-            ${ExampleOutputFunction}
-            `;
+            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+            SEE CONSOLE LOGS`);
             console.error(e)
           }
         }
@@ -167,28 +198,33 @@ export var PluginEditor = function ({
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit">Edit</button>
+        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit" style="width:90px;border-right: 1px solid #f0f8ff14;">Edit</button>
+
             <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
-            <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test">Test</button>
+        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test" style="width:90px;border-right: 1px solid #f0f8ff14">Test</button>
+
+        <button onclick="app.plugins.${self.name
+        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit" style="width:107px">Commit</button> 
           </div>
         </div>
         `.replaceAll('\n', ''),
       html: `
-      <div id="js-editor-wrapper">
+      <div style="overflow:hidden;">
+        <div id="js-editor-wrapper">
         <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
+        </div>
+
+        <div style="position: relative;">
+            <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
+        </div>
+        
+        <div>
+          <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%; border: none;">
+            Write to previewer
+          </textarea>
+        </div>
       </div>
 
-      <div style="position: relative;">
-          <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
-      </div>
-      
-      <div>
-        <textarea id="plugin-output-previewer" style="height: 70vh; width: 100%;">
-          Write to previewer
-        </textarea>
-      </div>
         `,
       focusConfirm: false,
       customClass: 'swal-wide',
@@ -215,7 +251,7 @@ export var PluginEditor = function ({
           onChangeDebounced();
         });
         const localVariables = getPluginStore(self.name);
-        this.onSetPluginEditMode(localVariables.pluginEditMode || 'commit');
+        this.onSetPluginEditMode(localVariables.pluginEditMode || 'edit');
 
         setPluginStore(self.name, 'pluginEditorOpen', true);
 
