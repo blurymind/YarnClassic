@@ -1,5 +1,16 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
-import './ace-diff/ace-diff-dark.min.css';
+
+const addStyleSheet = (path, root = document.head) => {
+  const styleEl = document.createElement("link")
+  styleEl.setAttribute("rel", "stylesheet")
+  styleEl.setAttribute("href", path)
+  styleEl.setAttribute("id", path)
+  root.appendChild(styleEl)
+}
+const removeStyleSheet = (path, root = document) => {
+  const el = root.getElementById(path);
+  if (el) root.getElementById(path).remove()
+}
 
 const ExampleOutputFunction = `
 // To render here, the script needs to be a function that returns modules, body and script
@@ -20,7 +31,6 @@ const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
   <script>${script}</script>
 `
 const editorOptions = {
-  theme: 'ace/theme/monokai',
   mode: 'ace/mode/javascript',
   tabSize: 2,
   enableBasicAutocompletion: true,
@@ -52,6 +62,7 @@ export var PluginEditor = function ({
   this.volatilePlugins = {};
   this.gistPluginFiles = {};
   this.mode = 'edit';
+  this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
   this.onSetPluginEditMode = mode => {
     this.mode = mode;
     setPluginStore(self.name, 'pluginEditMode', mode);
@@ -74,11 +85,8 @@ export var PluginEditor = function ({
     // ace-editor
     require('ace-builds/src-min-noconflict/ext-beautify');
     require('ace-builds/src-min-noconflict/mode-javascript');
-    require('ace-builds/src-min-noconflict/theme-monokai');
+    require('ace-builds/src-min-noconflict/theme-monokai')
     const beautify = ace.require('ace/ext/beautify');
-
-    // ace-diff
-    require('ace-builds/src-min-noconflict/theme-twilight');
 
     this.onSetEditingFile = () => {
       const fileName = document.getElementById('edited-plugin-file').value;
@@ -111,7 +119,7 @@ export var PluginEditor = function ({
           });
         }
         if (this.mode === 'test') {
-          try{
+          try {
             const extension = new Function("parameters", `return ${fileContents}`)();
             console.log({ extensionData: extension(), fileContents })
             if (typeof extension === 'function') {
@@ -133,7 +141,7 @@ export var PluginEditor = function ({
               return
             }
             document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
-          } catch(e) {
+          } catch (e) {
             document.getElementById('plugin-output-previewer').value = `${e.toString()}
             SEE CONSOLE LOGS
             ${ExampleOutputFunction}
@@ -185,10 +193,19 @@ export var PluginEditor = function ({
       focusConfirm: false,
       customClass: 'swal-wide',
       width: `${window.innerWidth - 20}px`,
+      onBeforeOpen: () => {
+        this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
+        // ace-diff
+        if (app.settings.theme() === 'dracula') {
+          addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        } else {
+          addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+        }
+      },
       onOpen: () => {
         // EDITOR
         this.editor = ace.edit('js-editor');
-        this.editor.setOptions(editorOptions);
+        this.editor.setOptions({ ...editorOptions, theme: this.theme });
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),
@@ -208,11 +225,13 @@ export var PluginEditor = function ({
           element: document.querySelector('.diff-editor'),
           left: {
             ...editorOptions,
+            theme: this.theme,
             content: '',
           },
           theme: 'ace/theme/monokai',
           right: {
             ...editorOptions,
+            theme: this.theme,
             content: '... no connection with gist',
           },
         });
@@ -231,6 +250,10 @@ export var PluginEditor = function ({
 
         // initialize data on both editor and differ
         this.onSetEditingFile();
+      },
+      onAfterClose: () => {
+        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
