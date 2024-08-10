@@ -149,7 +149,7 @@ export var PluginEditor = function ({
             this.differ
               .getEditors()
               .right.getSession()
-              .setValue(gistPluginFile.content);
+              .setValue(gistPluginFile ? gistPluginFile.content : `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`);
             this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
           });
         }
