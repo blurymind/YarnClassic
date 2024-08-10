@@ -8,10 +8,10 @@ async function importModuleWeb(
   modulePath,
   { forceUpdate } = { forceUpdate: false }
 ) {
-  if(!script.startsWith("export.module")) return Promise.reject( `${modulePath} Not a module`);
+  if (!script.startsWith("export.module")) return Promise.reject(`${modulePath} Not a module`);
 
   const { AsyncFunction, cache } = globalThis.__import__ || {
-    AsyncFunction: Object.getPrototypeOf(async function() {}).constructor,
+    AsyncFunction: Object.getPrototypeOf(async function () { }).constructor,
     cache: new Map(),
   };
   // Build new AsyncFunction and evaluate it
@@ -23,7 +23,7 @@ async function importModuleWeb(
   return module.exports;
 }
 
-export var Plugins = function(app) {
+export var Plugins = function (app) {
   const self = this;
   const registerPlugin = plugin => {
     app.plugins[plugin.name] = plugin;
@@ -73,7 +73,7 @@ export var Plugins = function(app) {
       .extend({ persist: valueKey });
 
     app.ui[optionsKey] = options;
-    app[setterKey] = function(value, e) {
+    app[setterKey] = function (value, e) {
       const newValue = e ? e.target.value : value;
       app.settings[valueKey](newValue);
     };
@@ -83,8 +83,7 @@ export var Plugins = function(app) {
       const options = app.ui[optionsKey]
         .map(
           option =>
-            `<option value="${option.id}" ${
-              option.id === app.settings[valueKey]() ? 'selected="true"' : ''
+            `<option value="${option.id}" ${option.id === app.settings[valueKey]() ? 'selected="true"' : ''
             }>${option.name}</option>`
         )
         .join('');
@@ -127,19 +126,16 @@ export var Plugins = function(app) {
     const button = document.createElement('span');
     button.id = id || name || title || iconName;
     button.innerHTML = `
-      <span class="item ${className || ''}" title="${title || ''}" ${
-      onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
-    }
-       ${
-         onPointerDown
-           ? ` onpointerdown="app.plugins.${pluginName}.${onPointerDown}"`
-           : ''
-       }
-              ${
-                onDoubleClick
-                  ? `ondblclick="app.plugins.${pluginName}.${onDoubleClick}"`
-                  : ''
-              }
+      <span class="item ${className || ''}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
+      }
+       ${onPointerDown
+        ? ` onpointerdown="app.plugins.${pluginName}.${onPointerDown}"`
+        : ''
+      }
+              ${onDoubleClick
+        ? `ondblclick="app.plugins.${pluginName}.${onDoubleClick}"`
+        : ''
+      }
        >
         <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw" style="color:currentColor;"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
         <span class="hide-when-narrow">&nbsp;</span>
@@ -268,6 +264,11 @@ export var Plugins = function(app) {
     });
   };
 
+  const saveGistPlugin = (fileName, contents) => {
+    console.log({gistId: app.settings.gistPluginsFile(), fileName, contents})
+    return app.data.storage.editGist(app.settings.gistPluginsFile(), fileName, contents)
+  }
+
   const pluginApiMethods = {
     app,
     createButton,
@@ -289,7 +290,8 @@ export var Plugins = function(app) {
     getVloatilePlugins,
     setVloatilePlugin,
     setVloatilePlugins,
-    getGistPluginFiles
+    getGistPluginFiles,
+    saveGistPlugin
   };
 
   // built in plugin initiation
