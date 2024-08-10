@@ -46,7 +46,7 @@ ${EXAMPLE}
 </textarea>
 <body>
 `
-const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
+const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "", yarnData = {}) => `
   <head>
     <style>
       body,
@@ -59,10 +59,12 @@ const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
   <body>
     ${html}
     ${modules.map(item => `<script src="${item}"></script>`)}
+    <script>
+      const yarnData = ${yarnData};
+    </script>
     <script type="module">
-    const run = ${script};
-    run();
-  </script>
+     (${script})()
+    </script>
   </body>
 `
 const editorOptions = {
@@ -98,6 +100,10 @@ export var PluginEditor = function ({
   this.gistPluginFiles = {};
   this.mode = 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
+
+  this.onDownloadPreview = () => {
+    app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
+  }
   this.onSetPluginEditMode = mode => {
     this.mode = mode;
     setPluginStore(self.name, 'pluginEditMode', mode);
@@ -113,6 +119,7 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.display =
       mode === 'test' ? 'block' : 'none';
+    document.getElementById('plugin-output-downloader').style.display = 'none';
 
     this.onSetEditingFile();
   };
@@ -154,31 +161,33 @@ export var PluginEditor = function ({
           });
         }
         if (this.mode === 'test') {
-          try {
-            const extension = new Function("parameters", `return ${fileContents}`)();
-            console.log({ extensionData: extension(), fileContents })
-            if (typeof extension === 'function') {
-              try {
-                const data = extension();
-                if (!data) {
-
-                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-                  return;
+          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink" : "json").then(yarnData => {
+            try {
+              const extension = new Function("parameters", `return ${fileContents}`)();
+              console.log({ fileContents, yarnData })
+              if (typeof extension === 'function') {
+                try {
+                  const data = extension();
+                  if (!data) {
+                    document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+                    return;
+                  }
+                  document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script, yarnData);
+                  document.getElementById('plugin-output-downloader').style.display = 'block';
+                } catch (e) {
+                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+                  SEE CONSOLE LOGS`);
+                  console.error(e)
                 }
-                document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script)
-              } catch (e) {
-                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-                SEE CONSOLE LOGS`)
-                  ;
+                return
               }
-              return
+              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
+            } catch (e) {
+              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+              SEE CONSOLE LOGS`);
+              console.error(e)
             }
-            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
-          } catch (e) {
-            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-            SEE CONSOLE LOGS`);
-            console.error(e)
-          }
+          });
         }
       });
     };
@@ -211,7 +220,7 @@ export var PluginEditor = function ({
       html: `
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper">
-        <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
+          <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
         </div>
 
         <div style="position: relative;">
@@ -219,13 +228,24 @@ export var PluginEditor = function ({
         </div>
         
         <div>
+          <button id="plugin-output-downloader" style="position: absolute;
+            right: 123px;
+            top: 51px;
+            padding-left: 9px;
+            padding-right: 9px;
+            border-radius: 0.9rem;"
+            onclick="app.plugins.${self.name
+            }.onDownloadPreview()"
+          >
+            Download
+          </button>
           <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%; border: none;">
-            Write to previewer
-          </textarea>
         </div>
       </div>
+     
 
         `,
+      showConfirmButton: false ,
       focusConfirm: false,
       customClass: 'swal-wide',
       width: `${window.innerWidth - 20}px`,
@@ -314,39 +334,3 @@ export var PluginEditor = function ({
     });
   });
 };
-
-// example output
-const exampleOutput = `
-  <head>
-  ..modules and css here
-  <body>
-    <div>
-  </body>
-  <script>
-    // stringified from script
-    const run = ({resources, onLoad, modules}) => {
-      const {kaboom} = modules;// stuff imported from head
-      const myFunc=()=> {
-        //err
-      }
-  
-      const myImage = resources["imagekey"] //this returns the base64 - keep flat to save size
-      onLoad()
-    }
-
-
-    // <=== added by renderer 
-    import kaboom from "blahblah"
-    run({
-       modules: {
-          kaboom
-       },
-       resources: {
-        imagekey: "base64Strjhkdfhkdfgh"
-       },
-       onLoad: document.body.onload
-
-    }) // <=== added by renderer 
-  <script>
-
-`
