@@ -579,6 +579,8 @@ input#editorTitle {
 }
 
 .node-editor .form .bbcode-toolbar {
+  display: flex;
+  flex-wrap: wrap;
   float: left;
   width: 100%;
   font-size: 0.8em;
@@ -651,7 +653,6 @@ input#editorTitle {
 
 .bbcode-button-right {
   float: right;
-  margin: 0 2px;
 }
 
 .bbcode-button-separator-float-right {
@@ -1044,6 +1045,7 @@ input:focus + span + .dropdown {
   width: 100%;
   padding: 10px;
   text-align:center;
+  border-radius: 3px;
 }
 
 .item img {
@@ -1420,12 +1422,16 @@ input[type=search]::-webkit-search-cancel-button {
 }
 
 .button-group-rounded {
-  border-radius: 17px;
+  border-radius: 2rem;
   gap: 0;
   display: flex;
+  flex-wrap: wrap;
   overflow: hidden;
-  font-size: 1.4rem;
+  /* font-size: 1.4rem; */
 }
 .button-group-rounded > :not(.active) {
   opacity: 0.5;
+}
+.button-group-rounded > button {
+  border-radius: 0;
 }

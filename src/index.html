@@ -256,36 +256,46 @@
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator">||</span>
           <span class="hide-when-narrow">&nbsp;</span>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold">
-            <svg class="icon icon-bold icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-bold"></use></svg>
-          </button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic">
-            <svg class="icon icon-italic icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-italic"></use></svg>
-          </button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined">
-            <svg class="icon icon-underline icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-underline"></use></svg>
-          </button>
+          <div class="button-group-rounded">
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('b')" title="Bold">
+              <svg class="icon icon-bold icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-bold"></use></svg>
+            </button>
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('i')" title="Italic">
+              <svg class="icon icon-italic icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-italic"></use></svg>
+            </button>
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('u')" title="Underlined">
+              <svg class="icon icon-underline icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-underline"></use></svg>
+            </button>
+          </div>
+
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator">||</span>
           <span class="hide-when-narrow">&nbsp;</span>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command">
-            <svg class="icon icon-angle-double-left icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-angle-double-left"></use></svg>
-          </button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link">
-            <svg class="icon icon-link icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-link"></use></svg>
-          </button>
+
+          <div class="button-group-rounded">
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('cmd')" title="Command">
+              <svg class="icon icon-angle-double-left icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-angle-double-left"></use></svg>
+            </button>
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('opt')" title="Choice/Link">
+              <svg class="icon icon-link icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-link"></use></svg>
+            </button>
+          </div>
+
           <span class="hide-when-narrow">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator">||</span>
           <span class="hide-when-narrow">&nbsp;</span>
-          <button class="hide-when-narrow bbcode-button" onclick="app.richTextFormatter.insertTag('img')" title="Image">
-            <svg class="icon icon-image icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-image"></use></svg>
-          </button>
-          <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('color')" title="Color Picker">
-            <svg class="icon icon-palette icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-palette"></use></svg>
-          </button>
-          <button class="bbcode-button hide-when-narrow" onclick="app.insertEmoji()" title="Emoji">
-            <svg class="icon icon-sweat-emoji icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-sweat-emoji"></use></svg>
-          </button>
+          
+          <div class="button-group-rounded">
+            <button class="hide-when-narrow bbcode-button" onclick="app.richTextFormatter.insertTag('img')" title="Image">
+              <svg class="icon icon-image icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-image"></use></svg>
+            </button>
+            <button class="bbcode-button" onclick="app.richTextFormatter.insertTag('color')" title="Color Picker">
+              <svg class="icon icon-palette icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-palette"></use></svg>
+            </button>
+            <button class="bbcode-button hide-when-narrow" onclick="app.insertEmoji()" title="Emoji">
+              <svg class="icon icon-sweat-emoji icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-sweat-emoji"></use></svg>
+            </button>
+          </div>
 
           <!-- ko if:app.usingVisualStudioCodeExtension() -->
           <button class="bbcode-button" id="edit-node-in-vscode" onclick="app.editNodeInVisualStudioCodeEditor(app.editing())">🛠️ Edit in Visual Studio Code Text Editor</button>
@@ -300,15 +310,18 @@
             <label for="togleAutoCloseTags" title="Auto Close tags"><svg class="icon icon-tag icon-fw icon-lg"><use xlink:href="public/icons.svg#icon-tag"></use></svg></label>
           </span>
 
-          <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor">
-            <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-exit"></use></svg>
-          </button>
-          <button id="snap-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.editorSnapToggle()" title="Snap to Other Side">
-            <svg class="icon icon-snap-document icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-snap-document"></use></svg>
-          </button>
-          <button id="full-size-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.toggleEditorView()" title="Full Size Editor">
-            <svg class="icon icon-no-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-no-columns"></use></svg>
-          </button>
+          <div class="button-group-rounded">
+            <button id="exit-editor" class="bbcode-button bbcode-button-right hide-when-narrow hidden" data-bind="click: function() {app.saveNode(); app.closeEditor()}" title="Close Editor">
+              <svg class="icon icon-exit icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-exit"></use></svg>
+            </button>
+            <button id="snap-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.editorSnapToggle()" title="Snap to Other Side">
+              <svg class="icon icon-snap-document icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-snap-document"></use></svg>
+            </button>
+            <button id="full-size-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow hidden" onclick="app.toggleEditorView()" title="Full Size Editor">
+              <svg class="icon icon-no-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-no-columns"></use></svg>
+            </button>
+          </div>
+          
           <span id="split-button-separator" class="hidden">
             <span class="hide-when-narrow float-right">&nbsp;</span>
             <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
@@ -317,10 +330,14 @@
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>
-          <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><svg class="icon icon-search icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-search"></use></svg></button>
-          <button id="split-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.toggleEditorView()" title="Split View">
-            <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-columns"></use></svg>
-          </button>
+
+          <div class="button-group-rounded">
+            <button class="bbcode-button bbcode-button-right" onclick="app.searchTextInEditor()" title="Search (Ctrl+f)"><svg class="icon icon-search icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-search"></use></svg></button>
+            <button id="split-editor-button" class="bbcode-button bbcode-button-right hide-when-narrow" onclick="app.toggleEditorView()" title="Split View">
+              <svg class="icon icon-columns icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-columns"></use></svg>
+            </button>
+          </div>
+          
           <span class="hide-when-narrow float-right">&nbsp;</span>
           <span class="hide-when-narrow bbcode-button-separator bbcode-button-separator-float-right">||</span>
           <span class="hide-when-narrow float-right">&nbsp;</span>

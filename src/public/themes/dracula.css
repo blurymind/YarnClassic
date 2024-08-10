@@ -65,6 +65,11 @@
   background-color: #343746;
 }
 
+.menu .dropdown .search-field{
+  color: #f8f8f2;
+  background: #282a36;
+}
+
 .app-menu .menu .dropdown .item:hover {
   background: #44475a;
   color: #f8f8f2;
@@ -474,7 +479,6 @@ input[type="text"] {
   color: #f8f8f2;
   background: #44475a;
   border: none;
-  height: 22px;
   line-height: 22px;
 }
 
