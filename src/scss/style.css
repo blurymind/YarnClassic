@@ -1389,7 +1389,7 @@ input[type=search]::-webkit-search-cancel-button {
 }
 
 .swal2-content {
-  max-height: 50vh !important;
+  /* max-height: 50vh !important; */
 }
 
 @keyframes fadeIn {
