@@ -111,27 +111,35 @@ export var PluginEditor = function ({
           });
         }
         if (this.mode === 'test') {
-          const extension = new Function("parameters", `return ${fileContents}`)();
-          console.log({ extensionData: extension(), fileContents })
-          if (typeof extension === 'function') {
-            try {
-              const data = extension();
-              if (!data) {
-                document.getElementById('plugin-output-previewer').value = `The function needs to return an object..
+          try{
+            const extension = new Function("parameters", `return ${fileContents}`)();
+            console.log({ extensionData: extension(), fileContents })
+            if (typeof extension === 'function') {
+              try {
+                const data = extension();
+                if (!data) {
+                  document.getElementById('plugin-output-previewer').value = `The function needs to return an object..
+                  ${ExampleOutputFunction}
+                `
+                  return;
+                }
+                document.getElementById('plugin-output-previewer').value = getPreviewHtml(data.modules || [], data.body, data.script)
+              } catch (e) {
+                document.getElementById('plugin-output-previewer').value = `${e.toString()}
+                SEE CONSOLE LOGS
                 ${ExampleOutputFunction}
-              `
-                return;
+                `;
               }
-              document.getElementById('plugin-output-previewer').value = getPreviewHtml(data.modules || [], data.body, data.script)
-            } catch (e) {
-              document.getElementById('plugin-output-previewer').value = `${ExampleOutputFunction}
-              SEE CONSOLE LOGS
-              `;
-              console.error(e)
+              return
             }
-            return
+            document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
+          } catch(e) {
+            document.getElementById('plugin-output-previewer').value = `${e.toString()}
+            SEE CONSOLE LOGS
+            ${ExampleOutputFunction}
+            `;
+            console.error(e)
           }
-          document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
         }
       });
     };
