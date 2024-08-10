@@ -65,6 +65,7 @@ export var PluginEditor = function({
     this.onSetEditingFile = () => {
       const fileName = document.getElementById('edited-plugin-file').value;
       getVloatilePlugins().then(volatilePlugins => {
+        console.log({volatilePlugins})
         this.volatilePlugins = volatilePlugins;
         let fileContents = this.volatilePlugins[fileName].content;
         this.editingFile = fileName;
@@ -212,3 +213,53 @@ export var PluginEditor = function({
     });
   });
 };
+
+const example =({resources}) => ({// straight to output
+  head: [],//goes in head - as src/style = detected by file type
+  body: `<div></div>`,// can have css tags,etc
+  resources, // passed from editor to output
+  script: ({resources, onLoad, modules}) => { // then to script
+    const {kaboom} = modules;// stuff imported from head
+    const myFunc=()=> {
+      //err
+    }
+
+    const myImage = resources["imagekey"] //this returns the base64 - keep flat to save size
+    onLoad()
+  }
+})
+// example output
+const exampleOutput = `
+  <head>
+  ..modules and css here
+  <body>
+    <div>
+  </body>
+  <script>
+    // stringified from script
+    const run = ({resources, onLoad, modules}) => {
+      const {kaboom} = modules;// stuff imported from head
+      const myFunc=()=> {
+        //err
+      }
+  
+      const myImage = resources["imagekey"] //this returns the base64 - keep flat to save size
+      onLoad()
+    }
+
+
+    // <=== added by renderer 
+    import kaboom from "blahblah"
+    run({
+       modules: {
+          kaboom
+       },
+       resources: {
+        imagekey: "base64Strjhkdfhkdfgh"
+       },
+       onLoad: document.body.onload
+
+    }) // <=== added by renderer 
+  <script>
+
+`

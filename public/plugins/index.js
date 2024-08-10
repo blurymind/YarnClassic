@@ -298,7 +298,8 @@ export var Plugins = function(app) {
     });
   });
 
-  dbStorage.getDbValue('volatilePlugins').then(volatilePlugins => {
+  getVloatilePlugins().then(volatilePlugins => {
+    volatilePlugins = volatilePlugins || {};
     // load builtin plugins
     const builtInVolatilePlugins = {};
     const builtInPlugins = {}; // so we can revert the volatile one to the built in one as fallback
@@ -351,9 +352,9 @@ export var Plugins = function(app) {
     const loadPluginsFromCacheOrGist = () => {
       getGistPluginFiles().then(plugins =>
         plugins.forEach(gistFile => {
-          console.log({ gistFile });
-          if (!(gistFile.filename in volatilePlugins)) {
-            loadPluginWithDependencies(content, gistFile.filename);
+          console.log({ gistFile, volatilePlugins });
+          if (volatilePlugins && !(gistFile.filename in volatilePlugins)) {
+            loadPluginWithDependencies(gistFile.content, gistFile.filename);
 
             volatileGistPlugins[gistFile.filename] = gistFile;
             setVloatilePlugin(
