@@ -1,6 +1,24 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
 import './ace-diff/ace-diff-dark.min.css';
 
+const ExampleOutputFunction = `
+// To render here, the script needs to be a function that returns modules, body and script
+// Example:
+() => {
+  return {
+    modules: [],
+    body: "<div></div>",
+    script: () => {
+      console.log("VOALA")
+    }
+  }
+}
+`
+const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
+  <head> ${modules.map(item => `<link as="script" href="${item}">`)}</head>
+  <body>${html}</body>
+  <script>${script}</script>
+`
 const editorOptions = {
   theme: 'ace/theme/monokai',
   mode: 'ace/mode/javascript',
@@ -8,7 +26,7 @@ const editorOptions = {
   enableBasicAutocompletion: true,
   enableLiveAutocompletion: true,
 };
-export var PluginEditor = function({
+export var PluginEditor = function ({
   app,
   createButton,
   addSettingsItem,
@@ -65,7 +83,7 @@ export var PluginEditor = function({
     this.onSetEditingFile = () => {
       const fileName = document.getElementById('edited-plugin-file').value;
       getVloatilePlugins().then(volatilePlugins => {
-        console.log({volatilePlugins})
+        console.log({ volatilePlugins })
         this.volatilePlugins = volatilePlugins;
         let fileContents = this.volatilePlugins[fileName].content;
         this.editingFile = fileName;
@@ -92,6 +110,29 @@ export var PluginEditor = function({
             this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
           });
         }
+        if (this.mode === 'test') {
+          const extension = new Function("parameters", `return ${fileContents}`)();
+          console.log({ extensionData: extension(), fileContents })
+          if (typeof extension === 'function') {
+            try {
+              const data = extension();
+              if (!data) {
+                document.getElementById('plugin-output-previewer').value = `The function needs to return an object..
+                ${ExampleOutputFunction}
+              `
+                return;
+              }
+              document.getElementById('plugin-output-previewer').value = getPreviewHtml(data.modules || [], data.body, data.script)
+            } catch (e) {
+              document.getElementById('plugin-output-previewer').value = `${ExampleOutputFunction}
+              SEE CONSOLE LOGS
+              `;
+              console.error(e)
+            }
+            return
+          }
+          document.getElementById('plugin-output-previewer').value = ExampleOutputFunction;
+        }
       });
     };
 
@@ -101,33 +142,26 @@ export var PluginEditor = function({
       title: `
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
           <div>
-            <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${
-              self.name
-            }.onSetEditingFile()">
+            <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
+        }.onSetEditingFile()">
               ${Object.keys(this.volatilePlugins).map(
-                key => `<option value="${key}">${key}</option>`
-              )}
+          key => `<option value="${key}">${key}</option>`
+        )}
             </select>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
-            <button onclick="app.plugins.${
-              self.name
-            }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit">Edit</button>
-            <button onclick="app.plugins.${
-              self.name
-            }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
-            <button onclick="app.plugins.${
-              self.name
-            }.onSetPluginEditMode('test')" id="edit-plugin-mode-test">Test</button>
+            <button onclick="app.plugins.${self.name
+        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit">Edit</button>
+            <button onclick="app.plugins.${self.name
+        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit">Commit</button> 
+            <button onclick="app.plugins.${self.name
+        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test">Test</button>
           </div>
         </div>
         `.replaceAll('\n', ''),
       html: `
       <div id="js-editor-wrapper">
-        <div id="js-editor" style="height: 70vh; width: 100%;">function greet(name) {
-            return "Hello!" + name;
-        }
-        </div>        
+        <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
       </div>
 
       <div style="position: relative;">
@@ -135,9 +169,9 @@ export var PluginEditor = function({
       </div>
       
       <div>
-        <div id="plugin-output-previewer" style="height: 70vh; width: 100%;">
+        <textarea id="plugin-output-previewer" style="height: 70vh; width: 100%;">
           Write to previewer
-        </div>
+        </textarea>
       </div>
         `,
       focusConfirm: false,
@@ -152,7 +186,7 @@ export var PluginEditor = function({
             content: this.editor.getValue(),
           });
         }, 600);
-        this.editor.getSession().on('change', function() {
+        this.editor.getSession().on('change', function () {
           onChangeDebounced();
         });
         const localVariables = getPluginStore(self.name);
@@ -183,7 +217,7 @@ export var PluginEditor = function({
         this.differ
           .getEditors()
           .left.getSession()
-          .on('change', function() {
+          .on('change', function () {
             onChangeFromDiffDebounced();
           });
 
@@ -214,20 +248,6 @@ export var PluginEditor = function({
   });
 };
 
-const example =({resources}) => ({// straight to output
-  head: [],//goes in head - as src/style = detected by file type
-  body: `<div></div>`,// can have css tags,etc
-  resources, // passed from editor to output
-  script: ({resources, onLoad, modules}) => { // then to script
-    const {kaboom} = modules;// stuff imported from head
-    const myFunc=()=> {
-      //err
-    }
-
-    const myImage = resources["imagekey"] //this returns the base64 - keep flat to save size
-    onLoad()
-  }
-})
 // example output
 const exampleOutput = `
   <head>
