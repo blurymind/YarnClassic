@@ -46,7 +46,7 @@ ${EXAMPLE}
 </textarea>
 <body>
 `
-const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
+const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "", yarnData = {}) => `
   <head>
     <style>
       body,
@@ -59,10 +59,12 @@ const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "") => `
   <body>
     ${html}
     ${modules.map(item => `<script src="${item}"></script>`)}
+    <script>
+      const yarnData = ${yarnData};
+    </script>
     <script type="module">
-    const run = ${script};
-    run();
-  </script>
+     (${script})()
+    </script>
   </body>
 `
 const editorOptions = {
@@ -154,31 +156,32 @@ export var PluginEditor = function ({
           });
         }
         if (this.mode === 'test') {
-          try {
-            const extension = new Function("parameters", `return ${fileContents}`)();
-            console.log({ extensionData: extension(), fileContents })
-            if (typeof extension === 'function') {
-              try {
-                const data = extension();
-                if (!data) {
-
-                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-                  return;
+          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink" : "json").then(yarnData => {
+            try {
+              const extension = new Function("parameters", `return ${fileContents}`)();
+              console.log({ fileContents, yarnData })
+              if (typeof extension === 'function') {
+                try {
+                  const data = extension();
+                  if (!data) {
+                    document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+                    return;
+                  }
+                  document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script, yarnData)
+                } catch (e) {
+                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+                  SEE CONSOLE LOGS`);
+                  console.error(e)
                 }
-                document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script)
-              } catch (e) {
-                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-                SEE CONSOLE LOGS`)
-                  ;
+                return
               }
-              return
+              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
+            } catch (e) {
+              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+              SEE CONSOLE LOGS`);
+              console.error(e)
             }
-            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
-          } catch (e) {
-            document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-            SEE CONSOLE LOGS`);
-            console.error(e)
-          }
+          });
         }
       });
     };
@@ -314,39 +317,3 @@ export var PluginEditor = function ({
     });
   });
 };
-
-// example output
-const exampleOutput = `
-  <head>
-  ..modules and css here
-  <body>
-    <div>
-  </body>
-  <script>
-    // stringified from script
-    const run = ({resources, onLoad, modules}) => {
-      const {kaboom} = modules;// stuff imported from head
-      const myFunc=()=> {
-        //err
-      }
-  
-      const myImage = resources["imagekey"] //this returns the base64 - keep flat to save size
-      onLoad()
-    }
-
-
-    // <=== added by renderer 
-    import kaboom from "blahblah"
-    run({
-       modules: {
-          kaboom
-       },
-       resources: {
-        imagekey: "base64Strjhkdfhkdfgh"
-       },
-       onLoad: document.body.onload
-
-    }) // <=== added by renderer 
-  <script>
-
-`
