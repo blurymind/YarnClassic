@@ -100,6 +100,10 @@ export var PluginEditor = function ({
   this.gistPluginFiles = {};
   this.mode = 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
+
+  this.onDownloadPreview = () => {
+    app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
+  }
   this.onSetPluginEditMode = mode => {
     this.mode = mode;
     setPluginStore(self.name, 'pluginEditMode', mode);
@@ -115,6 +119,7 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.display =
       mode === 'test' ? 'block' : 'none';
+    document.getElementById('plugin-output-downloader').style.display = 'none';
 
     this.onSetEditingFile();
   };
@@ -167,7 +172,8 @@ export var PluginEditor = function ({
                     document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
                     return;
                   }
-                  document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script, yarnData)
+                  document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script, yarnData);
+                  document.getElementById('plugin-output-downloader').style.display = 'block';
                 } catch (e) {
                   document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
                   SEE CONSOLE LOGS`);
@@ -214,7 +220,7 @@ export var PluginEditor = function ({
       html: `
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper">
-        <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
+          <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
         </div>
 
         <div style="position: relative;">
@@ -222,13 +228,24 @@ export var PluginEditor = function ({
         </div>
         
         <div>
+          <button id="plugin-output-downloader" style="position: absolute;
+            right: 123px;
+            top: 51px;
+            padding-left: 9px;
+            padding-right: 9px;
+            border-radius: 0.9rem;"
+            onclick="app.plugins.${self.name
+            }.onDownloadPreview()"
+          >
+            Download
+          </button>
           <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%; border: none;">
-            Write to previewer
-          </textarea>
         </div>
       </div>
+     
 
         `,
+      showConfirmButton: false ,
       focusConfirm: false,
       customClass: 'swal-wide',
       width: `${window.innerWidth - 20}px`,
