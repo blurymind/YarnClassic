@@ -90,6 +90,7 @@ export var PluginEditor = function ({
   setVloatilePlugin,
   setVloatilePlugins,
   getGistPluginFiles,
+  saveGistPlugin
 }) {
   const self = this;
   this.name = 'PluginEditor';
@@ -101,6 +102,12 @@ export var PluginEditor = function ({
   this.mode = 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
+  this.onCommitChanges = () => {
+    const contents = this.differ.getEditors().right.getValue();
+    saveGistPlugin(this.editingFile, contents).then(data=>{
+      this.differ.getEditors().left.setValue(contents)
+    });
+  }
   this.onDownloadPreview = () => {
     app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
   }
@@ -116,6 +123,8 @@ export var PluginEditor = function ({
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('diff-editor').style.display =
+      mode === 'commit' && app.settings.gistPluginsFile() ? 'block' : 'none';
+    document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.display =
       mode === 'test' ? 'block' : 'none';
@@ -157,7 +166,7 @@ export var PluginEditor = function ({
               .getEditors()
               .right.getSession()
               .setValue(gistPluginFile ? gistPluginFile.content : `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`);
-            this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
+            // this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
           });
         }
         if (this.mode === 'test') {
@@ -225,6 +234,18 @@ export var PluginEditor = function ({
 
         <div style="position: relative;">
             <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
+            <button id="plugin-differ-commit" style="position: absolute;
+            right: 9px;
+            bottom: 17px;
+            padding-left: 9px;
+            padding-right: 9px;
+            border-radius: 0.9rem;
+            display: block;"
+            onclick="app.plugins.${self.name
+        }.onCommitChanges()"
+          >
+            Save to Gist
+          </button>
         </div>
         
         <div>
@@ -306,6 +327,14 @@ export var PluginEditor = function ({
           .left.getSession()
           .on('change', function () {
             onChangeFromDiffDebounced();
+          });
+        //plugin-differ-commit button
+        this.differ
+          .getEditors()
+          .right.getSession()
+          .on('change', () => {
+            // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
+            // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
 
         // initialize data on both editor and differ
