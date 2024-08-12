@@ -246,9 +246,12 @@ export var Plugins = function (app) {
     });
   };
 
+  const isGistTokenInvalid = () => {
+    return app.data.storage.getIsTokenInvalid();
+  }
   const getGistPluginFiles = () => {
-    return new Promise((resolve, reject) => {
-      if (!app.settings.gistPluginsFile()) reject();
+    return new Promise((resolve) => {
+      // if (!app.settings.gistPluginsFile()) reject("No");
       app.data.storage
         .getGist(app.settings.gistPluginsFile())
         .then(({ filesInGist }) => {
@@ -291,7 +294,8 @@ export var Plugins = function (app) {
     setVloatilePlugin,
     setVloatilePlugins,
     getGistPluginFiles,
-    saveGistPlugin
+    saveGistPlugin,
+    isGistTokenInvalid
   };
 
   // built in plugin initiation

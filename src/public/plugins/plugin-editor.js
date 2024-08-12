@@ -90,7 +90,8 @@ export var PluginEditor = function ({
   setVloatilePlugin,
   setVloatilePlugins,
   getGistPluginFiles,
-  saveGistPlugin
+  saveGistPlugin,
+  isGistTokenInvalid
 }) {
   const self = this;
   this.name = 'PluginEditor';
@@ -123,7 +124,7 @@ export var PluginEditor = function ({
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('diff-editor').style.display =
-      mode === 'commit' && app.settings.gistPluginsFile() ? 'block' : 'none';
+      mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.display =
@@ -151,22 +152,33 @@ export var PluginEditor = function ({
         beautify.beautify(this.editor.session);
 
         if (this.mode === 'commit') {
+          fileContents = this.editor.getValue();
+          this.differ
+            .getEditors()
+            .left.getSession()
+            .setValue(fileContents);
           getGistPluginFiles().then(gistPluginFiles => {
             const gistPluginFile = gistPluginFiles.find(
               item => item.filename == fileName
             );
-            console.log({ gistPluginFile }, this.differ.getEditors());
-            fileContents = this.editor.getValue();
-            this.differ
-              .getEditors()
-              .left.getSession()
-              .setValue(fileContents);
 
+            const isTokenInvalid = isGistTokenInvalid()
+            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`
             this.differ
               .getEditors()
               .right.getSession()
-              .setValue(gistPluginFile ? gistPluginFile.content : `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`);
-            // this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
+              .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile.content : gistAccesError);
+            
+              this.differ.getEditors().right.setReadOnly(isTokenInvalid);
+              document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
+          })
+          .catch(error=>{
+            this.differ.getEditors().right.setReadOnly(true);
+            document.getElementById('plugin-differ-commit').className = "disabled";
+            this.differ
+              .getEditors()
+              .right.getSession()
+              .setValue(error.toString())
           });
         }
         if (this.mode === 'test') {

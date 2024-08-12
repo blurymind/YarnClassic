@@ -202,11 +202,13 @@ export const StorageJs = (type = 'gist') => {
         this.lastStorageHost = newHost;
       },
       token: undefined,
+      isTokenInvalid: true,
       gistId: undefined,
       setCredentials: function(token, gistId){
         //console.log("using gist credentials", {token, gistId})
         this.token = token
         this.gistId = gistId
+        this.isTokenInvalid = !token || token.length < 5
       },
       filesInGist: {},
       getFilesInGist: function(fileKey) {
@@ -215,6 +217,9 @@ export const StorageJs = (type = 'gist') => {
         console.error(`${fileKey} not found in gist`, this.filesInGist);
       },
       getGist: function(gistId, onFail = () => {}) {
+        if (!gistId) {
+          throw new Error('No gist id specified');
+        }
         const fetchAddress = `https://api.github.com/gists/${gistId}`;
         return fetch(fetchAddress, {
           method: 'GET',
@@ -231,15 +236,24 @@ export const StorageJs = (type = 'gist') => {
                 401: "Is your Gist Token valid?",
                 404: `Is your Gist ID online?\n\naddress:\n${fetchAddress}`
               }
-              alert(`Failed to get:\n${fetchAddress}...\n\nSTATUS: ${data.status}\n${data.status in GistStatusHints ? GistStatusHints[data.status] : ""}`)
+              console.error('GOT -- ', { data, fetchAddress, data })
+              onFail(`Failed to get:\n${fetchAddress}...\n\nSTATUS: ${data.status}\n${data.status in GistStatusHints ? GistStatusHints[data.status] : ""}`)
               if (data.status in GistStatusHints) onFail(data.status);
               if (data.status === 404) window.open(fetchAddress, '_blank').focus();
+
+              // try to fetch without authorisation
+              return fetch(fetchAddress).then(data=> {
+                console.warn("Got data without authorisation")
+                this.isTokenInvalid = true;
+                return data.json()
+              })
             }
+            this.isTokenInvalid = false;
             return data.json();
           })
           .then(content => {
             console.log('NEW from get::', { content });
-            this.filesInGist = content.files;
+            this.filesInGist = content.files || {};
             const inputOptions = {};
             Object.keys(this.filesInGist).forEach(key => {
               inputOptions[key] = key;
@@ -255,6 +269,9 @@ export const StorageJs = (type = 'gist') => {
       },
       hasGistSettings: function() {
         return this.gistId && this.gistId.length > 0;
+      },
+      getIsTokenInvalid: function() {
+        return !this.token || this.token.length < 5 || this.isTokenInvalid
       },
       getGistFile: function(onFail = () => {}) {
         return this.getGist(this.gistId, onFail);
