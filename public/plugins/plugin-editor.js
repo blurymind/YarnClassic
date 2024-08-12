@@ -143,7 +143,7 @@ export var PluginEditor = function ({
       const fileName = document.getElementById('edited-plugin-file').value;
       getVloatilePlugins().then(volatilePlugins => {
         console.log({ volatilePlugins })
-        this.volatilePlugins = volatilePlugins;
+        this.volatilePlugins = volatilePlugins || {};
         let fileContents = this.volatilePlugins[fileName].content;
         this.editingFile = fileName;
         this.editor.setValue(fileContents);
