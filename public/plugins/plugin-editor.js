@@ -177,7 +177,7 @@ export var PluginEditor = function ({
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('add-remove-plugin-file').style.display = 
-      mode === 'edit' ? 'flex' : 'none';
+      mode === 'edit' || mode === 'commit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
