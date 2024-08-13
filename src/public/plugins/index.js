@@ -8,7 +8,7 @@ async function importModuleWeb(
   modulePath,
   { forceUpdate } = { forceUpdate: false }
 ) {
-  if (!script.startsWith("export.module")) return Promise.reject(`${modulePath} Not a module`);
+  if (!script.startsWith("module.exports")) return Promise.reject(`${modulePath} Not a module`);
 
   const { AsyncFunction, cache } = globalThis.__import__ || {
     AsyncFunction: Object.getPrototypeOf(async function () { }).constructor,
@@ -289,8 +289,11 @@ export var Plugins = function (app) {
           gistPlugins.forEach(item=> {
             result[item.filename] = item
           })
+          // if gist plugins are fetched, load them, but spread the volatile ones ontop as more recent
           resolve({...result,...volatilePlugins})
         })
+        // if no gist plugins are fetched, load the local volatile ones still
+        .catch(()=> resolve(volatilePlugins) )
       })
     })
   }
@@ -381,23 +384,15 @@ export var Plugins = function (app) {
         window.addEventListener('DOMContentLoaded', e => {
           registerPlugin(newPlugin);
         });
-        // registerPlugin(newPlugin);
       });
     };
 
-    // const volatileGistPlugins = {};
     const loadPluginsFromCacheOrGist = () => {
       getPluginsList().then(pluginsList=>{
         console.log("----->",{pluginsList})
 
         setVloatilePlugins(pluginsList);
         Object.values(pluginsList).forEach(pluginFile => {
-          // volatileGistPlugins[pluginFile.filename] = pluginFile;
-          // setVloatilePlugin(
-          //   pluginFile.filename,
-          //   pluginFile
-          // );
-
           loadPluginWithDependencies(pluginFile.content, pluginFile.filename);
 
           importModuleWeb(pluginFile.content, pluginFile.filename).then(
@@ -411,42 +406,9 @@ export var Plugins = function (app) {
           );
         })
       })
-      // getGistPluginFiles().then(plugins =>
-      //   plugins.forEach(gistFile => {
-      //     console.log({ gistFile, volatilePlugins });
-      //     if (volatilePlugins && !(gistFile.filename in volatilePlugins)) {
-      //       loadPluginWithDependencies(gistFile.content, gistFile.filename);
-
-      //       volatileGistPlugins[gistFile.filename] = gistFile;
-      //       setVloatilePlugin(
-      //         gistFile.filename,
-      //         volatileGistPlugins[gistFile.filename]
-      //       );
-      //     } else {
-      //       // do not set volatilePlugin from gist if its already in cache
-      //     }
-      //   })
-      // );
     };
 
-    // const onLoadPluginsFromVolatile = () => {
-    //   Object.values(volatilePlugins).forEach(volatilePlugin => {
-    //     if (volatilePlugin.type === 'builtin') return; // todo for now built in ones dont
-    //     importModuleWeb(volatilePlugin.content, volatilePlugin.name).then(
-    //       importedPlugin => {
-    //         const initializedPlugin = new importedPlugin(pluginApiMethods);
-    //         console.log({ importedPlugin, initializedPlugin });
-    //         window.addEventListener('DOMContentLoaded', e => {
-    //           registerPlugin(initializedPlugin);
-    //         });
-    //       }
-    //     );
-    //   });
-    // };
-
-    // if (app.settings.gistPluginsFile() !== null) {
-      loadPluginsFromCacheOrGist(); // writes gist data to volatile cache
-    // }
+    loadPluginsFromCacheOrGist();
     onLoadBuiltInPlugins();
     // onLoadPluginsFromVolatile();
   });

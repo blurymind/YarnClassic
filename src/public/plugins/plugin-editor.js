@@ -86,7 +86,7 @@ export var PluginEditor = function ({
   onKeyDown,
   onLoad,
   setPluginStore,
-  getVloatilePlugins,
+  // getVloatilePlugins,
   setVloatilePlugin,
   setVloatilePlugins,
   getGistPluginFiles,
@@ -154,7 +154,7 @@ export var PluginEditor = function ({
 
     this.onSetEditingFile = () => {
       const fileName = document.getElementById('edited-plugin-file').value;
-      getVloatilePlugins().then(volatilePlugins => {
+      getPluginsList().then(volatilePlugins => {
         console.log({ volatilePlugins })
         this.volatilePlugins = volatilePlugins || {};
         let fileContents = this.volatilePlugins[fileName].content;
@@ -378,7 +378,7 @@ export var PluginEditor = function ({
   onLoad(() => {
     console.log({ isInDevMode: app.settings.developmentModeEnabled() });
     if (!app.settings.developmentModeEnabled()) return;
-    getVloatilePlugins().then(volatilePlugins => {
+    getPluginsList().then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
       console.log({ gotVolatilePlugins: volatilePlugins });
     });
