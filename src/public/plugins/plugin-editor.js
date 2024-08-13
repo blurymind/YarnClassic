@@ -134,10 +134,8 @@ export var PluginEditor = function ({
       const nextFile = fileNames.length > 0 ? fileNames[0] : '';
       deleteVolatilePlugin(this.editingFile).then(()=> {
         deleteGistPlugin(this.editingFile).then(()=>{
-          this.onUpdatePluginsList(nextFile).then(err=>{
-            console.log({err})
+          this.onUpdatePluginsList(nextFile).then(() =>{
             this.onSetEditingFile(nextFile)
-            alert("todo")
           })
         })
       })

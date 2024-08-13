@@ -306,9 +306,9 @@ export const StorageJs = (type = 'gist') => {
             'X-GitHub-Api-Version': '2022-11-28',
           },
           body: JSON.stringify({
-            description: 'upload data from api',
+            description: content ? 'upload data from api' : `delete ${fileName}`,
             public: false,
-            files: { [fileName]: { content } },
+            files: { [fileName]: content ? {} :{ content } },
           }),
         }).then(res => {
           this.setLastStorageHost('GIST');

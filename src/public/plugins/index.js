@@ -311,7 +311,7 @@ export var Plugins = function (app) {
 
   const deleteGistPlugin = (fileName) => {
     //todo doesnt work
-    return app.data.storage.deleteGistFile(gistPluginsFileUrl || app.settings.gistPluginsFile(), fileName);
+    return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
   }
  
 
