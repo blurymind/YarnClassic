@@ -120,14 +120,16 @@ export var Plugins = function (app) {
       onPointerDown,
       onDoubleClick,
       id,
+      as ='span',
+      style = ''
     }
   ) => {
     if (document.getElementById(id) !== null) return;
 
-    const button = document.createElement('span');
+    const button = document.createElement(as);
     button.id = id || name || title || iconName;
     button.innerHTML = `
-      <span class="item ${className || ''}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
+      <span class="item ${className || ''}" style="${style}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
       }
        ${onPointerDown
         ? ` onpointerdown="app.plugins.${pluginName}.${onPointerDown}"`
@@ -139,7 +141,6 @@ export var Plugins = function (app) {
       }
        >
         <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw" style="color:currentColor;"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
-        <span class="hide-when-narrow">&nbsp;</span>
         ${name || ''}
       </span>
     `;
@@ -239,15 +240,23 @@ export var Plugins = function (app) {
   const setVloatilePlugins = value => dbStorage.save('volatilePlugins', value);
   const setVloatilePlugin = (key, value) => {
     console.log({key, value: value.content.toString()})
-    getVloatilePlugins().then(prev => {
+    return getVloatilePlugins().then(prev => {
       prev = prev || {};
       console.log({key, prev})
-      dbStorage.save('volatilePlugins', {
+      return dbStorage.save('volatilePlugins', {
         ...prev,
         [key]: { ...prev[key], ...value },
       });
     });
   };
+  const deleteVolatilePlugin = (key) => {
+    return getVloatilePlugins().then(prev => {
+      if (key in prev) delete prev[key];
+      return dbStorage.save('volatilePlugins', {
+        ...prev,
+      });
+    });
+  }
 
   const isGistTokenInvalid = () => {
     return app.data.storage.getIsTokenInvalid();
@@ -300,6 +309,11 @@ export var Plugins = function (app) {
       })
     })
   }
+
+  const deleteGistPlugin = (fileName) => {
+    //todo doesnt work
+    return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
+  }
  
 
   const pluginApiMethods = {
@@ -329,7 +343,9 @@ export var Plugins = function (app) {
     urlParams,
     gistPluginsFileUrl,
     pluginModeUrl,
-    getPluginsList
+    getPluginsList,
+    deleteGistPlugin,
+    deleteVolatilePlugin
   };
 
   // built in plugin initiation

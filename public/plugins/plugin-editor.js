@@ -94,10 +94,14 @@ export var PluginEditor = function ({
   isGistTokenInvalid,
   gistPluginsFileUrl,
   pluginModeUrl,
-  getPluginsList
+  urlParams,
+  getPluginsList,
+  deleteGistPlugin,
+  deleteVolatilePlugin
 }) {
   const self = this;
   this.name = 'PluginEditor';
+  this.onSetEditingFile = () => {};
   this.editor = null;
   this.differ = null;
   this.editingFile = '';
@@ -105,9 +109,42 @@ export var PluginEditor = function ({
   this.mode = pluginModeUrl || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
+  this.onAddNewFile = () => {
+    // ask for filename - (adds js at the end)
+    let newFileName = prompt("Create a new plugin file?", 'my-new-plugin-js');
+    if(newFileName) {
+      newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
+      newFileName = newFileName.endsWith('.js') ? newFileName: `${newFileName}.js`
+      if(newFileName in this.volatilePlugins) {
+        alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
+        return;
+      }
+      setVloatilePlugin(newFileName, {content: EXAMPLE, filename: newFileName, language:'JavaScript' }).then(()=>{
+        this.onUpdatePluginsList(newFileName);
+        this.onSetEditingFile(newFileName);
+        this.onSetPluginEditMode('edit');
+      })
+    }
+  }
+  this.onRemoveSelectedFile = () =>{
+    const willDelete = confirm(`Are you sure you want to delete this file:\n${this.editingFile}`)
+    if(willDelete) {
+      if(this.editingFile in this.volatilePlugins)delete this.volatilePlugins[this.editingFile];
+
+      const fileNames = Object.keys(this.volatilePlugins)
+      const nextFile = fileNames.length > 0 ? fileNames[0] : '';
+      deleteVolatilePlugin(this.editingFile).then(()=> {
+        deleteGistPlugin(this.editingFile).then(()=>{
+          this.onUpdatePluginsList(nextFile).then(() =>{
+            this.onSetEditingFile(nextFile)
+          })
+        })
+      })
+    }
+  }
   this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
     // initialize file menu 
-    getPluginsList().then(fileList=>{
+    return getPluginsList().then(fileList=>{
       this.volatilePlugins = fileList;
       console.log({fileList: Object.values(fileList)})
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
@@ -115,6 +152,7 @@ export var PluginEditor = function ({
       );
       if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
         document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
+        this.editingFile = gistPluginsFileOnMount;
       }
     })
   }
@@ -138,6 +176,8 @@ export var PluginEditor = function ({
     // edit/commit/test
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
+    document.getElementById('add-remove-plugin-file').style.display = 
+      mode === 'edit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
@@ -181,7 +221,7 @@ export var PluginEditor = function ({
             .setValue(fileContents);
           getGistPluginFiles().then(gistPluginFiles => {
             const gistPluginFile = gistPluginFiles.find(
-              item => item.filename == fileName
+              item => item.filename == this.editingFile
             );
 
             const isTokenInvalid = isGistTokenInvalid()
@@ -240,13 +280,19 @@ export var PluginEditor = function ({
       showCancelButton: false,
       title: `
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
-          <div>
+          <div class="flex-wrap" style="gap: 12px;">
             <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
         }.onSetEditingFile()">
               ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
+            <div class="button-group-rounded" id="add-remove-plugin-file">
+              <button id="add-plugin-file" onclick="app.plugins.${self.name
+        }.onAddNewFile()" title="Add">+</button>
+              <button id="remove-plugin-file" onclick="app.plugins.${self.name
+        }.onRemoveSelectedFile()" title="remove">─</button>
+            </div>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
@@ -269,7 +315,7 @@ export var PluginEditor = function ({
         <div style="position: relative;">
             <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
             <button id="plugin-differ-commit" style="position: absolute;
-            right: 9px;
+            right: 17px;
             bottom: 17px;
             padding-left: 9px;
             padding-right: 9px;
@@ -399,10 +445,16 @@ export var PluginEditor = function ({
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Edit plugins',
-      attachTo: 'fileMenuDropdown',
+      name: 'Plugins',
+      attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
       iconName: 'cog',
+      ...(app.settings.developmentModeEnabled() ? {
+        className: 'bbcode-button',
+        style: 'width: 100px; margin-top: 3px',
+        as: 'div',
+        id: 'pluginEditorButton'
+      } : {})
     });
   });
 };
