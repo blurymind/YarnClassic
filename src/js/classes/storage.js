@@ -318,6 +318,14 @@ export const StorageJs = (type = 'gist') => {
       editGistFile: function(fileName, content) {
         return this.editGist(this.gistId, fileName, content);
       },
+      deleteGistFile: function(gistId, fileName) {
+        return this.editGist(gistId, fileName, '')
+        // return fetch('https://api.github.com/gists/' + gistId, {
+        //   accept: "application/vnd.github.v3+json",
+        //   method: "delete",
+        //   headers: {"Authorization": "Basic " + Utilities.base64Encode(`${user_name}:${this.token}`)}
+        // })
+      },
       FILETYPE,
     };
   } else if (type === 'github') {

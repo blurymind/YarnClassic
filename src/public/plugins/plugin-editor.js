@@ -94,10 +94,13 @@ export var PluginEditor = function ({
   isGistTokenInvalid,
   gistPluginsFileUrl,
   pluginModeUrl,
-  getPluginsList
+  getPluginsList,
+  deleteGistPlugin,
+  deleteVolatilePlugin
 }) {
   const self = this;
   this.name = 'PluginEditor';
+  this.onSetEditingFile = () => {};
   this.editor = null;
   this.differ = null;
   this.editingFile = '';
@@ -105,9 +108,44 @@ export var PluginEditor = function ({
   this.mode = pluginModeUrl || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
+  this.onAddNewFile = () => {
+    // ask for filename - (adds js at the end)
+    let newFileName = prompt("Create a new plugin file?", 'my-new-plugin-js');
+    if(newFileName) {
+      newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
+      newFileName = newFileName.endsWith('.js') ? newFileName: `${newFileName}.js`
+      if(newFileName in this.volatilePlugins) {
+        alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
+        return;
+      }
+      setVloatilePlugin(newFileName, {content: EXAMPLE, filename: newFileName, language:'JavaScript' }).then(()=>{
+        this.onUpdatePluginsList(newFileName);
+        this.onSetEditingFile(newFileName);
+        this.onSetPluginEditMode('edit');
+      })
+    }
+  }
+  this.onRemoveSelectedFile = () =>{
+    const willDelete = confirm(`Are you sure you want to delete this file:\n${this.editingFile}`)
+    if(willDelete) {
+      if(this.editingFile in this.volatilePlugins)delete this.volatilePlugins[this.editingFile];
+
+      const fileNames = Object.keys(this.volatilePlugins)
+      const nextFile = fileNames.length > 0 ? fileNames[0] : '';
+      deleteVolatilePlugin(this.editingFile).then(()=> {
+        deleteGistPlugin(this.editingFile).then(()=>{
+          this.onUpdatePluginsList(nextFile).then(err=>{
+            console.log({err})
+            this.onSetEditingFile(nextFile)
+            alert("todo")
+          })
+        })
+      })
+    }
+  }
   this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
     // initialize file menu 
-    getPluginsList().then(fileList=>{
+    return getPluginsList().then(fileList=>{
       this.volatilePlugins = fileList;
       console.log({fileList: Object.values(fileList)})
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
@@ -115,6 +153,7 @@ export var PluginEditor = function ({
       );
       if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
         document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
+        this.editingFile = gistPluginsFileOnMount;
       }
     })
   }
@@ -240,13 +279,19 @@ export var PluginEditor = function ({
       showCancelButton: false,
       title: `
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
-          <div>
+          <div class="flex-wrap" style="gap: 12px;">
             <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
         }.onSetEditingFile()">
               ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
+            <div class="button-group-rounded">
+              <button id="add-plugin-file" onclick="app.plugins.${self.name
+        }.onAddNewFile()">+Add</button>
+              <button id="remove-plugin-file" onclick="app.plugins.${self.name
+        }.onRemoveSelectedFile()">-Rem</button>
+            </div>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name

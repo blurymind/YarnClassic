@@ -239,15 +239,23 @@ export var Plugins = function (app) {
   const setVloatilePlugins = value => dbStorage.save('volatilePlugins', value);
   const setVloatilePlugin = (key, value) => {
     console.log({key, value: value.content.toString()})
-    getVloatilePlugins().then(prev => {
+    return getVloatilePlugins().then(prev => {
       prev = prev || {};
       console.log({key, prev})
-      dbStorage.save('volatilePlugins', {
+      return dbStorage.save('volatilePlugins', {
         ...prev,
         [key]: { ...prev[key], ...value },
       });
     });
   };
+  const deleteVolatilePlugin = (key) => {
+    return getVloatilePlugins().then(prev => {
+      if (key in prev) delete prev[key];
+      return dbStorage.save('volatilePlugins', {
+        ...prev,
+      });
+    });
+  }
 
   const isGistTokenInvalid = () => {
     return app.data.storage.getIsTokenInvalid();
@@ -300,6 +308,11 @@ export var Plugins = function (app) {
       })
     })
   }
+
+  const deleteGistPlugin = (fileName) => {
+    //todo doesnt work
+    return app.data.storage.deleteGistFile(gistPluginsFileUrl || app.settings.gistPluginsFile(), fileName);
+  }
  
 
   const pluginApiMethods = {
@@ -329,7 +342,9 @@ export var Plugins = function (app) {
     urlParams,
     gistPluginsFileUrl,
     pluginModeUrl,
-    getPluginsList
+    getPluginsList,
+    deleteGistPlugin,
+    deleteVolatilePlugin
   };
 
   // built in plugin initiation
