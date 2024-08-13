@@ -221,7 +221,7 @@ export var PluginEditor = function ({
             .setValue(fileContents);
           getGistPluginFiles().then(gistPluginFiles => {
             const gistPluginFile = gistPluginFiles.find(
-              item => item.filename == fileName
+              item => item.filename == this.editingFile
             );
 
             const isTokenInvalid = isGistTokenInvalid()
