@@ -86,11 +86,15 @@ export var PluginEditor = function ({
   onKeyDown,
   onLoad,
   setPluginStore,
-  getVloatilePlugins,
+  // getVloatilePlugins,
   setVloatilePlugin,
   setVloatilePlugins,
   getGistPluginFiles,
-  saveGistPlugin
+  saveGistPlugin,
+  isGistTokenInvalid,
+  gistPluginsFileUrl,
+  pluginModeUrl,
+  getPluginsList
 }) {
   const self = this;
   this.name = 'PluginEditor';
@@ -98,10 +102,22 @@ export var PluginEditor = function ({
   this.differ = null;
   this.editingFile = '';
   this.volatilePlugins = {};
-  this.gistPluginFiles = {};
-  this.mode = 'edit';
+  this.mode = pluginModeUrl || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
+  this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
+    // initialize file menu 
+    getPluginsList().then(fileList=>{
+      this.volatilePlugins = fileList;
+      console.log({fileList: Object.values(fileList)})
+      document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
+        key => `<option value="${key}">${key}</option>`
+      );
+      if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
+        document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
+      }
+    })
+  }
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
     saveGistPlugin(this.editingFile, contents).then(data=>{
@@ -123,7 +139,7 @@ export var PluginEditor = function ({
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('diff-editor').style.display =
-      mode === 'commit' && app.settings.gistPluginsFile() ? 'block' : 'none';
+      mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.display =
@@ -132,41 +148,59 @@ export var PluginEditor = function ({
 
     this.onSetEditingFile();
   };
+  // ace-editor
+  require('ace-builds/src-min-noconflict/ext-beautify');
+  require('ace-builds/src-min-noconflict/mode-javascript');
+  require('ace-builds/src-min-noconflict/theme-monokai')
+  // ace-diff
+  if (app.settings.theme() === 'dracula') {
+    addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+  } else {
+    addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+  }
   this.onOpenPluginEditor = async () => {
-    // ace-editor
-    require('ace-builds/src-min-noconflict/ext-beautify');
-    require('ace-builds/src-min-noconflict/mode-javascript');
-    require('ace-builds/src-min-noconflict/theme-monokai')
+    
     const beautify = ace.require('ace/ext/beautify');
 
-    this.onSetEditingFile = () => {
+    this.onSetEditingFile = (fileNameOnMount = '') => {
       const fileName = document.getElementById('edited-plugin-file').value;
-      getVloatilePlugins().then(volatilePlugins => {
+      getPluginsList().then(volatilePlugins => {
         console.log({ volatilePlugins })
         this.volatilePlugins = volatilePlugins || {};
-        let fileContents = this.volatilePlugins[fileName].content;
-        this.editingFile = fileName;
+        this.editingFile = fileNameOnMount || fileName;
+        let fileContents = this.volatilePlugins[this.editingFile].content;
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
         beautify.beautify(this.editor.session);
 
         if (this.mode === 'commit') {
+          fileContents = this.editor.getValue();
+          this.differ
+            .getEditors()
+            .left.getSession()
+            .setValue(fileContents);
           getGistPluginFiles().then(gistPluginFiles => {
             const gistPluginFile = gistPluginFiles.find(
               item => item.filename == fileName
             );
-            console.log({ gistPluginFile }, this.differ.getEditors());
-            fileContents = this.editor.getValue();
-            this.differ
-              .getEditors()
-              .left.getSession()
-              .setValue(fileContents);
 
+            const isTokenInvalid = isGistTokenInvalid()
+            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`
             this.differ
               .getEditors()
               .right.getSession()
-              .setValue(gistPluginFile ? gistPluginFile.content : `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`);
-            // this.differ.getEditors().right.setReadOnly(this.mode === 'commit');
+              .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile.content : gistAccesError);
+            
+              this.differ.getEditors().right.setReadOnly(isTokenInvalid);
+              document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
+          })
+          .catch(error=>{
+            this.differ.getEditors().right.setReadOnly(true);
+            document.getElementById('plugin-differ-commit').className = "disabled";
+            this.differ
+              .getEditors()
+              .right.getSession()
+              .setValue(error.toString())
           });
         }
         if (this.mode === 'test') {
@@ -209,7 +243,7 @@ export var PluginEditor = function ({
           <div>
             <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
         }.onSetEditingFile()">
-              ${Object.keys(this.volatilePlugins).map(
+              ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
@@ -274,14 +308,18 @@ export var PluginEditor = function ({
         this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
         // ace-diff
         if (app.settings.theme() === 'dracula') {
+          removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
         } else {
+          removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
+
+
       },
       onAfterClose: () => {
-        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
-        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+        // removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        // removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       onOpen: () => {
         // EDITOR
@@ -295,8 +333,6 @@ export var PluginEditor = function ({
         this.editor.getSession().on('change', function () {
           onChangeDebounced();
         });
-        const localVariables = getPluginStore(self.name);
-        this.onSetPluginEditMode(localVariables.pluginEditMode || 'edit');
 
         setPluginStore(self.name, 'pluginEditorOpen', true);
 
@@ -336,9 +372,14 @@ export var PluginEditor = function ({
             // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
             // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
-
+          const localVariables = getPluginStore(self.name);
+          this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
         // initialize data on both editor and differ
-        this.onSetEditingFile();
+        setTimeout(()=>{
+          // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
+          this.onUpdatePluginsList(gistPluginsFileUrl);
+          this.onSetEditingFile(gistPluginsFileUrl);
+        }, 400)
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
@@ -347,11 +388,13 @@ export var PluginEditor = function ({
     });
   };
   onLoad(() => {
-    console.log({ isInDevMode: app.settings.developmentModeEnabled() });
-    if (!app.settings.developmentModeEnabled()) return;
-    getVloatilePlugins().then(volatilePlugins => {
+    getPluginsList().then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
       console.log({ gotVolatilePlugins: volatilePlugins });
+
+      if(gistPluginsFileUrl) {
+        this.onOpenPluginEditor()
+      }
     });
 
     // create a button in the file menu if in dev mode
