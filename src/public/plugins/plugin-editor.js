@@ -91,7 +91,9 @@ export var PluginEditor = function ({
   setVloatilePlugins,
   getGistPluginFiles,
   saveGistPlugin,
-  isGistTokenInvalid
+  isGistTokenInvalid,
+  urlParams,
+  getPluginsList
 }) {
   const self = this;
   this.name = 'PluginEditor';
@@ -103,6 +105,16 @@ export var PluginEditor = function ({
   this.mode = 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
+  this.onUpdatePluginsList = () => {
+    // initialize file menu 
+    getPluginsList().then(fileList=>{
+      this.volatilePlugins = fileList;
+      console.log({fileList: Object.values(fileList)})
+      document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
+        key => `<option value="${key}">${key}</option>`
+      );
+    })
+  }
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
     saveGistPlugin(this.editingFile, contents).then(data=>{
@@ -221,7 +233,7 @@ export var PluginEditor = function ({
           <div>
             <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
         }.onSetEditingFile()">
-              ${Object.keys(this.volatilePlugins).map(
+              ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
@@ -290,6 +302,8 @@ export var PluginEditor = function ({
         } else {
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
+
+
       },
       onAfterClose: () => {
         removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
@@ -351,6 +365,9 @@ export var PluginEditor = function ({
 
         // initialize data on both editor and differ
         this.onSetEditingFile();
+        setTimeout(()=>{
+          this.onUpdatePluginsList();
+        }, 300)
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
