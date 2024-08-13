@@ -94,6 +94,7 @@ export var PluginEditor = function ({
   isGistTokenInvalid,
   gistPluginsFileUrl,
   pluginModeUrl,
+  urlParams,
   getPluginsList,
   deleteGistPlugin,
   deleteVolatilePlugin
@@ -288,9 +289,9 @@ export var PluginEditor = function ({
             </select>
             <div class="button-group-rounded" id="add-remove-plugin-file">
               <button id="add-plugin-file" onclick="app.plugins.${self.name
-        }.onAddNewFile()">+Add</button>
+        }.onAddNewFile()" title="Add">+</button>
               <button id="remove-plugin-file" onclick="app.plugins.${self.name
-        }.onRemoveSelectedFile()">-Rem</button>
+        }.onRemoveSelectedFile()" title="remove">─</button>
             </div>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
@@ -314,7 +315,7 @@ export var PluginEditor = function ({
         <div style="position: relative;">
             <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
             <button id="plugin-differ-commit" style="position: absolute;
-            right: 9px;
+            right: 17px;
             bottom: 17px;
             padding-left: 9px;
             padding-right: 9px;
