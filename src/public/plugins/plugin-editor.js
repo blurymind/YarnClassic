@@ -92,7 +92,8 @@ export var PluginEditor = function ({
   getGistPluginFiles,
   saveGistPlugin,
   isGistTokenInvalid,
-  urlParams,
+  gistPluginsFileUrl,
+  pluginModeUrl,
   getPluginsList
 }) {
   const self = this;
@@ -101,11 +102,10 @@ export var PluginEditor = function ({
   this.differ = null;
   this.editingFile = '';
   this.volatilePlugins = {};
-  this.gistPluginFiles = {};
-  this.mode = 'edit';
+  this.mode = pluginModeUrl || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
 
-  this.onUpdatePluginsList = () => {
+  this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
     // initialize file menu 
     getPluginsList().then(fileList=>{
       this.volatilePlugins = fileList;
@@ -113,6 +113,9 @@ export var PluginEditor = function ({
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
       );
+      if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
+        document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
+      }
     })
   }
   this.onCommitChanges = () => {
@@ -145,20 +148,27 @@ export var PluginEditor = function ({
 
     this.onSetEditingFile();
   };
+  // ace-editor
+  require('ace-builds/src-min-noconflict/ext-beautify');
+  require('ace-builds/src-min-noconflict/mode-javascript');
+  require('ace-builds/src-min-noconflict/theme-monokai')
+  // ace-diff
+  if (app.settings.theme() === 'dracula') {
+    addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+  } else {
+    addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+  }
   this.onOpenPluginEditor = async () => {
-    // ace-editor
-    require('ace-builds/src-min-noconflict/ext-beautify');
-    require('ace-builds/src-min-noconflict/mode-javascript');
-    require('ace-builds/src-min-noconflict/theme-monokai')
+    
     const beautify = ace.require('ace/ext/beautify');
 
-    this.onSetEditingFile = () => {
+    this.onSetEditingFile = (fileNameOnMount = '') => {
       const fileName = document.getElementById('edited-plugin-file').value;
       getPluginsList().then(volatilePlugins => {
         console.log({ volatilePlugins })
         this.volatilePlugins = volatilePlugins || {};
-        let fileContents = this.volatilePlugins[fileName].content;
-        this.editingFile = fileName;
+        this.editingFile = fileNameOnMount || fileName;
+        let fileContents = this.volatilePlugins[this.editingFile].content;
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
         beautify.beautify(this.editor.session);
@@ -298,16 +308,18 @@ export var PluginEditor = function ({
         this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
         // ace-diff
         if (app.settings.theme() === 'dracula') {
+          removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
         } else {
+          removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
 
 
       },
       onAfterClose: () => {
-        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
-        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+        // removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        // removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       onOpen: () => {
         // EDITOR
@@ -321,8 +333,6 @@ export var PluginEditor = function ({
         this.editor.getSession().on('change', function () {
           onChangeDebounced();
         });
-        const localVariables = getPluginStore(self.name);
-        this.onSetPluginEditMode(localVariables.pluginEditMode || 'edit');
 
         setPluginStore(self.name, 'pluginEditorOpen', true);
 
@@ -362,12 +372,14 @@ export var PluginEditor = function ({
             // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
             // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
-
+          const localVariables = getPluginStore(self.name);
+          this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
         // initialize data on both editor and differ
-        this.onSetEditingFile();
         setTimeout(()=>{
-          this.onUpdatePluginsList();
-        }, 300)
+          // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
+          this.onUpdatePluginsList(gistPluginsFileUrl);
+          this.onSetEditingFile(gistPluginsFileUrl);
+        }, 400)
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
@@ -381,6 +393,10 @@ export var PluginEditor = function ({
     getPluginsList().then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
       console.log({ gotVolatilePlugins: volatilePlugins });
+
+      if(gistPluginsFileUrl) {
+        this.onOpenPluginEditor()
+      }
     });
 
     // create a button in the file menu if in dev mode

@@ -253,6 +253,8 @@ export var Plugins = function (app) {
   }
   const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
   const gistPluginsId = urlParams.get('gistPlugins');
+  const gistPluginsFileUrl = urlParams.get('pluginFile');
+  const pluginModeUrl = urlParams.get('mode');
 
   const getGistPluginFiles = () => {
     return new Promise((resolve) => {
@@ -324,6 +326,8 @@ export var Plugins = function (app) {
     saveGistPlugin,
     isGistTokenInvalid,
     urlParams,
+    gistPluginsFileUrl,
+    pluginModeUrl,
     getPluginsList
   };
 
