@@ -388,8 +388,6 @@ export var PluginEditor = function ({
     });
   };
   onLoad(() => {
-    console.log({ isInDevMode: app.settings.developmentModeEnabled() });
-    if (!app.settings.developmentModeEnabled()) return;
     getPluginsList().then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
       console.log({ gotVolatilePlugins: volatilePlugins });

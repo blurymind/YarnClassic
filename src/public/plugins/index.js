@@ -9,6 +9,7 @@ async function importModuleWeb(
   { forceUpdate } = { forceUpdate: false }
 ) {
   if (!script.startsWith("module.exports")) return Promise.reject(`${modulePath} Not a module`);
+  if(!app.settings.developmentModeEnabled()) return Promise.reject(`${modulePath} Not allowed to load. App is not in dev mode`);
 
   const { AsyncFunction, cache } = globalThis.__import__ || {
     AsyncFunction: Object.getPrototypeOf(async function () { }).constructor,
