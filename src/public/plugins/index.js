@@ -120,14 +120,16 @@ export var Plugins = function (app) {
       onPointerDown,
       onDoubleClick,
       id,
+      as ='span',
+      style = ''
     }
   ) => {
     if (document.getElementById(id) !== null) return;
 
-    const button = document.createElement('span');
+    const button = document.createElement(as);
     button.id = id || name || title || iconName;
     button.innerHTML = `
-      <span class="item ${className || ''}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
+      <span class="item ${className || ''}" style="${style}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
       }
        ${onPointerDown
         ? ` onpointerdown="app.plugins.${pluginName}.${onPointerDown}"`
@@ -139,7 +141,6 @@ export var Plugins = function (app) {
       }
        >
         <svg class="icon menu-icon icon-file-${iconName} icon-lg icon-fw" style="color:currentColor;"><use xlink:href="public/icons.svg#icon-${iconName}"></use></svg>
-        <span class="hide-when-narrow">&nbsp;</span>
         ${name || ''}
       </span>
     `;

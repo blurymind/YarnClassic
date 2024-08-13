@@ -175,6 +175,8 @@ export var PluginEditor = function ({
     // edit/commit/test
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
+    document.getElementById('add-remove-plugin-file').style.display = 
+      mode === 'edit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
@@ -284,7 +286,7 @@ export var PluginEditor = function ({
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
-            <div class="button-group-rounded">
+            <div class="button-group-rounded" id="add-remove-plugin-file">
               <button id="add-plugin-file" onclick="app.plugins.${self.name
         }.onAddNewFile()">+Add</button>
               <button id="remove-plugin-file" onclick="app.plugins.${self.name
@@ -442,10 +444,16 @@ export var PluginEditor = function ({
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Edit plugins',
-      attachTo: 'fileMenuDropdown',
+      name: 'Plugins',
+      attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
       iconName: 'cog',
+      ...(app.settings.developmentModeEnabled() ? {
+        className: 'bbcode-button',
+        style: 'width: 100px; margin-top: 3px',
+        as: 'div',
+        id: 'pluginEditorButton'
+      } : {})
     });
   });
 };
