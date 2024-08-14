@@ -308,7 +308,7 @@ export const StorageJs = (type = 'gist') => {
           body: JSON.stringify({
             description: content ? 'upload data from api' : `delete ${fileName}`,
             public: false,
-            files: { [fileName]: content ? {} :{ content } },
+            files: { [fileName]: content ? { content } :{} },
           }),
         }).then(res => {
           this.setLastStorageHost('GIST');

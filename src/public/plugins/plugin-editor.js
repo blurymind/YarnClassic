@@ -30,7 +30,7 @@ const INTERNAL_EXAMPLE = `
 () => {
   return {
     name: 'ExamplePlugin',
-    Creator: function( {
+    Constructor: function( {
       app,
       createButton,
       createToggle,
