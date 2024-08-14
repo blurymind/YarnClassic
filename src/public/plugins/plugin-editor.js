@@ -26,6 +26,44 @@ const EXAMPLE = `
   }
 }
 `
+const INTERNAL_EXAMPLE = `
+() => {
+  return {
+    name: 'ExamplePlugin',
+    Creator: function( {
+      app,
+      createButton,
+      createToggle,
+      getPluginStore,
+      setPluginStore,
+      addSettingsItem,
+      onYarnLoadedData,
+      onYarnEditorOpen,
+      onYarnInPreviewMode,
+      onYarnSavedNode,
+      onYarnSetLanguage,
+      onYarnLoadedStateFromLocalStorage,
+      onYarnSavedStateToLocalStorage,
+      onYarnSetDocumentType,
+      onKeyUp,
+      onKeyDown,
+      onLoad,
+    }) {
+      const self = this;
+      this.name = 'ExamplePlugin';
+      this.onOpenPluginEditor = ()=> {
+        alert("YAY!")
+      }
+      createButton(self.name, {
+        name: 'ExamplePlugin',
+        attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
+        onClick: 'onOpenPluginEditor()',
+        iconName: 'cog',
+      });
+    }
+  }
+}
+`
 const getExampleOutputFunction = (error = "") => `
 <head>
 <style>
@@ -37,12 +75,16 @@ const getExampleOutputFunction = (error = "") => `
 </style>
 </head>
 <body>
-<textarea style="height: 70vh; width: 100%;">
+<textarea style="height: 100vh; width: 100%;">
 ${error}
 
-// To render here, the script needs to be a function that returns modules, body and script
+// To render output here, the script needs to be a function that returns modules, body and script
 // Example:
 ${EXAMPLE}
+
+// If you want to instead create a plugin that modifies yarn editor itself, you will need to reload yarn for changes to take effect
+// Example:
+${INTERNAL_EXAMPLE}
 </textarea>
 <body>
 `

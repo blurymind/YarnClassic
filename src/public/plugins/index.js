@@ -8,9 +8,6 @@ async function importModuleWeb(
   modulePath,
   { forceUpdate } = { forceUpdate: false }
 ) {
-  if (!script.startsWith("module.exports")) return Promise.reject(`${modulePath} Not a module`);
-  if(!app.settings.developmentModeEnabled()) return Promise.reject(`${modulePath} Not allowed to load. App is not in dev mode`);
-
   const { AsyncFunction, cache } = globalThis.__import__ || {
     AsyncFunction: Object.getPrototypeOf(async function () { }).constructor,
     cache: new Map(),
@@ -26,10 +23,6 @@ async function importModuleWeb(
 
 export var Plugins = function (app) {
   const self = this;
-  const registerPlugin = plugin => {
-    app.plugins[plugin.name] = plugin;
-    // app.log('attaching plugin', plugin, app.plugins);
-  };
 
   const getPluginStore = pluginName => {
     if (!self.pluginStorage) self.pluginStorage = {};
@@ -115,7 +108,7 @@ export var Plugins = function (app) {
       iconName,
       onClick,
       attachTo,
-      className,
+      className = 'item bbcode-button',
       title,
       onPointerDown,
       onDoubleClick,
@@ -124,10 +117,14 @@ export var Plugins = function (app) {
       style = ''
     }
   ) => {
-    if (document.getElementById(id) !== null) return;
+    const autoId = id || name || title || iconName;
+    if (document.getElementById(autoId) !== null) {
+      console.error(`Plugin button creation: Button with the id ${autoId} already exists. Skip creating it.`)
+      return;
+    }
 
     const button = document.createElement(as);
-    button.id = id || name || title || iconName;
+    button.id = autoId;
     button.innerHTML = `
       <span class="item ${className || ''}" style="${style}" title="${title || ''}" ${onClick ? `onclick="click: app.plugins.${pluginName}.${onClick}"` : ''
       }
@@ -161,11 +158,17 @@ export var Plugins = function (app) {
       onToggle,
       enableKey,
       iconName,
+      name
     }
   ) => {
-    if (document.getElementById(id) !== null) return;
+    const autoId = id || name || title || iconName;
+    if (document.getElementById(autoId) !== null) {
+      console.error(`Plugin button creation: Button with the id ${autoId} already exists. Skip creating it.`)
+      return;
+    }
+
     const toggleButton = document.createElement('span');
-    toggleButton.id = id;
+    toggleButton.id = autoId;
     toggleButton.className = 'styled-checkbox';
     toggleButton.innerHTML = `
             <input class="styled-checkbox" type="checkbox" id="${toggleValueKey}" data-bind="checked: app.plugins.${pluginName}.${enableKey}, event: { change: app.plugins.${pluginName}.${onToggle} }"></input>
@@ -352,7 +355,7 @@ export var Plugins = function (app) {
   PLUGINS.forEach(plugin => {
     const initializedPlugin = new plugin(pluginApiMethods);
     window.addEventListener('DOMContentLoaded', e => {
-      registerPlugin(initializedPlugin);
+      app.plugins[initializedPlugin.name] = initializedPlugin;
     });
   });
 
@@ -370,7 +373,6 @@ export var Plugins = function (app) {
           type: 'builtin',
           language: 'JavaScript',
         };
-        console.log({ builtInPlugin });
 
         builtInPlugins[plugin.name] = builtInPlugin;
         if (volatilePlugins && plugin.name in volatilePlugins) {
@@ -382,55 +384,40 @@ export var Plugins = function (app) {
       dbStorage.save('builtinVolatilePlugins', builtInVolatilePlugins);
     };
 
-    const loadPluginWithDependencies = (content, filename) => {
-      importModuleWeb(content, filename).then(importedPlugin => {
-        const newPlugin = new importedPlugin(pluginApiMethods);
-        console.log({ importedPlugin, newPlugin });
-        newPlugin.name = newPlugin.name || filename;
-
-        if ('dependencies' in newPlugin) {
-          newPlugin.dependencies.forEach(dependency => {
-            const scriptEle = document.createElement('script');
-            scriptEle.setAttribute('src', dependency);
-            document.body.appendChild(scriptEle);
-            scriptEle.addEventListener('load', () => {
-              console.log('File loaded', dependency);
-            });
-
-            scriptEle.addEventListener('error', ev => {
-              console.log('Error on loading file', ev);
-            });
+    const addDependencyScripts = (newPlugin) => {
+      if ('dependencies' in newPlugin) {
+        newPlugin.dependencies.forEach(dependency => {
+          const scriptEle = document.createElement('script');
+          scriptEle.setAttribute('src', dependency);
+          document.body.appendChild(scriptEle);
+          scriptEle.addEventListener('load', () => {
+            console.log('File loaded', dependency);
           });
-        }
-        window.addEventListener('DOMContentLoaded', e => {
-          registerPlugin(newPlugin);
+  
+          scriptEle.addEventListener('error', ev => {
+            console.log('Error on loading file', ev);
+          });
         });
-      });
-    };
+      }
+    }
 
     const loadPluginsFromCacheOrGist = () => {
       getPluginsList().then(pluginsList=>{
-        console.log("----->",{pluginsList})
-
         setVloatilePlugins(pluginsList);
         Object.values(pluginsList).forEach(pluginFile => {
-          loadPluginWithDependencies(pluginFile.content, pluginFile.filename);
-
-          importModuleWeb(pluginFile.content, pluginFile.filename).then(
-            importedPlugin => {
-              const initializedPlugin = new importedPlugin(pluginApiMethods);
-              console.log({ importedPlugin, initializedPlugin });
-              window.addEventListener('DOMContentLoaded', e => {
-                registerPlugin(initializedPlugin);
-              });
-            }
-          );
+          const funCode = `return ${pluginFile.content}`
+          const plugin = new Function("data",funCode)();
+          const pluginData = plugin()
+          if(pluginData && "Creator" in pluginData && "name" in pluginData) {
+            const FunInstance = new pluginData.Creator(pluginApiMethods);
+            app.plugins[pluginData.name] = FunInstance;
+            addDependencyScripts(pluginData)
+          }
         })
       })
     };
 
     loadPluginsFromCacheOrGist();
     onLoadBuiltInPlugins();
-    // onLoadPluginsFromVolatile();
   });
 };
