@@ -408,8 +408,8 @@ export var Plugins = function (app) {
           const funCode = `return ${pluginFile.content}`
           const plugin = new Function("data",funCode)();
           const pluginData = plugin()
-          if(pluginData && "Creator" in pluginData && "name" in pluginData) {
-            const FunInstance = new pluginData.Creator(pluginApiMethods);
+          if(pluginData && "Constructor" in pluginData && "name" in pluginData) {
+            const FunInstance = new pluginData.Constructor(pluginApiMethods);
             app.plugins[pluginData.name] = FunInstance;
             addDependencyScripts(pluginData)
           }
