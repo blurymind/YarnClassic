@@ -1071,7 +1071,7 @@ export const data = {
   trySaveGist: function(gists) {
     console.log({gists})
     if (data.storage.hasGistSettings()) {
-      data.storage.getGistFile().then(gist => {
+      data.storage.getGistFiles().then(gist => {
         const gistFiles = Object.keys(gist.body.files);
         app.log(gistFiles);
         data.promptFileNameAndFormat(({ editingName, yarnData }) => {
@@ -1113,7 +1113,7 @@ export const data = {
       console.log({edit:data.editingName(), last: app.settings.lastEditedGist(), lastHost: app.settings.lastStorageHost()})
       const previouslyOpenedGist =
         app.settings.lastStorageHost() === 'GIST' ? app.settings.lastEditedGist() : '';
-        data.storage.getGistFile(app.ui.openSettingsDialog).then(({ inputOptions, filesInGist }) => {
+        data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ inputOptions, filesInGist }) => {
         Swal.fire({
           title: '🐙 Open file from a gist',
           input: 'select',
@@ -1164,7 +1164,7 @@ export const data = {
 
     if (app.settings.lastStorageHost() === 'GIST') {
       const storage = data.storage;
-      storage.getGistFile().then(gist => {
+      // storage.getGistFile().then(gist => {
         data.getSaveData(data.editingType()).then(yarnData => {
           data.getSaveData(data.editingType());
           storage.editGistFile(data.editingName(), yarnData);
@@ -1176,7 +1176,7 @@ export const data = {
             text: `Saved ${data.editingName()} to Gist`,
           });
         });
-      });
+      // });
     } else if (!data.editingPath()) {
       // file access api (web + electron)
       data.getSaveData(data.editingType()).then(saveData => {

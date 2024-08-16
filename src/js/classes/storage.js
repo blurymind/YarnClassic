@@ -276,6 +276,9 @@ export const StorageJs = (type = 'gist') => {
       getGistFile: function(onFail = () => {}) {
         return this.getGist(this.gistId, onFail);
       },
+      getGistFiles: function(onFail = () => {}) {
+        return this.getGist(this.gistId, onFail);
+      },
       getContentOrRaw: function(content, rawUrl) {
         // sometimes github comes back empty handed for content, but has raw_url
         return new Promise((resolve, reject) => {
