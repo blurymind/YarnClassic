@@ -132,6 +132,7 @@ export var PluginEditor = function ({
   setVloatilePlugin,
   setVloatilePlugins,
   getGistPluginFiles,
+  getGistPluginFile,
   saveGistPlugin,
   isGistTokenInvalid,
   gistPluginsFileUrl,
@@ -161,10 +162,11 @@ export var PluginEditor = function ({
         alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
         return;
       }
-      setVloatilePlugin(newFileName, {content: EXAMPLE, filename: newFileName, language:'JavaScript' }).then(()=>{
+      const newFileData = {content: EXAMPLE, filename: newFileName, language:'JavaScript' }
+      setVloatilePlugin(newFileName, newFileData).then(()=>{
         this.onUpdatePluginsList(newFileName);
-        this.onSetEditingFile(newFileName);
         this.onSetPluginEditMode('edit');
+        this.onSetEditingFile(newFileName);
       })
     }
   }
@@ -185,10 +187,9 @@ export var PluginEditor = function ({
     }
   }
   this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
-    // initialize file menu 
+    // initialize file menu or update it. Refetch gist files if updating it
     return getPluginsList().then(fileList=>{
       this.volatilePlugins = fileList;
-      console.log({fileList: Object.values(fileList)})
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
       );
@@ -200,8 +201,8 @@ export var PluginEditor = function ({
   }
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
-    saveGistPlugin(this.editingFile, contents).then(data=>{
-      this.differ.getEditors().left.setValue(contents)
+    saveGistPlugin(this.editingFile, contents).then(response=>{
+      this.differ.getEditors().left.setValue(contents);
     });
   }
   this.onDownloadPreview = () => {
@@ -246,8 +247,7 @@ export var PluginEditor = function ({
 
     this.onSetEditingFile = (fileNameOnMount = '') => {
       const fileName = document.getElementById('edited-plugin-file').value;
-      getPluginsList().then(volatilePlugins => {
-        console.log({ volatilePlugins })
+      getPluginsList(false).then(volatilePlugins => {
         this.volatilePlugins = volatilePlugins || {};
         this.editingFile = fileNameOnMount || fileName;
         let fileContents = this.volatilePlugins[this.editingFile].content;
@@ -261,17 +261,14 @@ export var PluginEditor = function ({
             .getEditors()
             .left.getSession()
             .setValue(fileContents);
-          getGistPluginFiles().then(gistPluginFiles => {
-            const gistPluginFile = gistPluginFiles.find(
-              item => item.filename == this.editingFile
-            );
 
+          getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
-            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing.\n// Have you deleted/renamed it?`
+            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
             this.differ
               .getEditors()
               .right.getSession()
-              .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile.content : gistAccesError);
+              .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile : gistAccesError);
             
               this.differ.getEditors().right.setReadOnly(isTokenInvalid);
               document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
@@ -289,7 +286,6 @@ export var PluginEditor = function ({
           app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink" : "json").then(yarnData => {
             try {
               const extension = new Function("parameters", `return ${fileContents}`)();
-              console.log({ fileContents, yarnData })
               if (typeof extension === 'function') {
                 try {
                   const data = extension();
@@ -476,9 +472,8 @@ export var PluginEditor = function ({
     });
   };
   onLoad(() => {
-    getPluginsList().then(volatilePlugins => {
+    getPluginsList(false).then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
-      console.log({ gotVolatilePlugins: volatilePlugins });
 
       if(gistPluginsFileUrl) {
         this.onOpenPluginEditor()
