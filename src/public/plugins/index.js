@@ -242,10 +242,8 @@ export var Plugins = function (app) {
   const getVloatilePlugins = () => dbStorage.getDbValue('volatilePlugins');
   const setVloatilePlugins = value => dbStorage.save('volatilePlugins', value);
   const setVloatilePlugin = (key, value) => {
-    console.log({key, value: value.content.toString()})
     return getVloatilePlugins().then(prev => {
       prev = prev || {};
-      console.log({key, prev})
       return dbStorage.save('volatilePlugins', {
         ...prev,
         [key]: { ...prev[key], ...value },
@@ -269,17 +267,17 @@ export var Plugins = function (app) {
   const gistPluginsFileUrl = urlParams.get('pluginFile');
   const pluginModeUrl = urlParams.get('mode');
 
+  this.rawUrls = {};
   const getGistPluginFiles = () => {
     return new Promise((resolve) => {
-      // if (!app.settings.gistPluginsFile()) reject("No");
       const gistId = gistPluginsId || app.settings.gistPluginsFile();
-      console.log({gistId})
       app.data.storage
         .getGist(gistId)
         .then(({ filesInGist }) => {
           const promises = Object.values(filesInGist)
             .filter(gistFile => gistFile.language === 'JavaScript' || gistFile.filename.endsWith(".js"))
             .map(gistFile => {
+              this.rawUrls[gistFile.filename] = gistFile.raw_url;
               return app.data.storage
                 .getContentOrRaw(gistFile.content, gistFile.raw_url)
                 .then(content => ({ ...gistFile, content }));
@@ -288,18 +286,29 @@ export var Plugins = function (app) {
         });
     });
   };
+  
+  const getGistPluginFile = (fileName) => {
+    const gistId = gistPluginsId || app.settings.gistPluginsFile();
+    const rawUrl = this.rawUrls[fileName]
+    if(!rawUrl) return Promise.resolve('');
+    return app.data.storage.getGistFileFromRawUrl(rawUrl);
+  }
 
   const saveGistPlugin = (fileName, contents) => {
     console.log({gistId: app.settings.gistPluginsFile(), fileName, contents})
-    return app.data.storage.editGist(app.settings.gistPluginsFile(), fileName, contents)
+    return app.data.storage.editGist(app.settings.gistPluginsFile(), fileName, contents).then(response=> {
+      this.rawUrls[fileName] = response.file.raw_url;
+      return response;
+    })
   }
-  const getPluginsList = () => {
+  const getPluginsList = (includeGistFiles = false) => {
     return new Promise(resolve=> {
       return getVloatilePlugins().then(volatilePlugins => {
-        return getGistPluginFiles().then(gistPlugins => {
-          console.log({volatilePlugins, gistPlugins})
-          // if(!gistPlugins && volatilePlugins) resolve(volatilePlugins || {});
-          
+        if(!includeGistFiles) return resolve(volatilePlugins);
+
+        // we want to minimize doing this since github will start thinking its being spammed and time out
+        console.log("---- fetching from gist files ----");
+        return getGistPluginFiles().then(gistPlugins => {          
           const result = {}
           gistPlugins.forEach(item=> {
             result[item.filename] = item
@@ -314,7 +323,6 @@ export var Plugins = function (app) {
   }
 
   const deleteGistPlugin = (fileName) => {
-    //todo doesnt work
     return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
   }
  
@@ -341,6 +349,7 @@ export var Plugins = function (app) {
     setVloatilePlugin,
     setVloatilePlugins,
     getGistPluginFiles,
+    getGistPluginFile,
     saveGistPlugin,
     isGistTokenInvalid,
     urlParams,
@@ -402,7 +411,7 @@ export var Plugins = function (app) {
     }
 
     const loadPluginsFromCacheOrGist = () => {
-      getPluginsList().then(pluginsList=>{
+      getPluginsList(true).then(pluginsList=>{
         setVloatilePlugins(pluginsList);
         Object.values(pluginsList).forEach(pluginFile => {
           const funCode = `return ${pluginFile.content}`

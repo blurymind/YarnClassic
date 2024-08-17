@@ -216,6 +216,13 @@ export const StorageJs = (type = 'gist') => {
         if (fileKey in this.filesInGist) return this.filesInGist[fileKey];
         console.error(`${fileKey} not found in gist`, this.filesInGist);
       },
+      getGistHeaders: function() {
+        return {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${this.token}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+        }
+      },
       getGist: function(gistId, onFail = () => {}) {
         if (!gistId) {
           throw new Error('No gist id specified');
@@ -223,11 +230,7 @@ export const StorageJs = (type = 'gist') => {
         const fetchAddress = `https://api.github.com/gists/${gistId}`;
         return fetch(fetchAddress, {
           method: 'GET',
-          headers: {
-            Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${this.token}`,
-            'X-GitHub-Api-Version': '2022-11-28',
-          },
+          headers: this.getGistHeaders(),
         })
           .then(data => {
             console.log('GOT -- ', { data });
@@ -240,7 +243,6 @@ export const StorageJs = (type = 'gist') => {
               onFail(`Failed to get:\n${fetchAddress}...\n\nSTATUS: ${data.status}\n${data.status in GistStatusHints ? GistStatusHints[data.status] : ""}`)
               if (data.status in GistStatusHints) onFail(data.status);
               if (data.status === 404) window.open(fetchAddress, '_blank').focus();
-
               // try to fetch without authorisation
               return fetch(fetchAddress).then(data=> {
                 console.warn("Got data without authorisation")
@@ -263,7 +265,7 @@ export const StorageJs = (type = 'gist') => {
               body: content,
               filesInGist: this.filesInGist,
               inputOptions,
-              fileList: Object.keys(this.filesInGist),
+              fileList: Object.keys(this.filesInGist)
             };
           });
       },
@@ -273,8 +275,10 @@ export const StorageJs = (type = 'gist') => {
       getIsTokenInvalid: function() {
         return !this.token || this.token.length < 5 || this.isTokenInvalid
       },
-      getGistFile: function(onFail = () => {}) {
-        return this.getGist(this.gistId, onFail);
+      getGistFileFromRawUrl: function(rawUrl, onFail = () => {}) {
+        return fetch(rawUrl).then(file =>{
+          return file.text();
+        })
       },
       getGistFiles: function(onFail = () => {}) {
         return this.getGist(this.gistId, onFail);
@@ -301,21 +305,18 @@ export const StorageJs = (type = 'gist') => {
       },
       editGist: function(gistId, fileName, content) {
         console.log({ gistId, fileName, content });
-        return fetch('https://api.github.com/gists/' + gistId, {
+        return fetch(`https://api.github.com/gists/${gistId}`, {
           method: 'POST',
-          headers: {
-            Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${this.token}`,
-            'X-GitHub-Api-Version': '2022-11-28',
-          },
+          headers: this.getGistHeaders(),
           body: JSON.stringify({
             description: content ? 'upload data from api' : `delete ${fileName}`,
             public: false,
             files: { [fileName]: content ? { content } :{} },
           }),
-        }).then(res => {
+        }).then(result=> result.json()).then(response => {
           this.setLastStorageHost('GIST');
-          return res.json();
+          const file = response.files && fileName in response.files ? response.files[fileName] : undefined; 
+          return { response, file };
         });
       },
       editGistFile: function(fileName, content) {
@@ -323,11 +324,6 @@ export const StorageJs = (type = 'gist') => {
       },
       deleteGistFile: function(gistId, fileName) {
         return this.editGist(gistId, fileName, '')
-        // return fetch('https://api.github.com/gists/' + gistId, {
-        //   accept: "application/vnd.github.v3+json",
-        //   method: "delete",
-        //   headers: {"Authorization": "Basic " + Utilities.base64Encode(`${user_name}:${this.token}`)}
-        // })
       },
       FILETYPE,
     };
