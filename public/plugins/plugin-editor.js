@@ -64,6 +64,7 @@ const INTERNAL_EXAMPLE = `
   }
 }
 `
+
 const getExampleOutputFunction = (error = "") => `
 <head>
 <style>
@@ -88,27 +89,8 @@ ${INTERNAL_EXAMPLE}
 </textarea>
 <body>
 `
-const getPreviewHtml = (modules = [], html = "<div>...</div>", script = "", yarnData = {}) => `
-  <head>
-    <style>
-      body,
-      head {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    ${html}
-    ${modules.map(item => `<script src="${item}"></script>`)}
-    <script>
-      const yarnData = ${yarnData};
-    </script>
-    <script type="module">
-     (${script})()
-    </script>
-  </body>
-`
+
+
 const editorOptions = {
   mode: 'ace/mode/javascript',
   tabSize: 2,
@@ -140,7 +122,9 @@ export var PluginEditor = function ({
   urlParams,
   getPluginsList,
   deleteGistPlugin,
-  deleteVolatilePlugin
+  deleteVolatilePlugin, 
+  getExtensionScriptData,
+  getPreviewHtml
 }) {
   const self = this;
   this.name = 'PluginEditor';
@@ -219,6 +203,8 @@ export var PluginEditor = function ({
     // edit/commit/test
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
+    document.getElementById('edit-plugin-code-buttons').style.display =
+      mode === 'edit' ? 'flex' : 'none';
     document.getElementById('add-remove-plugin-file').style.display = 
       mode === 'edit' || mode === 'commit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
@@ -241,10 +227,13 @@ export var PluginEditor = function ({
   } else {
     addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
   }
-  this.onOpenPluginEditor = async () => {
-    
-    const beautify = ace.require('ace/ext/beautify');
 
+  this.onOpenPluginEditor = async () => {
+    this.beautify = ace.require('ace/ext/beautify');
+    
+    this.onFormatCode = () => {
+      this.beautify.beautify(this.editor.session);
+    }
     this.onSetEditingFile = (fileNameOnMount = '') => {
       const fileName = document.getElementById('edited-plugin-file').value;
       getPluginsList(false).then(volatilePlugins => {
@@ -253,7 +242,6 @@ export var PluginEditor = function ({
         let fileContents = this.volatilePlugins[this.editingFile].content;
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
-        beautify.beautify(this.editor.session);
 
         if (this.mode === 'commit') {
           fileContents = this.editor.getValue();
@@ -285,24 +273,14 @@ export var PluginEditor = function ({
         if (this.mode === 'test') {
           app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink" : "json").then(yarnData => {
             try {
-              const extension = new Function("parameters", `return ${fileContents}`)();
-              if (typeof extension === 'function') {
-                try {
-                  const data = extension();
-                  if (!data) {
-                    document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-                    return;
-                  }
-                  document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data.modules || [], data.body, data.script, yarnData);
-                  document.getElementById('plugin-output-downloader').style.display = 'block';
-                } catch (e) {
-                  document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-                  SEE CONSOLE LOGS`);
-                  console.error(e)
-                }
-                return
+              const [data] = getExtensionScriptData(fileContents);
+              if (!data || !data.script) {
+                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+                return;
               }
-              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction();
+              console.log({outputData: data})
+              document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
+              document.getElementById('plugin-output-downloader').style.display = 'block';
             } catch (e) {
               document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
               SEE CONSOLE LOGS`);
@@ -331,6 +309,10 @@ export var PluginEditor = function ({
               <button id="remove-plugin-file" onclick="app.plugins.${self.name
         }.onRemoveSelectedFile()" title="remove">─</button>
             </div>
+          </div>
+          <div id="edit-plugin-code-buttons" class="button-group-rounded">
+            <button title="format" onclick="app.plugins.${self.name
+        }.onFormatCode()">format</button>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
