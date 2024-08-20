@@ -1,8 +1,16 @@
-const bondage = require('bondage');
 const bbcode = require('bbcode');
 const yarnRunner = new bondage.Runner();
 const EventEmitter = require('events').EventEmitter;
 
+const isTextResult = (result) => {
+  return result instanceof bondage.TextResult
+}
+const isOptionsResult = (result) => {
+  return result instanceof bondage.OptionsResult
+}
+const isCommandResult = (result) => {
+  return result instanceof bondage.CommandResult
+}
 export var yarnRender = function() {
   let visitedNodes = [];
   this.visitedNodes = visitedNodes; // collects titles of ALL visited nodes
@@ -109,14 +117,14 @@ export var yarnRender = function() {
         emiter.emit('finished');
         return;
       }
-      if (vnResult.constructor.name === 'TextResult') {
+      if (isTextResult(vnResult)) {
         vnText = vnResult.text;
         vnTextScrollIdx = 0;
         emiter.emit('textResult', vnText);
         this.changeTextScrollSpeed(220);
         return;
       }
-      if (vnResult.constructor.name === 'OptionsResult') {
+      if (isOptionsResult(vnResult)) {
         // Add choices to text
         if (this.vnSelectedChoice === -1) {
           this.vnSelectedChoice = 0;
@@ -133,8 +141,9 @@ export var yarnRender = function() {
 
   self.goToNext = () => {
     const nextNode = VNdata.next().value;
+    console.log({nextNode})
     if (!this.isFinishedParsing(nextNode)) {
-      if (nextNode.constructor.name === 'TextResult') {
+      if (isTextResult(vnResult)) {
         /// bbcode local images with path relative to the resourcesPath specified on init
         // if (this.resourcesPath.length) {
         // 	const resourcesPath = this.resourcesPath;
@@ -185,12 +194,12 @@ export var yarnRender = function() {
     if (this.isFinishedParsing(vnResult)) {
       return;
     }
-    if (vnResult.constructor.name === 'TextResult') {
+    if (isTextResult(vnResult)) {
       vnText += '\n' + vnResult.text;
       emiter.emit('textResult', vnResult.text);
       // this.changeTextScrollSpeed(111);
     }
-    if (vnResult.constructor.name === 'OptionsResult') {
+    if (isOptionsResult(vnResult)) {
       vnTextScrollIdx = -1;
     }
   };
@@ -200,24 +209,24 @@ export var yarnRender = function() {
       return;
     }
     if (vnTextScrollIdx < 0) {
-      if (vnResult.constructor.name === 'CommandResult') {
+      if (isCommandResult(vnResult)) {
         this.runCommand();
       }
     } else if (vnTextScrollIdx > vnText.length) {
-      if (vnResult.constructor.name === 'TextResult') {
+      if (isTextResult(vnResult)) {
         vnResult = self.goToNext();
         if (this.isFinishedParsing(vnResult)) {
           return;
         }
-        if (vnResult.constructor.name === 'CommandResult') {
+        if (isCommandResult(vnResult)) {
           this.runCommand();
-        } else if (vnResult.constructor.name === 'TextResult') {
+        } else if (isTextResult(vnResult)) {
           vnTextScrollIdx = -1;
-        } else if (vnResult.constructor.name === 'OptionsResult') {
+        } else if (isOptionsResult(vnResult)) {
           vnTextScrollIdx = -1;
         }
       }
-    } else if (vnResult.constructor.name === 'TextResult') {
+    } else if (isTextResult(vnResult)) {
       // update text
       vnTextScrollIdx += 1;
       vnTextResult = vnText.substring(0, vnTextScrollIdx);
@@ -227,7 +236,7 @@ export var yarnRender = function() {
 
   // trigger this only on text update
   self.updateVNHud = () => {
-    if (vnResult.constructor.name === 'TextResult') {
+    if (isTextResult(vnResult)) {
       while (
         vnTextResult.lastIndexOf('[img]') > vnTextResult.lastIndexOf('[/img]')
       ) {

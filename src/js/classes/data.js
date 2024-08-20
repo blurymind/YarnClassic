@@ -1,6 +1,6 @@
 /* eslint-disable jquery/no-ajax */
 const path = require('path');
-const inkjs = require('inkjs');
+// const inkjs = require('inkjs');
 import { Node } from './node';
 import { Utils } from './utils';
 import { getFileType, FILETYPE, DBStorage, StorageJs } from './storage';
