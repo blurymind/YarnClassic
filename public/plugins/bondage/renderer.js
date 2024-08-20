@@ -226,7 +226,7 @@ export var yarnRender = function() {
           vnTextScrollIdx = -1;
         }
       }
-    } else if (vnText && isTextResult(vnResult)) {
+    } else if (isTextResult(vnResult)) {
       // update text
       vnTextScrollIdx += 1;
       vnTextResult = vnText.substring(0, vnTextScrollIdx);

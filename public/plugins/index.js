@@ -3,6 +3,14 @@ import { PluginEditor } from './plugin-editor';
 
 const PLUGINS = [Runner, PluginEditor];
 
+const PublicLibs = {}
+Promise.all(["public/libs/ink-full.js", "public/libs/bondage.min.js"].map(u=>fetch(u))).then(responses =>
+  Promise.all(responses.map(res => res.text()))
+).then(texts => {
+  PublicLibs.ink = texts[0];
+  PublicLibs.yarn = texts[1];
+})
+
 async function importModuleWeb(
   script,
   modulePath,
@@ -350,6 +358,11 @@ export var Plugins = function (app) {
     return [null, fileContents]
   }
 
+const getStoryParserModuleCode = (parser) => {
+  if (parser === 'ink') return `<script id="inkParserInclude">${PublicLibs.ink}</script>`
+  if (parser === 'yarn') return `<script id="yarnParserInclude">${PublicLibs.yarn}</script>`
+  return '';
+}
 const getFunctionBody = (func = ()=>{}) => {
   const entire = func.toString(); 
   const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
@@ -391,7 +404,8 @@ const getFunctionBody = (func = ()=>{}) => {
       <script id="yarnDataJson">
         const yarnData = ${yarnData};
       </script>
-      ${data.html || ''}
+      ${data.html || data.body || ''}
+      ${getStoryParserModuleCode(data.parser)}
       ${remoteModules.map(item => `<script src="${item}" id="${item}"></script>`).join("")}
       ${localModules.map(item => `<script id="${item.id}">${item.body}</script>`).join("")}
       <script type="module">
