@@ -236,8 +236,6 @@ export var PluginEditor = function ({
     document.getElementById('plugin-output-downloader').style.display = 'none';
 
     updateUrlParams('mode', mode);
-
-    console.log({urlParams})
     this.onSetEditingFile();
   };
   // ace-editor

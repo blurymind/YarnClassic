@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-const { Story } = require('inkjs');
+const { Story } = inkjs;
 
 export var inkRender = function() {
   let emiter = new EventEmitter(); //todo add signals

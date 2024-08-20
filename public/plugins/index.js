@@ -338,7 +338,7 @@ export var Plugins = function (app) {
   const getExtensionScriptData = (fileContents) => {
     try {
       const extension = new Function("parameters", `return ${fileContents}`);//();
-      console.log({isFunction: typeof extension === 'function', fileContents})
+      //console.log({isFunction: typeof extension === 'function', fileContents})
       if(typeof extension === 'function') {
         const data = extension();
         if(data) return [data(), fileContents];
