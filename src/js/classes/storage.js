@@ -223,6 +223,8 @@ export const StorageJs = (type = 'gist') => {
           'X-GitHub-Api-Version': '2022-11-28',
         }
       },
+      // the gist api can also give a list of commits which could be used to revert a file to a previous version
+      // https://api.github.com/gists/2ff124dc94f936e8f7d96632f559aecb/commits
       getGist: function(gistId, onFail = () => {}) {
         if (!gistId) {
           throw new Error('No gist id specified');

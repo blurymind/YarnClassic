@@ -326,6 +326,70 @@ export var Plugins = function (app) {
     return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
   }
  
+  const getExtensionScriptData = (fileContents) => {
+    try {
+      const extension = new Function("parameters", `return ${fileContents}`);//();
+      console.log({isFunction: typeof extension === 'function', fileContents})
+      if(typeof extension === 'function') {
+        const data = extension();
+        if(data) return [data(), fileContents];
+      }
+    } catch (e){
+      console.log({e, fileContents});
+      return [null, fileContents];
+    }
+    return [null, fileContents]
+  }
+
+const getFunctionBody = (func = ()=>{}) => {
+  const entire = func.toString(); 
+  const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
+  return body;
+}
+  const getPreviewHtml = (data, otherFiles, yarnData = {}) => {
+    // includes: ['some-other-file.js'] - with moduleName (can be used to create an instance) or no moduleName (just dump script body)
+    const localModules = (data.modules || []).filter(item => !item.includes('/') && item in otherFiles &&  otherFiles[item].content).map(item => {
+      try {
+        const [includeData, textConent] = getExtensionScriptData(otherFiles[item].content);
+        console.log(item, "---->",{includeData})
+        if(includeData && 'script' in includeData) {
+          const functionContents = includeData.script.toString()
+          const body = functionContents.startsWith('function ') ? `${functionContents}` : getFunctionBody(includeData.script);
+          return {id:item ,body};
+        } else if (textConent) {
+          return {id: item, body: textConent}
+        }
+
+      } catch(e){
+        return false
+      }
+    }).filter(Boolean)
+  
+    // modules: ['https://repo.com/some-other-module.js'] - type="module" only when its hosted somewhere btw
+    const remoteModules =(data.modules || []).filter(item=>item.includes('/'))
+    console.log({data, otherFiles, localModules,remoteModules})
+    return `
+    <head>
+      <style>
+        body,
+        head {
+          width: 100%;
+          height: 100%;
+        }
+      </style>
+    </head>
+    <body>
+      <script id="yarnDataJson">
+        const yarnData = ${yarnData};
+      </script>
+      ${data.html || ''}
+      ${remoteModules.map(item => `<script src="${item}" id="${item}"></script>`).join("")}
+      ${localModules.map(item => `<script id="${item.id}">${item.body}</script>`).join("")}
+      <script type="module">
+       (${data.script || ''})()
+      </script>
+    </body>
+  `}
 
   const pluginApiMethods = {
     app,
@@ -357,7 +421,9 @@ export var Plugins = function (app) {
     pluginModeUrl,
     getPluginsList,
     deleteGistPlugin,
-    deleteVolatilePlugin
+    deleteVolatilePlugin,
+    getExtensionScriptData,
+    getPreviewHtml
   };
 
   // built in plugin initiation
@@ -414,9 +480,9 @@ export var Plugins = function (app) {
       getPluginsList(true).then(pluginsList=>{
         setVloatilePlugins(pluginsList);
         Object.values(pluginsList).forEach(pluginFile => {
-          const funCode = `return ${pluginFile.content}`
-          const plugin = new Function("data",funCode)();
-          const pluginData = plugin()
+          // const funCode = `return ${pluginFile.content}`
+          // const plugin = new Function("data",funCode)();
+          const [pluginData] = getExtensionScriptData(pluginFile.content)
           if(pluginData && "Constructor" in pluginData && "name" in pluginData) {
             const FunInstance = new pluginData.Constructor(pluginApiMethods);
             app.plugins[pluginData.name] = FunInstance;
