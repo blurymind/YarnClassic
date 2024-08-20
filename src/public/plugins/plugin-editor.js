@@ -15,13 +15,32 @@ const removeStyleSheet = (path, root = document) => {
 const EXAMPLE = `
 () => {
   return {
-    modules: ["https://unpkg.com/kaboom@0.5.1/dist/kaboom.js"],
-    body: "<canvas id='kaboom'></canvas>",
+    //https://unpkg.com/kaplay@3000.1.17/dist/kaboom.cjs
+    // https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js
+    modules: [
+      // if a module is a web address, it can be included this way
+      "https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js",
+      // you can host a module on the same gist
+      "test-local-module.js",
+      'test-includes-script.js'
+    ],
     script: () => {
-      const k = kaboom({
-        canvas: document.querySelector("#kaboom"),
-      })
+      const k = kaplay();
       k.loadSprite("bean", "public/icon.png")
+      // define a scene
+      k.scene("main", () => {
+        k.add([
+          k.pos(200, 100),
+          k.sprite("bean"),
+        ]);
+        k.add([
+          k.text("ohhimark fdfg"),
+        ])
+
+      });
+
+      // start the game
+      k.go("main");
     }
   }
 }
@@ -304,7 +323,7 @@ export var PluginEditor = function ({
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
           <div class="flex-wrap" style="gap: 12px;">
             <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
-        }.onSetEditingFile()">
+        }.onSetEditingFile()" style="max-width: calc(90vw - 60px)">
               ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
@@ -315,10 +334,6 @@ export var PluginEditor = function ({
               <button id="remove-plugin-file" onclick="app.plugins.${self.name
         }.onRemoveSelectedFile()" title="remove">─</button>
             </div>
-          </div>
-          <div id="edit-plugin-code-buttons" class="button-group-rounded">
-            <button title="format" onclick="app.plugins.${self.name
-        }.onFormatCode()">format</button>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
             <button onclick="app.plugins.${self.name
@@ -355,17 +370,24 @@ export var PluginEditor = function ({
         </div>
         
         <div>
-          <button id="plugin-output-downloader" style="position: absolute;
-            right: 123px;
-            top: 51px;
-            padding-left: 9px;
-            padding-right: 9px;
-            border-radius: 0.9rem;"
-            onclick="app.plugins.${self.name
-        }.onDownloadPreview()"
-          >
-            Download
-          </button>
+          <div style="position: absolute;
+              right: calc(50vw - 65px);
+              bottom: 3px;
+              z-index: 999;
+              padding-left: 9px;
+              padding-right: 9px;
+              border-radius: 0.9rem;">
+            <button id="plugin-output-downloader"
+              onclick="app.plugins.${self.name
+          }.onDownloadPreview()"
+            >
+              Download
+            </button>
+
+            <button title="format" onclick="app.plugins.${self.name
+             }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
+          </div>
+
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
