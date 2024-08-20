@@ -70,6 +70,7 @@ export var Runner = function({
       // create a button in the file menu
       createButton(self.name, {
         name: 'Playtest variables',
+        className: 'item',
         attachTo: 'fileMenuDropdown',
         onClick: 'onOpenDialog()',
         iconName: 'cog',
