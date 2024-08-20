@@ -267,6 +267,15 @@ export var Plugins = function (app) {
   const gistPluginsFileUrl = urlParams.get('pluginFile');
   const pluginModeUrl = urlParams.get('mode');
 
+  const updateUrlParams = (key, value) => {
+    const url = new URL(window.location.href);
+    if (value) {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+    window.history.replaceState(null, null, url); // or pushState
+  }
   this.rawUrls = {};
   const getGistPluginFiles = () => {
     return new Promise((resolve) => {
@@ -417,6 +426,7 @@ const getFunctionBody = (func = ()=>{}) => {
     saveGistPlugin,
     isGistTokenInvalid,
     urlParams,
+    updateUrlParams,
     gistPluginsFileUrl,
     pluginModeUrl,
     getPluginsList,

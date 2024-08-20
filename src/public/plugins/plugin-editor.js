@@ -120,6 +120,7 @@ export var PluginEditor = function ({
   gistPluginsFileUrl,
   pluginModeUrl,
   urlParams,
+  updateUrlParams,
   getPluginsList,
   deleteGistPlugin,
   deleteVolatilePlugin, 
@@ -215,6 +216,9 @@ export var PluginEditor = function ({
       mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-output-downloader').style.display = 'none';
 
+    updateUrlParams('mode', mode);
+
+    console.log({urlParams})
     this.onSetEditingFile();
   };
   // ace-editor
@@ -242,6 +246,7 @@ export var PluginEditor = function ({
         let fileContents = this.volatilePlugins[this.editingFile].content;
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
+        updateUrlParams('pluginFile', this.editingFile);
 
         if (this.mode === 'commit') {
           fileContents = this.editor.getValue();
@@ -291,6 +296,7 @@ export var PluginEditor = function ({
       });
     };
 
+    const HEIGHT = '80vh';
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
@@ -329,11 +335,11 @@ export var PluginEditor = function ({
       html: `
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper">
-          <div id="js-editor" style="height: 70vh; width: 100%;"></div>        
+          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>        
         </div>
 
         <div style="position: relative;">
-            <div id="diff-editor" class="diff-editor" style="height: 70vh; width: 100%;"></div>
+            <div id="diff-editor" class="diff-editor" style="height: ${HEIGHT}; width: 100%;"></div>
             <button id="plugin-differ-commit" style="position: absolute;
             right: 17px;
             bottom: 17px;
@@ -360,7 +366,7 @@ export var PluginEditor = function ({
           >
             Download
           </button>
-          <iframe id="plugin-output-previewer" style="height: 70vh; width: 100%; border: none;">
+          <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
      
@@ -384,6 +390,7 @@ export var PluginEditor = function ({
 
       },
       onAfterClose: () => {
+        updateUrlParams('pluginFile', '');
         // removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
         // removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
