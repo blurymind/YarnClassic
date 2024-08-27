@@ -3,6 +3,8 @@ import '../scss/normalize.css';
 import '../scss/spectrum.css';
 import '../scss/style.css';
 
+import '../public/web-components.js'
+
 import { Utils } from './classes/utils';
 
 import ko from 'knockout';

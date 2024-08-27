@@ -763,12 +763,8 @@ export const data = {
       const inkTextFileData = await data.getSaveData('ink', null, true);
 
       const InkJsonData = new Promise((resolve, reject) => {
-        app.ui.toastMixin.fire({
-          title: 'Ink file is compiling',
-          icon: 'info',
-          timer: 4000,
-          text: 'Please wait...',
-        });
+        ToastWc.show({type: 'info', content: 'Ink file is compiling', time: 2000})
+
         data.inkCompiler
           .init(response => {
             if (response.errors.length > 0) {
@@ -784,16 +780,13 @@ export const data = {
               reject();
             } else {
               app.log('Warnings', response.warnings);
-
-              app.ui.toastMixin.fire({
-                animation: true,
-                title:
-                  response.warnings.length > 0
-                    ? 'Ink file compiled with some warnings'
-                    : 'Ink file compiled successfully',
-                icon: response.warnings.length > 0 ? 'warning' : 'success',
-                text: response.warnings.join('\n'),
-              });
+              ToastWc.show({
+                type: response.warnings.length > 0 ? 'warning' : 'success',
+                content: `${response.warnings.length > 0 ? 
+                  `Ink file compiled with some warnings:\n${response.warnings.join('\n')}`: 
+                  'Ink file compiled successfully'}`,
+                time: response.warnings.length > 0 ? 3000 : 1500
+              })
               app.log({ responseStory: response.story });
               resolve(JSON.stringify(response.story, null, '\t'));
             }
