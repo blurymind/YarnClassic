@@ -349,7 +349,13 @@ export var Plugins = function (app) {
       //console.log({isFunction: typeof extension === 'function', fileContents})
       if(typeof extension === 'function') {
         const data = extension();
-        if(data) return [data(), fileContents];
+        if(data) {
+          const StartIndex = fileContents.indexOf('script:');// todo this is a bit fragile
+          const result = data() || {};
+          const scriptStartLn = fileContents.substring(0, StartIndex).split('\n').length
+          //console.log({fileContents, StartIndex, scriptStartLn})
+          return [{...result, scriptStartLn }, fileContents];
+        }
       }
     } catch (e){
       console.log({e, fileContents});
@@ -411,6 +417,27 @@ const getFunctionBody = (func = ()=>{}) => {
       <script type="module">
        (${data.script || ''})()
       </script>
+      <script id="handle-fallback-message">
+        window.addEventListener("error", (e) => {
+          console.log({errorEvent: e});
+          const errorMessage = document.querySelector('#errorMessage');
+          errorMessage.innerHTML = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
+          errorMessage.style.display = 'block';
+        });
+      
+      </script>
+      <div id="errorMessage" style="
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+        display: none;
+        color: yellow;
+        background: rgb(0 0 0 / 76%);
+        padding: 12px;
+        border-radius: 0.2rem;
+        width: 80vw;
+        font-family: 'Courier New', monospace;
+      "></div>
     </body>
   `}
 
