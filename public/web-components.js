@@ -69,7 +69,7 @@ template.innerHTML = `
 }
 </style>
 <div id="simpleToast">
-  <span id="toastBody">The notification message...</span>
+  <div id="toastBody">The notification message...</span>
 </div>
 `
 

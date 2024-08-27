@@ -1,4 +1,8 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
+import 'ace-builds/webpack-resolver';
+
+// import "ace-builds/src-noconflict/theme-monokai"
+
 
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
@@ -115,6 +119,7 @@ const editorOptions = {
   tabSize: 2,
   enableBasicAutocompletion: true,
   enableLiveAutocompletion: true,
+  useWorker: true
 };
 export var PluginEditor = function ({
   app,
@@ -243,7 +248,7 @@ export var PluginEditor = function ({
   // ace-editor
   require('ace-builds/src-min-noconflict/ext-beautify');
   require('ace-builds/src-min-noconflict/mode-javascript');
-  require('ace-builds/src-min-noconflict/theme-monokai')
+  require('ace-builds/src-min-noconflict/theme-monokai');
   // ace-diff
   if (app.settings.theme() === 'dracula') {
     addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
@@ -425,7 +430,9 @@ export var PluginEditor = function ({
             content: this.editor.getValue(),
           });
         }, 600);
-        this.editor.getSession().on('change', function () {
+        this.editor.getSession().on('change',  ()=> {
+          console.log(this.editor.getSession().$mode.$highlightRules.getRules())
+          console.log(this.editor.getSession().getAnnotations())
           onChangeDebounced();
         });
 
