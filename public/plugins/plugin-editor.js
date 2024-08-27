@@ -206,7 +206,9 @@ export var PluginEditor = function ({
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
     saveGistPlugin(this.editingFile, contents).then(response=>{
+      console.log({response})
       this.differ.getEditors().left.setValue(contents);
+      ToastWc.show({type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000})
     });
   }
   this.onDownloadPreview = () => {
@@ -293,7 +295,7 @@ export var PluginEditor = function ({
           });
         }
         if (this.mode === 'test') {
-          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink" : "json").then(yarnData => {
+          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
             try {
               const [data] = getExtensionScriptData(fileContents);
               if (!data || !data.script) {

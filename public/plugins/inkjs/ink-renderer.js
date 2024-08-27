@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'events';// todo remove this emitter
 const { Story } = inkjs;
 
 export var inkRender = function() {
