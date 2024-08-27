@@ -1,5 +1,13 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
+import 'ace-builds/webpack-resolver'; // needed for the webworker to work  (syntax highlighting)
 
+const addEsVersionToEditor = editor => {
+  editor.session.$worker.send("setOptions", [{
+    "esversion": 11,
+    "esnext": false,
+    "asi": true // disable "Missing semicolon." warning in editor for JavaScript
+  }]);
+}
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
   styleEl.setAttribute("rel", "stylesheet")
@@ -115,6 +123,7 @@ const editorOptions = {
   tabSize: 2,
   enableBasicAutocompletion: true,
   enableLiveAutocompletion: true,
+  useWorker: true
 };
 export var PluginEditor = function ({
   app,
@@ -243,7 +252,7 @@ export var PluginEditor = function ({
   // ace-editor
   require('ace-builds/src-min-noconflict/ext-beautify');
   require('ace-builds/src-min-noconflict/mode-javascript');
-  require('ace-builds/src-min-noconflict/theme-monokai')
+  require('ace-builds/src-min-noconflict/theme-monokai');
   // ace-diff
   if (app.settings.theme() === 'dracula') {
     addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
@@ -420,12 +429,14 @@ export var PluginEditor = function ({
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
+        // required to enable better syntax highlighting
+        addEsVersionToEditor(this.editor);
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),
           });
         }, 600);
-        this.editor.getSession().on('change', function () {
+        this.editor.getSession().on('change',  ()=> {
           onChangeDebounced();
         });
 
@@ -447,6 +458,8 @@ export var PluginEditor = function ({
             content: '... no connection with gist',
           },
         });
+        addEsVersionToEditor(this.differ.getEditors().left);
+        addEsVersionToEditor(this.differ.getEditors().right);
 
         const onChangeFromDiffDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {

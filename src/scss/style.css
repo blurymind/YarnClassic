@@ -1173,7 +1173,7 @@ input:focus + span + .dropdown {
   cursor: text;
 }
 .ace_tooltip {
-  background-color: unset;
+  /* background-color: unset; */
 }
 
 /*-- ----------------------------HTML previews------------------------------- */
