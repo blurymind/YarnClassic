@@ -1,9 +1,13 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
-import 'ace-builds/webpack-resolver';
+import 'ace-builds/webpack-resolver'; // needed for the webworker to work  (syntax highlighting)
 
-// import "ace-builds/src-noconflict/theme-monokai"
-
-
+const addEsVersionToEditor = editor => {
+  editor.session.$worker.send("setOptions", [{
+    "esversion": 11,
+    "esnext": false,
+    "asi": true // disable "Missing semicolon." warning in editor for JavaScript
+  }]);
+}
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
   styleEl.setAttribute("rel", "stylesheet")
@@ -425,14 +429,14 @@ export var PluginEditor = function ({
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
+        // required to enable better syntax highlighting
+        addEsVersionToEditor(this.editor);
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),
           });
         }, 600);
         this.editor.getSession().on('change',  ()=> {
-          console.log(this.editor.getSession().$mode.$highlightRules.getRules())
-          console.log(this.editor.getSession().getAnnotations())
           onChangeDebounced();
         });
 
@@ -454,6 +458,8 @@ export var PluginEditor = function ({
             content: '... no connection with gist',
           },
         });
+        addEsVersionToEditor(this.differ.getEditors().left);
+        addEsVersionToEditor(this.differ.getEditors().right);
 
         const onChangeFromDiffDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
