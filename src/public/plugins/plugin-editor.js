@@ -151,13 +151,13 @@ export var PluginEditor = function ({
   updateUrlParams,
   getPluginsList,
   deleteGistPlugin,
-  deleteVolatilePlugin, 
+  deleteVolatilePlugin,
   getExtensionScriptData,
   getPreviewHtml
 }) {
   const self = this;
   this.name = 'PluginEditor';
-  this.onSetEditingFile = () => {};
+  this.onSetEditingFile = () => { };
   this.editor = null;
   this.differ = null;
   this.editingFile = '';
@@ -168,45 +168,45 @@ export var PluginEditor = function ({
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
     let newFileName = prompt("Create a new plugin file?", 'my-new-plugin-js');
-    if(newFileName) {
+    if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
-      newFileName = newFileName.endsWith('.js') ? newFileName: `${newFileName}.js`
-      if(newFileName in this.volatilePlugins) {
+      newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
+      if (newFileName in this.volatilePlugins) {
         alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
         return;
       }
-      const newFileData = {content: EXAMPLE, filename: newFileName, language:'JavaScript' }
-      setVloatilePlugin(newFileName, newFileData).then(()=>{
+      const newFileData = { content: EXAMPLE, filename: newFileName, language: 'JavaScript' }
+      setVloatilePlugin(newFileName, newFileData).then(() => {
         this.onUpdatePluginsList(newFileName);
         this.onSetPluginEditMode('edit');
         this.onSetEditingFile(newFileName);
       })
     }
   }
-  this.onRemoveSelectedFile = () =>{
+  this.onRemoveSelectedFile = () => {
     const willDelete = confirm(`Are you sure you want to delete this file:\n${this.editingFile}`)
-    if(willDelete) {
-      if(this.editingFile in this.volatilePlugins)delete this.volatilePlugins[this.editingFile];
+    if (willDelete) {
+      if (this.editingFile in this.volatilePlugins) delete this.volatilePlugins[this.editingFile];
 
       const fileNames = Object.keys(this.volatilePlugins)
       const nextFile = fileNames.length > 0 ? fileNames[0] : '';
-      deleteVolatilePlugin(this.editingFile).then(()=> {
-        deleteGistPlugin(this.editingFile).then(()=>{
-          this.onUpdatePluginsList(nextFile).then(() =>{
+      deleteVolatilePlugin(this.editingFile).then(() => {
+        deleteGistPlugin(this.editingFile).then(() => {
+          this.onUpdatePluginsList(nextFile).then(() => {
             this.onSetEditingFile(nextFile)
           })
         })
       })
     }
   }
-  this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
+  this.onUpdatePluginsList = (gistPluginsFileOnMount = '') => {
     // initialize file menu or update it. Refetch gist files if updating it
-    return getPluginsList().then(fileList=>{
+    return getPluginsList().then(fileList => {
       this.volatilePlugins = fileList;
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
       );
-      if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
+      if (gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
         document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
         this.editingFile = gistPluginsFileOnMount;
       }
@@ -214,10 +214,10 @@ export var PluginEditor = function ({
   }
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
-    saveGistPlugin(this.editingFile, contents).then(response=>{
-      console.log({response})
+    saveGistPlugin(this.editingFile, contents).then(response => {
+      console.log({ response })
       this.differ.getEditors().left.setValue(contents);
-      ToastWc.show({type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000})
+      ToastWc.show({ type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000 })
     });
   }
   this.onDownloadPreview = () => {
@@ -236,7 +236,7 @@ export var PluginEditor = function ({
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('edit-plugin-code-buttons').style.display =
       mode === 'edit' ? 'flex' : 'none';
-    document.getElementById('add-remove-plugin-file').style.display = 
+    document.getElementById('add-remove-plugin-file').style.display =
       mode === 'edit' || mode === 'commit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
       mode === 'commit' ? 'block' : 'none';
@@ -262,7 +262,7 @@ export var PluginEditor = function ({
 
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
-    
+
     this.onFormatCode = () => {
       this.beautify.beautify(this.editor.session);
     }
@@ -285,23 +285,23 @@ export var PluginEditor = function ({
 
           getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
-            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
+            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
             this.differ
               .getEditors()
               .right.getSession()
               .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile : gistAccesError);
-            
-              this.differ.getEditors().right.setReadOnly(isTokenInvalid);
-              document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
+
+            this.differ.getEditors().right.setReadOnly(isTokenInvalid);
+            document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
           })
-          .catch(error=>{
-            this.differ.getEditors().right.setReadOnly(true);
-            document.getElementById('plugin-differ-commit').className = "disabled";
-            this.differ
-              .getEditors()
-              .right.getSession()
-              .setValue(error.toString())
-          });
+            .catch(error => {
+              this.differ.getEditors().right.setReadOnly(true);
+              document.getElementById('plugin-differ-commit').className = "disabled";
+              this.differ
+                .getEditors()
+                .right.getSession()
+                .setValue(error.toString())
+            });
         }
         if (this.mode === 'test') {
           app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
@@ -311,7 +311,7 @@ export var PluginEditor = function ({
                 document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
                 return;
               }
-              console.log({outputData: data})
+              console.log({ outputData: data })
               document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
               document.getElementById('plugin-output-downloader').style.display = 'block';
             } catch (e) {
@@ -388,13 +388,13 @@ export var PluginEditor = function ({
               border-radius: 0.9rem;">
             <button id="plugin-output-downloader"
               onclick="app.plugins.${self.name
-          }.onDownloadPreview()"
+        }.onDownloadPreview()"
             >
               Download
             </button>
 
             <button title="format" onclick="app.plugins.${self.name
-             }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
+        }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
           </div>
 
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
@@ -436,7 +436,7 @@ export var PluginEditor = function ({
             content: this.editor.getValue(),
           });
         }, 600);
-        this.editor.getSession().on('change',  ()=> {
+        this.editor.getSession().on('change', () => {
           onChangeDebounced();
         });
 
@@ -480,10 +480,10 @@ export var PluginEditor = function ({
             // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
             // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
-          const localVariables = getPluginStore(self.name);
-          this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
+        const localVariables = getPluginStore(self.name);
+        this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
         // initialize data on both editor and differ
-        setTimeout(()=>{
+        setTimeout(() => {
           // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
           this.onUpdatePluginsList(gistPluginsFileUrl);
           this.onSetEditingFile(gistPluginsFileUrl);
@@ -499,7 +499,7 @@ export var PluginEditor = function ({
     getPluginsList(false).then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
 
-      if(gistPluginsFileUrl) {
+      if (gistPluginsFileUrl) {
         this.onOpenPluginEditor()
       }
     });
@@ -507,7 +507,7 @@ export var PluginEditor = function ({
     // create a button in the file menu if in dev mode
     createButton(self.name, {
       name: 'Plugins',
-      attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
+      attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
       iconName: 'cog',
       ...(app.settings.developmentModeEnabled() ? {
