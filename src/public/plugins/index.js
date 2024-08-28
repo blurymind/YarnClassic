@@ -436,6 +436,7 @@ const getFunctionBody = (func = ()=>{}) => {
                 return typeof arg == 'object' ? '<pre style="color:white">' + message +  '</pre>' : '<p style="color:'+ colors[typeof arg] + ';border-right:6px solid ' + colors[log.type] + '">' + message + '</p>'
               }).join('') // join args
             ).join('')//join logs
+          logMessage.scrollTop = logMessage.scrollHeight;
         }
         window.addEventListener("error", (e) => {
           const errorMessage = document.querySelector('#errorMessage');
