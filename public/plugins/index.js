@@ -11,24 +11,6 @@ Promise.all(["public/libs/ink-full.js", "public/libs/bondage.min.js"].map(u=>fet
   PublicLibs.yarn = texts[1];
 })
 
-async function importModuleWeb(
-  script,
-  modulePath,
-  { forceUpdate } = { forceUpdate: false }
-) {
-  const { AsyncFunction, cache } = globalThis.__import__ || {
-    AsyncFunction: Object.getPrototypeOf(async function () { }).constructor,
-    cache: new Map(),
-  };
-  // Build new AsyncFunction and evaluate it
-  const fn = new AsyncFunction('module', 'importModuleWeb', script);
-  const module = { exports: {}, filename: modulePath }; // module-API
-
-  // Execute user code
-  await fn(module, importModuleWeb);
-  return module.exports;
-}
-
 export var Plugins = function (app) {
   const self = this;
 
@@ -556,65 +538,32 @@ const getFunctionBody = (func = ()=>{}) => {
     });
   });
 
-  getVloatilePlugins().then(volatilePlugins => {
-    volatilePlugins = volatilePlugins || {};
-    // load builtin plugins
-    const builtInVolatilePlugins = {};
-    const builtInPlugins = {}; // so we can revert the volatile one to the built in one as fallback
-    const onLoadBuiltInPlugins = () => {
-      PLUGINS.forEach(plugin => {
-        const builtInPlugin = {
-          filename: `${plugin.name}.js`,
-          content: `
-        module.exports = ${plugin.toString()}`,
-          type: 'builtin',
-          language: 'JavaScript',
-        };
-
-        builtInPlugins[plugin.name] = builtInPlugin;
-        if (volatilePlugins && plugin.name in volatilePlugins) {
-          return; // use the mutated volatile plugin when available
-        }
-
-        builtInVolatilePlugins[plugin.name] = builtInPlugin;
-      });
-      dbStorage.save('builtinVolatilePlugins', builtInVolatilePlugins);
-    };
-
-    const addDependencyScripts = (newPlugin) => {
-      if ('dependencies' in newPlugin) {
-        newPlugin.dependencies.forEach(dependency => {
-          const scriptEle = document.createElement('script');
-          scriptEle.setAttribute('src', dependency);
-          document.body.appendChild(scriptEle);
-          scriptEle.addEventListener('load', () => {
-            console.log('File loaded', dependency);
-          });
-  
-          scriptEle.addEventListener('error', ev => {
-            console.log('Error on loading file', ev);
-          });
+  const addDependencyScripts = (newPlugin) => {
+    if ('dependencies' in newPlugin) {
+      newPlugin.dependencies.forEach(dependency => {
+        const scriptEle = document.createElement('script');
+        scriptEle.setAttribute('src', dependency);
+        document.body.appendChild(scriptEle);
+        scriptEle.addEventListener('load', () => {
+          console.log('File loaded', dependency);
         });
-      }
+
+        scriptEle.addEventListener('error', ev => {
+          console.log('Error on loading file', ev);
+        });
+      });
     }
+  }
 
-    const loadPluginsFromCacheOrGist = () => {
-      getPluginsList(true).then(pluginsList=>{
-        setVloatilePlugins(pluginsList);
-        Object.values(pluginsList).forEach(pluginFile => {
-          // const funCode = `return ${pluginFile.content}`
-          // const plugin = new Function("data",funCode)();
-          const [pluginData] = getExtensionScriptData(pluginFile.content)
-          if(pluginData && "Constructor" in pluginData && "name" in pluginData) {
-            const FunInstance = new pluginData.Constructor(pluginApiMethods);
-            app.plugins[pluginData.name] = FunInstance;
-            addDependencyScripts(pluginData)
-          }
-        })
-      })
-    };
-
-    loadPluginsFromCacheOrGist();
-    onLoadBuiltInPlugins();
-  });
+  getPluginsList(true).then(pluginsList=>{
+    setVloatilePlugins(pluginsList);
+    Object.values(pluginsList).forEach(pluginFile => {
+      const [pluginData] = getExtensionScriptData(pluginFile.content)
+      if(pluginData && "Constructor" in pluginData && "name" in pluginData) {
+        const FunInstance = new pluginData.Constructor(pluginApiMethods);
+        app.plugins[pluginData.name] = FunInstance;
+        addDependencyScripts(pluginData)
+      }
+    })
+  })
 };
