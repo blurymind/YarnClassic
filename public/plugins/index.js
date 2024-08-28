@@ -439,30 +439,30 @@ const getFunctionBody = (func = ()=>{}) => {
           onUpdateConsoleLogsInternal();
         });
         
-        const _log = console.log,
-            _warn = console.warn,
-            _info = console.info,
-            _error = console.error;
-        console.log = function() {
-            logOfConsole.push({type: 'log', arguments: arguments});
-            onUpdateConsoleLogsInternal();
-            return _log.apply(console, arguments);
-        };
-        console.warn = function() {
-            logOfConsole.push({type: 'warning', arguments: arguments});
-            onUpdateConsoleLogsInternal();
-            return _warn.apply(console, arguments);
-        };
-        console.error = function() {
-            logOfConsole.push({type: 'error', arguments: arguments});
-            onUpdateConsoleLogsInternal();
-            return _error.apply(console, arguments);
-        };
-        console.info = function() {
-          logOfConsole.push({type: 'info', arguments: arguments});
-          onUpdateConsoleLogsInternal();
-          return _info.apply(console, arguments);
-      };
+        // const _log = console.log,
+        //     _warn = console.warn,
+        //     _info = console.info,
+        //     _error = console.error;
+        // console.log = function() {
+        //     logOfConsole.push({type: 'log', arguments: arguments});
+        //     onUpdateConsoleLogsInternal();
+        //     return _log.apply(console, arguments);
+        // };
+        // console.warn = function() {
+        //     logOfConsole.push({type: 'warning', arguments: arguments});
+        //     onUpdateConsoleLogsInternal();
+        //     return _warn.apply(console, arguments);
+        // };
+        // console.error = function() {
+        //     logOfConsole.push({type: 'error', arguments: arguments});
+        //     onUpdateConsoleLogsInternal();
+        //     return _error.apply(console, arguments);
+        // };
+        // console.info = function() {
+        //   logOfConsole.push({type: 'info', arguments: arguments});
+        //   onUpdateConsoleLogsInternal();
+        //   return _info.apply(console, arguments);
+        // };
       
       </script>
       <div style="display:flex">
