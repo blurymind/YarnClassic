@@ -418,14 +418,54 @@ const getFunctionBody = (func = ()=>{}) => {
        (${data.script || ''})()
       </script>
       <script id="handle-fallback-message">
+        const logOfConsole = [];
+        const onUpdateConsoleLogsInternal = () => {
+          const logMessage = document.querySelector('#logMessage');
+          logMessage.style.display = 'block'
+          const colors = {string: '#00ff00', number: 'red', boolean: '#00fff3', warning: '#ffff008a', log: '#33ff0054', error: 'red', info: '#002bff8a'}
+          logMessage.innerHTML = '<p>-- console logs --</p>' + logOfConsole.map(
+            log => Object.values(log.arguments).map(
+              arg => {
+                return typeof arg == 'object' ? '<p style="color:white">' + JSON.stringify(arg) +  '</p>' : '<p style="color:'+ colors[typeof arg] + ';border-right:6px solid ' + colors[log.type] + '">' + arg
+              }).join('') // join args
+            ).join('')//join logs
+        }
         window.addEventListener("error", (e) => {
-          console.log({errorEvent: e});
           const errorMessage = document.querySelector('#errorMessage');
           errorMessage.innerHTML = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
           errorMessage.style.display = 'block';
+
+          logOfConsole.push({type: 'error', arguments: [e.message]});
+          onUpdateConsoleLogsInternal();
         });
+        
+        const _log = console.log,
+            _warn = console.warn,
+            _info = console.info,
+            _error = console.error;
+        console.log = function() {
+            logOfConsole.push({type: 'log', arguments: arguments});
+            onUpdateConsoleLogsInternal();
+            return _log.apply(console, arguments);
+        };
+        console.warn = function() {
+            logOfConsole.push({type: 'warning', arguments: arguments});
+            onUpdateConsoleLogsInternal();
+            return _warn.apply(console, arguments);
+        };
+        console.error = function() {
+            logOfConsole.push({type: 'error', arguments: arguments});
+            onUpdateConsoleLogsInternal();
+            return _error.apply(console, arguments);
+        };
+        console.info = function() {
+          logOfConsole.push({type: 'info', arguments: arguments});
+          onUpdateConsoleLogsInternal();
+          return _info.apply(console, arguments);
+      };
       
       </script>
+      <div style="display:flex">
       <div id="errorMessage" style="
         position: absolute;
         bottom: 3px;
@@ -435,9 +475,31 @@ const getFunctionBody = (func = ()=>{}) => {
         background: rgb(0 0 0 / 76%);
         padding: 12px;
         border-radius: 0.2rem;
-        width: 80vw;
         font-family: 'Courier New', monospace;
+        max-height: 70%;
+        max-width: 40%;
+        overflow: auto;
+        flex: 1;
       "></div>
+      <div id="logMessage" style="
+        position: absolute;
+        bottom: 3px;
+        left: 3px;
+        display: none;
+        color: white;
+        background: rgb(0 0 0 / 56%);
+        padding: 6px;
+        border-radius: 0.2rem;
+        font-family: 'Courier New', monospace;
+        word-wrap: break-word;
+        max-height: 70%;
+        max-width: 40%;
+        overflow: auto;
+        line-height: 1rem;
+        flex: 1;
+      ">
+      </div>
+      </div>
     </body>
   `}
 
