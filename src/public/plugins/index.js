@@ -354,7 +354,7 @@ export var Plugins = function (app) {
           const result = data() || {};
           const scriptStartLn = fileContents.substring(0, StartIndex).split('\n').length
           //console.log({fileContents, StartIndex, scriptStartLn})
-          return [{...result, scriptStartLn }, fileContents];
+          return [{ console: false, ...result, scriptStartLn }, fileContents];
         }
       }
     } catch (e){
@@ -419,7 +419,9 @@ const getFunctionBody = (func = ()=>{}) => {
       </script>
       <script id="handle-fallback-message">
         const logOfConsole = [];
+        const logOfErrors = [];
         const onUpdateConsoleLogsInternal = () => {
+          ${data.console === false && 'if(logOfErrors.length === 0)return;'}
           const logMessage = document.querySelector('#logMessage');
           logMessage.style.display = 'block'
           const colors = {string: '#00ff00', number: 'red', boolean: '#00fff3', warning: '#ffff008a', log: '#33ff0054', error: 'red', info: '#002bff8a'}
@@ -441,6 +443,7 @@ const getFunctionBody = (func = ()=>{}) => {
           errorMessage.style.display = 'block';
 
           logOfConsole.push({type: 'error', arguments: [e.message]});
+          logOfErrors.push({type: 'error', arguments: [e.message]});
           onUpdateConsoleLogsInternal();
         });
         
