@@ -525,11 +525,11 @@ export var PluginEditor = function ({
         const localVariables = getPluginStore(self.name);
         this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
         // initialize data on both editor and differ
-        setTimeout(() => {
-          // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
-          this.onUpdatePluginsList(gistPluginsFileUrl);
-          this.onSetEditingFile(gistPluginsFileUrl);
-        }, 400)
+        // setTimeout(() => {
+        //   // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
+        //   this.onUpdatePluginsList(gistPluginsFileUrl);
+        //   this.onSetEditingFile(gistPluginsFileUrl);
+        // }, 400)
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
