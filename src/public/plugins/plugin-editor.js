@@ -255,6 +255,9 @@ export var PluginEditor = function ({
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
+    // if(this.hasTestedOnce && mode === 'edit') {
+    //   ToastWc.show({ type: 'info', content: 'The code editor is now listening for compiling errors', time: 3000 })
+    // }
   };
   // ace-editor
   require('ace-builds/src-min-noconflict/ext-beautify');
@@ -340,8 +343,10 @@ export var PluginEditor = function ({
                 .setValue(error.toString())
             });
         }
-        if (this.mode === 'test') {
+        if (this.mode === 'test' && this.hasTestedOnce === false) {
           this.hasTestedOnce = true;
+          ToastWc.show({ type: 'info', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
+          document.querySelector('#edit-plugin-mode-test').style['border-bottom'] = '1px solid';
         }
       });
     };
@@ -460,6 +465,7 @@ export var PluginEditor = function ({
       onAfterClose: () => {
         updateUrlParams('pluginFile', '');
         window.removeEventListener("previewErrors",this.onErrorsInPreview);
+        this.hasTestedOnce = false;
       },
       onOpen: () => {
         app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
@@ -524,12 +530,14 @@ export var PluginEditor = function ({
           });
         const localVariables = getPluginStore(self.name);
         this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
-        // initialize data on both editor and differ
-        // setTimeout(() => {
-        //   // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
-        //   this.onUpdatePluginsList(gistPluginsFileUrl);
-        //   this.onSetEditingFile(gistPluginsFileUrl);
-        // }, 400)
+        // initialize data on both editor and differ from url
+        if(gistPluginsFileUrl) {
+          setTimeout(() => {
+            // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
+            this.onUpdatePluginsList(gistPluginsFileUrl);
+            this.onSetEditingFile(gistPluginsFileUrl);
+          }, 400)
+        }
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
