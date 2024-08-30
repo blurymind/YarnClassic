@@ -431,8 +431,7 @@ export var Plugins = function (app) {
           logOfConsole.push({type: 'error', arguments: [e.message]});
           logOfErrors.push({type: 'error', arguments: [e.message]});
           onUpdateConsoleLogsInternal();
-        });
-        
+        });    
         const _log = console.log,
             _warn = console.warn,
             _info = console.info,
