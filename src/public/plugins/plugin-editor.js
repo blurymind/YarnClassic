@@ -165,6 +165,8 @@ export var PluginEditor = function ({
   this.volatilePlugins = {};
   this.mode = pluginModeUrl || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
+  this.yarnData = null;
+  this.hasTestedOnce = false;
 
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
@@ -266,30 +268,29 @@ export var PluginEditor = function ({
   }
 
   this.updatePreviewOutput = (fileContents = '', onLoad = ()=> {}) => {
-    const fileData = fileContents || this.volatilePlugins[this.editingFile].content;
-    app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
-      document.querySelector('#js-editor-errors').style.display = 'none';
-      try {
-        const [data, _, errorEvent] = getExtensionScriptData(fileData);
-        if (!data || !data.script) {
-          document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-          if(errorEvent) this.onErrorsInPreview({detail: {errorText: errorEvent.message, errorEvent}});
-          return;
-        }
-        console.log({ outputData: data })
-        document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
-        document.getElementById('plugin-output-previewer').onload = () => {
-          console.log("LOADED")
-          onLoad();
-        }
-        // document.getElementById('plugin-output-downloader').style.display = 'block';
-      } catch (e) {
-        document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-        SEE CONSOLE LOGS`);
-        console.error(e)
-        this.onErrorsInPreview({detail: {errorText: e.message, e}})
+    const fileData = fileContents || this.volatilePlugins[this.editingFile].content; 
+    document.querySelector('#js-editor-errors').style.display = 'none';
+    try {
+      const [data, _, errorEvent] = getExtensionScriptData(fileData);
+      if (!data || !data.script) {
+        document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+        if(errorEvent) this.onErrorsInPreview({detail: {errorText: errorEvent.message, errorEvent}});
+        return;
       }
-    });
+      console.log({ outputData: data })
+      // just in case to prevent getting stuck with bad code
+      if(!this.hasTestedOnce) return;
+      document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, this.yarnData);
+      document.getElementById('plugin-output-previewer').onload = () => {
+        console.log("LOADED")
+        onLoad();
+      }
+    } catch (e) {
+      document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+      SEE CONSOLE LOGS`);
+      console.error(e)
+      this.onErrorsInPreview({detail: {errorText: e.message, e}})
+    }
   }
   this.onErrorsInPreview = (errorsInPreview) => {
     const errorText = errorsInPreview.detail.errorText;
@@ -340,7 +341,7 @@ export var PluginEditor = function ({
             });
         }
         if (this.mode === 'test') {
-          //this.updatePreviewOutput(fileContents);
+          this.hasTestedOnce = true;
         }
       });
     };
@@ -460,7 +461,10 @@ export var PluginEditor = function ({
         updateUrlParams('pluginFile', '');
         window.removeEventListener("previewErrors",this.onErrorsInPreview);
       },
-      onOpen: () => {      
+      onOpen: () => {
+        app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
+          this.yarnData = yarnData;
+        })
         window.addEventListener("previewErrors",this.onErrorsInPreview, false);
         // EDITOR
         this.editor = ace.edit('js-editor');
