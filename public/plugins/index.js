@@ -4,7 +4,7 @@ import { PluginEditor } from './plugin-editor';
 const PLUGINS = [Runner, PluginEditor];
 
 const PublicLibs = {}
-Promise.all(["public/libs/ink-full.js", "public/libs/bondage.min.js"].map(u=>fetch(u))).then(responses =>
+Promise.all(["public/libs/ink-full.js", "public/libs/bondage.min.js"].map(u => fetch(u))).then(responses =>
   Promise.all(responses.map(res => res.text()))
 ).then(texts => {
   PublicLibs.ink = texts[0];
@@ -103,7 +103,7 @@ export var Plugins = function (app) {
       onPointerDown,
       onDoubleClick,
       id,
-      as ='span',
+      as = 'span',
       style = ''
     }
   ) => {
@@ -285,38 +285,38 @@ export var Plugins = function (app) {
         });
     });
   };
-  
+
   const getGistPluginFile = (fileName) => {
     const gistId = gistPluginsId || app.settings.gistPluginsFile();
     const rawUrl = this.rawUrls[fileName]
-    if(!rawUrl) return Promise.resolve('');
+    if (!rawUrl) return Promise.resolve('');
     return app.data.storage.getGistFileFromRawUrl(rawUrl);
   }
 
   const saveGistPlugin = (fileName, contents) => {
-    console.log({gistId: app.settings.gistPluginsFile(), fileName, contents})
-    return app.data.storage.editGist(app.settings.gistPluginsFile(), fileName, contents).then(response=> {
+    console.log({ gistId: app.settings.gistPluginsFile(), fileName, contents })
+    return app.data.storage.editGist(app.settings.gistPluginsFile(), fileName, contents).then(response => {
       this.rawUrls[fileName] = response.file.raw_url;
       return response;
     })
   }
   const getPluginsList = (includeGistFiles = false) => {
-    return new Promise(resolve=> {
+    return new Promise(resolve => {
       return getVloatilePlugins().then(volatilePlugins => {
-        if(!includeGistFiles) return resolve(volatilePlugins);
+        if (!includeGistFiles) return resolve(volatilePlugins);
 
         // we want to minimize doing this since github will start thinking its being spammed and time out
         console.log("---- fetching from gist files ----");
-        return getGistPluginFiles().then(gistPlugins => {          
+        return getGistPluginFiles().then(gistPlugins => {
           const result = {}
-          gistPlugins.forEach(item=> {
+          gistPlugins.forEach(item => {
             result[item.filename] = item
           })
           // if gist plugins are fetched, load them, but spread the volatile ones ontop as more recent
-          resolve({...result,...volatilePlugins})
+          resolve({ ...result, ...volatilePlugins })
         })
-        // if no gist plugins are fetched, load the local volatile ones still
-        .catch(()=> resolve(volatilePlugins) )
+          // if no gist plugins are fetched, load the local volatile ones still
+          .catch(() => resolve(volatilePlugins))
       })
     })
   }
@@ -324,14 +324,14 @@ export var Plugins = function (app) {
   const deleteGistPlugin = (fileName) => {
     return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
   }
- 
+
   const getExtensionScriptData = (fileContents) => {
     try {
       const extension = new Function("parameters", `return ${fileContents}`);//();
       //console.log({isFunction: typeof extension === 'function', fileContents})
-      if(typeof extension === 'function') {
+      if (typeof extension === 'function') {
         const data = extension();
-        if(data) {
+        if (data) {
           const StartIndex = fileContents.indexOf('script:');// todo this is a bit fragile
           const result = data() || {};
           const scriptStartLn = fileContents.substring(0, StartIndex).split('\n').length
@@ -339,45 +339,45 @@ export var Plugins = function (app) {
           return [{ console: false, ...result, scriptStartLn }, fileContents];
         }
       }
-    } catch (e){
-      console.log({e, fileContents});
-      return [null, fileContents];
+    } catch (e) {
+      console.log({ e, fileContents });
+      return [null, fileContents, e];
     }
     return [null, fileContents]
   }
 
-const getStoryParserModuleCode = (parser) => {
-  if (parser === 'ink') return `<script id="inkParserInclude">${PublicLibs.ink}</script>`
-  if (parser === 'yarn') return `<script id="yarnParserInclude">${PublicLibs.yarn}</script>`
-  return '';
-}
-const getFunctionBody = (func = ()=>{}) => {
-  const entire = func.toString(); 
-  const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
-  return body;
-}
+  const getStoryParserModuleCode = (parser) => {
+    if (parser === 'ink') return `<script id="inkParserInclude">${PublicLibs.ink}</script>`
+    if (parser === 'yarn') return `<script id="yarnParserInclude">${PublicLibs.yarn}</script>`
+    return '';
+  }
+  const getFunctionBody = (func = () => { }) => {
+    const entire = func.toString();
+    const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
+    return body;
+  }
   const getPreviewHtml = (data, otherFiles, yarnData = {}) => {
     // includes: ['some-other-file.js'] - with moduleName (can be used to create an instance) or no moduleName (just dump script body)
-    const localModules = (data.modules || []).filter(item => !item.includes('/') && item in otherFiles &&  otherFiles[item].content).map(item => {
+    const localModules = (data.modules || []).filter(item => !item.includes('/') && item in otherFiles && otherFiles[item].content).map(item => {
       try {
         const [includeData, textConent] = getExtensionScriptData(otherFiles[item].content);
-        console.log(item, "---->",{includeData})
-        if(includeData && 'script' in includeData) {
+        console.log(item, "---->", { includeData })
+        if (includeData && 'script' in includeData) {
           const functionContents = includeData.script.toString()
           const body = functionContents.startsWith('function ') ? `${functionContents}` : getFunctionBody(includeData.script);
-          return {id:item ,body};
+          return { id: item, body };
         } else if (textConent) {
-          return {id: item, body: textConent}
+          return { id: item, body: textConent }
         }
 
-      } catch(e){
+      } catch (e) {
         return false
       }
     }).filter(Boolean)
-  
+
     // modules: ['https://repo.com/some-other-module.js'] - type="module" only when its hosted somewhere btw
-    const remoteModules =(data.modules || []).filter(item=>item.includes('/'))
-    console.log({data, otherFiles, localModules,remoteModules})
+    const remoteModules = (data.modules || []).filter(item => item.includes('/'))
+    console.log({ data, otherFiles, localModules, remoteModules })
     return `
     <head>
       <style>
@@ -385,6 +385,7 @@ const getFunctionBody = (func = ()=>{}) => {
         head {
           width: 100%;
           height: 100%;
+          user-select: none;
         }
       </style>
     </head>
@@ -422,8 +423,10 @@ const getFunctionBody = (func = ()=>{}) => {
         }
         window.addEventListener("error", (e) => {
           const errorMessage = document.querySelector('#errorMessage');
-          errorMessage.innerHTML = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
+          const errorText = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
+          errorMessage.innerHTML = errorText;
           errorMessage.style.display = 'block';
+          window.top.dispatchEvent(new CustomEvent("previewErrors", {detail: {errorText, e}}))
 
           logOfConsole.push({type: 'error', arguments: [e.message]});
           logOfErrors.push({type: 'error', arguments: [e.message]});
@@ -555,11 +558,11 @@ const getFunctionBody = (func = ()=>{}) => {
     }
   }
 
-  getPluginsList(true).then(pluginsList=>{
+  getPluginsList(true).then(pluginsList => {
     setVloatilePlugins(pluginsList);
     Object.values(pluginsList).forEach(pluginFile => {
       const [pluginData] = getExtensionScriptData(pluginFile.content)
-      if(pluginData && "Constructor" in pluginData && "name" in pluginData) {
+      if (pluginData && "Constructor" in pluginData && "name" in pluginData) {
         const FunInstance = new pluginData.Constructor(pluginApiMethods);
         app.plugins[pluginData.name] = FunInstance;
         addDependencyScripts(pluginData)

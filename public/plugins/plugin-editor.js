@@ -8,6 +8,7 @@ const addEsVersionToEditor = editor => {
     "asi": true // disable "Missing semicolon." warning in editor for JavaScript
   }]);
 }
+const HEIGHT = '80vh';
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
   styleEl.setAttribute("rel", "stylesheet")
@@ -151,13 +152,13 @@ export var PluginEditor = function ({
   updateUrlParams,
   getPluginsList,
   deleteGistPlugin,
-  deleteVolatilePlugin, 
+  deleteVolatilePlugin,
   getExtensionScriptData,
   getPreviewHtml
 }) {
   const self = this;
   this.name = 'PluginEditor';
-  this.onSetEditingFile = () => {};
+  this.onSetEditingFile = () => { };
   this.editor = null;
   this.differ = null;
   this.editingFile = '';
@@ -168,45 +169,45 @@ export var PluginEditor = function ({
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
     let newFileName = prompt("Create a new plugin file?", 'my-new-plugin-js');
-    if(newFileName) {
+    if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
-      newFileName = newFileName.endsWith('.js') ? newFileName: `${newFileName}.js`
-      if(newFileName in this.volatilePlugins) {
+      newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
+      if (newFileName in this.volatilePlugins) {
         alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
         return;
       }
-      const newFileData = {content: EXAMPLE, filename: newFileName, language:'JavaScript' }
-      setVloatilePlugin(newFileName, newFileData).then(()=>{
+      const newFileData = { content: EXAMPLE, filename: newFileName, language: 'JavaScript' }
+      setVloatilePlugin(newFileName, newFileData).then(() => {
         this.onUpdatePluginsList(newFileName);
         this.onSetPluginEditMode('edit');
         this.onSetEditingFile(newFileName);
       })
     }
   }
-  this.onRemoveSelectedFile = () =>{
+  this.onRemoveSelectedFile = () => {
     const willDelete = confirm(`Are you sure you want to delete this file:\n${this.editingFile}`)
-    if(willDelete) {
-      if(this.editingFile in this.volatilePlugins)delete this.volatilePlugins[this.editingFile];
+    if (willDelete) {
+      if (this.editingFile in this.volatilePlugins) delete this.volatilePlugins[this.editingFile];
 
       const fileNames = Object.keys(this.volatilePlugins)
       const nextFile = fileNames.length > 0 ? fileNames[0] : '';
-      deleteVolatilePlugin(this.editingFile).then(()=> {
-        deleteGistPlugin(this.editingFile).then(()=>{
-          this.onUpdatePluginsList(nextFile).then(() =>{
+      deleteVolatilePlugin(this.editingFile).then(() => {
+        deleteGistPlugin(this.editingFile).then(() => {
+          this.onUpdatePluginsList(nextFile).then(() => {
             this.onSetEditingFile(nextFile)
           })
         })
       })
     }
   }
-  this.onUpdatePluginsList = (gistPluginsFileOnMount ='') => {
+  this.onUpdatePluginsList = (gistPluginsFileOnMount = '') => {
     // initialize file menu or update it. Refetch gist files if updating it
-    return getPluginsList().then(fileList=>{
+    return getPluginsList().then(fileList => {
       this.volatilePlugins = fileList;
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
       );
-      if(gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
+      if (gistPluginsFileOnMount && gistPluginsFileOnMount in fileList) {
         document.getElementById("edited-plugin-file").value = gistPluginsFileOnMount;
         this.editingFile = gistPluginsFileOnMount;
       }
@@ -214,10 +215,10 @@ export var PluginEditor = function ({
   }
   this.onCommitChanges = () => {
     const contents = this.differ.getEditors().right.getValue();
-    saveGistPlugin(this.editingFile, contents).then(response=>{
-      console.log({response})
+    saveGistPlugin(this.editingFile, contents).then(response => {
+      console.log({ response })
       this.differ.getEditors().left.setValue(contents);
-      ToastWc.show({type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000})
+      ToastWc.show({ type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000 })
     });
   }
   this.onDownloadPreview = () => {
@@ -236,15 +237,19 @@ export var PluginEditor = function ({
       mode === 'edit' ? 'block' : 'none';
     document.getElementById('edit-plugin-code-buttons').style.display =
       mode === 'edit' ? 'flex' : 'none';
-    document.getElementById('add-remove-plugin-file').style.display = 
+    document.getElementById('add-remove-plugin-file').style.display =
       mode === 'edit' || mode === 'commit' ? 'flex' : 'none';
     document.getElementById('diff-editor').style.display =
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
-    document.getElementById('plugin-output-previewer').style.display =
-      mode === 'test' ? 'block' : 'none';
-    document.getElementById('plugin-output-downloader').style.display = 'none';
+    document.getElementById('plugin-output-previewer').style.height =
+      mode === 'test' ? HEIGHT : '0vh';
+    document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
+    //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
+    document.getElementById('plugin-output-previewer').sandbox = mode === 'test' ? `allow-scripts allow-modals allow-same-origin`: `allow-scripts allow-same-origin`;
+
+    document.getElementById('plugin-output-downloader').style.display =  mode === 'test' ? 'block' : 'none';
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
@@ -260,9 +265,40 @@ export var PluginEditor = function ({
     addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
   }
 
+  this.updatePreviewOutput = (fileContents = '', onLoad = ()=> {}) => {
+    const fileData = fileContents || this.volatilePlugins[this.editingFile].content;
+    app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
+      document.querySelector('#js-editor-errors').style.display = 'none';
+      try {
+        const [data, _, errorEvent] = getExtensionScriptData(fileData);
+        if (!data || !data.script) {
+          document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+          if(errorEvent) this.onErrorsInPreview({detail: {errorText: errorEvent.message, errorEvent}});
+          return;
+        }
+        console.log({ outputData: data })
+        document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
+        document.getElementById('plugin-output-previewer').onload = () => {
+          console.log("LOADED")
+          onLoad();
+        }
+        // document.getElementById('plugin-output-downloader').style.display = 'block';
+      } catch (e) {
+        document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+        SEE CONSOLE LOGS`);
+        console.error(e)
+        this.onErrorsInPreview({detail: {errorText: e.message, e}})
+      }
+    });
+  }
+  this.onErrorsInPreview = (errorsInPreview) => {
+    const errorText = errorsInPreview.detail.errorText;
+    document.querySelector('#js-editor-errors').innerHTML = errorText;
+    document.querySelector('#js-editor-errors').style.display = 'block';
+  },
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
-    
+
     this.onFormatCode = () => {
       this.beautify.beautify(this.editor.session);
     }
@@ -285,46 +321,30 @@ export var PluginEditor = function ({
 
           getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
-            const gistAccesError = isTokenInvalid? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.`: `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
+            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
             this.differ
               .getEditors()
               .right.getSession()
               .setValue(gistPluginFile && !isTokenInvalid ? gistPluginFile : gistAccesError);
-            
-              this.differ.getEditors().right.setReadOnly(isTokenInvalid);
-              document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
+
+            this.differ.getEditors().right.setReadOnly(isTokenInvalid);
+            document.getElementById('plugin-differ-commit').className = isTokenInvalid ? "disabled" : ""
           })
-          .catch(error=>{
-            this.differ.getEditors().right.setReadOnly(true);
-            document.getElementById('plugin-differ-commit').className = "disabled";
-            this.differ
-              .getEditors()
-              .right.getSession()
-              .setValue(error.toString())
-          });
+            .catch(error => {
+              this.differ.getEditors().right.setReadOnly(true);
+              document.getElementById('plugin-differ-commit').className = "disabled";
+              this.differ
+                .getEditors()
+                .right.getSession()
+                .setValue(error.toString())
+            });
         }
         if (this.mode === 'test') {
-          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
-            try {
-              const [data] = getExtensionScriptData(fileContents);
-              if (!data || !data.script) {
-                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-                return;
-              }
-              console.log({outputData: data})
-              document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
-              document.getElementById('plugin-output-downloader').style.display = 'block';
-            } catch (e) {
-              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-              SEE CONSOLE LOGS`);
-              console.error(e)
-            }
-          });
+          //this.updatePreviewOutput(fileContents);
         }
       });
     };
-
-    const HEIGHT = '80vh';
+    
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
@@ -358,8 +378,27 @@ export var PluginEditor = function ({
         `.replaceAll('\n', ''),
       html: `
       <div style="overflow:hidden;">
-        <div id="js-editor-wrapper">
-          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>        
+        <div id="js-editor-wrapper" style="position:relative">
+          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>
+
+          <div id="js-editor-errors" style="
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            color: red;
+            background: rgba(0, 0, 0, 0.66);
+            padding: 6px;
+            border-radius: 0.2rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            text-align: start;
+            max-height: 20%;
+            max-width: 80%;
+            overflow: auto;
+          ">
+            error text dkjfghkdfjhgkdfhgkdfjghkdfjghkg 
+          </div>   
         </div>
 
         <div style="position: relative;">
@@ -388,19 +427,18 @@ export var PluginEditor = function ({
               border-radius: 0.9rem;">
             <button id="plugin-output-downloader"
               onclick="app.plugins.${self.name
-          }.onDownloadPreview()"
+        }.onDownloadPreview()"
             >
               Download
             </button>
 
             <button title="format" onclick="app.plugins.${self.name
-             }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
+        }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
           </div>
 
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
-     
 
         `,
       showConfirmButton: false,
@@ -417,15 +455,13 @@ export var PluginEditor = function ({
           removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
-
-
       },
       onAfterClose: () => {
         updateUrlParams('pluginFile', '');
-        // removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
-        // removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+        window.removeEventListener("previewErrors",this.onErrorsInPreview);
       },
-      onOpen: () => {
+      onOpen: () => {      
+        window.addEventListener("previewErrors",this.onErrorsInPreview, false);
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
@@ -434,9 +470,11 @@ export var PluginEditor = function ({
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),
+          }).then(()=> {
+            this.updatePreviewOutput(this.editor.getValue(), () => this.editor.focus());
           });
         }, 600);
-        this.editor.getSession().on('change',  ()=> {
+        this.editor.getSession().on('change', () => {
           onChangeDebounced();
         });
 
@@ -480,10 +518,10 @@ export var PluginEditor = function ({
             // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
             // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
-          const localVariables = getPluginStore(self.name);
-          this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
+        const localVariables = getPluginStore(self.name);
+        this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
         // initialize data on both editor and differ
-        setTimeout(()=>{
+        setTimeout(() => {
           // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
           this.onUpdatePluginsList(gistPluginsFileUrl);
           this.onSetEditingFile(gistPluginsFileUrl);
@@ -499,20 +537,20 @@ export var PluginEditor = function ({
     getPluginsList(false).then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
 
-      if(gistPluginsFileUrl) {
+      if (gistPluginsFileUrl) {
         this.onOpenPluginEditor()
       }
     });
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Plugins',
-      attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
+      name: 'Playground',
+      attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
-      iconName: 'cog',
+      iconName: 'javascript',
       ...(app.settings.developmentModeEnabled() ? {
         className: 'bbcode-button',
-        style: 'width: 100px; margin-top: 3px',
+        style: 'padding: 0 10px; margin-top: 3px',
         as: 'div',
         id: 'pluginEditorButton'
       } : {})
