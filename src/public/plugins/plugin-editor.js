@@ -8,6 +8,7 @@ const addEsVersionToEditor = editor => {
     "asi": true // disable "Missing semicolon." warning in editor for JavaScript
   }]);
 }
+const HEIGHT = '80vh';
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
   styleEl.setAttribute("rel", "stylesheet")
@@ -242,9 +243,13 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
-    document.getElementById('plugin-output-previewer').style.display =
-      mode === 'test' ? 'block' : 'none';
-    document.getElementById('plugin-output-downloader').style.display = 'none';
+    document.getElementById('plugin-output-previewer').style.height =
+      mode === 'test' ? HEIGHT : '0vh';
+    document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
+    //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
+    document.getElementById('plugin-output-previewer').sandbox = mode === 'test' ? `allow-scripts allow-modals allow-same-origin`: `allow-scripts allow-same-origin`;
+
+    document.getElementById('plugin-output-downloader').style.display =  mode === 'test' ? 'block' : 'none';
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
@@ -260,6 +265,37 @@ export var PluginEditor = function ({
     addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
   }
 
+  this.updatePreviewOutput = (fileContents = '', onLoad = ()=> {}) => {
+    const fileData = fileContents || this.volatilePlugins[this.editingFile].content;
+    app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
+      document.querySelector('#js-editor-errors').style.display = 'none';
+      try {
+        const [data, _, errorEvent] = getExtensionScriptData(fileData);
+        if (!data || !data.script) {
+          document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
+          if(errorEvent) this.onErrorsInPreview({detail: {errorText: errorEvent.message, errorEvent}});
+          return;
+        }
+        console.log({ outputData: data })
+        document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
+        document.getElementById('plugin-output-previewer').onload = () => {
+          console.log("LOADED")
+          onLoad();
+        }
+        // document.getElementById('plugin-output-downloader').style.display = 'block';
+      } catch (e) {
+        document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
+        SEE CONSOLE LOGS`);
+        console.error(e)
+        this.onErrorsInPreview({detail: {errorText: e.message, e}})
+      }
+    });
+  }
+  this.onErrorsInPreview = (errorsInPreview) => {
+    const errorText = errorsInPreview.detail.errorText;
+    document.querySelector('#js-editor-errors').innerHTML = errorText;
+    document.querySelector('#js-editor-errors').style.display = 'block';
+  },
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
 
@@ -304,27 +340,11 @@ export var PluginEditor = function ({
             });
         }
         if (this.mode === 'test') {
-          app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
-            try {
-              const [data] = getExtensionScriptData(fileContents);
-              if (!data || !data.script) {
-                document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
-                return;
-              }
-              console.log({ outputData: data })
-              document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, yarnData);
-              document.getElementById('plugin-output-downloader').style.display = 'block';
-            } catch (e) {
-              document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction(`${e.toString()}
-              SEE CONSOLE LOGS`);
-              console.error(e)
-            }
-          });
+          //this.updatePreviewOutput(fileContents);
         }
       });
     };
-
-    const HEIGHT = '80vh';
+    
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
@@ -358,8 +378,27 @@ export var PluginEditor = function ({
         `.replaceAll('\n', ''),
       html: `
       <div style="overflow:hidden;">
-        <div id="js-editor-wrapper">
-          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>        
+        <div id="js-editor-wrapper" style="position:relative">
+          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>
+
+          <div id="js-editor-errors" style="
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            color: red;
+            background: rgba(0, 0, 0, 0.66);
+            padding: 6px;
+            border-radius: 0.2rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            text-align: start;
+            max-height: 20%;
+            max-width: 80%;
+            overflow: auto;
+          ">
+            error text dkjfghkdfjhgkdfhgkdfjghkdfjghkg 
+          </div>   
         </div>
 
         <div style="position: relative;">
@@ -400,7 +439,6 @@ export var PluginEditor = function ({
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
-     
 
         `,
       showConfirmButton: false,
@@ -417,15 +455,13 @@ export var PluginEditor = function ({
           removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
-
-
       },
       onAfterClose: () => {
         updateUrlParams('pluginFile', '');
-        // removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
-        // removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
+        window.removeEventListener("previewErrors",this.onErrorsInPreview);
       },
-      onOpen: () => {
+      onOpen: () => {      
+        window.addEventListener("previewErrors",this.onErrorsInPreview, false);
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
@@ -434,6 +470,8 @@ export var PluginEditor = function ({
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),
+          }).then(()=> {
+            this.updatePreviewOutput(this.editor.getValue(), () => this.editor.focus());
           });
         }, 600);
         this.editor.getSession().on('change', () => {
@@ -506,13 +544,13 @@ export var PluginEditor = function ({
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Plugins',
+      name: 'Playground',
       attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
-      iconName: 'cog',
+      iconName: 'javascript',
       ...(app.settings.developmentModeEnabled() ? {
         className: 'bbcode-button',
-        style: 'width: 100px; margin-top: 3px',
+        style: 'padding: 0 10px; margin-top: 3px',
         as: 'div',
         id: 'pluginEditorButton'
       } : {})

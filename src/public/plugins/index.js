@@ -341,7 +341,7 @@ export var Plugins = function (app) {
       }
     } catch (e) {
       console.log({ e, fileContents });
-      return [null, fileContents];
+      return [null, fileContents, e];
     }
     return [null, fileContents]
   }
@@ -385,6 +385,7 @@ export var Plugins = function (app) {
         head {
           width: 100%;
           height: 100%;
+          user-select: none;
         }
       </style>
     </head>
@@ -422,8 +423,10 @@ export var Plugins = function (app) {
         }
         window.addEventListener("error", (e) => {
           const errorMessage = document.querySelector('#errorMessage');
-          errorMessage.innerHTML = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
+          const errorText = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
+          errorMessage.innerHTML = errorText;
           errorMessage.style.display = 'block';
+          window.top.dispatchEvent(new CustomEvent("previewErrors", {detail: {errorText, e}}))
 
           logOfConsole.push({type: 'error', arguments: [e.message]});
           logOfErrors.push({type: 'error', arguments: [e.message]});
