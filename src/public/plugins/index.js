@@ -252,13 +252,16 @@ export var Plugins = function (app) {
   const isGistTokenInvalid = () => {
     return app.data.storage.getIsTokenInvalid();
   }
-  const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
-  const gistPluginsId = urlParams.get('gistPlugins');
-  const gistPluginsFileUrl = urlParams.get('pluginFile');
+  // const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
+  const url = new URL(window.location.href);
+  const urlParams = url.searchParams;
+  console.log({urlParams, url})
+  const getGistPluginsId = () => urlParams.get('gistPlugins') || app.settings.gistPluginsFile();
+  const getGistPluginsFileUrl = () => urlParams.get('pluginFile');
   const pluginModeUrl = urlParams.get('mode');
 
   const updateUrlParams = (key, value) => {
-    const url = new URL(window.location.href);
+    console.log("updateUrlParams", {key, value})
     if (value) {
       url.searchParams.set(key, value);
     } else {
@@ -269,9 +272,8 @@ export var Plugins = function (app) {
   this.rawUrls = {};
   const getGistPluginFiles = () => {
     return new Promise((resolve) => {
-      const gistId = gistPluginsId || app.settings.gistPluginsFile();
       app.data.storage
-        .getGist(gistId)
+        .getGist(getGistPluginsId())
         .then(({ filesInGist }) => {
           const promises = Object.values(filesInGist)
             .filter(gistFile => gistFile.language === 'JavaScript' || gistFile.filename.endsWith(".js"))
@@ -287,7 +289,6 @@ export var Plugins = function (app) {
   };
 
   const getGistPluginFile = (fileName) => {
-    const gistId = gistPluginsId || app.settings.gistPluginsFile();
     const rawUrl = this.rawUrls[fileName]
     if (!rawUrl) return Promise.resolve('');
     return app.data.storage.getGistFileFromRawUrl(rawUrl);
@@ -322,7 +323,7 @@ export var Plugins = function (app) {
   }
 
   const deleteGistPlugin = (fileName) => {
-    return app.data.storage.deleteGistFile(gistPluginsId || app.settings.gistPluginsFile(), fileName);
+    return app.data.storage.deleteGistFile(getGistPluginsId(), fileName);
   }
 
   const getExtensionScriptData = (fileContents) => {
@@ -523,7 +524,8 @@ export var Plugins = function (app) {
     isGistTokenInvalid,
     urlParams,
     updateUrlParams,
-    gistPluginsFileUrl,
+    getGistPluginsFileUrl,
+    getGistPluginsId,
     pluginModeUrl,
     getPluginsList,
     deleteGistPlugin,
