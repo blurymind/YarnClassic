@@ -396,16 +396,21 @@ export var Plugins = function (app) {
       </script>
       ${data.html || data.body || ''}
       ${getStoryParserModuleCode(data.parser)}
-      ${remoteModules.map(item => `<script src="${item}" id="${item}"></script>`).join("")}
-      ${localModules.map(item => `<script id="${item.id}">${item.body}</script>`).join("")}
-      <script type="module">
-       (${data.script || ''})()
-      </script>
+
       <script id="handle-fallback-message">
         const logOfConsole = [];
         const logOfErrors = [];
         const onUpdateConsoleLogsInternal = () => {
           ${data.console === false && 'if(logOfErrors.length === 0)return;'}
+          window.top.dispatchEvent(
+            new CustomEvent(
+              "previewErrors",
+              {detail: {
+                  errorText: logOfErrors.map(item=>item.arguments.join('')).join('')
+                }
+              }
+            )
+          )
           const logMessage = document.querySelector('#logMessage');
           logMessage.style.display = 'block'
           const colors = {string: '#00ff00', number: 'red', boolean: '#00fff3', warning: '#ffff008a', log: '#33ff0054', error: 'red', info: '#002bff8a'}
@@ -423,14 +428,14 @@ export var Plugins = function (app) {
           logMessage.scrollTop = logMessage.scrollHeight;
         }
         window.addEventListener("error", (e) => {
-          const errorMessage = document.querySelector('#errorMessage');
           const errorText = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
-          errorMessage.innerHTML = errorText;
-          errorMessage.style.display = 'block';
-          window.top.dispatchEvent(new CustomEvent("previewErrors", {detail: {errorText, e}}))
-
-          logOfConsole.push({type: 'error', arguments: [e.message]});
-          logOfErrors.push({type: 'error', arguments: [e.message]});
+          logOfConsole.push({type: 'error', arguments: [errorText]});
+          logOfErrors.push({type: 'error', arguments: [errorText]});
+          onUpdateConsoleLogsInternal();
+        });
+        window.addEventListener('unhandledrejection', e => {
+          console.log({e})
+          logOfErrors.push({type: 'error', arguments: [e.reason.stack]});
           onUpdateConsoleLogsInternal();
         });
         const _log = console.log,
@@ -459,22 +464,12 @@ export var Plugins = function (app) {
         };
       
       </script>
+      ${remoteModules.map(item => `<script src="${item}" id="${item}" crossorigin="anonymous"></script>`).join("")}
+      ${localModules.map(item => `<script id="${item.id}" crossorigin="anonymous">${item.body}</script>`).join("")}
+      <script type="module">
+      (${data.script || ''})()
+      </script>
       <div style="display:flex">
-      <div id="errorMessage" style="
-        position: absolute;
-        bottom: 3px;
-        right: 3px;
-        display: none;
-        color: yellow;
-        background: rgb(0 0 0 / 76%);
-        padding: 12px;
-        border-radius: 0.2rem;
-        font-family: 'Courier New', monospace;
-        max-height: 70%;
-        max-width: 40%;
-        overflow: auto;
-        flex: 1;
-      "></div>
       <div id="logMessage" style="
         position: absolute;
         bottom: 3px;
