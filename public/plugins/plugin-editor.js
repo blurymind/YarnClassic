@@ -146,9 +146,10 @@ export var PluginEditor = function ({
   getGistPluginFile,
   saveGistPlugin,
   isGistTokenInvalid,
-  gistPluginsFileUrl,
-  pluginModeUrl,
+  getGistPluginsFileUrl,
   urlParams,
+  pluginModeUrl,
+  getGistPluginsId,
   updateUrlParams,
   getPluginsList,
   deleteGistPlugin,
@@ -226,7 +227,14 @@ export var PluginEditor = function ({
   this.onDownloadPreview = () => {
     app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
   }
-  this.onSetPluginEditMode = mode => {
+  this.onCopyLink = () => {
+    window.navigator.clipboard.writeText(window.location.href);
+    ToastWc.show({ type: 'success', content: `Copied ${window.location.href} to clipboard!`, time: 3000 })
+  }
+  this.onOpenGistLink = () => {
+    window.open(`https://gist.github.com/${getGistPluginsId()}`, "_blank");
+  }
+  this.onSetPluginEditMode = (mode) => {
     this.mode = mode;
     setPluginStore(self.name, 'pluginEditMode', mode);
     document
@@ -245,6 +253,8 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-differ-commit').style.display =
       mode === 'commit' ? 'block' : 'none';
+    document.getElementById('plugin-differ-link').style.display =
+      mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.height =
       mode === 'test' ? HEIGHT : '0vh';
     document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
@@ -252,6 +262,7 @@ export var PluginEditor = function ({
     document.getElementById('plugin-output-previewer').sandbox = mode === 'test' ? `allow-scripts allow-modals allow-same-origin`: `allow-scripts allow-same-origin`;
 
     document.getElementById('plugin-output-downloader').style.display =  mode === 'test' ? 'block' : 'none';
+    document.getElementById('plugin-output-linker').style.display =  mode === 'test' ? 'block' : 'none';
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
@@ -314,6 +325,7 @@ export var PluginEditor = function ({
         let fileContents = this.volatilePlugins[this.editingFile].content;
         this.editor.setValue(fileContents);
         this.editor.clearSelection();
+        console.log("update plugins file::" ,  this.editingFile)
         updateUrlParams('pluginFile', this.editingFile);
 
         if (this.mode === 'commit') {
@@ -421,8 +433,20 @@ export var PluginEditor = function ({
           >
             Save to Gist
           </button>
+          <button id="plugin-differ-link" style="position: absolute;
+            right: 170px;
+            bottom: 17px;
+            padding-left: 9px;
+            padding-right: 9px;
+            border-radius: 0.9rem;
+            display: block;"
+            onclick="app.plugins.${self.name
+        }.onOpenGistLink()"
+          >
+            Open target gist
+          </button>
         </div>
-        
+
         <div>
           <div style="position: absolute;
               right: calc(50vw - 65px);
@@ -440,6 +464,21 @@ export var PluginEditor = function ({
 
             <button title="format" onclick="app.plugins.${self.name
         }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
+          </div>
+
+          <div style="position: absolute;
+              right: calc(50vw + 80px);
+              bottom: 3px;
+              z-index: 999;
+              padding-left: 9px;
+              padding-right: 9px;
+              border-radius: 0.9rem;">
+            <button id="plugin-output-linker"
+              onclick="app.plugins.${self.name
+            }.onCopyLink()"
+            >
+              Copy link
+            </button>
           </div>
 
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
@@ -463,7 +502,6 @@ export var PluginEditor = function ({
         }
       },
       onAfterClose: () => {
-        updateUrlParams('pluginFile', '');
         window.removeEventListener("previewErrors",this.onErrorsInPreview);
         this.hasTestedOnce = false;
       },
@@ -528,16 +566,17 @@ export var PluginEditor = function ({
             // const contentChanged = this.differ.getEditors().left.getValue() !== this.differ.getEditors().right.getValue()
             // document.getElementById('plugin-differ-commit').className = contentChanged ? "" : "disabled"
           });
-        const localVariables = getPluginStore(self.name);
-        this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode);
-        // initialize data on both editor and differ from url
-        if(gistPluginsFileUrl) {
-          setTimeout(() => {
+        setTimeout(() => {
+          const localVariables = getPluginStore(self.name);
+          console.log("Open plugins file  "+ getGistPluginsFileUrl())
+          if(getGistPluginsFileUrl()) {
             // ?gistPlugins=2ff124dc94f936e8f7d96632f559aecb&pluginFile=yarn-output-pixi-bunnies.js&mode=test
-            this.onUpdatePluginsList(gistPluginsFileUrl);
-            this.onSetEditingFile(gistPluginsFileUrl);
-          }, 400)
-        }
+            this.onUpdatePluginsList(getGistPluginsFileUrl()).then(()=> {
+              this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode, getGistPluginsFileUrl());
+              updateUrlParams('gistPlugins', getGistPluginsId());
+            });
+          }
+        }, 400)
       },
       preConfirm: () => {
         setPluginStore(self.name, 'pluginEditorOpen', false);
@@ -548,9 +587,8 @@ export var PluginEditor = function ({
   onLoad(() => {
     getPluginsList(false).then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
-
-      if (gistPluginsFileUrl) {
-        this.onOpenPluginEditor()
+      if(getGistPluginsFileUrl()) {
+        this.onOpenPluginEditor();
       }
     });
 
