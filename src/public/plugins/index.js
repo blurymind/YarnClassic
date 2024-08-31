@@ -400,13 +400,13 @@ export var Plugins = function (app) {
       <script id="handle-fallback-message">
         const logOfConsole = [];
         const logOfErrors = [];
-        const onUpdateConsoleLogsInternal = () => {
+        const onUpdateConsoleLogsInternal = (arguments = {}) => {
           ${data.console === false && 'if(logOfErrors.length === 0)return;'}
           window.top.dispatchEvent(
             new CustomEvent(
               "previewErrors",
               {detail: {
-                  errorText: logOfErrors.map(item=>item.arguments.join('')).join('')
+                  errorText: logOfErrors.map(item=>item.arguments.join('')).join('') || Object.values(arguments).join('')
                 }
               }
             )
@@ -455,7 +455,7 @@ export var Plugins = function (app) {
         };
         console.error = function() {
             logOfConsole.push({type: 'error', arguments: arguments});
-            onUpdateConsoleLogsInternal();
+            onUpdateConsoleLogsInternal(arguments);
             return _error.apply(console, arguments);
         };
         console.info = function() {

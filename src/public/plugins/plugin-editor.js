@@ -118,7 +118,6 @@ ${INTERNAL_EXAMPLE}
 <body>
 `
 
-
 const editorOptions = {
   mode: 'ace/mode/javascript',
   tabSize: 2,
@@ -321,10 +320,14 @@ export var PluginEditor = function ({
     }
   }
   this.onErrorsInPreview = (errorsInPreview) => {
+    // alert('ef')
+    console.log({errorsInPreview})
     const errorText = errorsInPreview.detail.errorText;
-    document.querySelector('#js-editor-errors').innerHTML = errorText;
-    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
-    this.editor.find(errorText);
+    if(errorText) {
+      document.querySelector('#js-editor-errors').innerHTML = errorText;
+      document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
+      this.editor.find(errorText);
+    }
   },
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
@@ -509,7 +512,6 @@ export var PluginEditor = function ({
           </div>
         </div>
       </div>
-
         `,
       showConfirmButton: false,
       focusConfirm: false,
