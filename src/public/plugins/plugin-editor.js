@@ -261,8 +261,7 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.height =
       mode === 'test' ? HEIGHT : '0vh';
-    document.getElementById('plugin-yarn-reloader').style.display =
-      mode === 'test' ? 'block' : 'none';
+    document.getElementById('plugin-yarn-reloader').style.display = 'none';
     document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
     //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
     document.getElementById('plugin-output-previewer').sandbox = mode === 'test' ? `allow-scripts allow-modals allow-same-origin`: `allow-scripts allow-same-origin`;
@@ -295,10 +294,10 @@ export var PluginEditor = function ({
       const [data, _, errorEvent] = getExtensionScriptData(fileData);
 
       const isAnEditorPlugin = this.mode === 'test' && data && 'Constructor' in data;
-      document.getElementById('plugin-yarn-reloader').style.display =
-        isAnEditorPlugin ? 'block' : 'none'; 
       document.getElementById('plugin-output-previewer').style.display =
         !isAnEditorPlugin ? 'block' : 'none';
+      document.getElementById('plugin-yarn-reloader').style.display =
+        isAnEditorPlugin ? 'flex' : 'none';
       document.getElementById('plugin-output-downloader').innerText = isAnEditorPlugin ? 'Reload' : 'Download'
 
       if (!data || !data.script) {
@@ -495,14 +494,19 @@ export var PluginEditor = function ({
               Copy link
             </button>
           </div>
-          <div id="plugin-yarn-reloader" style="height: ${HEIGHT}; padding: 2rem">
-            <div>
-              Your code has a Constructor field
-              This appears to be a yarn editor plugin.
-              You need to reload Yarn for any changes to take effect.
+          <div style="height: ${HEIGHT}; width: 100%;">
+            <div id="plugin-yarn-reloader" style="display: none; flex-direction: column; gap: 7px">
+              <div style="margin: 2rem">
+                Your code has a Constructor field.
+                This appears to be a yarn editor plugin.
+                You need to reload Yarn for any changes to take effect.
+              </div>
+              <div style="flex:1;align-content:center;">
+                <img  width="170px" src="./public/icon.png" alt="Yarn Icon" style="margin:0; padding:0;filter: drop-shadow(1px 1px 1px white) drop-shadow(-1px -1px 1px white);" />
+              </div>
             </div>
+            <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%;border: none;"> 
           </div>
-          <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
 
