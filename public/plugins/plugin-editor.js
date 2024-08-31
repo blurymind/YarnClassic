@@ -403,22 +403,21 @@ export var PluginEditor = function ({
         </div>
         <div id="js-editor-errors" style="
           position: absolute;
-          bottom: 20px;
+          bottom: 28px;
           right: 20px;
           display: none;
           color: red;
-          background: rgba(0, 0, 0, 0.66);
+          background: rgba(0, 0, 0, 0.75);
           padding: 6px;
           border-radius: 0.2rem;
           font-family: 'Courier New', monospace;
           font-size: 0.7rem;
           text-align: start;
-          max-height: 20%;
-          max-width: 80%;
+          max-height: 60%;
+          max-width: 45%;
           overflow: auto;
           z-index: 9999;
         ">
-          error text dkjfghkdfjhgkdfhgkdfjghkdfjghkg 
         </div> 
 
         <div style="position: relative;">
@@ -601,12 +600,13 @@ export var PluginEditor = function ({
       name: 'Playground',
       attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
+      className: 'item',
+      id: 'pluginEditorButton',
       iconName: 'javascript',
       ...(app.settings.developmentModeEnabled() ? {
         className: 'bbcode-button',
         style: 'padding: 0 10px; margin-top: 3px',
         as: 'div',
-        id: 'pluginEditorButton'
       } : {})
     });
   });

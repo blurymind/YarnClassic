@@ -428,13 +428,14 @@ export var Plugins = function (app) {
           logMessage.scrollTop = logMessage.scrollHeight;
         }
         window.addEventListener("error", (e) => {
+          console.error({e})
           const errorText = e.message + "<br>Line: " + (e.lineno - 60 + 1 + ${data.scriptStartLn}) + "<br>Col: " + (e.colno - 4) + "<br> Please see console for more details..";
-          logOfConsole.push({type: 'error', arguments: [errorText]});
-          logOfErrors.push({type: 'error', arguments: [errorText]});
+          logOfConsole.push({type: 'error', arguments: [e.error.stack || e.message]});
+          logOfErrors.push({type: 'error', arguments: [e.error.stack || e.message]});
           onUpdateConsoleLogsInternal();
         });
         window.addEventListener('unhandledrejection', e => {
-          console.log({e})
+          console.error({e})
           logOfErrors.push({type: 'error', arguments: [e.reason.stack]});
           onUpdateConsoleLogsInternal();
         });
