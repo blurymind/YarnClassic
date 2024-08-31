@@ -323,11 +323,9 @@ export var PluginEditor = function ({
     // alert('ef')
     console.log({errorsInPreview})
     const errorText = errorsInPreview.detail.errorText;
-    if(errorText) {
-      document.querySelector('#js-editor-errors').innerHTML = errorText;
-      document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
-      this.editor.find(errorText);
-    }
+    document.querySelector('#js-editor-errors').innerHTML = errorText;
+    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
+    this.editor.find(errorText);
   },
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
