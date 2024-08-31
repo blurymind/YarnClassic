@@ -357,7 +357,7 @@ export var PluginEditor = function ({
         }
         if (this.mode === 'test' && this.hasTestedOnce === false) {
           this.hasTestedOnce = true;
-          ToastWc.show({ type: 'info', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
+          ToastWc.show({ type: 'warning', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
           document.querySelector('#edit-plugin-mode-test').style['border-bottom'] = '1px solid';
         }
       });
