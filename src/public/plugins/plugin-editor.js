@@ -263,6 +263,7 @@ export var PluginEditor = function ({
 
     document.getElementById('plugin-output-downloader').style.display =  mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-output-linker').style.display =  mode === 'test' ? 'block' : 'none';
+    document.getElementById('js-editor-errors').style.display = mode === 'commit' ? 'none' : 'block';
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
@@ -309,7 +310,8 @@ export var PluginEditor = function ({
   this.onErrorsInPreview = (errorsInPreview) => {
     const errorText = errorsInPreview.detail.errorText;
     document.querySelector('#js-editor-errors').innerHTML = errorText;
-    document.querySelector('#js-editor-errors').style.display = 'block';
+    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
+    this.editor.find(errorText);
   },
   this.onOpenPluginEditor = async () => {
     this.beautify = ace.require('ace/ext/beautify');
@@ -397,27 +399,27 @@ export var PluginEditor = function ({
       html: `
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper" style="position:relative">
-          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>
-
-          <div id="js-editor-errors" style="
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-            color: red;
-            background: rgba(0, 0, 0, 0.66);
-            padding: 6px;
-            border-radius: 0.2rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.7rem;
-            text-align: start;
-            max-height: 20%;
-            max-width: 80%;
-            overflow: auto;
-          ">
-            error text dkjfghkdfjhgkdfhgkdfjghkdfjghkg 
-          </div>   
+          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>  
         </div>
+        <div id="js-editor-errors" style="
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+          display: none;
+          color: red;
+          background: rgba(0, 0, 0, 0.66);
+          padding: 6px;
+          border-radius: 0.2rem;
+          font-family: 'Courier New', monospace;
+          font-size: 0.7rem;
+          text-align: start;
+          max-height: 20%;
+          max-width: 80%;
+          overflow: auto;
+          z-index: 9999;
+        ">
+          error text dkjfghkdfjhgkdfhgkdfjghkdfjghkg 
+        </div> 
 
         <div style="position: relative;">
             <div id="diff-editor" class="diff-editor" style="height: ${HEIGHT}; width: 100%;"></div>
@@ -575,6 +577,8 @@ export var PluginEditor = function ({
               this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode, getGistPluginsFileUrl());
               updateUrlParams('gistPlugins', getGistPluginsId());
             });
+          } else {
+            this.onSetPluginEditMode(localVariables.pluginEditMode || this.mode, getGistPluginsFileUrl());
           }
         }, 400)
       },
