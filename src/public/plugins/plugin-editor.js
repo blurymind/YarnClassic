@@ -224,8 +224,12 @@ export var PluginEditor = function ({
       ToastWc.show({ type: 'success', content: `Saved ${this.editingFile}\nto gist: ${response.response.id}`, time: 3000 })
     });
   }
-  this.onDownloadPreview = () => {
-    app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
+  this.onDownloadPreviewOrReload = () => {
+    if( document.getElementById('plugin-output-downloader').innerText.includes('Download')) {
+      app.data.storage.downloadContent(document.getElementById('plugin-output-previewer').srcdoc, 'output.html');
+      return
+    }
+    window.location.reload();
   }
   this.onCopyLink = () => {
     window.navigator.clipboard.writeText(window.location.href);
@@ -257,6 +261,8 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.height =
       mode === 'test' ? HEIGHT : '0vh';
+    document.getElementById('plugin-yarn-reloader').style.display =
+      mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
     //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
     document.getElementById('plugin-output-previewer').sandbox = mode === 'test' ? `allow-scripts allow-modals allow-same-origin`: `allow-scripts allow-same-origin`;
@@ -287,6 +293,14 @@ export var PluginEditor = function ({
     document.querySelector('#js-editor-errors').style.display = 'none';
     try {
       const [data, _, errorEvent] = getExtensionScriptData(fileData);
+
+      const isAnEditorPlugin = this.mode === 'test' && data && 'Constructor' in data;
+      document.getElementById('plugin-yarn-reloader').style.display =
+        isAnEditorPlugin ? 'block' : 'none'; 
+      document.getElementById('plugin-output-previewer').style.display =
+        !isAnEditorPlugin ? 'block' : 'none';
+      document.getElementById('plugin-output-downloader').innerText = isAnEditorPlugin ? 'Reload' : 'Download'
+
       if (!data || !data.script) {
         document.getElementById('plugin-output-previewer').srcdoc = getExampleOutputFunction("The function needs to return an object..");
         if(errorEvent) this.onErrorsInPreview({detail: {errorText: errorEvent.message, errorEvent}});
@@ -359,7 +373,7 @@ export var PluginEditor = function ({
         }
         if (this.mode === 'test' && this.hasTestedOnce === false) {
           this.hasTestedOnce = true;
-          ToastWc.show({ type: 'warning', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
+          // ToastWc.show({ type: 'warning', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
           document.querySelector('#edit-plugin-mode-test').style['border-bottom'] = '1px solid';
         }
       });
@@ -458,7 +472,7 @@ export var PluginEditor = function ({
               border-radius: 0.9rem;">
             <button id="plugin-output-downloader"
               onclick="app.plugins.${self.name
-        }.onDownloadPreview()"
+        }.onDownloadPreviewOrReload()"
             >
               Download
             </button>
@@ -481,7 +495,13 @@ export var PluginEditor = function ({
               Copy link
             </button>
           </div>
-
+          <div id="plugin-yarn-reloader" style="height: ${HEIGHT}; padding: 2rem">
+            <div>
+              Your code has a Constructor field
+              This appears to be a yarn editor plugin.
+              You need to reload Yarn for any changes to take effect.
+            </div>
+          </div>
           <iframe id="plugin-output-previewer" style="height: ${HEIGHT}; width: 100%; border: none;">
         </div>
       </div>
