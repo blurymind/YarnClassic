@@ -600,12 +600,13 @@ export var PluginEditor = function ({
       name: 'Playground',
       attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
+      className: 'item',
+      id: 'pluginEditorButton',
       iconName: 'javascript',
       ...(app.settings.developmentModeEnabled() ? {
         className: 'bbcode-button',
         style: 'padding: 0 10px; margin-top: 3px',
         as: 'div',
-        id: 'pluginEditorButton'
       } : {})
     });
   });
