@@ -276,7 +276,7 @@ export var Plugins = function (app) {
         .getGist(getGistPluginsId())
         .then(({ filesInGist }) => {
           const promises = Object.values(filesInGist)
-            .filter(gistFile => gistFile.language === 'JavaScript' || gistFile.filename.endsWith(".js"))
+            .filter(gistFile => gistFile.language === 'JavaScript' || gistFile.filename.endsWith(".js") || gistFile.filename.endsWith(".json") || gistFile.filename.endsWith(".txt"))
             .map(gistFile => {
               this.rawUrls[gistFile.filename] = gistFile.raw_url;
               return app.data.storage

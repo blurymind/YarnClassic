@@ -163,10 +163,10 @@ export var PluginEditor = function ({
 
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
-    let newFileName = prompt("Create a new plugin file?", 'my-new-plugin-js');
+    let newFileName = prompt("Create a new plugin file?\nAllowed formats: .js, .json and .txt", 'my-new-plugin.js');
     if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
-      newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
+      // newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
       if (newFileName in this.volatilePlugins) {
         alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
         return;
