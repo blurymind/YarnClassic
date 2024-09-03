@@ -387,6 +387,7 @@ input.settings-value {
   padding: 4px;
 }
 
+.button,
 button {
   background: #44475a;
   color: #f8f8f2;

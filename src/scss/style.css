@@ -1200,6 +1200,24 @@ input:focus + span + .dropdown {
   }
 }
 
+.row-when-narrow {
+  flex-direction: column;
+}
+@media only screen and (min-width: 600px) {
+  .row-when-narrow {
+    flex-direction: row;
+  }
+}
+.flex-when-narrow {
+  flex: 1;
+}
+@media only screen and (min-width: 600px) {
+  .flex-when-narrow {
+    flex: none;
+  }
+}
+
+
 @media only screen and (max-width: 600px) {
   .hide-when-narrow {
     display: none !important;
@@ -1437,6 +1455,7 @@ input[type=search]::-webkit-search-cancel-button {
 }
 
 input,
+.button,
 button {
   outline: none;
   border: 0;

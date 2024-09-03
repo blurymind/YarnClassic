@@ -160,10 +160,11 @@ export var PluginEditor = function ({
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
   this.yarnData = null;
   this.hasTestedOnce = false;
+  this.selectedResources = [];
 
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
-    let newFileName = prompt("Create a new plugin file?\nAllowed formats: .js, .json and .txt", 'my-new-plugin.js');
+    let newFileName = prompt("Create a new plugin file?\nAllowed formats: .js, .json and .txt\nReserved names: resources.json and yarnData.json", 'my-new-plugin.js');
     if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
       // newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
@@ -237,7 +238,6 @@ export var PluginEditor = function ({
       .querySelectorAll('#edit-plugin-mode > button')
       .forEach(item => item.classList.remove('active'));
     document.getElementById(`edit-plugin-mode-${mode}`).classList.add('active');
-    console.log({ mode });
     // edit/commit/test
     document.getElementById('js-editor').style.display =
       mode === 'edit' ? 'block' : 'none';
@@ -315,11 +315,10 @@ export var PluginEditor = function ({
     }
   }
   this.onErrorsInPreview = (errorsInPreview) => {
-    // alert('ef')
-    console.log({errorsInPreview})
+    console.log({errorsInPreview, editingFile: this.editingFile})
     const errorText = errorsInPreview.detail.errorText;
     document.querySelector('#js-editor-errors').innerHTML = errorText;
-    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
+    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' && this.editingFile !== 'resources.json' ? 'block' : 'none';
     this.editor.find(errorText);
   },
   this.onOpenPluginEditor = async () => {
@@ -345,6 +344,7 @@ export var PluginEditor = function ({
             .getEditors()
             .left.getSession()
             .setValue(fileContents);
+          this.fileContents = fileContents;
 
           getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
@@ -370,9 +370,91 @@ export var PluginEditor = function ({
           this.hasTestedOnce = true;
           // ToastWc.show({ type: 'warning', content: 'The code editor will now recompile when typing and listen for compiling errors', time: 3000 })
           document.querySelector('#edit-plugin-mode-test').style['border-bottom'] = '1px solid';
+          document.querySelector('#edit-plugin-mode-test').style.display = 'block';
+        }
+        if (this.mode === 'edit') {
+          document.getElementById('resources-editor').style.display =
+            this.editingFile === 'resources.json' ? 'flex' : 'none';
+          console.log(document.getElementById('resources-editor-select'))
+          document.getElementById('js-editor').style.display =
+            this.editingFile !== 'resources.json' ? 'block' : 'none';
+          document.getElementById('js-editor-errors').style.display =
+            this.editingFile !== 'resources.json' ? 'block' : 'none';
+          document.getElementById('edit-plugin-code-buttons').style.display =
+            this.editingFile !== 'resources.json' ?  'flex' : 'none';
+          this.updateResourcesList(fileContents);
+        } else {
+          document.getElementById('resources-editor').style.display = 'none';
         }
       });
     };
+
+    this.onSelectResource = (evt) => {
+      const selectedItem = evt.target.value;
+      this.selectedResources = Object.values(evt.target.selectedOptions).map(item =>item.id);
+      if(selectedItem.startsWith('data:image')) {
+        document.getElementById('selected-resource-preview').innerHTML = `
+          <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
+        `
+      } else {
+        document.getElementById('selected-resource-preview').innerHTML = ``
+      }
+    }
+    this.onRemoveResource = () => {
+      const fileData = JSON.parse(this.volatilePlugins[this.editingFile].content);
+      this.selectedResources.forEach(selectedResource => {
+        if(selectedResource in fileData) delete fileData[selectedResource];
+      })
+ 
+      const newContent = JSON.stringify(fileData, null, 2);
+      setVloatilePlugin(this.editingFile, {
+        content: newContent,
+      }).then(()=> {
+        this.volatilePlugins[this.editingFile].content = newContent;
+        this.updateResourcesList(newContent);
+      });
+
+    }
+    const toBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve({src: reader.result, name: file.name});
+        reader.onerror = error => reject(error);
+      });
+    };
+    this.onAddResource = (evt) => {
+      const newResFiles = Object.values(evt.target.files);
+      const filePathsPromises = [];
+      newResFiles.forEach(file => {
+        filePathsPromises.push(toBase64(file))
+      })
+      Promise.all(filePathsPromises).then(filePaths=> {
+        const fileData = JSON.parse(this.volatilePlugins[this.editingFile].content);        
+        filePaths.forEach(file => {
+          fileData[file.name] = {src: file.src, added: new Date()}
+        })
+        const newContent = JSON.stringify(fileData, null, 2)
+        setVloatilePlugin(this.editingFile, {
+            content: newContent,
+          }).then(()=> {
+            this.volatilePlugins[this.editingFile].content = newContent;
+            this.updateResourcesList(newContent);
+          });
+      });
+    }
+
+    this.updateResourcesList = (fileContents) => {
+      const resourcesData = JSON.parse(fileContents);
+      const options = Object.keys(JSON.parse(fileContents)).map((fileKey, index) => {
+        const fileData = resourcesData[fileKey];
+        console.log({fileKey, fileData})
+        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="background-size: 45px;background-repeat: no-repeat;background-position-x: right;background-image:url(${fileData.src});">
+          ${fileKey} 
+        </option>`
+      });
+      document.getElementById('resources-editor-select').innerHTML = options.join('');
+    }
     
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
@@ -408,7 +490,30 @@ export var PluginEditor = function ({
       html: `
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper" style="position:relative">
-          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>  
+          <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>
+          <div id="resources-editor" style="height: ${HEIGHT}; width: 100%;">
+          
+          <div style="display:flex;flex:1;gap:3px;" class="row-when-narrow">
+            <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
+              <label for="resources-editor-select" id="listLabel">Files:</label>
+              <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true">
+                <option value="23432423434">myImage.png</option>
+              </select>
+              <div style="display:flex;justify-content:space-around;">
+                <input type="file" accept="image/*" multiple="true"
+                  id="file-input-res"
+                  style="display:none"
+                />
+                <label class="button" style="padding:3px;" for="file-input-res">
+                  Add Files
+                </label>
+                <button onclick="app.plugins.${self.name
+                }.onRemoveResource()">Remove</button>
+              </div>
+            </div>
+            <div id="selected-resource-preview" style="overflow:auto;align-content:center;flex:1;border:1px solid;border-radius:0.7rem;"></div>
+          </div>
+        </div>
         </div>
         <div id="js-editor-errors" style="
           position: absolute;
@@ -530,6 +635,8 @@ export var PluginEditor = function ({
           this.yarnData = yarnData;
         })
         window.addEventListener("previewErrors",this.onErrorsInPreview, false);
+        document.getElementById('file-input-res').addEventListener('change', this.onAddResource);
+        document.getElementById('resources-editor-select').addEventListener('change',this.onSelectResource);
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });

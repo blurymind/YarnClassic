@@ -220,6 +220,7 @@ a:hover {
   color: grey;
 }
 
+.button,
 button {
   background: #99ebe4;
 }
