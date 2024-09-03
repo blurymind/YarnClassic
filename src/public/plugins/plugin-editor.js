@@ -133,8 +133,8 @@ export var PluginEditor = function ({
   setPluginStore,
   // getVloatilePlugins,
   setVloatilePlugin,
-  setVloatilePlugins,
   getGistPluginFiles,
+  setVloatilePlugins,
   getGistPluginFile,
   saveGistPlugin,
   isGistTokenInvalid,
@@ -197,7 +197,7 @@ export var PluginEditor = function ({
   }
   this.onUpdatePluginsList = (gistPluginsFileOnMount = '') => {
     // initialize file menu or update it. Refetch gist files if updating it
-    return getPluginsList().then(fileList => {
+    return getPluginsList(!!gistPluginsFileOnMount).then(fileList => {
       this.volatilePlugins = fileList;
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
