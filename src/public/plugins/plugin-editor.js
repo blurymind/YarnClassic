@@ -446,13 +446,14 @@ export var PluginEditor = function ({
 
     this.updateResourcesList = (fileContents) => {
       const resourcesData = JSON.parse(fileContents);
-      const options = Object.keys(JSON.parse(fileContents)).map((fileKey, index) => {
+      const objectKeys = Object.keys(JSON.parse(fileContents));
+      const options = objectKeys.map((fileKey, index) => {
         const fileData = resourcesData[fileKey];
-        console.log({fileKey, fileData})
-        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="background-size: 45px;background-repeat: no-repeat;background-position-x: right;background-image:url(${fileData.src});">
-          ${fileKey} 
+        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="${objectKeys.length < 100 && `background-image:url(${fileData.src});`}content-visibility:visible;background-size: 45px;background-repeat: no-repeat;background-position-x: right;">
+           ${fileKey} 
         </option>`
       });
+      document.getElementById('resource-list-label').innerHTML = `Files: (${objectKeys.length})`;
       document.getElementById('resources-editor-select').innerHTML = options.join('');
     }
     
@@ -495,7 +496,7 @@ export var PluginEditor = function ({
           
           <div style="display:flex;flex:1;gap:3px;" class="row-when-narrow">
             <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
-              <label for="resources-editor-select" id="listLabel">Files:</label>
+              <label for="resources-editor-select" id="resource-list-label">Files:</label>
               <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true">
                 <option value="23432423434">myImage.png</option>
               </select>
