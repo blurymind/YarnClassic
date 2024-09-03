@@ -443,18 +443,35 @@ export var PluginEditor = function ({
           });
       });
     }
-
+    this.onSelectScroll = evt => {
+      const slackSpace = evt.target.clientHeight / 2;
+      const startPos = evt.target.scrollTop - slackSpace
+      const scrollHeight= evt.target.clientHeight + slackSpace
+      const endPos = startPos + scrollHeight;
+      const options = Object.values(evt.target.options);
+      if(options.length < 300) return;
+      options.forEach((item) => {
+        const itemPos = item.offsetTop;
+        if(itemPos > startPos && itemPos < endPos) {
+          item.style['background-image'] = `url(${item.value})`;
+        } else {
+          item.style['background-image'] = '';
+        }
+      })
+    }
     this.updateResourcesList = (fileContents) => {
       const resourcesData = JSON.parse(fileContents);
       const objectKeys = Object.keys(JSON.parse(fileContents));
-      const options = objectKeys.map((fileKey, index) => {
+      // const showThumbnails = true;//objectKeys.length < 600;
+      const options = objectKeys.map((fileKey) => {
         const fileData = resourcesData[fileKey];
-        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="${objectKeys.length < 100 && `background-image:url(${fileData.src});`}content-visibility:visible;background-size: 45px;background-repeat: no-repeat;background-position-x: right;">
+        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
            ${fileKey} 
         </option>`
       });
       document.getElementById('resource-list-label').innerHTML = `Files: (${objectKeys.length})`;
       document.getElementById('resources-editor-select').innerHTML = options.join('');
+      this.onSelectScroll({target: document.getElementById('resources-editor-select')})
     }
     
     const { value: formValues } = await Swal.fire({
@@ -638,6 +655,8 @@ export var PluginEditor = function ({
         window.addEventListener("previewErrors",this.onErrorsInPreview, false);
         document.getElementById('file-input-res').addEventListener('change', this.onAddResource);
         document.getElementById('resources-editor-select').addEventListener('change',this.onSelectResource);
+        const onUpdateScrollVis = app.utils.debounce(this.onSelectScroll, 70);
+        document.getElementById('resources-editor-select').addEventListener('scroll',onUpdateScrollVis);
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
