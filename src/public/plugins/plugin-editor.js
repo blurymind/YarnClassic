@@ -24,31 +24,24 @@ const removeStyleSheet = (path, root = document) => {
 const EXAMPLE = `
 () => {
   return {
-    //https://unpkg.com/kaplay@3000.1.17/dist/kaboom.cjs
-    // https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js
     modules: [
       // if a module is a web address, it can be included this way
       "https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js",
       // you can host a module on the same gist
-      "test-local-module.js",
-      'test-includes-script.js'
+      // "test-local-module.js",
     ],
     script: () => {
       const k = kaplay();
       k.loadSprite("bean", "public/icon.png")
-      // define a scene
       k.scene("main", () => {
         k.add([
           k.pos(200, 100),
           k.sprite("bean"),
         ]);
         k.add([
-          k.text("ohhimark fdfg"),
+          k.text("yarr"),
         ])
-
       });
-
-      // start the game
       k.go("main");
     }
   }
@@ -260,6 +253,8 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.height =
       mode === 'test' ? HEIGHT : '0vh';
+    document.getElementById('plugin-test-area').style.display =
+      mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-yarn-reloader').style.display = 'none';
     document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
     //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
@@ -353,7 +348,7 @@ export var PluginEditor = function ({
 
           getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
-            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
+            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n// Failed to fetch plugin`
             this.differ
               .getEditors()
               .right.getSession()
@@ -495,7 +490,7 @@ export var PluginEditor = function ({
               Copy link
             </button>
           </div>
-          <div style="height: ${HEIGHT}; width: 100%;">
+          <div id="plugin-test-area" style="height: ${HEIGHT}; width: 100%;">
             <div id="plugin-yarn-reloader" style="display: none; flex-direction: column; gap: 7px">
               <div style="margin: 2rem">
                 Your code has a Constructor field.
