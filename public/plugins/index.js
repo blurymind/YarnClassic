@@ -289,8 +289,10 @@ export var Plugins = function (app) {
   };
 
   const getGistPluginFile = (fileName) => {
+    if (!getGistPluginsId()) return Promise.resolve(`// ${fileName}:\n// No gist id specified - to look for the file`);
+    console.log({rawUrls: this.rawUrls})
     const rawUrl = this.rawUrls[fileName]
-    if (!rawUrl) return Promise.resolve('');
+    if (!rawUrl) return Promise.resolve(`// ${fileName}:\n// Not found at ${getGistPluginsId()}\n// Check if it was deleted or renamed before comitting\n// Commiting changes will create the file at that gist.`);
     return app.data.storage.getGistFileFromRawUrl(rawUrl);
   }
 

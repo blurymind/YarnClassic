@@ -24,31 +24,24 @@ const removeStyleSheet = (path, root = document) => {
 const EXAMPLE = `
 () => {
   return {
-    //https://unpkg.com/kaplay@3000.1.17/dist/kaboom.cjs
-    // https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js
     modules: [
       // if a module is a web address, it can be included this way
       "https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js",
       // you can host a module on the same gist
-      "test-local-module.js",
-      'test-includes-script.js'
+      // "test-local-module.js",
     ],
     script: () => {
       const k = kaplay();
       k.loadSprite("bean", "public/icon.png")
-      // define a scene
       k.scene("main", () => {
         k.add([
           k.pos(200, 100),
           k.sprite("bean"),
         ]);
         k.add([
-          k.text("ohhimark fdfg"),
+          k.text("yarr"),
         ])
-
       });
-
-      // start the game
       k.go("main");
     }
   }
@@ -140,8 +133,8 @@ export var PluginEditor = function ({
   setPluginStore,
   // getVloatilePlugins,
   setVloatilePlugin,
-  setVloatilePlugins,
   getGistPluginFiles,
+  setVloatilePlugins,
   getGistPluginFile,
   saveGistPlugin,
   isGistTokenInvalid,
@@ -204,7 +197,7 @@ export var PluginEditor = function ({
   }
   this.onUpdatePluginsList = (gistPluginsFileOnMount = '') => {
     // initialize file menu or update it. Refetch gist files if updating it
-    return getPluginsList().then(fileList => {
+    return getPluginsList(!!gistPluginsFileOnMount).then(fileList => {
       this.volatilePlugins = fileList;
       document.getElementById("edited-plugin-file").innerHTML = Object.keys(fileList || {}).map(
         key => `<option value="${key}">${key}</option>`
@@ -355,7 +348,7 @@ export var PluginEditor = function ({
 
           getGistPluginFile(this.editingFile).then(gistPluginFile => {
             const isTokenInvalid = isGistTokenInvalid()
-            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n//Gist with this filename is missing on github.\n// Have you deleted/renamed it?`
+            const gistAccesError = isTokenInvalid ? `//Access to gist writing failed\n\n//Do you have a valid token.\n// It needs to have permission to edit the gist file.` : `//${fileName}\n\n// Failed to fetch plugin`
             this.differ
               .getEditors()
               .right.getSession()
