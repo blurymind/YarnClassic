@@ -260,6 +260,8 @@ export var PluginEditor = function ({
       mode === 'commit' ? 'block' : 'none';
     document.getElementById('plugin-output-previewer').style.height =
       mode === 'test' ? HEIGHT : '0vh';
+    document.getElementById('plugin-test-area').style.display =
+      mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-yarn-reloader').style.display = 'none';
     document.getElementById('plugin-output-previewer').style.position = mode === 'test' ? 'relative' : 'absolute';
     //allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-top-navigation
@@ -495,7 +497,7 @@ export var PluginEditor = function ({
               Copy link
             </button>
           </div>
-          <div style="height: ${HEIGHT}; width: 100%;">
+          <div id="plugin-test-area" style="height: ${HEIGHT}; width: 100%;">
             <div id="plugin-yarn-reloader" style="display: none; flex-direction: column; gap: 7px">
               <div style="margin: 2rem">
                 Your code has a Constructor field.
