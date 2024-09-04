@@ -156,11 +156,10 @@ export var PluginEditor = function ({
   this.differ = null;
   this.editingFile = '';
   this.volatilePlugins = {};
-  this.mode = pluginModeUrl || 'edit';
+  this.mode = pluginModeUrl() || 'edit';
   this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
   this.yarnData = null;
   this.hasTestedOnce = false;
-  this.selectedResources = [];
 
   this.onAddNewFile = () => {
     // ask for filename - (adds js at the end)
@@ -318,7 +317,7 @@ export var PluginEditor = function ({
     console.log({errorsInPreview, editingFile: this.editingFile})
     const errorText = errorsInPreview.detail.errorText;
     document.querySelector('#js-editor-errors').innerHTML = errorText;
-    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' && this.editingFile !== 'resources.json' ? 'block' : 'none';
+    document.querySelector('#js-editor-errors').style.display =  errorText && this.mode !== 'commit' ? 'block' : 'none';
     this.editor.find(errorText);
   },
   this.onOpenPluginEditor = async () => {
@@ -373,107 +372,12 @@ export var PluginEditor = function ({
           document.querySelector('#edit-plugin-mode-test').style.display = 'block';
         }
         if (this.mode === 'edit') {
-          document.getElementById('resources-editor').style.display =
-            this.editingFile === 'resources.json' ? 'flex' : 'none';
-          console.log(document.getElementById('resources-editor-select'))
-          document.getElementById('js-editor').style.display =
-            this.editingFile !== 'resources.json' ? 'block' : 'none';
-          document.getElementById('js-editor-errors').style.display =
-            this.editingFile !== 'resources.json' ? 'block' : 'none';
-          document.getElementById('edit-plugin-code-buttons').style.display =
-            this.editingFile !== 'resources.json' ?  'flex' : 'none';
-          this.updateResourcesList(fileContents);
-        } else {
-          document.getElementById('resources-editor').style.display = 'none';
+          document.getElementById('js-editor').style.display = 'block';
+          document.getElementById('js-editor-errors').style.display = 'block';
+          document.getElementById('edit-plugin-code-buttons').style.display = 'flex';
         }
       });
     };
-
-    this.onSelectResource = (evt) => {
-      const selectedItem = evt.target.value;
-      this.selectedResources = Object.values(evt.target.selectedOptions).map(item =>item.id);
-      if(selectedItem.startsWith('data:image')) {
-        document.getElementById('selected-resource-preview').innerHTML = `
-          <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
-        `
-      } else {
-        document.getElementById('selected-resource-preview').innerHTML = ``
-      }
-    }
-    this.onRemoveResource = () => {
-      const fileData = JSON.parse(this.volatilePlugins[this.editingFile].content);
-      this.selectedResources.forEach(selectedResource => {
-        if(selectedResource in fileData) delete fileData[selectedResource];
-      })
- 
-      const newContent = JSON.stringify(fileData, null, 2);
-      setVloatilePlugin(this.editingFile, {
-        content: newContent,
-      }).then(()=> {
-        this.volatilePlugins[this.editingFile].content = newContent;
-        this.updateResourcesList(newContent);
-      });
-
-    }
-    const toBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve({src: reader.result, name: file.name});
-        reader.onerror = error => reject(error);
-      });
-    };
-    this.onAddResource = (evt) => {
-      const newResFiles = Object.values(evt.target.files);
-      const filePathsPromises = [];
-      newResFiles.forEach(file => {
-        filePathsPromises.push(toBase64(file))
-      })
-      Promise.all(filePathsPromises).then(filePaths=> {
-        const fileData = JSON.parse(this.volatilePlugins[this.editingFile].content);        
-        filePaths.forEach(file => {
-          fileData[file.name] = {src: file.src, added: new Date()}
-        })
-        const newContent = JSON.stringify(fileData, null, 2)
-        setVloatilePlugin(this.editingFile, {
-            content: newContent,
-          }).then(()=> {
-            this.volatilePlugins[this.editingFile].content = newContent;
-            this.updateResourcesList(newContent);
-          });
-      });
-    }
-    this.onSelectScroll = evt => {
-      const slackSpace = evt.target.clientHeight / 2;
-      const startPos = evt.target.scrollTop - slackSpace
-      const scrollHeight= evt.target.clientHeight + slackSpace
-      const endPos = startPos + scrollHeight;
-      const options = Object.values(evt.target.options);
-      if(options.length < 300) return;
-      options.forEach((item) => {
-        const itemPos = item.offsetTop;
-        if(itemPos > startPos && itemPos < endPos) {
-          item.style['background-image'] = `url(${item.value})`;
-        } else {
-          item.style['background-image'] = '';
-        }
-      })
-    }
-    this.updateResourcesList = (fileContents) => {
-      const resourcesData = JSON.parse(fileContents);
-      const objectKeys = Object.keys(JSON.parse(fileContents));
-      // const showThumbnails = true;//objectKeys.length < 600;
-      const options = objectKeys.map((fileKey) => {
-        const fileData = resourcesData[fileKey];
-        return `<option value="${fileData.src}" id="${fileKey}" title="${fileKey}" style="content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
-           ${fileKey} 
-        </option>`
-      });
-      document.getElementById('resource-list-label').innerHTML = `Files: (${objectKeys.length})`;
-      document.getElementById('resources-editor-select').innerHTML = options.join('');
-      this.onSelectScroll({target: document.getElementById('resources-editor-select')})
-    }
-    
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
@@ -509,28 +413,6 @@ export var PluginEditor = function ({
       <div style="overflow:hidden;">
         <div id="js-editor-wrapper" style="position:relative">
           <div id="js-editor" style="height: ${HEIGHT}; width: 100%;"></div>
-          <div id="resources-editor" style="height: ${HEIGHT}; width: 100%;">
-          
-          <div style="display:flex;flex:1;gap:3px;" class="row-when-narrow">
-            <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
-              <label for="resources-editor-select" id="resource-list-label">Files:</label>
-              <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true">
-                <option value="23432423434">myImage.png</option>
-              </select>
-              <div style="display:flex;justify-content:space-around;">
-                <input type="file" accept="image/*" multiple="true"
-                  id="file-input-res"
-                  style="display:none"
-                />
-                <label class="button" style="padding:3px;" for="file-input-res">
-                  Add Files
-                </label>
-                <button onclick="app.plugins.${self.name
-                }.onRemoveResource()">Remove</button>
-              </div>
-            </div>
-            <div id="selected-resource-preview" style="overflow:auto;align-content:center;flex:1;border:1px solid;border-radius:0.7rem;"></div>
-          </div>
         </div>
         </div>
         <div id="js-editor-errors" style="
@@ -643,20 +525,22 @@ export var PluginEditor = function ({
           removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
+        updateUrlParams('gistPlugins', getGistPluginsId());
       },
       onAfterClose: () => {
         window.removeEventListener("previewErrors",this.onErrorsInPreview);
         this.hasTestedOnce = false;
+        // updateUrlParams('gistPlugins', '');
+        updateUrlParams('mode', '');
+        // updateUrlParams('pluginFile', '');
+        this.editor.terminate();
+        this.editor = null;
       },
       onOpen: () => {
         app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
           this.yarnData = yarnData;
         })
         window.addEventListener("previewErrors",this.onErrorsInPreview, false);
-        document.getElementById('file-input-res').addEventListener('change', this.onAddResource);
-        document.getElementById('resources-editor-select').addEventListener('change',this.onSelectResource);
-        const onUpdateScrollVis = app.utils.debounce(this.onSelectScroll, 70);
-        document.getElementById('resources-editor-select').addEventListener('scroll',onUpdateScrollVis);
         // EDITOR
         this.editor = ace.edit('js-editor');
         this.editor.setOptions({ ...editorOptions, theme: this.theme });
@@ -736,7 +620,7 @@ export var PluginEditor = function ({
   onLoad(() => {
     getPluginsList(false).then(volatilePlugins => {
       this.volatilePlugins = volatilePlugins;
-      if(getGistPluginsFileUrl()) {
+      if(getGistPluginsFileUrl() && pluginModeUrl()) {
         this.onOpenPluginEditor();
       }
     });
@@ -751,8 +635,8 @@ export var PluginEditor = function ({
       iconName: 'javascript',
       ...(app.settings.developmentModeEnabled() ? {
         className: 'bbcode-button',
-        style: 'padding: 0 10px; margin-top: 3px',
-        as: 'div',
+        style: 'padding: 0 10px; margin-top: 3px; font-size: small',
+        as: 'span',
       } : {})
     });
   });
