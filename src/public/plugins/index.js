@@ -1,7 +1,8 @@
 import { Runner } from './runner';
 import { PluginEditor } from './plugin-editor';
+import { ResourcesEditor } from './resources-editor';
 
-const PLUGINS = [Runner, PluginEditor];
+const PLUGINS = [Runner, PluginEditor, ResourcesEditor];
 
 const PublicLibs = {}
 Promise.all(["public/libs/ink-full.js", "public/libs/bondage.min.js"].map(u => fetch(u))).then(responses =>
@@ -258,7 +259,9 @@ export var Plugins = function (app) {
   console.log({urlParams, url})
   const getGistPluginsId = () => urlParams.get('gistPlugins') || app.settings.gistPluginsFile();
   const getGistPluginsFileUrl = () => urlParams.get('pluginFile');
-  const pluginModeUrl = urlParams.get('mode');
+  const getGistFileUrl = () => urlParams.get('gistFile') || app.settings.gistFile();
+  const getSelectedResourceUrl = () => urlParams.get('selectedResource');
+  const pluginModeUrl = () => urlParams.get('mode');
 
   const updateUrlParams = (key, value) => {
     console.log("updateUrlParams", {key, value})
@@ -529,7 +532,9 @@ export var Plugins = function (app) {
     deleteGistPlugin,
     deleteVolatilePlugin,
     getExtensionScriptData,
-    getPreviewHtml
+    getPreviewHtml,
+    getGistFileUrl,
+    getSelectedResourceUrl
   };
 
   // built in plugin initiation

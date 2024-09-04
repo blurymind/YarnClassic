@@ -615,10 +615,10 @@ This is the content of the stitch that should be embedded within a knot.
   debounce: function(fun, mil) {
     var timer;    
     return function() {
-      var arg = arguments[0]
+      // const arg = arguments[0]
       clearTimeout(timer);
       timer = setTimeout(function() {
-        fun(arg);
+        fun();//fun(arg)
       }, mil);
     };
   },

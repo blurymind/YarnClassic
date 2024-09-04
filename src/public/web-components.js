@@ -5,7 +5,7 @@ template.innerHTML = `
 #simpleToast {
   visibility: hidden; /* Hidden by default. Visible on click */
   min-width: 250px; /* Set a default minimum width */
-  margin-left: -125px; /* Divide value of min-width by 2 */
+  word-break: break-word;
   background-color: MediumVioletRed; /* Background color */
   color: #fff; /* White text color */
   text-align: center; /* Centered text */
@@ -13,7 +13,9 @@ template.innerHTML = `
   padding: 16px; /* Padding */
   position: fixed; /* Sit on top of the screen */
   z-index: 999999; /* Add a z-index if needed */
-  left: 50%; /* Center the snackbar */
+  left: 10vw; /* Center the snackbar */
+  max-width: 80vw;
+  opacity: 0.9;
   bottom: 30px; /* 30px from the bottom */
   font-family: monospace;
   display: inline-flex;
@@ -78,24 +80,31 @@ class Toast extends HTMLElement {
         super();
         const shadow = this.attachShadow({ mode: "open" })
         shadow.append(template.content.cloneNode(true))
+        const shadowRoot = document.querySelector('toast-component').shadowRoot;
     }
-    openToast({ content, type, time }) {
+    openToast({ content, type, time, onClick }) {
         const shadowRoot = document.querySelector('toast-component').shadowRoot;
         this.toast = shadowRoot.querySelector("#simpleToast");
         this.toast.className = "show";
         this.toast.setAttribute('data-type', type || '')
         this.toastBody = shadowRoot.querySelector("#toastBody");
         this.toastBody.innerHTML = content;
+        const onClose = (event) => {
+          this.toast.className = this.toast.className.replace("show", "");
+          if(event && onClick) {onClick()}
+        }
         clearTimeout(this.countdown)
         this.countdown = setTimeout(() => {
-            this.toast.className = this.toast.className.replace("show", "");
+            onClose();
             clearTimeout(this.countdown)
         }, time || 3000);
+        this.toast.removeEventListener('click', onClose);
+        this.toast.addEventListener('click', onClose);
     }
 }
 customElements.define('toast-component', Toast);
 window.ToastWc = {
-    show: ({ content, type, time }) => {
-        document.querySelector('toast-component').openToast({ content, type, time })
+    show: ({ content, type, time, onClick }) => {
+        document.querySelector('toast-component').openToast({ content, type, time, onClick })
     }
 }

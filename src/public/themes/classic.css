@@ -31,6 +31,7 @@ a:hover {
 /*-- Menu ------------------------------------------------------------------ */
 
 .app-menu {
+  display: flex;
   position: absolute;
   top: 0;
   left: 0;
@@ -223,4 +224,8 @@ a:hover {
 .button,
 button {
   background: #99ebe4;
+}
+
+.content-data-image {
+  content: "url(" attr(data-src) ") ";
 }
