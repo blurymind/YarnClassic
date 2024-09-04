@@ -14,9 +14,8 @@ export var ResourcesEditor = function({
   this.resourcesFileUrl = '';
   this.resourcesFileContent = '';
   this.isBusy = (message) => {
-    document.getElementById('resourcesLoaderIsBusy').style.display = message ? 'block' : 'none';
+    document.querySelector('spinner-component').isBusy(message);
     document.getElementById('resource-file-buttons').className = message ? 'disabled' : '';
-    document.getElementById('resourcesLoaderIsBusyMessage').innerText = message; 
   };
   this.initResourcesFile = () => {
     return new Promise(resolve => {
@@ -137,7 +136,7 @@ export var ResourcesEditor = function({
     });
     document.getElementById(
       'resource-list-label'
-    ).innerHTML = `Files: (${objectKeys.length})`;
+    ).innerHTML = `${objectKeys.length} files`;
     document.getElementById('resources-editor-select').innerHTML = options.join(
       ''
     );
@@ -153,14 +152,15 @@ export var ResourcesEditor = function({
       showCancelButton: false,
       title: `
         <div class="flex-wrap" style="flex:1;gap: 10px; font-size: 0.9rem">
-        <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a> from <a href="${this.gistId}" target="_blank" rel="noopener noreferrer">Gist</a>
+        <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a>
+        <label for="resources-editor-select" id="resource-list-label">...</label> 
+        from <a href="${this.gistId}" target="_blank" rel="noopener noreferrer">Gist</a>
         </div>
         `.replaceAll('\n', ''),
       html: `
         <div id="resources-editor" style="display:flex;height: ${HEIGHT}; width: 100%; overflow: hidden;">
           <div style="display:flex;flex:1;gap:3px;" class="row-when-narrow">
             <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
-              <label for="resources-editor-select" id="resource-list-label">Files:</label>
               <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true">
                 <option value="23432423434">...</option>
               </select>
@@ -175,10 +175,7 @@ export var ResourcesEditor = function({
                 <button onclick="${domPath}.onRemoveResource()">Remove</button>
               </div>
             </div>
-            <div id="resourcesLoaderIsBusy" style="position:absolute;right:50%;bottom:20%">
-              <div class="spinner"></div>
-              <div id="resourcesLoaderIsBusyMessage">Loading</div>
-            </div>
+            <spinner-component id="resourcesLoaderIsBusy" style="position:absolute;right:50%;bottom:20%"></spinner-component> 
             <div id="selected-resource-preview" style="overflow:auto;align-content:center;flex:1;border:1px solid;border-radius:0.7rem;"></div>
           </div>
         </div>
