@@ -309,6 +309,7 @@ class ResourcesComponent extends HTMLElement {
     this.onRemoveResource = () => {
       const fileData = JSON.parse(this.resourcesFileContent);
       this.selectedResources.forEach(selectedResource => {
+        console.log({selectedResource})
         if (selectedResource in fileData) delete fileData[selectedResource];
       });
   
@@ -355,6 +356,7 @@ class ResourcesComponent extends HTMLElement {
       }
     };
     this.onCommitResourceFiles = newContent => {
+      this.resourcesFileContent = newContent;
       this.notifyParent('commitNewContent', newContent)
       this.updateResourcesList(newContent, true);
     };
