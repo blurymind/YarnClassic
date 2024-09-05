@@ -294,27 +294,30 @@ class ResourcesComponent extends HTMLElement {
     this.resourcesFileContent = '';
     this.gistId = '';
     this.onSelectResource = evt => {
-      const selectedItem = evt.target.value;
       this.selectedResources = Object.values(evt.target.selectedOptions).map(
-        item => item.id
+        (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
-      if (selectedItem.startsWith('data:image')) {
-        shadowRoot.getElementById('selected-resource-preview').innerHTML = `
-          <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
-        `;
-      } else {
-        shadowRoot.getElementById('selected-resource-preview').innerHTML = ``;
-      }
+      shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map(resource => {
+        const selectedItem = resource.src;
+        if (selectedItem.startsWith('data:image')) {
+          return `
+            <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
+          `;
+        } else {
+          return ``;
+        }
+      }).join('');
     };
     this.onRemoveResource = () => {
+      this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
       this.selectedResources.forEach(selectedResource => {
-        console.log({selectedResource})
-        if (selectedResource in fileData) delete fileData[selectedResource];
+        if (selectedResource.id in fileData) delete fileData[selectedResource.id];
       });
   
       const newContent = JSON.stringify(fileData, null, 2);
       this.onCommitResourceFiles(newContent);
+      this.isBusy('');
     };
     const toBase64 = file => {
       return new Promise((resolve, reject) => {
@@ -330,13 +333,15 @@ class ResourcesComponent extends HTMLElement {
       newResFiles.forEach(file => {
         filePathsPromises.push(toBase64(file));
       });
+      this.isBusy('Updating file list with files...');
       Promise.all(filePathsPromises).then(filePaths => {
         const fileData = JSON.parse(this.resourcesFileContent);
         filePaths.forEach(file => {
           fileData[file.name] = { src: file.src, added: new Date() };
         });
+        this.isBusy('');
         const newContent = JSON.stringify(fileData, null, 2);
-      this.onCommitResourceFiles(newContent);
+        this.onCommitResourceFiles(newContent);
       });
     };
     this.onSelectScroll = () => {
@@ -349,7 +354,7 @@ class ResourcesComponent extends HTMLElement {
         const item = target[i];
         const itemPos = item.offsetTop;
         if (itemPos > startPos && itemPos < endPos) {
-          item.style['background-image'] = `url(${item.value})`;
+          item.style['background-image'] = `url(${item.dataset.src})`;
         } else {
           item.style['background-image'] = '';
         }
@@ -366,19 +371,13 @@ class ResourcesComponent extends HTMLElement {
       const options = objectKeys.map(fileKey => {
         const fileData = resourcesData[fileKey];
         const isCommitted = 'committed' in fileData; //add this field when saving
-        return `<option value="${
-          fileData.src
-        }" id="${fileKey}" title="${fileKey}" style="${!isCommitted &&
+        return `<option value="${fileKey}" id="${fileKey}" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
           'border-left:3px solid'}content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
            ${fileKey} 
         </option>`;
       });
-      shadowRoot.getElementById(
-        'resource-list-label'
-      ).innerHTML = `${objectKeys.length} files`;
-      shadowRoot.getElementById('resources-editor-select').innerHTML = options.join(
-        ''
-      );
+      shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
+      shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
       this.onSelectScroll({
         target: shadowRoot.getElementById('resources-editor-select'),
       });
