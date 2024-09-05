@@ -241,11 +241,13 @@ class ResourcesComponent extends HTMLElement {
       }
       </style>
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
-        <div class="flex-wrap" style="gap: 10px;">
+        <div class="flex-wrap" style="gap: 10px;padding-bottom:2px;">
           <slot name="header-area"></slot>
           <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a>
           <label for="resources-editor-select" id="resource-list-label">...</label> 
-          from <a href="${this.gistId}" target="_blank" rel="noopener noreferrer">Gist</a>
+          from <a href="${this.gistId}" id="gistIdFileLink" target="_blank" rel="noopener noreferrer">Gist</a>
+          <div id="header-buttons"  class="flex-wrap" style="flex:1;gap: 10px;"></div>
+          <div id="isNewFile"></div>
         </div>
         
 
@@ -292,10 +294,10 @@ class ResourcesComponent extends HTMLElement {
     this.resourcesFileContent = '';
     this.gistId = '';
     this.onSelectResource = evt => {
-      const selectedItem = evt.target.value;
       this.selectedResources = Object.values(evt.target.selectedOptions).map(
-        item => item.id
+        (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
+      const selectedItem = this.selectedResources[this.selectedResources.length - 1].src;
       if (selectedItem.startsWith('data:image')) {
         shadowRoot.getElementById('selected-resource-preview').innerHTML = `
           <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
@@ -305,13 +307,15 @@ class ResourcesComponent extends HTMLElement {
       }
     };
     this.onRemoveResource = () => {
+      this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
       this.selectedResources.forEach(selectedResource => {
-        if (selectedResource in fileData) delete fileData[selectedResource];
+        if (selectedResource.id in fileData) delete fileData[selectedResource.id];
       });
   
       const newContent = JSON.stringify(fileData, null, 2);
       this.onCommitResourceFiles(newContent);
+      this.isBusy('');
     };
     const toBase64 = file => {
       return new Promise((resolve, reject) => {
@@ -327,13 +331,15 @@ class ResourcesComponent extends HTMLElement {
       newResFiles.forEach(file => {
         filePathsPromises.push(toBase64(file));
       });
+      this.isBusy('Updating file list with files...');
       Promise.all(filePathsPromises).then(filePaths => {
         const fileData = JSON.parse(this.resourcesFileContent);
         filePaths.forEach(file => {
           fileData[file.name] = { src: file.src, added: new Date() };
         });
+        this.isBusy('');
         const newContent = JSON.stringify(fileData, null, 2);
-      this.onCommitResourceFiles(newContent);
+        this.onCommitResourceFiles(newContent);
       });
     };
     this.onSelectScroll = () => {
@@ -346,41 +352,38 @@ class ResourcesComponent extends HTMLElement {
         const item = target[i];
         const itemPos = item.offsetTop;
         if (itemPos > startPos && itemPos < endPos) {
-          item.style['background-image'] = `url(${item.value})`;
+          item.style['background-image'] = `url(${item.dataset.src})`;
         } else {
           item.style['background-image'] = '';
         }
       }
     };
     this.onCommitResourceFiles = newContent => {
-      this.isBusy('Uploading changes to gist...');
+      this.resourcesFileContent = newContent;
       this.notifyParent('commitNewContent', newContent)
+      this.updateResourcesList(newContent, true);
     };
-    this.updateResourcesList = fileContents => {
+    this.updateResourcesList = (fileContents, isNew = false) => {
       const resourcesData = JSON.parse(fileContents);
       const objectKeys = Object.keys(JSON.parse(fileContents));
       const options = objectKeys.map(fileKey => {
         const fileData = resourcesData[fileKey];
         const isCommitted = 'committed' in fileData; //add this field when saving
-        return `<option value="${
-          fileData.src
-        }" id="${fileKey}" title="${fileKey}" style="${!isCommitted &&
+        return `<option value="${fileKey}" id="${fileKey}" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
           'border-left:3px solid'}content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
            ${fileKey} 
         </option>`;
       });
-      shadowRoot.getElementById(
-        'resource-list-label'
-      ).innerHTML = `${objectKeys.length} files`;
-      shadowRoot.getElementById('resources-editor-select').innerHTML = options.join(
-        ''
-      );
+      shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
+      shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
       this.onSelectScroll({
         target: shadowRoot.getElementById('resources-editor-select'),
       });
-      console.log(" DOONE ")
       this.isBusy(false);
+      this.setIsNew(isNew);
+      // shadowRoot.getElementById('resources-editor-select').value = this.selectedResources[0];
     };
+    this.setIsNew = isNew => shadowRoot.getElementById('isNewFile').innerText = isNew ? '*' : '';
     ////methods end
     shadowRoot
       .getElementById('file-input-res')
@@ -399,12 +402,21 @@ class ResourcesComponent extends HTMLElement {
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
   }
-  init({ file, darkMode }) {//todo you cannot pass functions to web components, but can use events?
+  init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
     this.resourcesFileContent = file.content || '{}';
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
     shadowRoot.getElementById('resourcesFileLink').href = file.raw_url;
+    shadowRoot.getElementById('gistIdFileLink').href = gistId || '';
     if (darkMode) shadowRoot.getElementById('resources-editor').setAttribute("data-theme", "dark");
-    this.updateResourcesList(this.resourcesFileContent);
+    this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
+    if(headerButtons) {
+      headerButtons.forEach(button => {
+        const el = document.createElement('button', {id: button.action});
+        el.innerText = button.title;
+        el.addEventListener('click', () => this.notifyParent('headerButtonClicked', button.action));
+        shadowRoot.getElementById('header-buttons').appendChild(el);
+      })
+    };
   }
   notifyParent(eventKey, detail) {
     this.dispatchEvent(new CustomEvent(eventKey, { detail, composed: true }));

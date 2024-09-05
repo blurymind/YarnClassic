@@ -8,13 +8,24 @@ export var ResourcesEditor = function({
   getGistFileUrl,
   getSelectedResourceUrl,
   updateUrlParams,
+  
 }) {
   const self = this;
   this.name = 'ResourcesEditor';
+  this.selectedResourcesJson = 'resources.json';
   this.resourcesFileUrl = '';
   this.resourcesFileContent = '';
-  this.initResourcesFile = () => {
+  const dbStorage = app.data.db;
+  this.getVloatileResource = () => dbStorage.getDbValue(`volatileResources-${this.selectedResourcesJson}`);
+  this.setVolatileResource = value => dbStorage.save(`volatileResources-${this.selectedResourcesJson}`, value);
+  
+  this.hasLocalChanges = () => this.getVloatileResource().then(volatile => {
+    if(volatile && volatile.raw_url) return false;
+    return true;
+  })
+  this.getFromGist = () => {
     return new Promise(resolve => {
+      // todo copypasta
       app.data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ filesInGist }) => {
         const fileFound = Object.values(filesInGist).find(
           item => item.filename === 'resources.json'
@@ -28,6 +39,7 @@ export var ResourcesEditor = function({
                 time: 3000,
             });
             this.resourcesFileUrl = file.raw_url;
+            this.setVolatileResource(file);
             resolve(file);
           });
         } else {
@@ -35,50 +47,74 @@ export var ResourcesEditor = function({
             return app.data.storage
               .getContentOrRaw(fileFound.content, fileFound.raw_url)
               .then(content => {
-                resolve({ ...fileFound, content })
+                const fileWithContent = { ...fileFound, content };
+                this.setVolatileResource(fileWithContent);
+                resolve(fileWithContent)
             });
         }
       });
+    })
+  }
+  // resource in local or at gist
+  this.initResourcesFile = () => {
+    return new Promise(resolve => {
+      this.getVloatileResource().then(volatile => {
+        const volatileData = {};
+        console.log('------------', {volatile, volatileData})
+
+        if(volatile && volatile.content) {
+          ToastWc.show({
+            type: 'success',
+            content: `LOADED resources.json file`,
+            time: 2000,
+          });
+          console.log({volatile})
+          resolve(volatile);
+          return
+        } else {
+          app.data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ filesInGist }) => {
+            const fileFound = Object.values(filesInGist).find(
+              item => item.filename === 'resources.json'
+            );
+            if (!fileFound) {
+              app.data.storage.editGistFile('resources.json', '{}').then(({file})=>{
+                console.log({result})
+                ToastWc.show({
+                    type: 'success',
+                    content: `Created a resources.json file`,
+                    time: 3000,
+                });
+                this.resourcesFileUrl = file.raw_url;
+                this.setVolatileResource(file);
+                resolve(file);
+              });
+            } else {
+                this.resourcesFileUrl = fileFound.raw_url;
+                return app.data.storage
+                  .getContentOrRaw(fileFound.content, fileFound.raw_url)
+                  .then(content => {
+                    const fileWithContent = { ...fileFound, content };
+                    this.setVolatileResource(fileWithContent);
+                    resolve(fileWithContent)
+                });
+            }
+          });
+        }
+      })
     });
   };
 
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
-    app.data.storage.editGistFile('resources.json', newContent).then(response => {
+    app.data.storage.editGistFile('resources.json', newContent).then(() => {
       ToastWc.show({
         type: 'info',
         content: 'Saved resources on gist',
         time: 1000,
       });
-      this.isBusy('Updating list...');
-      this.updateResourcesList(newContent);
+      document.querySelector('resources-component').setIsNew(false)
+      this.isBusy('')
     });
-  };
-  this.updateResourcesList = fileContents => {
-    const resourcesData = JSON.parse(fileContents);
-    const objectKeys = Object.keys(JSON.parse(fileContents));
-    // const showThumbnails = true;//objectKeys.length < 600;
-    //todo use a for loop here
-    const options = objectKeys.map(fileKey => {
-      const fileData = resourcesData[fileKey];
-      const isCommitted = 'committed' in fileData; //add this field when saving
-      return `<option value="${
-        fileData.src
-      }" id="${fileKey}" title="${fileKey}" style="${!isCommitted &&
-        'border-left:3px solid'}content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
-         ${fileKey} 
-      </option>`;
-    });
-    document.getElementById(
-      'resource-list-label'
-    ).innerHTML = `${objectKeys.length} files`;
-    document.getElementById('resources-editor-select').innerHTML = options.join(
-      ''
-    );
-    this.onSelectScroll({
-      target: document.getElementById('resources-editor-select'),
-    });
-    this.isBusy('');
   };
   this.onOpenResourcesEditor = async () => {
     const domPath = `app.plugins.${self.name}`;
@@ -110,17 +146,29 @@ export var ResourcesEditor = function({
         document.querySelector('resources-component').addEventListener('isBusy', event => {
             this.isBusy(event.detail.message)
         });
-        document.querySelector('resources-component').addEventListener('commitNewContent', event => {
+        document.querySelector('resources-component').addEventListener('commitNewContent', event => {//raw
             const newContent = event.detail;
-            app.data.storage.editGistFile('resources.json', newContent).then(response => {
-                ToastWc.show({
-                type: 'info',
-                content: 'Saved resources on gist',
-                time: 1000,
-                });
-                this.isBusy('Updating list...');
-                document.querySelector('resources-component').updateResourcesList(newContent);
+            this.setVolatileResource({
+              filename:'resources.json',
+              content: newContent, // todo not having raw_url can be used to detect if new file
             });
+        });
+        document.querySelector('resources-component').addEventListener('headerButtonClicked', ({detail: action}) => {
+           if(action === 'pull') {
+            this.isBusy('Downloading changes to gist...');
+            this.getFromGist().then(resolve => {
+              document.querySelector('resources-component').updateResourcesList(resolve.content);
+              ToastWc.show({
+                type: 'success',
+                content: `Re-Downloaded resources.json file`,
+                time: 3000,
+              });
+              this.isBusy('');
+            })
+           }
+           if(action === 'push'){
+            this.getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
+           }
         });
         this.initResourcesFile().then((file) => {
             ToastWc.show({
@@ -130,7 +178,12 @@ export var ResourcesEditor = function({
                 onClick: ()=> window.open(file.raw_url, "_blank")
             });
             updateUrlParams('selectedResource', 'none');
-            document.querySelector('resources-component').init({file, darkMode: app.settings.theme() === 'dracula'})
+            document.querySelector('resources-component').init({
+              file,
+              gistId: this.gistId ,
+              darkMode: app.settings.theme() === 'dracula',
+              headerButtons: [{title: 'Load from gist', action: 'pull'}, {title: 'Save to gist', action: 'push'}]
+            })
         });
       },
       preConfirm: () => {
