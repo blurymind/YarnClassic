@@ -13,10 +13,6 @@ export var ResourcesEditor = function({
   this.name = 'ResourcesEditor';
   this.resourcesFileUrl = '';
   this.resourcesFileContent = '';
-  this.isBusy = (message) => {
-    document.querySelector('spinner-component').isBusy(message);
-    document.getElementById('resource-file-buttons').className = message ? 'disabled' : '';
-  };
   this.initResourcesFile = () => {
     return new Promise(resolve => {
       app.data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ filesInGist }) => {
@@ -150,34 +146,13 @@ export var ResourcesEditor = function({
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
-      title: `
-        <div class="flex-wrap" style="flex:1;gap: 10px; font-size: 0.9rem">
-        <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a>
-        <label for="resources-editor-select" id="resource-list-label">...</label> 
-        from <a href="${this.gistId}" target="_blank" rel="noopener noreferrer">Gist</a>
-        </div>
-        `.replaceAll('\n', ''),
-      html: `
-        <div id="resources-editor" style="display:flex;height: ${HEIGHT}; width: 100%; overflow: hidden;">
-          <div style="display:flex;flex:1;gap:3px;" class="row-when-narrow">
-            <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
-              <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true">
-                <option value="23432423434">...</option>
-              </select>
-              <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
-                <input type="file" accept="image/*" multiple="true"
-                  id="file-input-res"
-                  style="display:none"
-                />
-                <label class="button" style="padding:3px;" for="file-input-res">
-                  Add Files
-                </label>
-                <button onclick="${domPath}.onRemoveResource()">Remove</button>
-              </div>
-            </div>
-            <spinner-component id="resourcesLoaderIsBusy" style="position:absolute;right:50%;bottom:20%"></spinner-component> 
-            <div id="selected-resource-preview" style="overflow:auto;align-content:center;flex:1;border:1px solid;border-radius:0.7rem;"></div>
-          </div>
+      title: '',
+      html:`
+        <div id="resourcesEditorWrapper" style="height:${HEIGHT}">
+            <spinner-component></spinner-component>
+            <resources-component>
+              <span slot="header-area">Files in</span>
+            </resources-component>
         </div>
         `,
       showConfirmButton: false,
@@ -189,22 +164,25 @@ export var ResourcesEditor = function({
         updateUrlParams('selectedResource', '')
       },
       onOpen: () => {
-        document
-          .getElementById('file-input-res')
-          .addEventListener('change', this.onAddResource);
-        document
-          .getElementById('resources-editor-select')
-          .addEventListener('change', this.onSelectResource);
-        const onUpdateScrollVis = app.utils.debounce(this.onSelectScroll, 70);
-        document
-          .getElementById('resources-editor-select')
-          .removeEventListener('scroll', onUpdateScrollVis);
-        document
-          .getElementById('resources-editor-select')
-          .addEventListener('scroll', onUpdateScrollVis);
-        setPluginStore(self.name, 'resourcesEditorOpen', true);
-
+        this.isBusy = (message) => {
+          document.querySelector('spinner-component').isBusy(message);
+        };
         this.isBusy('Loading files from gist...');
+        document.querySelector('resources-component').addEventListener('isBusy', event => {
+            this.isBusy(event.detail.message)
+        });
+        document.querySelector('resources-component').addEventListener('commitNewContent', event => {
+            const newContent = event.detail;
+            app.data.storage.editGistFile('resources.json', newContent).then(response => {
+                ToastWc.show({
+                type: 'info',
+                content: 'Saved resources on gist',
+                time: 1000,
+                });
+                this.isBusy('Updating list...');
+                document.querySelector('resources-component').updateResourcesList(newContent);
+            });
+        });
         this.initResourcesFile().then((file) => {
             ToastWc.show({
                 type: 'success',
@@ -212,11 +190,8 @@ export var ResourcesEditor = function({
                 time: 2000,
                 onClick: ()=> window.open(file.raw_url, "_blank")
             });
-            console.log({file})
-            this.resourcesFileContent = file.content || '{}';
-            document.getElementById('resourcesFileLink').href = file.raw_url;
-            updateUrlParams('selectedResource', 'none')
-            this.updateResourcesList(this.resourcesFileContent);
+            updateUrlParams('selectedResource', 'none');
+            document.querySelector('resources-component').init({file, darkMode: app.settings.theme() === 'dracula'})
         });
       },
       preConfirm: () => {
