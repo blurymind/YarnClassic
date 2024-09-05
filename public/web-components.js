@@ -297,14 +297,16 @@ class ResourcesComponent extends HTMLElement {
       this.selectedResources = Object.values(evt.target.selectedOptions).map(
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
-      const selectedItem = this.selectedResources[this.selectedResources.length - 1].src;
-      if (selectedItem.startsWith('data:image')) {
-        shadowRoot.getElementById('selected-resource-preview').innerHTML = `
-          <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
-        `;
-      } else {
-        shadowRoot.getElementById('selected-resource-preview').innerHTML = ``;
-      }
+      shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map(resource => {
+        const selectedItem = resource.src;
+        if (selectedItem.startsWith('data:image')) {
+          return `
+            <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
+          `;
+        } else {
+          return ``;
+        }
+      }).join('');
     };
     this.onRemoveResource = () => {
       this.isBusy('Removing files...');
@@ -381,7 +383,6 @@ class ResourcesComponent extends HTMLElement {
       });
       this.isBusy(false);
       this.setIsNew(isNew);
-      // shadowRoot.getElementById('resources-editor-select').value = this.selectedResources[0];
     };
     this.setIsNew = isNew => shadowRoot.getElementById('isNewFile').innerText = isNew ? '*' : '';
     ////methods end
