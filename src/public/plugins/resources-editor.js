@@ -42,67 +42,6 @@ export var ResourcesEditor = function({
     });
   };
 
-  this.onSelectResource = evt => {
-    const selectedItem = evt.target.value;
-    this.selectedResources = Object.values(evt.target.selectedOptions).map(
-      item => item.id
-    );
-    if (selectedItem.startsWith('data:image')) {
-      document.getElementById('selected-resource-preview').innerHTML = `
-        <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
-      `;
-    } else {
-      document.getElementById('selected-resource-preview').innerHTML = ``;
-    }
-  };
-  this.onRemoveResource = () => {
-    const fileData = JSON.parse(this.resourcesFileContent);
-    this.selectedResources.forEach(selectedResource => {
-      if (selectedResource in fileData) delete fileData[selectedResource];
-    });
-
-    const newContent = JSON.stringify(fileData, null, 2);
-    this.onCommitResourceFiles(newContent);
-  };
-  const toBase64 = file => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve({ src: reader.result, name: file.name });
-      reader.onerror = error => reject(error);
-    });
-  };
-  this.onAddResource = evt => {
-    const newResFiles = Object.values(evt.target.files);
-    const filePathsPromises = [];
-    newResFiles.forEach(file => {
-      filePathsPromises.push(toBase64(file));
-    });
-    Promise.all(filePathsPromises).then(filePaths => {
-      const fileData = JSON.parse(this.resourcesFileContent);
-      filePaths.forEach(file => {
-        fileData[file.name] = { src: file.src, added: new Date() };
-      });
-      const newContent = JSON.stringify(fileData, null, 2);
-    this.onCommitResourceFiles(newContent);
-    });
-  };
-  this.onSelectScroll = () => {
-    const target = document.getElementById('resources-editor-select');
-    const slackSpace = window.innerHeight / 2;
-    const startPos = target.scrollTop - slackSpace;
-    const scrollHeight = target.clientHeight;
-    const endPos = startPos + scrollHeight + slackSpace + slackSpace;
-    for (let i = 0; i < target.length; i++) {
-      const item = target[i];
-      const itemPos = item.offsetTop;
-      if (itemPos > startPos && itemPos < endPos) {
-        item.style['background-image'] = `url(${item.value})`;
-      } else {
-        item.style['background-image'] = '';
-      }
-    }
-  };
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
     app.data.storage.editGistFile('resources.json', newContent).then(response => {
