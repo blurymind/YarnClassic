@@ -19,6 +19,10 @@ export var ResourcesEditor = function({
   this.getVloatileResource = () => dbStorage.getDbValue(`volatileResources-${this.selectedResourcesJson}`);
   this.setVolatileResource = value => dbStorage.save(`volatileResources-${this.selectedResourcesJson}`, value);
   
+  this.hasLocalChanges = () => this.getVloatileResource().then(volatile => {
+    if(volatile && volatile.raw_url) return false;
+    return true;
+  })
   this.getFromGist = () => {
     return new Promise(resolve => {
       // todo copypasta
@@ -55,6 +59,9 @@ export var ResourcesEditor = function({
   this.initResourcesFile = () => {
     return new Promise(resolve => {
       this.getVloatileResource().then(volatile => {
+        const volatileData = {};
+        console.log('------------', {volatile, volatileData})
+
         if(volatile && volatile.content) {
           ToastWc.show({
             type: 'success',
@@ -63,46 +70,49 @@ export var ResourcesEditor = function({
           });
           console.log({volatile})
           resolve(volatile);
+          return
+        } else {
+          app.data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ filesInGist }) => {
+            const fileFound = Object.values(filesInGist).find(
+              item => item.filename === 'resources.json'
+            );
+            if (!fileFound) {
+              app.data.storage.editGistFile('resources.json', '{}').then(({file})=>{
+                console.log({result})
+                ToastWc.show({
+                    type: 'success',
+                    content: `Created a resources.json file`,
+                    time: 3000,
+                });
+                this.resourcesFileUrl = file.raw_url;
+                this.setVolatileResource(file);
+                resolve(file);
+              });
+            } else {
+                this.resourcesFileUrl = fileFound.raw_url;
+                return app.data.storage
+                  .getContentOrRaw(fileFound.content, fileFound.raw_url)
+                  .then(content => {
+                    const fileWithContent = { ...fileFound, content };
+                    this.setVolatileResource(fileWithContent);
+                    resolve(fileWithContent)
+                });
+            }
+          });
         }
       })
-      app.data.storage.getGistFiles(app.ui.openSettingsDialog).then(({ filesInGist }) => {
-        const fileFound = Object.values(filesInGist).find(
-          item => item.filename === 'resources.json'
-        );
-        if (!fileFound) {
-          app.data.storage.editGistFile('resources.json', '{}').then(({file})=>{
-            console.log({result})
-            ToastWc.show({
-                type: 'success',
-                content: `Created a resources.json file`,
-                time: 3000,
-            });
-            this.resourcesFileUrl = file.raw_url;
-            this.setVolatileResource(file);
-            resolve(file);
-          });
-        } else {
-            this.resourcesFileUrl = fileFound.raw_url;
-            return app.data.storage
-              .getContentOrRaw(fileFound.content, fileFound.raw_url)
-              .then(content => {
-                const fileWithContent = { ...fileFound, content };
-                this.setVolatileResource(fileWithContent);
-                resolve(fileWithContent)
-            });
-        }
-      });
     });
   };
 
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
-    app.data.storage.editGistFile('resources.json', newContent).then(response => {
+    app.data.storage.editGistFile('resources.json', newContent).then(() => {
       ToastWc.show({
         type: 'info',
         content: 'Saved resources on gist',
         time: 1000,
       });
+      document.querySelector('resources-component').setIsNew(false)
       this.isBusy('')
     });
   };
@@ -136,24 +146,18 @@ export var ResourcesEditor = function({
         document.querySelector('resources-component').addEventListener('isBusy', event => {
             this.isBusy(event.detail.message)
         });
-        document.querySelector('resources-component').addEventListener('commitNewContent', event => {
+        document.querySelector('resources-component').addEventListener('commitNewContent', event => {//raw
             const newContent = event.detail;
-            this.setVolatileResource(newContent);
-            app.data.storage.editGistFile('resources.json', newContent).then(response => {
-                ToastWc.show({
-                type: 'info',
-                content: 'Saved resources on gist',
-                time: 1000,
-                });
-                this.isBusy('Updating list...');
-                document.querySelector('resources-component').updateResourcesList(newContent);
+            this.setVolatileResource({
+              filename:'resources.json',
+              content: newContent, // todo not having raw_url can be used to detect if new file
             });
         });
         document.querySelector('resources-component').addEventListener('headerButtonClicked', ({detail: action}) => {
-           console.log({action})
            if(action === 'pull') {
             this.isBusy('Downloading changes to gist...');
             this.getFromGist().then(resolve => {
+              document.querySelector('resources-component').updateResourcesList(resolve.content);
               ToastWc.show({
                 type: 'success',
                 content: `Re-Downloaded resources.json file`,
@@ -163,7 +167,7 @@ export var ResourcesEditor = function({
             })
            }
            if(action === 'push'){
-            this.getVloatileResource().then(this.onCommitResourceFiles)
+            this.getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
            }
         });
         this.initResourcesFile().then((file) => {
@@ -176,6 +180,7 @@ export var ResourcesEditor = function({
             updateUrlParams('selectedResource', 'none');
             document.querySelector('resources-component').init({
               file,
+              gistId: this.gistId ,
               darkMode: app.settings.theme() === 'dracula',
               headerButtons: [{title: 'Load from gist', action: 'pull'}, {title: 'Save to gist', action: 'push'}]
             })
