@@ -241,11 +241,12 @@ class ResourcesComponent extends HTMLElement {
       }
       </style>
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
-        <div class="flex-wrap" style="gap: 10px;">
+        <div class="flex-wrap" style="gap: 10px;padding-bottom:2px;">
           <slot name="header-area"></slot>
           <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a>
           <label for="resources-editor-select" id="resource-list-label">...</label> 
           from <a href="${this.gistId}" target="_blank" rel="noopener noreferrer">Gist</a>
+          <div id="header-buttons"  class="flex-wrap" style="flex:1;gap: 10px;"></div>
         </div>
         
 
@@ -399,12 +400,20 @@ class ResourcesComponent extends HTMLElement {
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
   }
-  init({ file, darkMode }) {//todo you cannot pass functions to web components, but can use events?
+  init({ file, darkMode, headerButtons }) {//todo you cannot pass functions to web components, but can use events?
     this.resourcesFileContent = file.content || '{}';
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
     shadowRoot.getElementById('resourcesFileLink').href = file.raw_url;
     if (darkMode) shadowRoot.getElementById('resources-editor').setAttribute("data-theme", "dark");
     this.updateResourcesList(this.resourcesFileContent);
+    if(headerButtons) {
+      headerButtons.forEach(button => {
+        const el = document.createElement('button', {id: button.action});
+        el.innerText = button.title;
+        el.addEventListener('click', () => this.notifyParent('headerButtonClicked', button.action));
+        shadowRoot.getElementById('header-buttons').appendChild(el);
+      })
+    };
   }
   notifyParent(eventKey, detail) {
     this.dispatchEvent(new CustomEvent(eventKey, { detail, composed: true }));
