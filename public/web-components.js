@@ -122,7 +122,10 @@ class Toast extends HTMLElement {
 customElements.define('toast-component', Toast);
 window.ToastWc = {
     show: ({ content, type, time, onClick }) => {
-        document.querySelector('toast-component').openToast({ content, type, time, onClick })
+        return new Promise(resolve => {
+          document.querySelector('toast-component').openToast({ content, type, time, onClick });
+          setTimeout(()=> resolve(), time + 100)
+        })
     }
 }
 
@@ -243,11 +246,10 @@ class ResourcesComponent extends HTMLElement {
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
         <div class="flex-wrap" style="gap: 10px;padding-bottom:2px;">
           <slot name="header-area"></slot>
-          <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a>
+          <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a><span id="isNewFile"></span>
           <label for="resources-editor-select" id="resource-list-label">...</label> 
           from <a href="${this.gistId}" id="gistIdFileLink" target="_blank" rel="noopener noreferrer">Gist</a>
-          <div id="header-buttons"  class="flex-wrap" style="flex:1;gap: 10px;"></div>
-          <div id="isNewFile"></div>
+          <div id="header-buttons" class="flex-wrap" style="flex:1;gap: 10px;justify-content: end;"></div>
         </div>
         
 
@@ -297,7 +299,9 @@ class ResourcesComponent extends HTMLElement {
       this.selectedResources = Object.values(evt.target.selectedOptions).map(
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
-      shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map(resource => {
+      shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
+        if(index > 100) return;// we need some hard limit from preventing potential crash
+
         const selectedItem = resource.src;
         if (selectedItem.startsWith('data:image')) {
           return `
@@ -402,11 +406,16 @@ class ResourcesComponent extends HTMLElement {
     shadowRoot
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
+    this.updateRawUrl = (newUrl) => {
+      shadowRoot.getElementById('resourcesFileLink').href = newUrl || 'unknown';
+    }
   }
+
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
+    console.log({ file, darkMode, headerButtons, gistId })
     this.resourcesFileContent = file.content || '{}';
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
-    shadowRoot.getElementById('resourcesFileLink').href = file.raw_url;
+    this.updateRawUrl(file.raw_url);
     shadowRoot.getElementById('gistIdFileLink').href = gistId || '';
     if (darkMode) shadowRoot.getElementById('resources-editor').setAttribute("data-theme", "dark");
     this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
