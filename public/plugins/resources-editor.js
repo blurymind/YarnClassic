@@ -119,6 +119,7 @@ export var ResourcesEditor = function({
 
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
+    document.querySelector('resources-component').setIsLocked(true);
     app.data.storage.editGistFile('resources.json', newContent).then(({ok, gistId, file}) => {
       if(ok){
         ToastWc.show({
@@ -136,6 +137,7 @@ export var ResourcesEditor = function({
           time: 3000,
         });      
       }
+      document.querySelector('resources-component').setIsLocked(false);
       this.isBusy('')
     });
   };
@@ -147,7 +149,12 @@ export var ResourcesEditor = function({
       title: '',
       html:`
         <div id="resourcesEditorWrapper" style="height:${HEIGHT}">
-            <spinner-component></spinner-component>
+            <spinner-component style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              z-index: 999;
+            "></spinner-component>
             <resources-component>
               <span slot="header-area">Files in</span>
             </resources-component>

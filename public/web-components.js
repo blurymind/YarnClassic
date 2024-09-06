@@ -426,6 +426,12 @@ class ResourcesComponent extends HTMLElement {
     this.updateRawUrl = (newUrl) => {
       shadowRoot.getElementById('resourcesFileLink').href = newUrl || 'unknown';
     }
+    this.setIsLocked = isLocked => {//todo make it a class
+      shadowRoot.getElementById('header-buttons').style.pointerEvents = isLocked ? 'none' : 'auto';
+      shadowRoot.getElementById('header-buttons').style.opacity = isLocked ? '0.8' : '1';
+      shadowRoot.getElementById('resource-file-buttons').style.pointerEvents = isLocked ? 'none' : 'auto';
+      shadowRoot.getElementById('resource-file-buttons').style.opacity = isLocked ? '0.8' : '1';
+    }
   }
 
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
