@@ -242,6 +242,20 @@ class ResourcesComponent extends HTMLElement {
       :is(.add-files, button):hover {
         background-color: var(--bg-color);
       }
+      .preview-image {
+        position: relative;
+      }
+      .preview-image:hover::after {
+        position: absolute;
+        bottom: 2%;
+        left: 30%;
+        padding: 3px;
+        display: block;
+        content: ' ☆ name: ' attr(title) ' ☆ ';
+        color: white;
+        background-color: #00000096;
+        border-radius: 3px;
+      }
       </style>
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
         <div class="flex-wrap" style="gap: 10px;padding-bottom:2px;">
@@ -304,8 +318,11 @@ class ResourcesComponent extends HTMLElement {
 
         const selectedItem = resource.src;
         if (selectedItem.startsWith('data:image')) {
+          console.log({resource})
           return `
+          <div title="${resource.id}" class="preview-image"">
             <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
+          </div>
           `;
         } else {
           return ``;
@@ -417,6 +434,7 @@ class ResourcesComponent extends HTMLElement {
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
     this.updateRawUrl(file.raw_url);
     shadowRoot.getElementById('gistIdFileLink').href = gistId || '';
+    if(!gistId) shadowRoot.getElementById('gistIdFileLink').innerText = 'Gist is missing' 
     if (darkMode) shadowRoot.getElementById('resources-editor').setAttribute("data-theme", "dark");
     this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
     if(headerButtons) {
