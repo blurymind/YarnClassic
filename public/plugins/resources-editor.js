@@ -186,15 +186,16 @@ export var ResourcesEditor = function({
         document.querySelector('resources-component').addEventListener('headerButtonClicked', ({detail: action}) => {
            if(action === 'pull') {
             this.isBusy('Downloading changes to gist...');
-            this.getFromGist().then(resolve => {
-              document.querySelector('resources-component').updateResourcesList(resolve.content);
+            this.getFromGist().then(file => {
+              document.querySelector('resources-component').updateResourcesList(file.content);
               ToastWc.show({
                 type: 'success',
                 content: `Re-Downloaded resources.json file`,
                 time: 3000,
               });
               this.isBusy('');
-              document.querySelector('resources-component').updateRawUrl(resolve.raw_url);
+              document.querySelector('resources-component').setFileContent(file);
+              this.setVolatileResource(file);
             }).catch(() => {
               ToastWc.show({
                 type: 'error',
