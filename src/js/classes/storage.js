@@ -318,7 +318,7 @@ export const StorageJs = (type = 'gist') => {
         }).then(result=> result.json()).then(response => {
           this.setLastStorageHost('GIST');
           const file = response.files && fileName in response.files ? response.files[fileName] : undefined; 
-          return { response, file, gistId: this.gistId };
+          return { response, file, gistId: this.gistId, ok: response.ok || file.raw_url };
         });
       },
       editGistFile: function(fileName, content) {

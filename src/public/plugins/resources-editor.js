@@ -13,7 +13,7 @@ export var ResourcesEditor = function({
   const self = this;
   this.name = 'ResourcesEditor';
   this.selectedResourcesJson = 'resources.json';
-  this.resourcesFileUrl = '';
+  this.resourcesFileUrl = '';// todo this should be written in the file itself instead. It doesnt persist between reloads atm
   this.resourcesFileContent = '';
   const dbStorage = app.data.db;
   this.getVloatileResource = () => dbStorage.getDbValue(`volatileResources-${this.selectedResourcesJson}`);
@@ -119,14 +119,16 @@ export var ResourcesEditor = function({
 
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
-    app.data.storage.editGistFile('resources.json', newContent).then(({response, gistId}) => {
-      if(response.ok){
+    app.data.storage.editGistFile('resources.json', newContent).then(({ok, gistId, file}) => {
+      if(ok){
         ToastWc.show({
           type: 'info',
           content: 'Saved resources on gist',
           time: 1000,
         });
+        this.resourcesFileUrl = file.raw_url;
         document.querySelector('resources-component').setIsNew(false);
+        document.querySelector('resources-component').updateRawUrl(file.raw_url);
       } else {
         ToastWc.show({
           type: 'error',
@@ -185,6 +187,7 @@ export var ResourcesEditor = function({
                 time: 3000,
               });
               this.isBusy('');
+              document.querySelector('resources-component').updateRawUrl(resolve.raw_url);
             }).catch(() => {
               ToastWc.show({
                 type: 'error',
@@ -208,9 +211,10 @@ export var ResourcesEditor = function({
           })
         }
         this.initResourcesFile().then(file => {
+            this.resourcesFileUrl = file.raw_url;
             ToastWc.show({
                 type: 'success',
-                content: `Editing resources.json at\n${file.raw_url}`,
+                content: `Editing resources.json at\n${file.raw_url || '---'}`,
                 time: 2000,
                 onClick: ()=> window.open(file.raw_url, "_blank")
             });
@@ -229,10 +233,6 @@ export var ResourcesEditor = function({
           });
           this.isBusy('');
           this.initResourcesFile(true).then(this.initResourcesComponent);
-          // this.setVolatileResource({
-          //   filename:'resources.json',
-          //   content: '', // todo not having raw_url can be used to detect if new file
-          // });
         });
       },
       preConfirm: () => {
