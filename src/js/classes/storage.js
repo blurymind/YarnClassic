@@ -244,7 +244,7 @@ export const StorageJs = (type = 'gist') => {
               console.error('GOT -- ', { data, fetchAddress, data })
               onFail(`Failed to get:\n${fetchAddress}...\n\nSTATUS: ${data.status}\n${data.status in GistStatusHints ? GistStatusHints[data.status] : ""}`)
               if (data.status in GistStatusHints) onFail(data.status);
-              if (data.status === 404) window.open(fetchAddress, '_blank').focus();
+              // if (data.status === 404) window.open(fetchAddress, '_blank').focus();
               // try to fetch without authorisation
               return fetch(fetchAddress).then(data=> {
                 console.warn("Got data without authorisation")
