@@ -432,17 +432,20 @@ class ResourcesComponent extends HTMLElement {
       shadowRoot.getElementById('resource-file-buttons').style.pointerEvents = isLocked ? 'none' : 'auto';
       shadowRoot.getElementById('resource-file-buttons').style.opacity = isLocked ? '0.8' : '1';
     }
+    this.setFileContent = (file) => {
+      this.updateRawUrl(file.raw_url);
+      this.resourcesFileContent = file.content || '{}';
+      this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
+    }
   }
 
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
     console.log({ file, darkMode, headerButtons, gistId })
-    this.resourcesFileContent = file.content || '{}';
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
-    this.updateRawUrl(file.raw_url);
+    this.setFileContent(file);
     shadowRoot.getElementById('gistIdFileLink').href = gistId || '';
     if(!gistId) shadowRoot.getElementById('gistIdFileLink').innerText = 'Gist is missing' 
     if (darkMode) shadowRoot.getElementById('resources-editor').setAttribute("data-theme", "dark");
-    this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
     if(headerButtons) {
       headerButtons.forEach(button => {
         const el = document.createElement('button', {id: button.action});
