@@ -248,7 +248,7 @@ export const StorageJs = (type = 'gist') => {
               // try to fetch without authorisation
               return fetch(fetchAddress).then(data=> {
                 console.warn("Got data without authorisation")
-                this.isTokenInvalid = true;
+                // this.isTokenInvalid = true;
                 return data.json()
               })
             }
@@ -318,7 +318,7 @@ export const StorageJs = (type = 'gist') => {
         }).then(result=> result.json()).then(response => {
           this.setLastStorageHost('GIST');
           const file = response.files && fileName in response.files ? response.files[fileName] : undefined; 
-          return { response, file };
+          return { response, file, gistId: this.gistId };
         });
       },
       editGistFile: function(fileName, content) {
