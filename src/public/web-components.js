@@ -122,7 +122,10 @@ class Toast extends HTMLElement {
 customElements.define('toast-component', Toast);
 window.ToastWc = {
     show: ({ content, type, time, onClick }) => {
-        document.querySelector('toast-component').openToast({ content, type, time, onClick })
+        return new Promise(resolve => {
+          document.querySelector('toast-component').openToast({ content, type, time, onClick });
+          setTimeout(()=> resolve(), time + 100)
+        })
     }
 }
 
