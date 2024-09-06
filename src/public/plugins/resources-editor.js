@@ -31,16 +31,21 @@ export var ResourcesEditor = function({
           item => item.filename === 'resources.json'
         );
         if (!fileFound) {
-          app.data.storage.editGistFile('resources.json', '{}').then(({file})=>{
-            console.log({result})
-            ToastWc.show({
+          app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
+            if(response.ok) {
+              ToastWc.show({
                 type: 'success',
                 content: `Created a resources.json file`,
                 time: 3000,
-            });
-            this.resourcesFileUrl = file.raw_url;
-            this.setVolatileResource(file);
-            resolve(file);
+              });
+              this.resourcesFileUrl = file.raw_url;
+              this.setVolatileResource(file);
+              resolve(file);
+            } else {
+              const newFile = {filename: 'resources.json', content: ''};
+              this.setVolatileResource(newFile);
+              resolve(newFile)
+            }
           });
         } else {
             this.resourcesFileUrl = fileFound.raw_url;
@@ -60,11 +65,6 @@ export var ResourcesEditor = function({
     return new Promise((resolve, reject) => {
       this.getVloatileResource().then(volatile => {
         if(volatile && volatile.content) {
-          ToastWc.show({
-            type: 'success',
-            content: `LOADED resources.json file`,
-            time: 2000,
-          });
           console.log({volatile})
           resolve(volatile);
           return
@@ -83,15 +83,24 @@ export var ResourcesEditor = function({
             item => item.filename === 'resources.json'
           );
           if (!fileFound) {
-            app.data.storage.editGistFile('resources.json', '{}').then(({file})=>{
-              ToastWc.show({
+            app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
+              if(response.ok) {
+                ToastWc.show({
                   type: 'success',
                   content: `Created a resources.json file`,
                   time: 3000,
-              });
-              this.resourcesFileUrl = file.raw_url;
-              this.setVolatileResource(file);
-              resolve(file);
+                });
+                this.resourcesFileUrl = file.raw_url;
+                this.setVolatileResource(file);
+                resolve(file);
+              } else {
+                const newFile = {
+                  filename:'resources.json',
+                  content: '{}',
+                }
+                this.setVolatileResource(newFile);
+                resolve(newFile);
+              }
             });
           } else {
               this.resourcesFileUrl = fileFound.raw_url;
@@ -189,20 +198,23 @@ export var ResourcesEditor = function({
             this.getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
            }
         });
-        this.initResourcesFile().then((file) => {
+        this.initResourcesComponent = (file) => {
+          updateUrlParams('selectedResource', 'none');
+          document.querySelector('resources-component').init({
+            file,
+            gistId: this.gistId ,
+            darkMode: app.settings.theme() === 'dracula',
+            headerButtons: [{title: 'Load from gist', action: 'pull'}, {title: 'Save to gist', action: 'push'}]
+          })
+        }
+        this.initResourcesFile().then(file => {
             ToastWc.show({
                 type: 'success',
                 content: `Editing resources.json at\n${file.raw_url}`,
                 time: 2000,
                 onClick: ()=> window.open(file.raw_url, "_blank")
             });
-            updateUrlParams('selectedResource', 'none');
-            document.querySelector('resources-component').init({
-              file,
-              gistId: this.gistId ,
-              darkMode: app.settings.theme() === 'dracula',
-              headerButtons: [{title: 'Load from gist', action: 'pull'}, {title: 'Save to gist', action: 'push'}]
-            })
+            this.initResourcesComponent(file);
         }). catch(error=> {
           ToastWc.show({
             type: 'error',
@@ -216,7 +228,7 @@ export var ResourcesEditor = function({
             })
           });
           this.isBusy('');
-          this.initResourcesFile(true);
+          this.initResourcesFile(true).then(this.initResourcesComponent);
           // this.setVolatileResource({
           //   filename:'resources.json',
           //   content: '', // todo not having raw_url can be used to detect if new file

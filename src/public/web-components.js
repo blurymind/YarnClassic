@@ -407,6 +407,7 @@ class ResourcesComponent extends HTMLElement {
       .addEventListener('click', this.onRemoveResource);
   }
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
+    console.log({ file, darkMode, headerButtons, gistId })
     this.resourcesFileContent = file.content || '{}';
     const shadowRoot = document.querySelector('resources-component').shadowRoot;
     shadowRoot.getElementById('resourcesFileLink').href = file.raw_url;
