@@ -227,6 +227,7 @@ export const StorageJs = (type = 'gist') => {
       // https://api.github.com/gists/2ff124dc94f936e8f7d96632f559aecb/commits
       getGist: function(gistId, onFail = () => {}) {
         if (!gistId) {
+          onFail('No gist id specified');
           throw new Error('No gist id specified');
         }
         const fetchAddress = `https://api.github.com/gists/${gistId}`;

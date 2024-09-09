@@ -399,9 +399,7 @@ class ResourcesComponent extends HTMLElement {
       });
       shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
       shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
-      this.onSelectScroll({
-        target: shadowRoot.getElementById('resources-editor-select'),
-      });
+      this.onSelectScroll();
       this.isBusy(false);
       this.setIsNew(isNew);
     };
