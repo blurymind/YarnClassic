@@ -12,31 +12,45 @@ export var ResourcesEditor = function({
 }) {
   const self = this;
   this.name = 'ResourcesEditor';
-  this.selectedResourcesJson = 'resources.json';
+  this.selectedResourcesJson = 'resources.res.json';
   this.resourcesFileUrl = '';// todo this should be written in the file itself instead. It doesnt persist between reloads atm
   this.resourcesFileContent = '';
   const dbStorage = app.data.db;
-  this.getVloatileResource = () => dbStorage.getDbValue(`volatileResources-${this.selectedResourcesJson}`);
-  this.setVolatileResource = value => dbStorage.save(`volatileResources-${this.selectedResourcesJson}`, value);
-  
+  this.getVloatileResource = (name = '') => dbStorage.getDbValue(`volatileResources-${name || this.selectedResourcesJson}`);
+  this.setVolatileResource = (value, name = '') => dbStorage.save(`volatileResources-${name || this.selectedResourcesJson}`, value);
+  this.deleteVolatileResource = (name = '') => dbStorage.save(`volatileResources-${name || this.selectedResourcesJson}`, undefined);
+  this.getVolatileResourcesList = () => dbStorage.getDbValue(`volatileResources`);
+  this.setVolatileResourcesList = (key, add = true) => {
+    return this.getVolatileResourcesList().then(data => {
+        if(!data) data = new Set([]);
+        if(add) {
+          data.add(key)
+        } else {
+          data.delete(key)
+        }
+        return dbStorage.save(`volatileResources`, data);
+      })
+  };
+
+  this.getNewresourceFileContent = () => '{}';
   this.createOrEditGistFile = (resolve, reject) => {
     app.data.storage.getGistFiles(reject).then(({ filesInGist }) => {
       const fileFound = Object.values(filesInGist).find(
-        item => item.filename === 'resources.json'
+        item => item.filename === this.selectedResourcesJson
       );
       if (!fileFound) {
-        app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
+        app.data.storage.editGistFile(this.selectedResourcesJson, this.getNewresourceFileContent()).then(({file, response})=>{
           if(response.ok) {
             ToastWc.show({
               type: 'success',
-              content: `Created a resources.json file`,
+              content: `Created a ${this.selectedResourcesJson} file..`,
               time: 3000,
             });
             this.resourcesFileUrl = file.raw_url;
             this.setVolatileResource(file);
             resolve(file);
           } else {
-            const newFile = {filename: 'resources.json', content: ''};
+            const newFile = {filename: this.selectedResourcesJson, content: ''};
             this.setVolatileResource(newFile);
             resolve(newFile)
           }
@@ -50,8 +64,8 @@ export var ResourcesEditor = function({
               this.setVolatileResource(fileWithContent);
               resolve(fileWithContent)
           });
-      }
-    });
+        }
+      });
   }
   this.getFromGist = () => {
     return new Promise((resolve, reject) => {
@@ -61,22 +75,34 @@ export var ResourcesEditor = function({
   // resource in local or at gist
   this.initResourcesFile = (createVolatile = false) => {
     return new Promise((resolve, reject) => {
-      this.getVloatileResource().then(volatile => {
-        if(volatile && volatile.content) {
-          console.log({volatile})
-          resolve(volatile);
-          return
-        }
-        if(createVolatile) {
-          const newFile = {
-            filename:'resources.json',
-            content: '{}',
+      const getOrCreateVolatile = () => {
+        return this.getVloatileResource().then(volatile => {
+          if(volatile && volatile.content) {
+            console.log({volatile})
+            this.onUpdateResourcesList();
+            resolve(volatile);
+            return
           }
-          this.setVolatileResource(newFile);
-          resolve(newFile);
-          return
+          if(createVolatile) {
+            const newFile = {
+              filename: this.selectedResourcesJson,
+              content: this.getNewresourceFileContent(),
+            }
+            this.setVolatileResource(newFile);
+            resolve(newFile);
+            return
+          }
+          return this.createOrEditGistFile(resolve, reject);
+        })
+      }
+      this.getVolatileResourcesList().then(volatileResourcesList => {
+        console.log({volatileResourcesList})
+        if(!volatileResourcesList) {
+          this.setVolatileResourcesList(this.selectedResourcesJson).then(()=> {
+            return getOrCreateVolatile()
+          })
         }
-        return this.createOrEditGistFile(resolve, reject);
+        return getOrCreateVolatile();
       })
     });
   };
@@ -84,7 +110,7 @@ export var ResourcesEditor = function({
   this.onCommitResourceFiles = newContent => {
     this.isBusy('Uploading changes to gist...');
     document.querySelector('resources-component').setIsLocked(true);
-    app.data.storage.editGistFile('resources.json', newContent).then(({ok, gistId, file}) => {
+    app.data.storage.editGistFile(this.selectedResourcesJson, newContent).then(({ok, gistId, file}) => {
       if(!gistId) {
         ToastWc.show({
           type: 'error',
@@ -111,6 +137,107 @@ export var ResourcesEditor = function({
       this.isBusy('')
     });
   };
+
+  this.onGetFromGist = () => {
+    // todo make this less hideous
+    this.getVolatileResourcesList().then(volatileResourcesList => {
+      app.data.storage.getGistFiles().then(({ filesInGist }) => {
+        // try to detect json resource map files in the gist
+        const filesFromGist = [];
+        const promises = [];
+        Object.values(filesInGist).forEach(
+          item => {
+            if(item.filename.endsWith('.res.json') && !volatileResourcesList.has(item.filename)) {
+              filesFromGist.push(item);
+              promises.push(app.data.storage.getContentOrRaw(item.content, item.raw_url, console.error));
+            }
+          }
+        );
+        Promise.all(promises).then((files) => {
+          files.forEach((content, index) => {
+            const file = {...filesFromGist[index], content}
+            const newFileName = file.filename;
+            console.log({file, newFileName, filesFromGist})
+            if(!newFileName) return;
+            this.setVolatileResource(file, newFileName).then(() => {
+              if(index === files.length -1) {
+                this.setVolatileResourcesList(newFileName).then(()=> {
+                  this.onUpdateResourcesList(newFileName);
+                  this.onSetEditingFile(newFileName);
+                  ToastWc.show({
+                    type: 'success',
+                    content: `Added ${files.length} files..\n${filesFromGist.map(item=>item.filename).join('\n')}`,
+                    time: 3000,
+                  });
+                })
+              }
+            })
+          })
+        })
+      })
+    })
+  }
+  this.onUpdateResourcesList = () => {
+    this.getVolatileResourcesList().then(resourcesList => {
+      document.getElementById("edited-resources").innerHTML = Array.from(resourcesList).map(key => `<option value="${key}">${key}</option>`).join('')
+    })
+  }
+  this.onSetEditingFile = (newFileName = '') => {
+    const fileName = newFileName || document.getElementById('edited-resources').value;
+    this.selectedResourcesJson = fileName;
+    this.getVloatileResource(fileName).then(file => {
+      console.log('Set', {fileName, file})
+      document.querySelector('resources-component').updateResourcesList(file.content);
+      document.getElementById("edited-resources").value = this.selectedResourcesJson;
+      document.querySelector('resources-component').updateRawUrl(file.raw_url);
+    });
+  }
+  this.onAddNewFile = () => {
+    // ask for filename - (adds js at the end)
+    let newFileName = prompt("Create a new resource file?\nAllowed formats: .res.json\nReserved names: resources.res.json", 'images.res.json');
+    if (newFileName) {
+      newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
+      newFileName = newFileName.endsWith('.res.json') ? newFileName : `${newFileName}.res.json`;
+      this.getVolatileResourcesList().then(volatileResources => {
+        if (volatileResources.has(newFileName)) {
+          alert(`${newFileName} already exists.\nPlease choose another name..`)
+          return;
+        }
+        const newFileData = { content: this.getNewresourceFileContent(), filename: newFileName }
+        this.setVolatileResource(newFileData, newFileName).then(() => {
+          this.setVolatileResourcesList(newFileName).then(()=> {
+            this.onUpdateResourcesList(newFileName);
+            this.onSetEditingFile(newFileName);
+          })
+        })
+      })
+    }
+  }
+  this.onRemoveSelectedFile = () => {
+    const fileName = document.getElementById('edited-resources').value;
+    if(fileName === 'resources.res.json') {
+      alert(`Not allowed to delete resources.res.json placeholder`);
+      return;
+    }
+    const willDelete = confirm(`Are you sure you want to delete this resources file:\n${fileName}?`)
+    if (willDelete) {
+      this.getVolatileResourcesList().then(oldList =>{
+        const resourcesList = Array.from(oldList);
+        let nextFileIndex = resourcesList.indexOf(fileName) - 1;
+        if(nextFileIndex < 0) nextFileIndex = 0;
+        this.setVolatileResourcesList(fileName, false).then(() => {
+          this.onUpdateResourcesList();
+          this.deleteVolatileResource(fileName);
+          this.onSetEditingFile(resourcesList[nextFileIndex]);
+          // todo also ask if they wish to delete if from gist
+          const willDeleteFromGist = confirm(`Would you also like to delete this resource file from the Gist?\n${fileName}?`);
+          if(willDeleteFromGist) {
+            alert('TODO')
+          }
+        })
+      })
+    }
+  }
   this.onOpenResourcesEditor = async () => {
     const domPath = `app.plugins.${self.name}`;
     const { value: formValues } = await Swal.fire({
@@ -126,7 +253,17 @@ export var ResourcesEditor = function({
               z-index: 999;
             "></spinner-component>
             <resources-component>
-              <span slot="header-area">Files in</span>
+              <div slot="header-area" style="display:flex;gap: 12px;flex:1;max-width: 320px;">
+                <select id="edited-resources" onchange="${domPath}.onSetEditingFile()">
+                  <option value="resources.res.json">resources.res.json</option>
+                </select>
+                <div class="button-group-rounded" id="add-remove-resource-file" style="flex-wrap:nowrap">
+                  <button id="add-resource-file" onclick="${domPath}.onAddNewFile()" title="Add">+</button>
+                  <button id="remove-resource-file" onclick="${domPath}.onRemoveSelectedFile()" title="remove">─</button>
+                  <button id="remove-resource-file" onclick="${domPath}.onGetFromGist()" title="get from gist"> ⟳ </button>
+                </div>
+              </span>
+            </div>
             </resources-component>
         </div>
         `,
@@ -149,7 +286,7 @@ export var ResourcesEditor = function({
         document.querySelector('resources-component').addEventListener('commitNewContent', event => {//raw
             const newContent = event.detail;
             this.setVolatileResource({
-              filename:'resources.json',
+              filename: this.selectedResourcesJson,
               content: newContent, // todo not having raw_url can be used to detect if new file
             });
         });
@@ -160,7 +297,7 @@ export var ResourcesEditor = function({
               document.querySelector('resources-component').updateResourcesList(file.content);
               ToastWc.show({
                 type: 'success',
-                content: `Re-Downloaded resources.json file`,
+                content: `Re-Downloaded ${this.selectedResourcesJson} file`,
                 time: 3000,
               });
               this.isBusy('');
@@ -192,7 +329,7 @@ export var ResourcesEditor = function({
             this.resourcesFileUrl = file.raw_url;
             ToastWc.show({
                 type: 'success',
-                content: `Editing resources.json at\n${file.raw_url || '---'}`,
+                content: `Editing ${this.selectedResourcesJson} at\n${file.raw_url || '---'}`,
                 time: 2000,
                 onClick: ()=> window.open(file.raw_url, "_blank")
             });
