@@ -260,7 +260,7 @@ class ResourcesComponent extends HTMLElement {
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
         <div class="flex-wrap" style="gap: 10px;padding-bottom:2px;">
           <slot name="header-area"></slot>
-          <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">resources.json</a><span id="isNewFile"></span>
+          <a id="resourcesFileLink" href="${this.resourcesFileUrl}" target="_blank" rel="noopener noreferrer">raw url</a><span id="isNewFile"></span>
           <label for="resources-editor-select" id="resource-list-label">...</label> 
           from <a href="${this.gistId}" id="gistIdFileLink" target="_blank" rel="noopener noreferrer">Gist</a>
           <div id="header-buttons" class="flex-wrap" style="flex:1;gap: 10px;justify-content: end;"></div>
