@@ -260,7 +260,7 @@ export var ResourcesEditor = function({
                 <div class="button-group-rounded" id="add-remove-resource-file" style="flex-wrap:nowrap">
                   <button id="add-resource-file" onclick="${domPath}.onAddNewFile()" title="Add">+</button>
                   <button id="remove-resource-file" onclick="${domPath}.onRemoveSelectedFile()" title="remove">─</button>
-                  <button id="remove-resource-file" onclick="${domPath}.onGetFromGist()" title="get from gist"> ⟳ </button>
+                  <button id="remove-resource-file" onclick="${domPath}.onGetFromGist()" title="search for new in gist"> ⟳ </button>
                 </div>
               </span>
             </div>
@@ -322,7 +322,7 @@ export var ResourcesEditor = function({
             file,
             gistId: this.gistId ,
             darkMode: app.settings.theme() === 'dracula',
-            headerButtons: [{title: 'Load from gist', action: 'pull'}, {title: 'Save to gist', action: 'push'}]
+            headerButtons: [{title: 'Pull from gist', action: 'pull'}, {title: 'Commit to gist', action: 'push'}]
           })
         }
         this.initResourcesFile().then(file => {
