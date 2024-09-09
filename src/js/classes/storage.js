@@ -248,9 +248,12 @@ export const StorageJs = (type = 'gist') => {
               // if (data.status === 404) window.open(fetchAddress, '_blank').focus();
               // try to fetch without authorisation
               return fetch(fetchAddress).then(data=> {
-                console.warn("Got data without authorisation")
+                console.warn("Getting data without authorisation")
                 // this.isTokenInvalid = true;
                 return data.json()
+              }).then(response => {
+                if(response.status === '404') onFail(`Failed to get ${fetchAddress}`)
+                return response;
               })
             }
             this.isTokenInvalid = false;
@@ -317,6 +320,9 @@ export const StorageJs = (type = 'gist') => {
             files: { [fileName]: content ? { content } :{} },
           }),
         }).then(result=> result.json()).then(response => {
+          if(response.status === '404') {
+            return { response: {ok: false}, file: null, gistId, ok: false}
+          };
           this.setLastStorageHost('GIST');
           const file = response.files && fileName in response.files ? response.files[fileName] : undefined; 
           return { response, file, gistId: this.gistId, ok: response.ok || file.raw_url };

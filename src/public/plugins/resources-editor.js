@@ -85,7 +85,13 @@ export var ResourcesEditor = function({
     this.isBusy('Uploading changes to gist...');
     document.querySelector('resources-component').setIsLocked(true);
     app.data.storage.editGistFile('resources.json', newContent).then(({ok, gistId, file}) => {
-      if(ok){
+      if(!gistId) {
+        ToastWc.show({
+          type: 'error',
+          content: 'No Gist id provided to save to. Configure it in the settings dialog.',
+          time: 3000,
+        });
+      } else if(ok){
         ToastWc.show({
           type: 'info',
           content: 'Saved resources on gist',
@@ -97,7 +103,7 @@ export var ResourcesEditor = function({
       } else {
         ToastWc.show({
           type: 'error',
-          content: `Could not save changes to ${gistId}!`,
+          content: `Could not save changes to Gist id: ${gistId}!`,
           time: 3000,
         });      
       }
@@ -160,10 +166,10 @@ export var ResourcesEditor = function({
               this.isBusy('');
               document.querySelector('resources-component').setFileContent(file);
               this.setVolatileResource(file);
-            }).catch(() => {
+            }).catch(error => {
               ToastWc.show({
                 type: 'error',
-                content: `Could not Load changed from Gist file!`,
+                content: `Could not Load changed from Gist file!\n${error}..`,
                 time: 3000,
               });
               this.isBusy('');
