@@ -19,45 +19,43 @@ export var ResourcesEditor = function({
   this.getVloatileResource = () => dbStorage.getDbValue(`volatileResources-${this.selectedResourcesJson}`);
   this.setVolatileResource = value => dbStorage.save(`volatileResources-${this.selectedResourcesJson}`, value);
   
-  this.hasLocalChanges = () => this.getVloatileResource().then(volatile => {
-    if(volatile && volatile.raw_url) return false;
-    return true;
-  })
+  this.createOrEditGistFile = (resolve, reject) => {
+    app.data.storage.getGistFiles(reject).then(({ filesInGist }) => {
+      const fileFound = Object.values(filesInGist).find(
+        item => item.filename === 'resources.json'
+      );
+      if (!fileFound) {
+        app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
+          if(response.ok) {
+            ToastWc.show({
+              type: 'success',
+              content: `Created a resources.json file`,
+              time: 3000,
+            });
+            this.resourcesFileUrl = file.raw_url;
+            this.setVolatileResource(file);
+            resolve(file);
+          } else {
+            const newFile = {filename: 'resources.json', content: ''};
+            this.setVolatileResource(newFile);
+            resolve(newFile)
+          }
+        });
+      } else {
+          this.resourcesFileUrl = fileFound.raw_url;
+          return app.data.storage
+            .getContentOrRaw(fileFound.content, fileFound.raw_url)
+            .then(content => {
+              const fileWithContent = { ...fileFound, content };
+              this.setVolatileResource(fileWithContent);
+              resolve(fileWithContent)
+          });
+      }
+    });
+  }
   this.getFromGist = () => {
     return new Promise((resolve, reject) => {
-      // todo copypasta
-      app.data.storage.getGistFiles(reject).then(({ filesInGist }) => {
-        const fileFound = Object.values(filesInGist).find(
-          item => item.filename === 'resources.json'
-        );
-        if (!fileFound) {
-          app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
-            if(response.ok) {
-              ToastWc.show({
-                type: 'success',
-                content: `Created a resources.json file`,
-                time: 3000,
-              });
-              this.resourcesFileUrl = file.raw_url;
-              this.setVolatileResource(file);
-              resolve(file);
-            } else {
-              const newFile = {filename: 'resources.json', content: ''};
-              this.setVolatileResource(newFile);
-              resolve(newFile)
-            }
-          });
-        } else {
-            this.resourcesFileUrl = fileFound.raw_url;
-            return app.data.storage
-              .getContentOrRaw(fileFound.content, fileFound.raw_url)
-              .then(content => {
-                const fileWithContent = { ...fileFound, content };
-                this.setVolatileResource(fileWithContent);
-                resolve(fileWithContent)
-            });
-        }
-      });
+      return this.createOrEditGistFile(resolve, reject);
     })
   }
   // resource in local or at gist
@@ -78,41 +76,7 @@ export var ResourcesEditor = function({
           resolve(newFile);
           return
         }
-        app.data.storage.getGistFiles(reject).then(({ filesInGist }) => {
-          const fileFound = Object.values(filesInGist).find(
-            item => item.filename === 'resources.json'
-          );
-          if (!fileFound) {
-            app.data.storage.editGistFile('resources.json', '{}').then(({file, response})=>{
-              if(response.ok) {
-                ToastWc.show({
-                  type: 'success',
-                  content: `Created a resources.json file`,
-                  time: 3000,
-                });
-                this.resourcesFileUrl = file.raw_url;
-                this.setVolatileResource(file);
-                resolve(file);
-              } else {
-                const newFile = {
-                  filename:'resources.json',
-                  content: '{}',
-                }
-                this.setVolatileResource(newFile);
-                resolve(newFile);
-              }
-            });
-          } else {
-              this.resourcesFileUrl = fileFound.raw_url;
-              return app.data.storage
-                .getContentOrRaw(fileFound.content, fileFound.raw_url)
-                .then(content => {
-                  const fileWithContent = { ...fileFound, content };
-                  this.setVolatileResource(fileWithContent);
-                  resolve(fileWithContent)
-            });
-          }
-        });
+        return this.createOrEditGistFile(resolve, reject);
       })
     });
   };
