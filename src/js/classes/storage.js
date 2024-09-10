@@ -320,12 +320,14 @@ export const StorageJs = (type = 'gist') => {
             files: { [fileName]: content ? { content } :{} },
           }),
         }).then(result=> result.json()).then(response => {
-          if(response.status === '404') {
+          console.log({response})
+          const hasErrors = response && (response.errors || []).length > 0;
+          if(response.status === '404' || response.status === '422' || hasErrors) {
             return { response: {ok: false}, file: null, gistId, ok: false}
           };
           this.setLastStorageHost('GIST');
           const file = response.files && fileName in response.files ? response.files[fileName] : undefined; 
-          return { response, file, gistId: this.gistId, ok: response.ok || file.raw_url };
+          return { response, file, gistId: this.gistId, ok: response.ok || file && file.raw_url };
         });
       },
       editGistFile: function(fileName, content) {

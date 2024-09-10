@@ -145,6 +145,10 @@ class Spinner extends HTMLElement {
           border-top-color: #fff;
           animation: spin 1s ease-in-out infinite;
           -webkit-animation: spin 1s ease-in-out infinite;
+          background: inherit;
+          background-clip: text;
+          color: transparent;
+          filter: invert(0.5) grayscale(1) contrast(9);
         }
         @keyframes spin {
           to { -webkit-transform: rotate(360deg); }
@@ -165,8 +169,8 @@ class Spinner extends HTMLElement {
   isBusy (message){
     const shadowRoot = document.querySelector('spinner-component').shadowRoot;
     this.spinner = shadowRoot.querySelector("#resourcesLoaderIsBusy");
-    this.spinner.style.display = message ? 'block' : 'none';
-    this.text = shadowRoot.querySelector("#resourcesLoaderIsBusyMessage");
+    this.spinner.style.display =  'block'  ;
+    this.text = 'shadowRoot.querySelector("#resourcesLoaderIsBusyMessage")';
     this.text.innerText = message || '';
   }
 }
@@ -186,6 +190,7 @@ class ResourcesComponent extends HTMLElement {
           --bg-color: rgb(243,243,243);
           --scroll-color: rgb(0 0 0 / 49%);
           --scroll-bg: rgb(255 255 255 / 0%);
+          --bg-active-color: rgb(100 255 255 / 70%);
       }
       [data-theme="dark"] {
           --font-color: #c1bfbd;
@@ -194,6 +199,7 @@ class ResourcesComponent extends HTMLElement {
           --bg-color: #333;
           --scroll-color: #ffffff47;
           --scroll-bg: #00000024;
+          --bg-active-color: rgb(100 255 255 / 20%);
       }
       a {
         color: var(--link-color);
@@ -214,6 +220,13 @@ class ResourcesComponent extends HTMLElement {
         .row-when-narrow {
           flex-direction: row;
         }
+        .left-area {
+          width: 300px;
+        }
+      }
+      .left-area {
+        height: 100%;
+        overflow: hidden; 
       }
       .flex-when-narrow {
         flex: 1;
@@ -228,6 +241,12 @@ class ResourcesComponent extends HTMLElement {
         flex-wrap: wrap;
         gap: 3px;
         align-items: center;
+      }
+      [data-selected]{
+        background-color: var(--bg-active-color);
+      }
+      #resources-editor-select {
+        overflow: auto;
       }
       button,
       select,
@@ -268,10 +287,10 @@ class ResourcesComponent extends HTMLElement {
         
 
         <div style="display:flex;flex:1;gap:3px;overflow:auto;" class="row-when-narrow">
-          <div style="width: 300px;display:flex;flex-direction:column;gap:3px;" class="flex-when-narrow">
-            <select id="resources-editor-select" name="resources-editor-select" size="4" multiple="true" style="flex:1;background:transparent;">
-              <option value="23432423434">...</option>
-            </select>
+          <div style="display:flex;flex-direction:column;gap:3px;" class="left-area flex-when-narrow">
+            <div id="resources-editor-select" name="resources-editor-select" multiple="true" style="flex:1;background:transparent;">
+              <div value="23432423434" class="select-option">...</div>
+            </div>
             <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
               <input type="file" accept="image/*" multiple="true"
                 id="file-input-res"
@@ -310,7 +329,10 @@ class ResourcesComponent extends HTMLElement {
     this.resourcesFileContent = '';
     this.gistId = '';
     this.onSelectResource = evt => {
-      this.selectedResources = Object.values(evt.target.selectedOptions).map(
+      evt.target.toggleAttribute('data-selected');// todo make it drag select
+      const allSelected = shadowRoot.getElementById('resources-editor-select').querySelectorAll('[data-selected]')
+      console.log({evt, target: evt.target.id,allSelected})
+      this.selectedResources = Object.values(allSelected).map(
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
       shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
@@ -371,8 +393,8 @@ class ResourcesComponent extends HTMLElement {
       const startPos = target.scrollTop - slackSpace;
       const scrollHeight = target.clientHeight;
       const endPos = startPos + scrollHeight + slackSpace + slackSpace;
-      for (let i = 0; i < target.length; i++) {
-        const item = target[i];
+      for (let i = 0; i < target.children.length; i++) {
+        const item = target.children[i];
         const itemPos = item.offsetTop;
         if (itemPos > startPos && itemPos < endPos) {
           item.style['background-image'] = `url(${item.dataset.src})`;
@@ -392,10 +414,10 @@ class ResourcesComponent extends HTMLElement {
       const options = objectKeys.map(fileKey => {
         const fileData = resourcesData[fileKey];
         const isCommitted = 'committed' in fileData; //add this field when saving
-        return `<option value="${fileKey}" id="${fileKey}" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
+        return `<div value="${fileKey}" id="${fileKey}" class="select-option" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
           'border-left:3px solid'}content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
            ${fileKey} 
-        </option>`;
+        </div>`;
       });
       shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
       shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
@@ -419,6 +441,12 @@ class ResourcesComponent extends HTMLElement {
       .getElementById('resources-editor-select')
       .addEventListener('scroll', onUpdateScrollVis);
     shadowRoot
+      .getElementById('resources-editor-select')
+      .removeEventListener('click', this.onSelectResource);
+    shadowRoot
+      .getElementById('resources-editor-select')
+      .addEventListener('click', this.onSelectResource);
+    shadowRoot
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
     this.updateRawUrl = (newUrl) => {
@@ -435,6 +463,7 @@ class ResourcesComponent extends HTMLElement {
       this.resourcesFileContent = file.content || '{}';
       this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
     }
+
   }
 
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
