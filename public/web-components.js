@@ -276,13 +276,13 @@ class ResourcesComponent extends HTMLElement {
           object-fit: fill;
         }
       }
-      .preview-image:active::after {
+      .preview-image:hover::after {
         position: absolute;
         bottom: 2%;
         left: 30%;
         padding: 3px;
         display: block;
-        content: ' ☆ name: ' attr(title) ' ☆ ';
+        content: ' ☆ ' attr(title) ' ☆ ';
         color: black;
         background-color: #ffffff4a;
         border-radius: 3px;
@@ -307,6 +307,15 @@ class ResourcesComponent extends HTMLElement {
         background-repeat: no-repeat;
         background-position-x: right;
         background-clip: padding-box;
+      }
+      .total-size-estimate-selected {
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+        color: white;
+        background-color: #00000085;
+        backdrop-filter: blur(1px);
+        padding: 0 3px;
       }
       </style>
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
@@ -335,7 +344,7 @@ class ResourcesComponent extends HTMLElement {
               <button id="onRemoveButton">Remove</button>
             </div>
           </div>
-          <div id="selected-resource-preview"></div>
+          <span id="selected-resource-preview"></span>
         </div>
       </div>
   `
@@ -357,30 +366,49 @@ class ResourcesComponent extends HTMLElement {
     this.isBusy = (message) => {
       this.notifyParent('isBusy', {message})
     }
+    this.bytesToSize = bytes => {
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+      if (bytes === 0) return 'n/a'
+      const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
+      if (i === 0) return `${bytes} ${sizes[i]})`
+      return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
+    }
+    this.getBase64StringSizeInbites = string => {
+      string = string.substring(string.indexOf(',') + 1, string.length)
+      const bites = ((string.length * 6) / 8); // / 1000 is kb
+      return bites
+    }
     this.selectedResources = [];
     this.resourcesFileUrl = '';
     this.resourcesFileContent = '';
     this.gistId = '';
+    const kbLimitPreview = 30000000;// 30mb for now - its not virtualized
     this.updateSelected = () => {
       const allSelected = shadowRoot.getElementById('resources-editor-select').querySelectorAll('[data-selected]')
       this.selectedResources = Object.values(allSelected).map(
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
+      let totalSize = 0//bytes = (string_length(encoded_string) - 814) / 1.37
       shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
-        if(index > 100) return;// we need some hard limit from preventing potential crash
+        console.log({totalSize})
+        if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
 
         const selectedItem = resource.src;
         if (selectedItem.startsWith('data:image')) {
-          console.log({resource})
+          // console.log({resource})
+          const byteSize = this.getBase64StringSizeInbites(selectedItem);
+          totalSize += byteSize;
           return `
-          <div title="${resource.id}" class="preview-image">
+          <div title="${resource.id}  size: ${this.bytesToSize(byteSize)}" class="preview-image">
             <img src="${selectedItem}" class="image-view"></img>
           </div>
           `;
         } else {
           return ``;
         }
-      }).join('');
+      }).join('') + `<div class="total-size-estimate-selected" id="totalSizeEstimate">Previewing: ${this.selectedResources.length} Total size: ${this.bytesToSize(totalSize)}</div>`;
+      
+      // shadowRoot.getElementById('totalSizeEstimate').innerText = `Previewing: ${this.selectedResources.length} Total size: ${this.bytesToSize(totalSize)}`
     }
     this.isPointerDown = false;
     this.onPointerUp = () => {
@@ -394,23 +422,59 @@ class ResourcesComponent extends HTMLElement {
       this.isPointerDown = true;
       shadowRoot.getElementById('resources-editor-select').focus();
       if(evt.target.className !== 'select-option') return;
-      shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => item.removeAttribute('data-selected'));
+      console.log(this.isControlDown)
+      if(!this.isControlDown) shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => item.removeAttribute('data-selected'));
       evt.target.setAttribute('data-selected', true)
       this.updateSelected();
     }
+    this.selectAndScrollIntoView = el => {
+      const scrollOpt = {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+      }
+      el.setAttribute('data-selected', true);
+      setTimeout(()=> {
+        el.scrollIntoView(scrollOpt);
+        this.updateSelected();
+        shadowRoot.getElementById('resources-editor-select').focus();
+      }, 300) 
+    }
+    this.isControlDown = false;
+    this.onKeyDown = evt => {
+      evt.preventDefault();
+      evt.stopPropagation()
+      const key = evt.key;
+      
+      if(key === 'Control' || key === 'Shift') {
+        console.log('->',{key})
+        this.isControlDown = true;
+      }
+    }
     this.onKeyUp = evt => {
+      evt.preventDefault();
       const key = evt.key;
       const fakeSelect = shadowRoot.getElementById('resources-editor-select');
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
-      fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
+      if(!this.isControlDown)fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
       const selected = allSelected.length > 0 ? allSelected[allSelected.length - 1] : fakeSelect.firstChild;
+
+      if(key === 'Control' || key === 'Shift') {
+        this.isControlDown = false;
+      }
       if(key === 'ArrowUp' || key === 'ArrowLeft') {
-        selected.previousSibling ? selected.previousSibling.setAttribute('data-selected', true) : fakeSelect.lastChild.setAttribute('data-selected', true);
+        this.selectAndScrollIntoView(selected.previousSibling || fakeSelect.lastChild);
         this.updateSelected();
       }
       if(key === 'ArrowDown' || key === 'ArrowRight') {
-        selected.nextSibling ? selected.nextSibling.setAttribute('data-selected', true) : fakeSelect.firstChild.setAttribute('data-selected', true);
+        this.selectAndScrollIntoView(selected.nextSibling || fakeSelect.firstChild);
         this.updateSelected();
+      }
+      if (key === 'Delete') {
+        this.onRemoveResource();
+      }
+      if(key === 'a' && this.isControlDown) {
+        this.onSelectAll();
       }
     }
     this.onSelectResource = evt => {
@@ -422,7 +486,11 @@ class ResourcesComponent extends HTMLElement {
       shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => hasSelected ? item.removeAttribute('data-selected') : item.setAttribute('data-selected', true))
       this.updateSelected();
     }
+    this.selectAfterUpdate = null;
     this.onRemoveResource = () => {
+      const fakeSelect = shadowRoot.getElementById('resources-editor-select');
+      const allSelected = fakeSelect.querySelectorAll('[data-selected]');
+      this.selectAfterUpdate = allSelected.length > 0 ? allSelected[allSelected.length - 1].nextSibling.id : fakeSelect.firstChild.id
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
       this.selectedResources.forEach(selectedResource => {
@@ -487,14 +555,21 @@ class ResourcesComponent extends HTMLElement {
         const isCommitted = true;//'committed' in fileData; //add this field when saving
         return `<div value="${fileKey}" id="${fileKey}" class="select-option" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
           'border-left:3px solid'}">
-           ${fileKey} 
+           ${fileKey} -- ${this.bytesToSize(this.getBase64StringSizeInbites(fileData.src))}
         </div>`;
       });
       shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
+      const lastScrollTop = shadowRoot.getElementById('resources-editor-select').scrollTop;
       shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
+      shadowRoot.getElementById('resources-editor-select').scrollTop = lastScrollTop;
       this.onSelectScroll();
       this.isBusy(false);
       this.setIsNew(isNew);
+      if(this.selectAfterUpdate) {
+        console.log({next: this.selectAfterUpdate})
+        this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate));
+        this.selectAfterUpdate = null;
+      }
     };
     this.setIsNew = isNew => shadowRoot.getElementById('isNewFile').innerText = isNew ? '*' : '';
     ////methods end
@@ -527,9 +602,9 @@ class ResourcesComponent extends HTMLElement {
       .getElementById('resources-editor-select')
       .addEventListener('pointerup',this.onPointerUp);
     shadowRoot
-      .getElementById('resources-editor-select').removeEventListener('keydown', this.onKeyUp);
+      .getElementById('resources-editor-select').addEventListener('keydown', this.onKeyDown);
     shadowRoot
-      .getElementById('resources-editor-select').addEventListener('keydown', this.onKeyUp);
+      .getElementById('resources-editor-select').addEventListener('keyup', this.onKeyUp);
     shadowRoot
       .getElementById('onRemoveButton')
       .removeEventListener('click', this.onRemoveResource);
@@ -556,7 +631,6 @@ class ResourcesComponent extends HTMLElement {
       this.resourcesFileContent = file.content || '{}';
       this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
     }
-
   }
 
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
