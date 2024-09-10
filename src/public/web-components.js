@@ -169,8 +169,8 @@ class Spinner extends HTMLElement {
   isBusy (message){
     const shadowRoot = document.querySelector('spinner-component').shadowRoot;
     this.spinner = shadowRoot.querySelector("#resourcesLoaderIsBusy");
-    this.spinner.style.display =  'block'  ;
-    this.text = 'shadowRoot.querySelector("#resourcesLoaderIsBusyMessage")';
+    this.spinner.style.display = message ? 'block' : 'none';
+    this.text = shadowRoot.querySelector("#resourcesLoaderIsBusyMessage");
     this.text.innerText = message || '';
   }
 }
@@ -274,6 +274,14 @@ class ResourcesComponent extends HTMLElement {
         color: white;
         background-color: #00000096;
         border-radius: 3px;
+      }
+      .select-option{
+        text-align: left;
+        content-visibility:auto;
+        background-size: 25px;
+        background-repeat: no-repeat;
+        background-position-x: right;
+        background-clip: padding-box;
       }
       </style>
       <div id="resources-editor" style="display:flex;flex-direction:column;width: 100%;height:100%; overflow: hidden;">
@@ -415,7 +423,7 @@ class ResourcesComponent extends HTMLElement {
         const fileData = resourcesData[fileKey];
         const isCommitted = 'committed' in fileData; //add this field when saving
         return `<div value="${fileKey}" id="${fileKey}" class="select-option" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
-          'border-left:3px solid'}content-visibility:auto;background-size: 25px;background-repeat: no-repeat;background-position-x: right;background-clip: padding-box;">
+          'border-left:3px solid'}">
            ${fileKey} 
         </div>`;
       });
