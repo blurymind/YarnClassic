@@ -399,17 +399,25 @@ class ResourcesComponent extends HTMLElement {
       this.updateSelected();
     }
     this.onKeyUp = evt => {
+      evt.preventDefault();
       const key = evt.key;
       const fakeSelect = shadowRoot.getElementById('resources-editor-select');
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
       fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
       const selected = allSelected.length > 0 ? allSelected[allSelected.length - 1] : fakeSelect.firstChild;
+      const scrollOpt = {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+    }
       if(key === 'ArrowUp' || key === 'ArrowLeft') {
         selected.previousSibling ? selected.previousSibling.setAttribute('data-selected', true) : fakeSelect.lastChild.setAttribute('data-selected', true);
+        selected.previousSibling ? selected.previousSibling .scrollIntoView(scrollOpt) : fakeSelect.firstChild.scrollIntoView(scrollOpt);
         this.updateSelected();
       }
       if(key === 'ArrowDown' || key === 'ArrowRight') {
         selected.nextSibling ? selected.nextSibling.setAttribute('data-selected', true) : fakeSelect.firstChild.setAttribute('data-selected', true);
+        selected.nextSibling ? selected.nextSibling .scrollIntoView(scrollOpt) : fakeSelect.firstChild.scrollIntoView(scrollOpt);
         this.updateSelected();
       }
     }
