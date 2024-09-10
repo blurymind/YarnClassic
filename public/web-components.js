@@ -255,7 +255,7 @@ class ResourcesComponent extends HTMLElement {
         border-radius:0.7rem;
       }
       #selected-resource-preview:hover {
-        flex: 7;
+        flex: 8;
       }
       .preview-image {
         position: relative;
@@ -276,16 +276,17 @@ class ResourcesComponent extends HTMLElement {
           object-fit: fill;
         }
       }
-      .preview-image:hover::after {
+      .preview-image:active::after {
         position: absolute;
         bottom: 2%;
         left: 30%;
         padding: 3px;
         display: block;
         content: ' ☆ name: ' attr(title) ' ☆ ';
-        color: white;
-        background-color: #00000096;
+        color: black;
+        background-color: #ffffff4a;
         border-radius: 3px;
+        backdrop-filter: blur(1px);
       }
       button,
       #selected-resource-preview,
@@ -319,7 +320,7 @@ class ResourcesComponent extends HTMLElement {
         
         <div style="display:flex;flex:1;gap:3px;overflow:auto;" class="row-when-narrow">
           <div style="display:flex;flex-direction:column;gap:3px;" class="left-area flex-when-narrow">
-            <div id="resources-editor-select" name="resources-editor-select" multiple="true" style="flex:1;background:transparent;">
+            <div id="resources-editor-select" tabindex="0" style="flex:1;background:transparent;">
               <div value="23432423434" class="select-option">...</div>
             </div>
             <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
@@ -381,8 +382,39 @@ class ResourcesComponent extends HTMLElement {
         }
       }).join('');
     }
+    this.isPointerDown = false;
+    this.onPointerUp = () => {
+      this.isPointerDown = false;
+    }
+    this.onPointerEnter = (evt) => {
+      if(evt.target.className !== 'select-option' || !this.isPointerDown) return;
+      this.onSelectResource(evt);
+    }
+    this.onSelectOneResource  = evt => {
+      this.isPointerDown = true;
+      shadowRoot.getElementById('resources-editor-select').focus();
+      if(evt.target.className !== 'select-option') return;
+      shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => item.removeAttribute('data-selected'));
+      evt.target.setAttribute('data-selected', true)
+      this.updateSelected();
+    }
+    this.onKeyUp = evt => {
+      const key = evt.key;
+      const fakeSelect = shadowRoot.getElementById('resources-editor-select');
+      const allSelected = fakeSelect.querySelectorAll('[data-selected]');
+      fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
+      const selected = allSelected.length > 0 ? allSelected[allSelected.length - 1] : fakeSelect.firstChild;
+      if(key === 'ArrowUp' || key === 'ArrowLeft') {
+        selected.previousSibling ? selected.previousSibling.setAttribute('data-selected', true) : fakeSelect.lastChild.setAttribute('data-selected', true);
+        this.updateSelected();
+      }
+      if(key === 'ArrowDown' || key === 'ArrowRight') {
+        selected.nextSibling ? selected.nextSibling.setAttribute('data-selected', true) : fakeSelect.firstChild.setAttribute('data-selected', true);
+        this.updateSelected();
+      }
+    }
     this.onSelectResource = evt => {
-      evt.target.toggleAttribute('data-selected');// todo make it drag select
+      evt.target.toggleAttribute('data-selected');
       this.updateSelected();
     };
     this.onSelectAll = () => {
@@ -452,7 +484,7 @@ class ResourcesComponent extends HTMLElement {
       const objectKeys = Object.keys(JSON.parse(fileContents));
       const options = objectKeys.map(fileKey => {
         const fileData = resourcesData[fileKey];
-        const isCommitted = 'committed' in fileData; //add this field when saving
+        const isCommitted = true;//'committed' in fileData; //add this field when saving
         return `<div value="${fileKey}" id="${fileKey}" class="select-option" data-src="${fileData.src}" title="${fileKey}" style="${!isCommitted &&
           'border-left:3px solid'}">
            ${fileKey} 
@@ -469,9 +501,6 @@ class ResourcesComponent extends HTMLElement {
     shadowRoot
       .getElementById('file-input-res')
       .addEventListener('change', this.onAddResource);
-    shadowRoot
-      .getElementById('resources-editor-select')
-      .addEventListener('change', this.onSelectResource);
     const onUpdateScrollVis = this.utils.debounce(this.onSelectScroll, 70);
     shadowRoot
       .getElementById('resources-editor-select')
@@ -481,13 +510,35 @@ class ResourcesComponent extends HTMLElement {
       .addEventListener('scroll', onUpdateScrollVis);
     shadowRoot
       .getElementById('resources-editor-select')
-      .removeEventListener('click', this.onSelectResource);
+      .removeEventListener('pointerdown', this.onSelectOneResource);
     shadowRoot
       .getElementById('resources-editor-select')
-      .addEventListener('click', this.onSelectResource);
+      .addEventListener('pointerdown', this.onSelectOneResource);
+    shadowRoot
+      .getElementById('resources-editor-select')
+      .removeEventListener('pointerover', this.onPointerEnter);
+    shadowRoot
+      .getElementById('resources-editor-select')
+      .addEventListener('pointerover', this.onPointerEnter);
+    shadowRoot
+      .getElementById('resources-editor-select')
+      .removeEventListener('pointerup',this.onPointerUp);
+    shadowRoot
+      .getElementById('resources-editor-select')
+      .addEventListener('pointerup',this.onPointerUp);
+    shadowRoot
+      .getElementById('resources-editor-select').removeEventListener('keydown', this.onKeyUp);
+    shadowRoot
+      .getElementById('resources-editor-select').addEventListener('keydown', this.onKeyUp);
+    shadowRoot
+      .getElementById('onRemoveButton')
+      .removeEventListener('click', this.onRemoveResource);
     shadowRoot
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
+    shadowRoot
+      .getElementById('onSelectAllButton')
+      .removeEventListener('click', this.onSelectAll);
     shadowRoot
       .getElementById('onSelectAllButton')
       .addEventListener('click', this.onSelectAll);
