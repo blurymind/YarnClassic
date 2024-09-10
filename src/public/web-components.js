@@ -398,6 +398,19 @@ class ResourcesComponent extends HTMLElement {
       evt.target.setAttribute('data-selected', true)
       this.updateSelected();
     }
+    this.selectAndScrollIntoView = el => {
+      const scrollOpt = {
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center'
+      }
+      el.setAttribute('data-selected', true);
+      setTimeout(()=> {
+        el.scrollIntoView(scrollOpt);
+        this.updateSelected();
+        shadowRoot.getElementById('resources-editor-select').focus();
+      }, 300) 
+    }
     this.onKeyUp = evt => {
       evt.preventDefault();
       const key = evt.key;
@@ -405,20 +418,18 @@ class ResourcesComponent extends HTMLElement {
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
       fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
       const selected = allSelected.length > 0 ? allSelected[allSelected.length - 1] : fakeSelect.firstChild;
-      const scrollOpt = {
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center'
-    }
+
+      console.log({key})
       if(key === 'ArrowUp' || key === 'ArrowLeft') {
-        selected.previousSibling ? selected.previousSibling.setAttribute('data-selected', true) : fakeSelect.lastChild.setAttribute('data-selected', true);
-        selected.previousSibling ? selected.previousSibling .scrollIntoView(scrollOpt) : fakeSelect.firstChild.scrollIntoView(scrollOpt);
+        this.selectAndScrollIntoView(selected.previousSibling || fakeSelect.lastChild);
         this.updateSelected();
       }
       if(key === 'ArrowDown' || key === 'ArrowRight') {
-        selected.nextSibling ? selected.nextSibling.setAttribute('data-selected', true) : fakeSelect.firstChild.setAttribute('data-selected', true);
-        selected.nextSibling ? selected.nextSibling .scrollIntoView(scrollOpt) : fakeSelect.firstChild.scrollIntoView(scrollOpt);
+        this.selectAndScrollIntoView(selected.nextSibling || fakeSelect.firstChild);
         this.updateSelected();
+      }
+      if (key === 'Delete') {
+        this.onRemoveResource();
       }
     }
     this.onSelectResource = evt => {
@@ -430,7 +441,11 @@ class ResourcesComponent extends HTMLElement {
       shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => hasSelected ? item.removeAttribute('data-selected') : item.setAttribute('data-selected', true))
       this.updateSelected();
     }
+    this.selectAfterUpdate = null;
     this.onRemoveResource = () => {
+      const fakeSelect = shadowRoot.getElementById('resources-editor-select');
+      const allSelected = fakeSelect.querySelectorAll('[data-selected]');
+      this.selectAfterUpdate = allSelected.length > 0 ? allSelected[allSelected.length - 1].nextSibling.id : fakeSelect.firstChild.id
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
       this.selectedResources.forEach(selectedResource => {
@@ -499,10 +514,17 @@ class ResourcesComponent extends HTMLElement {
         </div>`;
       });
       shadowRoot.getElementById('resource-list-label').innerHTML = `${objectKeys.length} files`;
+      const lastScrollTop = shadowRoot.getElementById('resources-editor-select').scrollTop;
       shadowRoot.getElementById('resources-editor-select').innerHTML = options.join('');
+      shadowRoot.getElementById('resources-editor-select').scrollTop = lastScrollTop;
       this.onSelectScroll();
       this.isBusy(false);
       this.setIsNew(isNew);
+      if(this.selectAfterUpdate) {
+        console.log({next: this.selectAfterUpdate})
+        this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate));
+        this.selectAfterUpdate = null;
+      }
     };
     this.setIsNew = isNew => shadowRoot.getElementById('isNewFile').innerText = isNew ? '*' : '';
     ////methods end
