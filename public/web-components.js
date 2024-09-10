@@ -248,21 +248,33 @@ class ResourcesComponent extends HTMLElement {
       #resources-editor-select {
         overflow: auto;
       }
-      button,
-      select,
-      #selected-resource-preview,
-      .button {
-        outline: none;
-        background: transparent;
-        color: var(--font-color);
-        border: 1px solid var(--border-color);
-        border-radius: 2px;
+      #selected-resource-preview {
+        overflow:auto;
+        align-content:center;
+        flex: 1;
+        border-radius:0.7rem;
       }
-      :is(.add-files, button):hover {
-        background-color: var(--bg-color);
+      #selected-resource-preview:hover {
+        flex: 7;
       }
       .preview-image {
         position: relative;
+      }
+      .image-view {
+        pointer-events:none;
+        max-width:60vw;
+        object-fit: contain;
+        border: 0;
+      }
+      .preview-image:active .image-view {
+        max-width: 100%;
+        object-fit: fill;
+      }
+      @media only screen and (max-width: 600px) {
+        .preview-image:hover .image-view {
+          max-width: 100%;
+          object-fit: fill;
+        }
       }
       .preview-image:hover::after {
         position: absolute;
@@ -274,6 +286,18 @@ class ResourcesComponent extends HTMLElement {
         color: white;
         background-color: #00000096;
         border-radius: 3px;
+      }
+      button,
+      #selected-resource-preview,
+      .button {
+        outline: none;
+        background: transparent;
+        color: var(--font-color);
+        border: 1px solid var(--border-color);
+        border-radius: 2px;
+      }
+      :is(.add-files, button):hover {
+        background-color: var(--bg-color);
       }
       .select-option{
         text-align: left;
@@ -293,13 +317,13 @@ class ResourcesComponent extends HTMLElement {
           <div id="header-buttons" class="flex-wrap" style="flex:1;gap: 10px;justify-content: end;"></div>
         </div>
         
-
         <div style="display:flex;flex:1;gap:3px;overflow:auto;" class="row-when-narrow">
           <div style="display:flex;flex-direction:column;gap:3px;" class="left-area flex-when-narrow">
             <div id="resources-editor-select" name="resources-editor-select" multiple="true" style="flex:1;background:transparent;">
               <div value="23432423434" class="select-option">...</div>
             </div>
             <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
+              <button id="onSelectAllButton">Select all</button>
               <input type="file" accept="image/*" multiple="true"
                 id="file-input-res"
                 style="display:none"
@@ -310,7 +334,7 @@ class ResourcesComponent extends HTMLElement {
               <button id="onRemoveButton">Remove</button>
             </div>
           </div>
-          <div id="selected-resource-preview" style="overflow:auto;align-content:center;flex:1;border-radius:0.7rem;"></div>
+          <div id="selected-resource-preview"></div>
         </div>
       </div>
   `
@@ -336,10 +360,8 @@ class ResourcesComponent extends HTMLElement {
     this.resourcesFileUrl = '';
     this.resourcesFileContent = '';
     this.gistId = '';
-    this.onSelectResource = evt => {
-      evt.target.toggleAttribute('data-selected');// todo make it drag select
+    this.updateSelected = () => {
       const allSelected = shadowRoot.getElementById('resources-editor-select').querySelectorAll('[data-selected]')
-      console.log({evt, target: evt.target.id,allSelected})
       this.selectedResources = Object.values(allSelected).map(
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
@@ -350,15 +372,24 @@ class ResourcesComponent extends HTMLElement {
         if (selectedItem.startsWith('data:image')) {
           console.log({resource})
           return `
-          <div title="${resource.id}" class="preview-image"">
-            <img src="${selectedItem}" style="pointer-events:none;max-width:60vw;object-fit: contain; border: 0;"></img>
+          <div title="${resource.id}" class="preview-image">
+            <img src="${selectedItem}" class="image-view"></img>
           </div>
           `;
         } else {
           return ``;
         }
       }).join('');
+    }
+    this.onSelectResource = evt => {
+      evt.target.toggleAttribute('data-selected');// todo make it drag select
+      this.updateSelected();
     };
+    this.onSelectAll = () => {
+      const hasSelected = !!shadowRoot.getElementById('resources-editor-select').querySelector('[data-selected]');
+      shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => hasSelected ? item.removeAttribute('data-selected') : item.setAttribute('data-selected', true))
+      this.updateSelected();
+    }
     this.onRemoveResource = () => {
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
@@ -457,6 +488,9 @@ class ResourcesComponent extends HTMLElement {
     shadowRoot
       .getElementById('onRemoveButton')
       .addEventListener('click', this.onRemoveResource);
+    shadowRoot
+      .getElementById('onSelectAllButton')
+      .addEventListener('click', this.onSelectAll);
     this.updateRawUrl = (newUrl) => {
       shadowRoot.getElementById('resourcesFileLink').href = newUrl || 'unknown';
     }
