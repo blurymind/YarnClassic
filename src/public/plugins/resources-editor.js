@@ -1,4 +1,4 @@
-const HEIGHT = '80vh';
+const HEIGHT = '90vh';
 
 export var ResourcesEditor = function({
   app,

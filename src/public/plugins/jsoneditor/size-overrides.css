@@ -11,7 +11,7 @@
     width:100%;
 }
 .swal2-content{
-    max-height: 80vh;
+    max-height: 90vh;
     overflow: auto;
 }
 @media only screen and (max-width: 600px) {
