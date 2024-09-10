@@ -382,6 +382,7 @@ class ResourcesComponent extends HTMLElement {
     this.resourcesFileUrl = '';
     this.resourcesFileContent = '';
     this.gistId = '';
+    const kbLimitPreview = 30000000;// 30mb for now - its not virtualized
     this.updateSelected = () => {
       const allSelected = shadowRoot.getElementById('resources-editor-select').querySelectorAll('[data-selected]')
       this.selectedResources = Object.values(allSelected).map(
@@ -389,7 +390,8 @@ class ResourcesComponent extends HTMLElement {
       );
       let totalSize = 0//bytes = (string_length(encoded_string) - 814) / 1.37
       shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
-        if(index > 500) return;// we need some hard limit from preventing potential crash
+        console.log({totalSize})
+        if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
 
         const selectedItem = resource.src;
         if (selectedItem.startsWith('data:image')) {
@@ -470,6 +472,9 @@ class ResourcesComponent extends HTMLElement {
       }
       if (key === 'Delete') {
         this.onRemoveResource();
+      }
+      if(key === 'a' && this.isControlDown) {
+        this.onSelectAll();
       }
     }
     this.onSelectResource = evt => {
@@ -626,7 +631,6 @@ class ResourcesComponent extends HTMLElement {
       this.resourcesFileContent = file.content || '{}';
       this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
     }
-
   }
 
   init({ file, darkMode, headerButtons, gistId }) {//todo you cannot pass functions to web components, but can use events?
