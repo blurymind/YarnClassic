@@ -8,7 +8,7 @@ const addEsVersionToEditor = editor => {
     "asi": true // disable "Missing semicolon." warning in editor for JavaScript
   }]);
 }
-const HEIGHT = '80vh';
+const HEIGHT = '85vh';
 const addStyleSheet = (path, root = document.head) => {
   const styleEl = document.createElement("link")
   styleEl.setAttribute("rel", "stylesheet")
