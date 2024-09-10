@@ -255,7 +255,7 @@ class ResourcesComponent extends HTMLElement {
         border-radius:0.7rem;
       }
       #selected-resource-preview:hover {
-        flex: 7;
+        flex: 8;
       }
       .preview-image {
         position: relative;
@@ -276,16 +276,17 @@ class ResourcesComponent extends HTMLElement {
           object-fit: fill;
         }
       }
-      .preview-image:hover::after {
+      .preview-image:active::after {
         position: absolute;
         bottom: 2%;
         left: 30%;
         padding: 3px;
         display: block;
         content: ' ☆ name: ' attr(title) ' ☆ ';
-        color: white;
-        background-color: #00000096;
+        color: black;
+        background-color: #ffffff4a;
         border-radius: 3px;
+        backdrop-filter: blur(1px);
       }
       button,
       #selected-resource-preview,
@@ -403,11 +404,11 @@ class ResourcesComponent extends HTMLElement {
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
       fakeSelect.childNodes.forEach(item => item.removeAttribute('data-selected'));
       const selected = allSelected.length > 0 ? allSelected[allSelected.length - 1] : fakeSelect.firstChild;
-      if(key === 'ArrowUp') {
+      if(key === 'ArrowUp' || key === 'ArrowLeft') {
         selected.previousSibling ? selected.previousSibling.setAttribute('data-selected', true) : fakeSelect.lastChild.setAttribute('data-selected', true);
         this.updateSelected();
       }
-      if(key === 'ArrowDown') {
+      if(key === 'ArrowDown' || key === 'ArrowRight') {
         selected.nextSibling ? selected.nextSibling.setAttribute('data-selected', true) : fakeSelect.firstChild.setAttribute('data-selected', true);
         this.updateSelected();
       }
