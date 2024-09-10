@@ -390,7 +390,6 @@ class ResourcesComponent extends HTMLElement {
       );
       let totalSize = 0//bytes = (string_length(encoded_string) - 814) / 1.37
       shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
-        console.log({totalSize})
         if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
 
         const selectedItem = resource.src;
