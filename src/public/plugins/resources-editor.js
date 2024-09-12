@@ -43,7 +43,7 @@ export var ResourcesEditor = function({
           if(response.ok) {
             ToastWc.show({
               type: 'success',
-              content: `Created a ${this.selectedResourcesJson} file..`,
+              content: `☁️ Created a ${this.selectedResourcesJson} file..`,
               time: 3000,
             });
             this.resourcesFileUrl = file.raw_url;
@@ -120,7 +120,7 @@ export var ResourcesEditor = function({
       } else if(ok){
         ToastWc.show({
           type: 'info',
-          content: 'Saved resources on gist',
+          content: '☁️ Saved resources on gist',
           time: 1000,
         });
         this.resourcesFileUrl = file.raw_url;
@@ -129,7 +129,7 @@ export var ResourcesEditor = function({
       } else {
         ToastWc.show({
           type: 'error',
-          content: `Could not save changes to Gist id: ${gistId}!`,
+          content: `☁️ Could not save changes to Gist id: ${gistId}!`,
           time: 3000,
         });      
       }
@@ -279,7 +279,7 @@ export var ResourcesEditor = function({
         this.isBusy = (message) => {
           document.querySelector('spinner-component').isBusy(message);
         };
-        this.isBusy('Loading files from gist...');
+        this.isBusy('Loading files...');
         document.querySelector('resources-component').addEventListener('isBusy', event => {
             this.isBusy(event.detail.message)
         });
@@ -292,12 +292,12 @@ export var ResourcesEditor = function({
         });
         document.querySelector('resources-component').addEventListener('headerButtonClicked', ({detail: action}) => {
            if(action === 'pull') {
-            this.isBusy('Downloading changes to gist...');
+            this.isBusy('☁️ Downloading changes from gist...');
             this.getFromGist().then(file => {
               document.querySelector('resources-component').updateResourcesList(file.content);
               ToastWc.show({
                 type: 'success',
-                content: `Re-Downloaded ${this.selectedResourcesJson} file`,
+                content: `☁️ Re-Downloaded ${this.selectedResourcesJson} file`,
                 time: 3000,
               });
               this.isBusy('');
@@ -306,7 +306,7 @@ export var ResourcesEditor = function({
             }).catch(error => {
               ToastWc.show({
                 type: 'error',
-                content: `Could not Load changed from Gist file!\n${error}..`,
+                content: `☁️ Could not Load changed from Gist file!\n${error}..`,
                 time: 3000,
               });
               this.isBusy('');

@@ -150,6 +150,12 @@ class Spinner extends HTMLElement {
           color: transparent;
           filter: invert(0.5) grayscale(1) contrast(9);
         }
+        #resourcesLoaderIsBusyMessage {
+          background: rgb(0 0 0 / 30%);
+          padding: 3px;
+          border-radius: 3px;
+          backdrop-filter: blur(1px);
+        }
         @keyframes spin {
           to { -webkit-transform: rotate(360deg); }
         }
