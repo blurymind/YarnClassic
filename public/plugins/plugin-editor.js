@@ -527,9 +527,8 @@ export var PluginEditor = function ({
         window.addEventListener("previewErrors",this.onErrorsInPreview, false);        
         // SPLIT EDITOR
         const {Split} = ace.require("ace/ext/split");
-        console.log({Split})
         const container = document.getElementById('js-editor');
-        const split = new Split(container, 'ace/theme/monokai', 1);
+        const split = new Split(container, this.theme, 1);
         const secondEditingSession = new EditSession("new text here");
         const session = split.getEditor(0).session;
         this.editor = split.getEditor(0);
