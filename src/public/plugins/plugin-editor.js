@@ -121,25 +121,14 @@ const editorOptions = {
 export var PluginEditor = function ({
   app,
   createButton,
-  addSettingsItem,
   getPluginStore,
-  onYarnEditorOpen,
-  onYarnInPreviewMode,
-  onYarnSavedNode,
-  onYarnSetDocumentType,
-  onKeyUp,
-  onKeyDown,
   onLoad,
   setPluginStore,
-  // getVloatilePlugins,
   setVloatilePlugin,
-  getGistPluginFiles,
-  setVloatilePlugins,
   getGistPluginFile,
   saveGistPlugin,
   isGistTokenInvalid,
   getGistPluginsFileUrl,
-  urlParams,
   pluginModeUrl,
   getGistPluginsId,
   updateUrlParams,
@@ -162,11 +151,9 @@ export var PluginEditor = function ({
   this.hasTestedOnce = false;
 
   this.onAddNewFile = () => {
-    // ask for filename - (adds js at the end)
     let newFileName = prompt("Create a new plugin file?\nAllowed formats: .js, .json and .txt\nReserved names: resources.json and yarnData.json", 'my-new-plugin.js');
     if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
-      // newFileName = newFileName.endsWith('.js') ? newFileName : `${newFileName}.js`
       if (newFileName in this.volatilePlugins) {
         alert(`${newFileName} already exists as a plugin.\nPlease choose another name..`)
         return;
@@ -378,34 +365,29 @@ export var PluginEditor = function ({
         }
       });
     };
+    const domPath = `app.plugins.${self.name}`
     const { value: formValues } = await Swal.fire({
       showCloseButton: false,
       showCancelButton: false,
       title: `
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
           <div class="flex-wrap" style="gap: 12px;">
-            <select id="edited-plugin-file" class="settings-value" onchange="app.plugins.${self.name
-        }.onSetEditingFile()" style="max-width: calc(90vw - 60px)">
+            <select id="edited-plugin-file" class="settings-value" onchange="${domPath}.onSetEditingFile()" style="max-width: calc(90vw - 60px)">
               ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
             </select>
             <div class="button-group-rounded" id="add-remove-plugin-file">
-              <button id="add-plugin-file" onclick="app.plugins.${self.name
-        }.onAddNewFile()" title="Add">+</button>
-              <button id="remove-plugin-file" onclick="app.plugins.${self.name
-        }.onRemoveSelectedFile()" title="remove">─</button>
+              <button id="add-plugin-file" onclick="${domPath}.onAddNewFile()" title="Add">+</button>
+              <button id="remove-plugin-file" onclick="${domPath}.onRemoveSelectedFile()" title="remove">─</button>
             </div>
           </div>
           <div id="edit-plugin-mode" class="button-group-rounded">
-            <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit" style="width:90px;border-right: 1px solid #f0f8ff14;">Edit</button>
+            <button onclick="${domPath}.onSetPluginEditMode('edit')" id="edit-plugin-mode-edit" style="width:90px;border-right: 1px solid #f0f8ff14;">Edit</button>
 
-            <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('test')" id="edit-plugin-mode-test" style="width:90px;border-right: 1px solid #f0f8ff14">Test</button>
+            <button onclick="${domPath}.onSetPluginEditMode('test')" id="edit-plugin-mode-test" style="width:90px;border-right: 1px solid #f0f8ff14">Test</button>
 
-        <button onclick="app.plugins.${self.name
-        }.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit" style="width:107px">Commit</button> 
+        <button onclick="${domPath}.onSetPluginEditMode('commit')" id="edit-plugin-mode-commit" style="width:107px">Commit</button> 
           </div>
         </div>
         `.replaceAll('\n', ''),
@@ -443,8 +425,7 @@ export var PluginEditor = function ({
             padding-right: 9px;
             border-radius: 0.9rem;
             display: block;"
-            onclick="app.plugins.${self.name
-        }.onCommitChanges()"
+            onclick="${domPath}.onCommitChanges()"
           >
             Save to Gist
           </button>
@@ -455,8 +436,7 @@ export var PluginEditor = function ({
             padding-right: 9px;
             border-radius: 0.9rem;
             display: block;"
-            onclick="app.plugins.${self.name
-        }.onOpenGistLink()"
+            onclick="${domPath}.onOpenGistLink()"
           >
             Open target gist
           </button>
@@ -471,14 +451,12 @@ export var PluginEditor = function ({
               padding-right: 9px;
               border-radius: 0.9rem;">
             <button id="plugin-output-downloader"
-              onclick="app.plugins.${self.name
-        }.onDownloadPreviewOrReload()"
+              onclick="${domPath}.onDownloadPreviewOrReload()"
             >
               Download
             </button>
 
-            <button title="format" onclick="app.plugins.${self.name
-        }.onFormatCode()" id="edit-plugin-code-buttons">format</button>
+            <button title="format" onclick="${domPath}.onFormatCode()" id="edit-plugin-code-buttons">format</button>
           </div>
 
           <div style="position: absolute;
@@ -489,8 +467,7 @@ export var PluginEditor = function ({
               padding-right: 9px;
               border-radius: 0.9rem;">
             <button id="plugin-output-linker"
-              onclick="app.plugins.${self.name
-            }.onCopyLink()"
+              onclick="${domPath}.onCopyLink()"
             >
               Copy link
             </button>
