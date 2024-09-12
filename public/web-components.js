@@ -150,6 +150,12 @@ class Spinner extends HTMLElement {
           color: transparent;
           filter: invert(0.5) grayscale(1) contrast(9);
         }
+        #resourcesLoaderIsBusyMessage {
+          background: rgb(0 0 0 / 30%);
+          padding: 3px;
+          border-radius: 3px;
+          backdrop-filter: blur(1px);
+        }
         @keyframes spin {
           to { -webkit-transform: rotate(360deg); }
         }
@@ -248,9 +254,22 @@ class ResourcesComponent extends HTMLElement {
       #resources-editor-select {
         overflow: auto;
       }
+      button,
+      #selected-resource-preview,
+      .button {
+        outline: none;
+        background: transparent;
+        color: var(--font-color);
+        border: 1px solid var(--border-color);
+        border-radius: 2px;
+      }
+      :is(.add-files, button):hover {
+        background-color: var(--bg-color);
+      }
       #selected-resource-preview {
         overflow:auto;
         align-content:center;
+        text-align: -webkit-center;
         flex: 1;
         border-radius:0.7rem;
       }
@@ -259,6 +278,24 @@ class ResourcesComponent extends HTMLElement {
       }
       .preview-image {
         position: relative;
+        width: fit-content;
+      }
+      .delete-previewed-image {
+        color: rgb(255 255 255 / 48%);
+        background-color: rgb(0 0 0 / 57%);
+        border: 1px solid transparent;
+        display: none;
+        position: absolute;
+        top: 1px;
+        left: 1px;
+      }
+      .delete-previewed-image:hover {
+        color: rgb(255 255 255 / 60%);
+        background-color: rgb(0 0 0 / 80%);
+        border: 1px solid red;
+      }
+      .preview-image:hover .delete-previewed-image {
+        display: block;
       }
       .image-view {
         pointer-events:none;
@@ -287,18 +324,6 @@ class ResourcesComponent extends HTMLElement {
         background-color: #ffffff4a;
         border-radius: 3px;
         backdrop-filter: blur(1px);
-      }
-      button,
-      #selected-resource-preview,
-      .button {
-        outline: none;
-        background: transparent;
-        color: var(--font-color);
-        border: 1px solid var(--border-color);
-        border-radius: 2px;
-      }
-      :is(.add-files, button):hover {
-        background-color: var(--bg-color);
       }
       .select-option{
         text-align: left;
@@ -378,6 +403,7 @@ class ResourcesComponent extends HTMLElement {
       const bites = ((string.length * 6) / 8); // / 1000 is kb
       return bites
     }
+    this.onDelete
     this.selectedResources = [];
     this.resourcesFileUrl = '';
     this.resourcesFileContent = '';
@@ -389,25 +415,33 @@ class ResourcesComponent extends HTMLElement {
         (item, index) => ({id:item.id, index, src: item.dataset.src})
       );
       let totalSize = 0//bytes = (string_length(encoded_string) - 814) / 1.37
-      shadowRoot.getElementById('selected-resource-preview').innerHTML = this.selectedResources.map((resource, index) => {
+      shadowRoot.getElementById('selected-resource-preview').innerHTML = '';
+      this.selectedResources.forEach((resource, index) => {
         if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
-
         const selectedItem = resource.src;
         if (selectedItem.startsWith('data:image')) {
-          // console.log({resource})
           const byteSize = this.getBase64StringSizeInbites(selectedItem);
           totalSize += byteSize;
-          return `
-          <div title="${resource.id}  size: ${this.bytesToSize(byteSize)}" class="preview-image">
-            <img src="${selectedItem}" class="image-view"></img>
-          </div>
-          `;
-        } else {
-          return ``;
+          const wrapEl = document.createElement('div');
+          wrapEl.title = `${resource.id}  size: ${this.bytesToSize(byteSize)}`;
+          wrapEl.className = 'preview-image';
+          const imgEl = document.createElement('img');
+          imgEl.src = selectedItem;
+          imgEl.className = 'image-view';
+          wrapEl.appendChild(imgEl);
+          const deleteEl = document.createElement('button');
+          deleteEl.innerText = 'delete';
+          deleteEl.className = 'delete-previewed-image';
+          deleteEl.addEventListener('click', () => this.onRemoveResource(resource.id))
+          wrapEl.appendChild(deleteEl);
+          shadowRoot.getElementById('selected-resource-preview').appendChild(wrapEl);
         }
-      }).join('') + `<div class="total-size-estimate-selected" id="totalSizeEstimate">Previewing: ${this.selectedResources.length} Total size: ${this.bytesToSize(totalSize)}</div>`;
-      
-      // shadowRoot.getElementById('totalSizeEstimate').innerText = `Previewing: ${this.selectedResources.length} Total size: ${this.bytesToSize(totalSize)}`
+      });
+      const totalEstEl = document.createElement('div');
+      totalEstEl.className = 'total-size-estimate-selected';
+      totalEstEl.id = 'totalSizeEstimate';
+      totalEstEl.innerText = `Previewing: ${this.selectedResources.length} Total size: ${this.bytesToSize(totalSize)}`
+      shadowRoot.getElementById('selected-resource-preview').appendChild(totalEstEl);
     }
     this.isPointerDown = false;
     this.onPointerUp = () => {
@@ -486,18 +520,28 @@ class ResourcesComponent extends HTMLElement {
       this.updateSelected();
     }
     this.selectAfterUpdate = null;
-    this.onRemoveResource = () => {
+    this.onRemoveResource = (specificFileId = null) => {
       const fakeSelect = shadowRoot.getElementById('resources-editor-select');
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
-      this.selectAfterUpdate = allSelected.length > 0 ? allSelected[allSelected.length - 1].nextSibling.id : fakeSelect.firstChild.id
+      
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
-      this.selectedResources.forEach(selectedResource => {
-        if (selectedResource.id in fileData) delete fileData[selectedResource.id];
-      });
+      if(specificFileId) {
+        console.log({allSelected, specificFileId})
+        this.selectAfterUpdate = Object.values(allSelected).filter(item => item.id !== specificFileId);
+        delete fileData[specificFileId];
+        // this.selectAfterUpdate = null;
+        // this.updateSelected();
+      } else {
+        this.selectAfterUpdate = allSelected.length > 0 ? [allSelected[allSelected.length - 1].nextSibling.id ]: [fakeSelect.firstChild.id]
+        this.selectedResources.forEach(selectedResource => {
+          if (selectedResource.id in fileData) delete fileData[selectedResource.id];
+        });
+      }
   
       const newContent = JSON.stringify(fileData, null, 2);
       this.onCommitResourceFiles(newContent);
+      if(specificFileId) this.updateSelected();
       this.isBusy('');
     };
     const toBase64 = file => {
@@ -564,9 +608,14 @@ class ResourcesComponent extends HTMLElement {
       this.onSelectScroll();
       this.isBusy(false);
       this.setIsNew(isNew);
-      if(this.selectAfterUpdate) {
-        console.log({next: this.selectAfterUpdate})
-        this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate));
+      if(this.selectAfterUpdate && this.selectAfterUpdate.length > 0) {
+        if(this.selectAfterUpdate.length === 1){ 
+          this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate[0]));
+        } else {
+          this.selectAfterUpdate.forEach(el => {
+            shadowRoot.getElementById(el.id).setAttribute('data-selected', true);
+          })
+        }
         this.selectAfterUpdate = null;
       }
     };
