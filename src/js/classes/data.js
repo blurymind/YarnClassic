@@ -1260,15 +1260,21 @@ export const data = {
     this.submit = text => {
       this.errors = [];
       this.warnings = [];
-      const Output = new inkjs.Compiler(text, this.compilerOptions)
+      try {
+        const Output = new inkjs.Compiler(text, this.compilerOptions)
         .Compile()
         .ToJson();
-      const newOutput = {
-        story: JSON.parse(Output),
-        warnings: this.warnings,
-        errors: this.errors,
-      };
-      this.onComplete(newOutput);
+        const newOutput = {
+          story: JSON.parse(Output),
+          warnings: this.warnings,
+          errors: this.errors,
+        };
+        this.onComplete(newOutput);
+      } catch(e) {
+        console.error(e);
+        ToastWc.show({ type: 'error', content: `Inkjs -- ${e}\nSee console for details`, time: 3000 })
+      }
+
     };
     this.getInkErrorGotoNode = async (inkTextFileData, inkError) => {
       const inkErrorFind = inkError
