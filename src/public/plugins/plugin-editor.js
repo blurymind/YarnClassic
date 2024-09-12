@@ -517,8 +517,12 @@ export var PluginEditor = function ({
       onClose: ()=> {
         this.editor.destroy();
         this.editor = null;
+        this.split.getEditor(1).destroy();
         this.differ.destroy()
         this.differ = null;
+        this.split = null;
+        window.removeEventListener('resize', this.onResizeEditor);
+        window.removeEventListener("previewErrors",this.onErrorsInPreview);   
       },
       onOpen: () => {
         app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
@@ -542,7 +546,7 @@ export var PluginEditor = function ({
         })
         this.isSplitEditingSecondFile = false;
         this.editSecond = (secondIsNew = true) => {
-          if(secondIsNew) {
+          if(secondIsNew) {// todo edit another file
             const newSession = split.setSession(secondEditingSession, 1);
             // setEditor(split.getEditor(1)) 
           } else {     
@@ -558,6 +562,11 @@ export var PluginEditor = function ({
           this.split.setOrientation(window.innerWidth < window.innerHeight ? this.split.BELOW : this.split.BESIDE);
           this.editSecond(false);
         }
+        this.onResizeEditor = () => {
+          this.split.setOrientation(window.innerWidth < window.innerHeight ? this.split.BELOW : this.split.BESIDE);
+          this.split.resize()
+        }
+        window.addEventListener('resize', this.onResizeEditor);
         
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
