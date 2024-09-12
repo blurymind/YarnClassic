@@ -520,7 +520,6 @@ export var PluginEditor = function ({
       onClose: ()=> {
         this.editor.destroy();
         this.editor = null;
-        this.split.getEditor(1).destroy();
         this.differ.destroy()
         this.differ = null;
         this.split = null;
