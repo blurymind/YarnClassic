@@ -258,6 +258,8 @@ export var PluginEditor = function ({
   };
   // ace-editor
   require('ace-builds/src-min-noconflict/ext-beautify');
+  require('ace-builds/src-min-noconflict/ext-split');
+  const EditSession = ace.require("ace/edit_session").EditSession;
   require('ace-builds/src-min-noconflict/mode-javascript');
   require('ace-builds/src-min-noconflict/theme-monokai');
   // ace-diff
@@ -372,7 +374,8 @@ export var PluginEditor = function ({
       title: `
         <div class="flex-wrap" style="flex:1;justify-content:space-between;gap: 4px; font-size: 1.4rem">
           <div class="flex-wrap" style="gap: 12px;">
-            <select id="edited-plugin-file" class="settings-value" onchange="${domPath}.onSetEditingFile()" style="max-width: calc(90vw - 60px)">
+            <button id="split-editor-view" onclick="${domPath}.onSplitEditor()" title="Split editor">Split</button>
+            <select id="edited-plugin-file" class="settings-value" onchange="${domPath}.onSetEditingFile()" style="max-width: calc(70vw - 60px)">
               ${Object.keys(this.volatilePlugins || {}).map(
           key => `<option value="${key}">${key}</option>`
         )}
@@ -510,19 +513,53 @@ export var PluginEditor = function ({
         // updateUrlParams('gistPlugins', '');
         updateUrlParams('mode', '');
         // updateUrlParams('pluginFile', '');
-        this.editor.terminate();
+      },
+      onClose: ()=> {
+        this.editor.destroy();
         this.editor = null;
+        this.differ.destroy()
+        this.differ = null;
       },
       onOpen: () => {
         app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
           this.yarnData = yarnData;
         })
-        window.addEventListener("previewErrors",this.onErrorsInPreview, false);
-        // EDITOR
-        this.editor = ace.edit('js-editor');
-        this.editor.setOptions({ ...editorOptions, theme: this.theme });
-        // required to enable better syntax highlighting
-        addEsVersionToEditor(this.editor);
+        window.addEventListener("previewErrors",this.onErrorsInPreview, false);        
+        // SPLIT EDITOR
+        const {Split} = ace.require("ace/ext/split");
+        console.log({Split})
+        const container = document.getElementById('js-editor');
+        const split = new Split(container, 'ace/theme/monokai', 1);
+        const secondEditingSession = new EditSession("new text here");
+        const session = split.getEditor(0).session;
+        this.editor = split.getEditor(0);
+        this.secondEditor = split.getEditor(1);
+        this.split = split;
+        
+        this.split.forEach(item => {
+          item.setOptions({ ...editorOptions, theme: this.theme });
+          // required to enable better syntax highlighting
+          addEsVersionToEditor(item);
+        })
+        this.isSplitEditingSecondFile = false;
+        this.editSecond = (secondIsNew = true) => {
+          if(secondIsNew) {
+            const newSession = split.setSession(secondEditingSession, 1);
+            // setEditor(split.getEditor(1)) 
+          } else {     
+            this.split.setSession(session, 1);
+          }
+          this.isSplitEditingSecondFile = secondIsNew;
+        }
+        this.isEditorSplit = false;
+        this.onSplitEditor = () => {
+          this.isEditorSplit = !this.isEditorSplit;
+          document.getElementById('split-editor-view').className = this.isEditorSplit ? 'checked-button' : '';
+          this.split.setSplits(this.split.getSplits() === 1 ? 2 : 1);
+          this.split.setOrientation(window.innerWidth < window.innerHeight ? this.split.BELOW : this.split.BESIDE);
+          this.editSecond(false);
+        }
+        
         const onChangeDebounced = app.utils.debounce(() => {
           setVloatilePlugin(this.editingFile, {
             content: this.editor.getValue(),

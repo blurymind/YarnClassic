@@ -163,6 +163,7 @@
   background: #282a36;
 }
 
+.checked-button,
 .styled-checkbox input:checked + label {
   background: #ff79c6;
   color: 	#282a36;

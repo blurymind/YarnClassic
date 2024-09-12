@@ -193,6 +193,9 @@
   border: 2px solid orange;
 }
 
+.checked-button {
+  background-color: #EFC7C7;
+}
 .styled-checkbox input:checked + label.transcribe-button {
   background-color: #EFC7C7;
   border: 2px solid #DC8484;
