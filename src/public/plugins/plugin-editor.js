@@ -249,6 +249,10 @@ export var PluginEditor = function ({
     document.getElementById('plugin-output-downloader').style.display =  mode === 'test' ? 'block' : 'none';
     document.getElementById('plugin-output-linker').style.display =  mode === 'test' ? 'block' : 'none';
     document.getElementById('js-editor-errors').style.display = mode === 'commit' ? 'none' : 'block';
+    
+    document.getElementById('split-editor-view').style.display =
+      mode === 'edit' ? 'block' : 'none';
+    if (mode === 'edit') this.onResizeEditor();
 
     updateUrlParams('mode', mode);
     this.onSetEditingFile();
@@ -499,10 +503,9 @@ export var PluginEditor = function ({
         this.theme = app.settings.theme() === 'dracula' ? 'ace/theme/monokai' : undefined;
         // ace-diff
         if (app.settings.theme() === 'dracula') {
-          removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
           addStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
         } else {
-          removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+          
           addStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
         }
         updateUrlParams('gistPlugins', getGistPluginsId());
@@ -522,7 +525,9 @@ export var PluginEditor = function ({
         this.differ = null;
         this.split = null;
         window.removeEventListener('resize', this.onResizeEditor);
-        window.removeEventListener("previewErrors",this.onErrorsInPreview);   
+        window.removeEventListener("previewErrors",this.onErrorsInPreview);
+        removeStyleSheet('public/plugins/ace-diff/ace-diff-dark.min.css');
+        removeStyleSheet('public/plugins/ace-diff/ace-diff.min.css');
       },
       onOpen: () => {
         app.data.getSaveData(app.settings.documentType() === 'ink' ? "ink.json" : "json").then(yarnData => {
@@ -564,7 +569,7 @@ export var PluginEditor = function ({
         }
         this.onResizeEditor = () => {
           this.split.setOrientation(window.innerWidth < window.innerHeight ? this.split.BELOW : this.split.BESIDE);
-          this.split.resize()
+          this.split.resize();
         }
         window.addEventListener('resize', this.onResizeEditor);
         
