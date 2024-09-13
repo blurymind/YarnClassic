@@ -601,7 +601,7 @@ class ResourcesComponent extends HTMLElement {
       console.log({fakeSelect, allSelected, specificFileId})
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
-      if(specificFileId && !(specificFileId instanceof PointerEvent)) {
+      if(specificFileId && typeof specificFileId === 'string') {
         console.log({allSelected, specificFileId})
         this.selectAfterUpdate = Object.values(allSelected).filter(item => item.id !== specificFileId);
         delete fileData[specificFileId];

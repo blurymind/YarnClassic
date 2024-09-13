@@ -73,10 +73,12 @@ export var ResourcesEditor = function({
   }
   // resource in local or at gist
   this.initResourcesFile = (createVolatile = false) => {
+    console.log({INITWITH: this.selectedResourcesJson})
+    this.selectedResourcesJson = 'resources.res.json';//todo use url param, also needs to update list here - it doesnt
     return new Promise((resolve, reject) => {
       const getOrCreateVolatile = () => {
         return getVloatileResource().then(volatile => {
-          if(volatile && volatile.content) {            
+          if(volatile && volatile.content) {    
             resolve(volatile);
             return
           }
@@ -89,6 +91,7 @@ export var ResourcesEditor = function({
             resolve(newFile);
             return
           }
+          this.onUpdateResourcesList();
           return this.createOrEditGistFile(resolve, reject);
         })
       }
@@ -98,7 +101,7 @@ export var ResourcesEditor = function({
             return getOrCreateVolatile()
           })
         }
-        this.onUpdateResourcesList();
+        // this.onUpdateResourcesList();
         return getOrCreateVolatile();
       })
     });
@@ -122,7 +125,7 @@ export var ResourcesEditor = function({
         });
         this.resourcesFileUrl = file.raw_url;
         document.querySelector('resources-component').setIsNew(false);
-        document.querySelector('resources-component').updateRawUrl(file.raw_url);
+        document.querySelector('resources-component').setFileContent(file);
       } else {
         ToastWc.show({
           type: 'error',
@@ -213,7 +216,7 @@ export var ResourcesEditor = function({
       console.log('Set', {fileName, file})
       document.querySelector('resources-component').updateResourcesList(file.content);
       document.getElementById("edited-resources").value = this.selectedResourcesJson;
-      document.querySelector('resources-component').updateRawUrl(file.raw_url);
+      document.querySelector('resources-component').setFileContent(file);
     });
   }
   this.onAddNewFile = () => {
@@ -341,6 +344,7 @@ export var ResourcesEditor = function({
            }
         });
         this.initResourcesComponent = (file) => {
+          console.log('INIT RES', {file})
           updateUrlParams('selectedResource', 'none');
           document.querySelector('resources-component').init({
             file,
