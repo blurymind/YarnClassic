@@ -365,11 +365,8 @@ export var Plugins = function (app) {
     const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
     return body;
   }
-  const getVolatileResources = () => { ///todo
 
-  }
-  const getPreviewHtml = (data, otherFiles, yarnData = {}) => {
-
+  const getPreviewHtmlRender = (data, otherFiles, yarnData = {}, volatileResources) => {
     // todo get volatile resources 
 
     // includes: ['some-other-file.js'] - with moduleName (can be used to create an instance) or no moduleName (just dump script body)
@@ -406,8 +403,16 @@ export var Plugins = function (app) {
     </head>
     <body>
       <script id="yarnDataJson">
-        const yarnData = ${yarnData};
-        const y = {yarnData: ${yarnData}};
+        const yarnData = ${JSON.stringify(yarnData)};
+        const y = {
+          yarnData, resources: ${JSON.stringify(volatileResources)},
+          getRes: function(resMapKey, resKey) {
+            if(resMapKey in this.resources && resKey in this.resources[resMapKey] && 'src' in this.resources[resMapKey][resKey]) {
+              return this.resources[resMapKey][resKey].src;
+            }
+            return ''
+          },
+        };
       </script>
       ${data.html || data.body || ''}
       ${getStoryParserModuleCode(data.parser)}
@@ -507,6 +512,36 @@ export var Plugins = function (app) {
       </div>
     </body>
   `}
+
+  const getVolatileResources = async () => {
+    return new Promise((resolve,reject)=> {
+      getVolatileResourcesList().then(resourcesList => {
+        const result = {}
+        try{
+          const resourcesListArray = Array.from(resourcesList)
+          resourcesListArray.forEach((resourceName, index) => {
+            getVloatileResource(resourceName).then(data=> {
+              result[resourceName.split('.')[0]] = JSON.parse(data.content);
+              if(index === resourcesListArray.length - 1) resolve(result);
+            })
+          })
+        } catch(e) {
+          console.error(e);
+          reject(e);
+        }
+      })
+    })
+  }
+
+  const getPreviewHtml = async (data, otherFiles, yarnData = {}) => {
+    return getVolatileResources().then(volatileResources => {
+      console.log("GOT resources --- ", {volatileResources})
+      return getPreviewHtmlRender(data, otherFiles, yarnData = {}, volatileResources);
+    }).catch(()=> {
+      return getPreviewHtmlRender(data, otherFiles, yarnData = {}, {});
+    })
+    
+  }
 
   const pluginApiMethods = {
     app,

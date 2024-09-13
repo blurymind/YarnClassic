@@ -114,7 +114,7 @@ export var ResourcesEditor = function({
   };
 
   this.onCommitResourceFiles = newContent => {
-    this.isBusy('Uploading changes to gist...');
+    this.isBusy(`${this.selectedResourcesJson} Uploading changes to gist...`);
     document.querySelector('resources-component').setIsLocked(true);
     app.data.storage.editGistFile(this.selectedResourcesJson, newContent).then(({ok, gistId, file}) => {
       if(!gistId) {
@@ -130,8 +130,10 @@ export var ResourcesEditor = function({
           time: 1000,
         });
         this.resourcesFileUrl = file.raw_url;
+        console.log({file})
         document.querySelector('resources-component').setIsNew(false);
-        document.querySelector('resources-component').setFileContent(file);
+        document.querySelector('resources-component').setFileContent({...file, content: newContent});
+        this.isBusy('');
       } else {
         ToastWc.show({
           type: 'error',
@@ -309,7 +311,7 @@ export var ResourcesEditor = function({
       width: `${window.innerWidth - 20}px`,
       onBeforeOpen: () => {},
       onAfterClose: () => {
-        // updateUrlParams('selectedResource', '')
+        updateUrlParams('selectedResource', '')
       },
       onOpen: () => {
         this.isBusy = (message) => {
@@ -349,7 +351,9 @@ export var ResourcesEditor = function({
             })
            }
            if(action === 'push'){
-            getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
+            getVloatileResource(this.selectedResourcesJson).then(result=> {
+              this.onCommitResourceFiles(result.content)
+            })
            }
         });
         this.initResourcesComponent = (file) => {

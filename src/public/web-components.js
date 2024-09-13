@@ -533,7 +533,6 @@ class ResourcesComponent extends HTMLElement {
       this.isPointerDown = true;
       shadowRoot.getElementById('resources-editor-select').focus();
       if(evt.target.className !== 'select-option') return;
-      console.log('is control down --> ',this.isControlDown)
       if(!this.isControlDown) shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => item.removeAttribute('data-selected'));
       // evt.target.setAttribute('data-selected', true)
       toggleItemSelected(evt.target);
