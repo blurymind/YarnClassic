@@ -653,7 +653,8 @@ export var PluginEditor = function ({
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Playground',
+      name: app.settings.developmentModeEnabled() ? 'Js' : 'Playground',
+      title: 'Playground',
       attachTo: app.settings.developmentModeEnabled() ? 'appHeader' : 'fileMenuDropdown',
       onClick: 'onOpenPluginEditor()',
       className: 'item',
