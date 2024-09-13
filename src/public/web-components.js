@@ -279,6 +279,7 @@ class ResourcesComponent extends HTMLElement {
       .preview-image {
         position: relative;
         width: fit-content;
+        min-width: 200px;
       }
       .delete-previewed-image {
         color: rgb(255 255 255 / 48%);
