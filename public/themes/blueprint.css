@@ -1,3 +1,6 @@
+:root {
+  --text-color: #2f919a;
+}
 /*-- Scrollbar ------------------------------------------------------------------ */
 
 ::-webkit-scrollbar-thumb:hover {

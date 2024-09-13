@@ -364,7 +364,8 @@ export var ResourcesEditor = function({
 
     // create a button in the file menu if in dev mode
     createButton(self.name, {
-      name: 'Resources',
+      name: app.settings.developmentModeEnabled() ? 'Rs' : 'Resources',
+      title: 'Resources',
       attachTo: app.settings.developmentModeEnabled()
         ? 'appHeader'
         : 'fileMenuDropdown',

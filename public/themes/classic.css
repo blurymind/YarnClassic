@@ -2,6 +2,7 @@
 :root {
   --yarnBg: #baf5f2;
   --yarnFg: #00dcff;
+  --text-color: #134347;
 }
 
 #app-bg {
@@ -16,6 +17,9 @@ a {
 
 a:hover {
   color: #000;
+}
+.styled-checkbox {
+  background-color: white;
 }
 .styled-checkbox>label>svg,
 .bbcode-button>svg {
@@ -204,7 +208,8 @@ a:hover {
   }
 
   .app-search {
-    top: 0;
+    top: 34px;
+    left: 0px;
     position: absolute;
     width: 50%;
     padding: 5px 10px 5px 5px;

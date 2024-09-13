@@ -298,12 +298,12 @@ class ResourcesComponent extends HTMLElement {
         display: block;
       }
       .image-view {
-        pointer-events:none;
+        pointer-events: none;
         max-width:60vw;
         object-fit: contain;
         border: 0;
       }
-      .preview-image:active .image-view {
+      .preview-image:hover .image-view {
         max-width: 100%;
         object-fit: fill;
       }
@@ -312,10 +312,27 @@ class ResourcesComponent extends HTMLElement {
           max-width: 100%;
           object-fit: fill;
         }
+        .preview-image:hover .video-view {
+          max-width: 100%;
+          object-fit: contain;
+        }
+      }
+      .preview-font {
+        width: 500px;
+        height: 290px;
+        overflow: auto;
+        color: var(--font-color);
+        align-content: center;
+        text-align-last: start;
+      }
+      .video-view {
+        pointer-events: auto;
+        object-fit: contain;
+        object-fit: contain;
       }
       .preview-image:hover::after {
         position: absolute;
-        bottom: 2%;
+        top: 4px;
         left: 30%;
         padding: 3px;
         display: block;
@@ -359,7 +376,7 @@ class ResourcesComponent extends HTMLElement {
             </div>
             <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
               <button id="onSelectAllButton">Select all</button>
-              <input type="file" accept="image/*" multiple="true"
+              <input type="file" accept=".ttf,audio/*,video/*,image/*" multiple="true"
                 id="file-input-res"
                 style="display:none"
               />
@@ -419,23 +436,75 @@ class ResourcesComponent extends HTMLElement {
       this.selectedResources.forEach((resource, index) => {
         if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
         const selectedItem = resource.src;
+        const byteSize = this.getBase64StringSizeInbites(selectedItem);
+        totalSize += byteSize;
+        const wrapEl = document.createElement('div');
+        wrapEl.title = `${resource.id}  size: ${this.bytesToSize(byteSize)}`;
+
         if (selectedItem.startsWith('data:image')) {
-          const byteSize = this.getBase64StringSizeInbites(selectedItem);
-          totalSize += byteSize;
-          const wrapEl = document.createElement('div');
-          wrapEl.title = `${resource.id}  size: ${this.bytesToSize(byteSize)}`;
           wrapEl.className = 'preview-image';
           const imgEl = document.createElement('img');
           imgEl.src = selectedItem;
           imgEl.className = 'image-view';
           wrapEl.appendChild(imgEl);
-          const deleteEl = document.createElement('button');
-          deleteEl.innerText = 'delete';
-          deleteEl.className = 'delete-previewed-image';
-          deleteEl.addEventListener('click', () => this.onRemoveResource(resource.id))
-          wrapEl.appendChild(deleteEl);
-          shadowRoot.getElementById('selected-resource-preview').appendChild(wrapEl);
         }
+        if (selectedItem.startsWith('data:video') || selectedItem.startsWith('data:audio')) {
+          wrapEl.className = 'preview-image';
+          const vidEl = document.createElement('video');
+          vidEl.loop = true;
+          vidEl.addEventListener('pointerenter', () => {
+            vidEl.play();
+          });
+          vidEl.addEventListener('pointerleave', () => {
+            vidEl.pause();
+            vidEl.currentTime = 0;
+          });
+          vidEl.controls = true;
+          vidEl.src = selectedItem;
+          vidEl.className = 'image-view video-view';
+          wrapEl.appendChild(vidEl);
+        }
+        if (selectedItem.startsWith('data:font')) {
+          console.log({selectedItem, resource})
+          const fontFamily = resource.id.split('.')[0];
+          const newFont = new FontFace(fontFamily, `url(${selectedItem})`);
+          newFont.load().then(loaded_face => {
+            document.fonts.add(loaded_face)
+            const spanEl = document.createElement('span');
+            spanEl.className = 'preview-font';
+            spanEl.style.fontFamily = fontFamily;
+            const innerText = 'The quick brown fox jumps over the lazy dog';
+            spanEl.innerHTML = `
+              font-style: normal ----
+              <div style="font-weight: normal">font-weight: normal -- ${innerText}</div>
+              <div style="font-weight: bold">bold -- ${innerText}</div>
+              <div style="font-weight: bolder">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter">lighter -- ${innerText}</div>
+              font-style: italic ----
+              <div style="font-weight: normal;font-style: italic;">font-weight:normal -- ${innerText}</div>
+              <div style="font-weight: bold;font-style: italic;">bold -- ${innerText}</div>
+              <div style="font-weight: bolder;font-style: italic;">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter;font-style: italic;">lighter -- ${innerText}</div>
+              font-style: oblique ----
+              <div style="font-weight: normal;font-style: oblique;">font-weight:normal -- ${innerText}</div>
+              <div style="font-weight: bold;font-style: oblique;">bold -- ${innerText}</div>
+              <div style="font-weight: bolder;font-style: oblique;">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter;font-style: oblique;">lighter -- ${innerText}</div>
+            `;
+            spanEl.style.fontFamily = resource.id;
+            wrapEl.appendChild(spanEl); 
+        
+          }).catch(function(error) {
+            console.error(error)
+          });
+          wrapEl.className = 'preview-font preview-image';//todo rename preview-image class to something generic
+        }
+        const deleteEl = document.createElement('button');
+        deleteEl.innerText = 'delete';
+        deleteEl.className = 'delete-previewed-image';
+        deleteEl.addEventListener('click', () => this.onRemoveResource(resource.id))
+        wrapEl.appendChild(deleteEl);
+        shadowRoot.getElementById('selected-resource-preview').appendChild(wrapEl);
       });
       const totalEstEl = document.createElement('div');
       totalEstEl.className = 'total-size-estimate-selected';
@@ -466,6 +535,7 @@ class ResourcesComponent extends HTMLElement {
         block: 'center',
         inline: 'center'
       }
+      if(!el) return;
       el.setAttribute('data-selected', true);
       setTimeout(()=> {
         el.scrollIntoView(scrollOpt);
@@ -523,10 +593,10 @@ class ResourcesComponent extends HTMLElement {
     this.onRemoveResource = (specificFileId = null) => {
       const fakeSelect = shadowRoot.getElementById('resources-editor-select');
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
-      
+      console.log({fakeSelect, allSelected, specificFileId})
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
-      if(specificFileId) {
+      if(specificFileId && !(specificFileId instanceof PointerEvent)) {
         console.log({allSelected, specificFileId})
         this.selectAfterUpdate = Object.values(allSelected).filter(item => item.id !== specificFileId);
         delete fileData[specificFileId];
@@ -541,7 +611,7 @@ class ResourcesComponent extends HTMLElement {
   
       const newContent = JSON.stringify(fileData, null, 2);
       this.onCommitResourceFiles(newContent);
-      if(specificFileId) this.updateSelected();
+      this.updateSelected();
       this.isBusy('');
     };
     const toBase64 = file => {
@@ -609,7 +679,7 @@ class ResourcesComponent extends HTMLElement {
       this.isBusy(false);
       this.setIsNew(isNew);
       if(this.selectAfterUpdate && this.selectAfterUpdate.length > 0) {
-        if(this.selectAfterUpdate.length === 1){ 
+        if(this.selectAfterUpdate.length === 1){
           this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate[0]));
         } else {
           this.selectAfterUpdate.forEach(el => {
