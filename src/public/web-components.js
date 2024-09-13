@@ -277,9 +277,11 @@ class ResourcesComponent extends HTMLElement {
         flex: 8;
       }
       .preview-font {
-        width: 300px;
+        width: 500px;
         height: 300px;
-        background: yellow;
+        color: var(--font-color);
+        align-content: center;
+        text-align-last: start;
       }
       .preview-image {
         position: relative;
@@ -303,10 +305,13 @@ class ResourcesComponent extends HTMLElement {
         display: block;
       }
       .image-view {
-        pointer-events:none;
+        pointer-events: none;
         max-width:60vw;
         object-fit: contain;
         border: 0;
+      }
+      .video-view {
+        pointer-events: auto;
       }
       .preview-image:hover .image-view {
         max-width: 100%;
@@ -320,7 +325,7 @@ class ResourcesComponent extends HTMLElement {
       }
       .preview-image:hover::after {
         position: absolute;
-        bottom: 2%;
+        top: 4px;
         left: 30%;
         padding: 3px;
         display: block;
@@ -436,13 +441,56 @@ class ResourcesComponent extends HTMLElement {
           imgEl.className = 'image-view';
           wrapEl.appendChild(imgEl);
         }
+        if (selectedItem.startsWith('data:video') || selectedItem.startsWith('data:audio')) {
+          wrapEl.className = 'preview-image';
+          const vidEl = document.createElement('video');
+          vidEl.loop = true;
+          vidEl.addEventListener('pointerenter', () => {
+            vidEl.play();
+          });
+          vidEl.addEventListener('pointerleave', () => {
+            vidEl.pause();
+            vidEl.currentTime = 0;
+          });
+          vidEl.controls = true;
+          vidEl.src = selectedItem;
+          vidEl.className = 'image-view video-view';
+          wrapEl.appendChild(vidEl);
+        }
         if (selectedItem.startsWith('data:font')) {
-          wrapEl.className = 'preview-font';
-          const spanEl = document.createElement('span');
-          spanEl.src = selectedItem;
-          spanEl.className = 'image-view';
-          spanEl.innerText = 'Test me blah';
-          wrapEl.appendChild(spanEl);     
+          console.log({selectedItem, resource})
+          const fontFamily = resource.id.split('.')[0];
+          const newFont = new FontFace(fontFamily, `url(${selectedItem})`);
+          newFont.load().then(loaded_face => {
+            document.fonts.add(loaded_face)
+            const spanEl = document.createElement('span');
+            spanEl.className = 'preview-font';
+            spanEl.style.fontFamily = fontFamily;
+            const innerText = 'The quick brown fox jumps over the lazy dog';
+            spanEl.innerHTML = `
+              font-style: normal ----
+              <div style="font-weight: normal">font-weight: normal -- ${innerText}</div>
+              <div style="font-weight: bold">bold -- ${innerText}</div>
+              <div style="font-weight: bolder">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter">lighter -- ${innerText}</div>
+              font-style: italic ----
+              <div style="font-weight: normal;font-style: italic;">font-weight:normal -- ${innerText}</div>
+              <div style="font-weight: bold;font-style: italic;">bold -- ${innerText}</div>
+              <div style="font-weight: bolder;font-style: italic;">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter;font-style: italic;">lighter -- ${innerText}</div>
+              font-style: oblique ----
+              <div style="font-weight: normal;font-style: oblique;">font-weight:normal -- ${innerText}</div>
+              <div style="font-weight: bold;font-style: oblique;">bold -- ${innerText}</div>
+              <div style="font-weight: bolder;font-style: oblique;">bolder -- ${innerText}</div>
+              <div style="font-weight: lighter;font-style: oblique;">lighter -- ${innerText}</div>
+            `;
+            spanEl.style.fontFamily = resource.id;
+            wrapEl.appendChild(spanEl); 
+        
+          }).catch(function(error) {
+            console.error(error)
+          });
+          wrapEl.className = 'preview-font preview-image';//todo rename preview-image class to something generic
         }
         const deleteEl = document.createElement('button');
         deleteEl.innerText = 'delete';
