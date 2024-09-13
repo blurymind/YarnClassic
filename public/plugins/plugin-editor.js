@@ -294,7 +294,10 @@ export var PluginEditor = function ({
       console.log({ outputData: data })
       // just in case to prevent getting stuck with bad code
       if(!this.hasTestedOnce) return;
-      document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, this.yarnData);
+      getPreviewHtml(data, this.volatilePlugins, this.yarnData).then(output => {
+        document.getElementById('plugin-output-previewer').srcdoc = output;
+      })
+      // document.getElementById('plugin-output-previewer').srcdoc = getPreviewHtml(data, this.volatilePlugins, this.yarnData);
       document.getElementById('plugin-output-previewer').onload = () => {
         console.log("LOADED")
         onLoad();
