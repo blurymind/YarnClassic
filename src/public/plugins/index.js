@@ -520,7 +520,8 @@ export var Plugins = function (app) {
         try{
           const resourcesListArray = Array.from(resourcesList)
           resourcesListArray.forEach((resourceName, index) => {
-            getVloatileResource(resourceName).then(data=> {
+            getVloatileResource(resourceName).then(data=> {// todo this needs to also attempt to get themfrom gist provided in the url - if they have never been loaded!
+              // todo this is so the demo url will work out of the box
               result[resourceName.split('.')[0]] = JSON.parse(data.content);
               if(index === resourcesListArray.length - 1) resolve(result);
             })
