@@ -307,6 +307,10 @@ class ResourcesComponent extends HTMLElement {
         max-width: 100%;
         object-fit: fill;
       }
+      .preview-image:hover .video-view {
+        max-width: 100%;
+        object-fit: contain;
+      }
       @media only screen and (max-width: 600px) {
         .preview-image:hover .image-view {
           max-width: 100%;
@@ -327,7 +331,6 @@ class ResourcesComponent extends HTMLElement {
       }
       .video-view {
         pointer-events: auto;
-        object-fit: contain;
         object-fit: contain;
       }
       .preview-image:hover::after {
