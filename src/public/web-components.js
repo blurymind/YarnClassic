@@ -458,9 +458,11 @@ class ResourcesComponent extends HTMLElement {
           vidEl.addEventListener('pointerenter', () => {
             vidEl.play();
           });
+          vidEl.addEventListener('fullscreenchange', () => {
+            vidEl.play();
+          });
           vidEl.addEventListener('pointerleave', () => {
             vidEl.pause();
-            vidEl.currentTime = 0;
           });
           vidEl.controls = true;
           vidEl.src = selectedItem;
