@@ -8,12 +8,13 @@ export var ResourcesEditor = function({
   getGistFileUrl,
   getSelectedResourceUrl,
   updateUrlParams,
+  urlParams,
   getVolatileResourcesList,
   getVloatileResource
 }) {
   const self = this;
   this.name = 'ResourcesEditor';
-  this.selectedResourcesJson = 'resources.res.json';
+  this.selectedResourcesJson = urlParams.get('selectedResource') || 'resources.res.json';
   this.resourcesFileUrl = '';// todo this should be written in the file itself instead. It doesnt persist between reloads atm
   this.resourcesFileContent = '';
   const dbStorage = app.data.db;
@@ -73,11 +74,16 @@ export var ResourcesEditor = function({
   }
   // resource in local or at gist
   this.initResourcesFile = (createVolatile = false) => {
+    this.selectedResourcesJson = urlParams.get('selectedResource') || 'resources.res.json';
     console.log({INITWITH: this.selectedResourcesJson})
-    this.selectedResourcesJson = 'resources.res.json';//todo use url param, also needs to update list here - it doesnt
+    
+    // this.selectedResourcesJson = 'resources.res.json';//todo use url param, also needs to update list here - it doesnt
+    // updateUrlParams('selectedResource', this.selectedResourcesJson);
     return new Promise((resolve, reject) => {
       const getOrCreateVolatile = () => {
-        return getVloatileResource().then(volatile => {
+        const initVolatile = this.selectedResourcesJson;
+        return getVloatileResource(this.selectedResourcesJson).then(volatile => {
+          console.log({volatile})
           if(volatile && volatile.content) {    
             resolve(volatile);
             return
@@ -187,8 +193,9 @@ export var ResourcesEditor = function({
             this.setVolatileResource(file, newFileName).then(() => {
               if(index === files.length -1) {
                 this.setVolatileResourcesList(newFileName).then(()=> {
-                  this.onUpdateResourcesList();
+                  
                   this.onSetEditingFile(newFileName);
+                  this.onUpdateResourcesList();
                   ToastWc.show({
                     type: 'success',
                     content: `Added ${files.length} files..\n${filesFromGist.map(item=>item.filename).join('\n')}`,
@@ -204,17 +211,19 @@ export var ResourcesEditor = function({
     })
   }
   this.onUpdateResourcesList = () => {
-    getVolatileResourcesList().then(resourcesList => {
+    return getVolatileResourcesList().then(resourcesList => {
       console.log({resourcesList})
       document.getElementById("edited-resources").innerHTML = Array.from(resourcesList).map(key => `<option value="${key}">${key}</option>`).join('')
     })
   }
   this.onSetEditingFile = (newFileName = '') => {
+    console.log({newFileName})
+    if(newFileName) document.getElementById('edited-resources').value = newFileName;
     const fileName = newFileName || document.getElementById('edited-resources').value;
     this.selectedResourcesJson = fileName;
+    updateUrlParams('selectedResource', this.selectedResourcesJson);
     getVloatileResource(fileName).then(file => {
       console.log('Set', {fileName, file})
-      document.querySelector('resources-component').updateResourcesList(file.content);
       document.getElementById("edited-resources").value = this.selectedResourcesJson;
       document.querySelector('resources-component').setFileContent(file);
     });
@@ -300,7 +309,7 @@ export var ResourcesEditor = function({
       width: `${window.innerWidth - 20}px`,
       onBeforeOpen: () => {},
       onAfterClose: () => {
-        updateUrlParams('selectedResource', '')
+        // updateUrlParams('selectedResource', '')
       },
       onOpen: () => {
         this.isBusy = (message) => {
@@ -345,13 +354,17 @@ export var ResourcesEditor = function({
         });
         this.initResourcesComponent = (file) => {
           console.log('INIT RES', {file})
-          updateUrlParams('selectedResource', 'none');
-          document.querySelector('resources-component').init({
-            file,
-            gistId: this.gistId ,
-            darkMode: app.settings.theme() === 'dracula',
-            headerButtons: [{title: 'Pull from gist', action: 'pull'}, {title: 'Commit to gist', action: 'push'}]
-          })
+          this.onUpdateResourcesList().then(()=> {
+            updateUrlParams('selectedResource', file.filename);
+            document.getElementById('edited-resources').value = file.filename;
+            document.querySelector('resources-component').init({
+              file,
+              gistId: this.gistId ,
+              darkMode: app.settings.theme() === 'dracula',
+              headerButtons: [{title: 'Pull from gist', action: 'pull'}, {title: 'Commit to gist', action: 'push'}]
+            })
+          });
+
         }
         this.initResourcesFile().then(file => {
             this.resourcesFileUrl = file.raw_url;

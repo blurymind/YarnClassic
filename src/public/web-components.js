@@ -753,7 +753,8 @@ class ResourcesComponent extends HTMLElement {
     this.setFileContent = (file) => {
       this.updateRawUrl(file.raw_url);
       this.resourcesFileContent = file.content || '{}';
-      this.updateResourcesList(this.resourcesFileContent, !file.raw_url);
+      this.updateResourcesList(file.content, !file.raw_url);
+      this.updateSelected();
     }
   }
 
