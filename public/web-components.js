@@ -608,7 +608,9 @@ class ResourcesComponent extends HTMLElement {
         // this.selectAfterUpdate = null;
         // this.updateSelected();
       } else {
-        this.selectAfterUpdate = allSelected.length > 0 ? [allSelected[allSelected.length - 1].nextSibling.id ]: [fakeSelect.firstChild.id]
+        if(allSelected.length !== this.selectedResources.length) {
+          this.selectAfterUpdate = allSelected.length > 0 ? [allSelected[allSelected.length - 1].nextSibling.id ]: [fakeSelect.firstChild.id]
+        }
         this.selectedResources.forEach(selectedResource => {
           if (selectedResource.id in fileData) delete fileData[selectedResource.id];
         });
