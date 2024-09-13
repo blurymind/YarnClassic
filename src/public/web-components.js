@@ -276,6 +276,11 @@ class ResourcesComponent extends HTMLElement {
       #selected-resource-preview:hover {
         flex: 8;
       }
+      .preview-font {
+        width: 300px;
+        height: 300px;
+        background: yellow;
+      }
       .preview-image {
         position: relative;
         width: fit-content;
@@ -303,7 +308,7 @@ class ResourcesComponent extends HTMLElement {
         object-fit: contain;
         border: 0;
       }
-      .preview-image:active .image-view {
+      .preview-image:hover .image-view {
         max-width: 100%;
         object-fit: fill;
       }
@@ -359,7 +364,7 @@ class ResourcesComponent extends HTMLElement {
             </div>
             <div id="resource-file-buttons" style="display:flex;justify-content:space-around;">
               <button id="onSelectAllButton">Select all</button>
-              <input type="file" accept="image/*" multiple="true"
+              <input type="file" accept=".ttf,audio/*,video/*,image/*" multiple="true"
                 id="file-input-res"
                 style="display:none"
               />
@@ -419,23 +424,32 @@ class ResourcesComponent extends HTMLElement {
       this.selectedResources.forEach((resource, index) => {
         if(totalSize > kbLimitPreview) return;// we need some hard limit from preventing potential crash
         const selectedItem = resource.src;
+        const byteSize = this.getBase64StringSizeInbites(selectedItem);
+        totalSize += byteSize;
+        const wrapEl = document.createElement('div');
+        wrapEl.title = `${resource.id}  size: ${this.bytesToSize(byteSize)}`;
+
         if (selectedItem.startsWith('data:image')) {
-          const byteSize = this.getBase64StringSizeInbites(selectedItem);
-          totalSize += byteSize;
-          const wrapEl = document.createElement('div');
-          wrapEl.title = `${resource.id}  size: ${this.bytesToSize(byteSize)}`;
           wrapEl.className = 'preview-image';
           const imgEl = document.createElement('img');
           imgEl.src = selectedItem;
           imgEl.className = 'image-view';
           wrapEl.appendChild(imgEl);
-          const deleteEl = document.createElement('button');
-          deleteEl.innerText = 'delete';
-          deleteEl.className = 'delete-previewed-image';
-          deleteEl.addEventListener('click', () => this.onRemoveResource(resource.id))
-          wrapEl.appendChild(deleteEl);
-          shadowRoot.getElementById('selected-resource-preview').appendChild(wrapEl);
         }
+        if (selectedItem.startsWith('data:font')) {
+          wrapEl.className = 'preview-font';
+          const spanEl = document.createElement('span');
+          spanEl.src = selectedItem;
+          spanEl.className = 'image-view';
+          spanEl.innerText = 'Test me blah';
+          wrapEl.appendChild(spanEl);     
+        }
+        const deleteEl = document.createElement('button');
+        deleteEl.innerText = 'delete';
+        deleteEl.className = 'delete-previewed-image';
+        deleteEl.addEventListener('click', () => this.onRemoveResource(resource.id))
+        wrapEl.appendChild(deleteEl);
+        shadowRoot.getElementById('selected-resource-preview').appendChild(wrapEl);
       });
       const totalEstEl = document.createElement('div');
       totalEstEl.className = 'total-size-estimate-selected';
@@ -466,6 +480,7 @@ class ResourcesComponent extends HTMLElement {
         block: 'center',
         inline: 'center'
       }
+      if(!el) return;
       el.setAttribute('data-selected', true);
       setTimeout(()=> {
         el.scrollIntoView(scrollOpt);
@@ -523,10 +538,10 @@ class ResourcesComponent extends HTMLElement {
     this.onRemoveResource = (specificFileId = null) => {
       const fakeSelect = shadowRoot.getElementById('resources-editor-select');
       const allSelected = fakeSelect.querySelectorAll('[data-selected]');
-      
+      console.log({fakeSelect, allSelected, specificFileId})
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
-      if(specificFileId) {
+      if(specificFileId && !(specificFileId instanceof PointerEvent)) {
         console.log({allSelected, specificFileId})
         this.selectAfterUpdate = Object.values(allSelected).filter(item => item.id !== specificFileId);
         delete fileData[specificFileId];
@@ -541,7 +556,7 @@ class ResourcesComponent extends HTMLElement {
   
       const newContent = JSON.stringify(fileData, null, 2);
       this.onCommitResourceFiles(newContent);
-      if(specificFileId) this.updateSelected();
+      this.updateSelected();
       this.isBusy('');
     };
     const toBase64 = file => {
@@ -609,7 +624,7 @@ class ResourcesComponent extends HTMLElement {
       this.isBusy(false);
       this.setIsNew(isNew);
       if(this.selectAfterUpdate && this.selectAfterUpdate.length > 0) {
-        if(this.selectAfterUpdate.length === 1){ 
+        if(this.selectAfterUpdate.length === 1){
           this.selectAndScrollIntoView(shadowRoot.getElementById(this.selectAfterUpdate[0]));
         } else {
           this.selectAfterUpdate.forEach(el => {
