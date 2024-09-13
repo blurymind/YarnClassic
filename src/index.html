@@ -11,6 +11,7 @@
 <body>
   <script src="./public/libs/bondage.min.js"></script>
   <script src="./public/libs/ink-full.js"></script>
+  <script src="./public/libs/uFuzzy.iife.min.js"></script>
 
   <!-- Web components - see index.js importing web-components.js-->
   <toast-component></toast-component>
@@ -20,11 +21,50 @@
 
   <!-- Container -->
   <div id="app">
-
+    <!-- app-opened-documents -->
+    <div class="file-tabs" id="fileTabsTray">
+      <span style="border-radius: 2px; padding: 0 5px;margin-right: 5px" class="bbcode-button" data-bind="click:app.data.trySaveCurrent, text:`${data.isDocumentDirty() ? '💾':'✅'}`"></span>
+      <button class="bbcode-button" data-bind="click: function(){
+        app.settings.fileTabsVisible(!app.settings.fileTabsVisible())
+      },css: {
+       active: !app.settings.fileTabsVisible(), rotated: !app.settings.fileTabsVisible()
+       }, attr: { title: `${data.appInstanceStates().length} files opened`}">=</button>
+      <div class="file-tabs-buttons" data-bind="css:{
+        collapsed: !app.settings.fileTabsVisible()
+      }, foreach: { data: data.appInstanceStates, as: 'state' }">
+        <button class="bbcode-button session-button" data-bind="
+         click:function(data, event) {
+            $root.data.loadDocumentStateTabFromIndex($index());
+          },
+          attr: {
+            title:
+            `${state.editingName}
+            contains ${state.nodes.length} node${state.nodes.length > 1 ? 's':''}
+            ${state.lastStorageHost} HOST
+            ${state.lastEditedUnix || ''}
+          `},
+          css: { active: $index() == app.settings.selectedFileTab()}
+          ">
+          <span data-bind="text: state.editingName + `(${state.nodes.length})`"></span>
+<!--          <span data-bind="click:function(e){-->
+<!--            $root.data.deleteDocumentStateTab($index());-->
+<!--          },clickBubble: false">[X]</span>-->
+        </button>
+      </div>
+      <div class="flex-wrap" style="justify-content: space-between;" data-bind="visible:app.settings.fileTabsVisible()">
+        <button class="bbcode-button" data-bind="click:function() {
+         data.deleteDocumentStateTab(app.settings.selectedFileTab())
+         }, visible: data.appInstanceStates().length > 1, attr: { title: `Close ${data.editingName()} file`}">-</button>
+        <button class="bbcode-button" data-bind="click:function() {
+         data.addDocumentStateTab()
+         }" title="Open new tab">+</button>
+      </div>
+    </div>
+    
     <!-- search form -->
     <div class="app-search" id="appSearchTray">
       <form class="menu" autocomplete="off" onkeypress="return event.keyCode != 13;">
-        <span class="app-search-field">
+        <span class="app-search-field" id="nodeSearchInputWrapper">
           <input id="nodeSearchInput" type="search" class="search-field" placeholder="Search" autocomplete="off" oninput="app.ui.openNodeListMenu('open')" onmouseenter="app.ui.openNodeListMenu('open')">
           <button id="nodeSearchClear" data-bind="click: app.clearSearch">×</button> 
         </span>
@@ -83,7 +123,6 @@
       <span data-bind="click: function() { app.workspace.setZoom(2); }" title="Zoom 3:1"><svg class="icon icon-th icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-th"></use></svg></span>
       <span data-bind="click: function() { app.workspace.setZoom(1); }" title="Zoom 4:1"><svg class="icon icon-th icon-lg icon-fw"><use xlink:href="public/icons.svg#icon-th-small"></use></svg></span>
     </div>
-
     <!-- main menu -->
     <div class="app-menu" id="appHeader">
       <!-- File menu -->
@@ -180,46 +219,6 @@
         </div>
       </div> <!-- file menu -->
     </div> <!-- app-menu -->
-
-    <!-- app-opened-documents -->
-    <div class="file-tabs" id="fileTabsTray">
-      <span style="border-radius: 2px; padding: 0 5px;margin-right: 5px" class="bbcode-button" data-bind="click:app.data.trySaveCurrent, text:`${data.isDocumentDirty() ? '💾':'✅'}`"></span>
-      <button class="bbcode-button" data-bind="click: function(){
-        app.settings.fileTabsVisible(!app.settings.fileTabsVisible())
-      },css: {
-       active: !app.settings.fileTabsVisible(), rotated: !app.settings.fileTabsVisible()
-       }, attr: { title: `${data.appInstanceStates().length} files opened`}">=</button>
-      <div class="file-tabs-buttons" data-bind="css:{
-        collapsed: !app.settings.fileTabsVisible()
-      }, foreach: { data: data.appInstanceStates, as: 'state' }">
-        <button class="bbcode-button session-button" data-bind="
-         click:function(data, event) {
-            $root.data.loadDocumentStateTabFromIndex($index());
-          },
-          attr: {
-            title:
-            `${state.editingName}
-            contains ${state.nodes.length} node${state.nodes.length > 1 ? 's':''}
-            ${state.lastStorageHost} HOST
-            ${state.lastEditedUnix || ''}
-          `},
-          css: { active: $index() == app.settings.selectedFileTab()}
-          ">
-          <span data-bind="text: state.editingName + `(${state.nodes.length})`"></span>
-<!--          <span data-bind="click:function(e){-->
-<!--            $root.data.deleteDocumentStateTab($index());-->
-<!--          },clickBubble: false">[X]</span>-->
-        </button>
-      </div>
-      <div class="flex-wrap" style="justify-content: space-between;" data-bind="visible:app.settings.fileTabsVisible()">
-        <button class="bbcode-button" data-bind="click:function() {
-         data.deleteDocumentStateTab(app.settings.selectedFileTab())
-         }, visible: data.appInstanceStates().length > 1, attr: { title: `Close ${data.editingName()} file`}">-</button>
-        <button class="bbcode-button" data-bind="click:function() {
-         data.addDocumentStateTab()
-         }" title="Open new tab">+</button>
-      </div>
-    </div>
 
     <!-- grid bg for snap to grid functionality -->
     <canvas id="grid-canvas" class="grid-canvas"></canvas>

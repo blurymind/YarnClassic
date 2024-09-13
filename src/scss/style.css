@@ -3,7 +3,7 @@
   src: url('../public/droid-sans-mono.ttf');
 }
 :root{
-  --menu-dropdown-max-height: 700px;
+  --menu-dropdown-max-height: 90vh;
 }
 /* --- ROOT CSS --- */
 body {
@@ -965,7 +965,7 @@ input#editorTitle {
   left: 27px;
   min-width: 27px;
   opacity: 0.3;
-  z-index: 10002;
+  z-index: 10000;
   transform: rotate(270deg);
   transform-origin: left;
   display: flex;
@@ -989,7 +989,7 @@ input#editorTitle {
 }
 
 .app-search {
-  z-index: 10004;
+  z-index: 11004;
 }
 .app-search-field {
   position: relative;
@@ -1003,11 +1003,23 @@ input#editorTitle {
 #nodeSearchInput {
   border-radius: 3px;
 }
+#nodeSearchInputWrapper::after {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  color: var(--text-color);
+  top: -3px;
+  font-size: 0.8rem;
+  right: 27px;
+  opacity: 0.4;
+  content: attr(title);
+}
 #nodeSearchInput:not(:focus) + #nodeSearchClear:not(:active){
   visibility: hidden;
 }
 .menu:hover .dropdown {
   max-height: var(--menu-dropdown-max-height);
+  overflow-y: auto;
 }
 
 input:focus + span + .dropdown {
@@ -1295,12 +1307,11 @@ input:focus + span + .dropdown {
   }
 
   .menu:hover .dropdown.shrink-when-narrow {
-    max-height: 45vh !important;
+    max-height: calc(var(--menu-dropdown-max-height) - 100px);
   }
 
-  .menu,
-  .app-search {
-    opacity: 0.85;
+  .menu {
+    /* opacity: 0.85; */
   }
 
   #linkHelperMenuFilter {

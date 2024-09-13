@@ -1,4 +1,7 @@
 import { data } from './data';
+// const uFuzzy = require('@leeoniya/ufuzzy');
+const opts = {intraMode: 1};
+const uf = new uFuzzy(opts);
 
 export const UI = function(app) {
   const self = this;
@@ -216,58 +219,45 @@ export const UI = function(app) {
     });
   };
 
-  this.nodeSearchMatches = function(node, search, matchAll = false) {
-    var title = matchAll || $('.search-title input').is(':checked');
-    var body = matchAll || $('.search-body input').is(':checked');
-    var tags = matchAll || $('.search-tags input').is(':checked');
-
-    if (search.length === 0 || (!title && !body && !tags)) {
-      return {
-        matchTitle: false,
-        matchBody: false,
-        matchTags: false,
-        clearSearch: true,
-      };
-    } else {
-      var matchTitle =
-        title &&
-        node
-          .title()
-          .toLowerCase()
-          .indexOf(search) >= 0;
-      var matchBody =
-        body &&
-        node
-          .body()
-          .toLowerCase()
-          .indexOf(search) >= 0;
-      var matchTags =
-        tags &&
-        node
-          .tags()
-          .toLowerCase()
-          .indexOf(search) >= 0;
-      return { matchTitle, matchBody, matchTags, clearSearch: false };
-    }
-  };
-
   this.findMatchingNodes = function(searchText) {
-    const found = {
-      matchTitle: [],
-      matchBody: [],
-      matchTags: [],
-      foundNodes: false,
-    };
-    [...app.nodes()].reverse().forEach(node => {
-      const { matchTitle, matchBody, matchTags } = app.ui.nodeSearchMatches(
-        node,
-        searchText,
-        true
-      );
-      if (matchTitle) found.matchTitle.push(node);
-      if (matchBody) found.matchBody.push(node);
-      if (matchTags) found.matchTags.push(node);
+    const title = $('.search-title input').is(':checked');
+    const body = $('.search-body input').is(':checked');
+    const tags = $('.search-tags input').is(':checked');
+
+    const searchNodesReversed = [...app.nodes()].reverse();
+    if(searchText.length === 0 || (!title && !body && !tags)) return searchNodesReversed;
+    const searchNodeTitles = [];
+    const searchNodeBody = [];
+    const searchNodeTags = [];
+    searchNodesReversed.map(node=> {
+      if (title) searchNodeTitles.push(node.title())
+      if (body) searchNodeBody.push(node.body())
+      if (tags) searchNodeTags.push(node.tags())
     });
+    
+    const matchTitle = uf.filter(searchNodeTitles, searchText);
+    // todo markup hints
+    // const titleInfo = uf.info(matchTitle, searchNodeTitles, searchText);
+    // const titleOrder = uf.sort(titleInfo, searchNodeTitles, searchText);
+    // let innerHTML = '';//should be array
+    // for (let i = 0; i < titleOrder.length; i++) {
+    //   let infoIdx = titleOrder[i];
+    //   innerHTML += uFuzzy.highlight(
+    //     searchNodeTitles[titleInfo.idx[infoIdx]],
+    //     titleInfo.ranges[infoIdx],
+    //   ) + '<br>';
+    // }
+    // console.log({matchTitle, titleInfo, titleOrder, innerHTML})
+    const matchBody = uf.filter(searchNodeBody, searchText);
+    const matchTags = uf.filter(searchNodeTags, searchText);
+    const found = {
+      matchTitle: matchTitle.map(idx => searchNodesReversed[idx]),
+      matchBody: matchBody.map(idx => searchNodesReversed[idx]),
+      matchTags: matchTags.map(idx => searchNodesReversed[idx]),
+      foundNodes: false,
+      clearSearch: searchText.length === 0 || (!title && !body && !tags)
+    };
+    
     found.foundNodes =
       found.matchTitle.length > 0 ||
       found.matchBody.length > 0 ||
@@ -326,6 +316,10 @@ export const UI = function(app) {
 
     // If there's no search query or nothing is found, simply return all nodes
     if (!searchText) {
+      if(action !== 'link') {
+        document.getElementById('nodeSearchInputWrapper').style.borderLeft = '';
+        document.getElementById('nodeSearchInputWrapper').title = `total: ${app.nodes().length}`;
+      }
       listAllNodes();
       return;
     }
@@ -342,6 +336,12 @@ export const UI = function(app) {
       found.matchBody.forEach(node => {
         this.createSearchMenuLine(node, action, rootMenu, 'body');
       });
+      if(action !== 'link') {
+        document.getElementById('nodeSearchInputWrapper').style.borderLeft = found.foundNodes ? '1px solid red' : '';
+        const foundInfo = `${found.matchTitle.length > 0 ? `title:${found.matchTitle.length}`: ''}${found.matchBody.length > 0 ? ` body:${found.matchBody.length}`: ''}${found.matchTags.length > 0 ? ` tags:${found.matchTags.length}` : ''}`;
+        document.getElementById('nodeSearchInputWrapper').title = foundInfo;// todo move out
+      }
+
     }
   };
 

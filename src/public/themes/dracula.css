@@ -23,7 +23,9 @@
 .node .body::-webkit-scrollbar {
   display: none;
 }
-
+:root {
+  --text-color: #fdffab;
+}
 /*-- Menu ------------------------------------------------------------------ */
 .app-menu {
   position: absolute;
@@ -64,7 +66,6 @@
   opacity: 0.9;
   background-color: #343746;
 }
-
 .menu .dropdown .search-field{
   color: #f8f8f2;
   background: #282a36;

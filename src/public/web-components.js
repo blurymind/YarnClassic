@@ -276,13 +276,6 @@ class ResourcesComponent extends HTMLElement {
       #selected-resource-preview:hover {
         flex: 8;
       }
-      .preview-font {
-        width: 500px;
-        height: 300px;
-        color: var(--font-color);
-        align-content: center;
-        text-align-last: start;
-      }
       .preview-image {
         position: relative;
         width: fit-content;
@@ -310,9 +303,6 @@ class ResourcesComponent extends HTMLElement {
         object-fit: contain;
         border: 0;
       }
-      .video-view {
-        pointer-events: auto;
-      }
       .preview-image:hover .image-view {
         max-width: 100%;
         object-fit: fill;
@@ -322,6 +312,23 @@ class ResourcesComponent extends HTMLElement {
           max-width: 100%;
           object-fit: fill;
         }
+        .preview-image:hover .video-view {
+          max-width: 100%;
+          object-fit: contain;
+        }
+      }
+      .preview-font {
+        width: 500px;
+        height: 290px;
+        overflow: auto;
+        color: var(--font-color);
+        align-content: center;
+        text-align-last: start;
+      }
+      .video-view {
+        pointer-events: auto;
+        object-fit: contain;
+        object-fit: contain;
       }
       .preview-image:hover::after {
         position: absolute;
