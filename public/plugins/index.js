@@ -249,6 +249,9 @@ export var Plugins = function (app) {
       });
     });
   }
+  const getVolatileResourcesList = () => dbStorage.getDbValue(`volatileResources`);
+  const getVloatileResource = (name = '') => dbStorage.getDbValue(`volatileResources-${name || this.selectedResourcesJson}`);
+
 
   const isGistTokenInvalid = () => {
     return app.data.storage.getIsTokenInvalid();
@@ -362,7 +365,13 @@ export var Plugins = function (app) {
     const body = func.toString().slice(entire.indexOf("{") + 1, entire.lastIndexOf("}"));
     return body;
   }
+  const getVolatileResources = () => { ///todo
+
+  }
   const getPreviewHtml = (data, otherFiles, yarnData = {}) => {
+
+    // todo get volatile resources 
+
     // includes: ['some-other-file.js'] - with moduleName (can be used to create an instance) or no moduleName (just dump script body)
     const localModules = (data.modules || []).filter(item => !item.includes('/') && item in otherFiles && otherFiles[item].content).map(item => {
       try {
@@ -398,6 +407,7 @@ export var Plugins = function (app) {
     <body>
       <script id="yarnDataJson">
         const yarnData = ${yarnData};
+        const y = {yarnData: ${yarnData}};
       </script>
       ${data.html || data.body || ''}
       ${getStoryParserModuleCode(data.parser)}
@@ -525,6 +535,8 @@ export var Plugins = function (app) {
     isGistTokenInvalid,
     urlParams,
     updateUrlParams,
+    getVolatileResourcesList,
+    getVloatileResource,
     getGistPluginsFileUrl,
     getGistPluginsId,
     pluginModeUrl,
@@ -534,7 +546,7 @@ export var Plugins = function (app) {
     getExtensionScriptData,
     getPreviewHtml,
     getGistFileUrl,
-    getSelectedResourceUrl
+    getSelectedResourceUrl,
   };
 
   // built in plugin initiation

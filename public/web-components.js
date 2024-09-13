@@ -520,18 +520,23 @@ class ResourcesComponent extends HTMLElement {
     this.isPointerDown = false;
     this.onPointerUp = () => {
       this.isPointerDown = false;
+      this.updateSelected();
     }
     this.onPointerEnter = (evt) => {
       if(evt.target.className !== 'select-option' || !this.isPointerDown) return;
-      this.onSelectResource(evt);
+      toggleItemSelected(evt.target);
+    }
+    const toggleItemSelected = item => {
+      item.hasAttribute('data-selected') ? item.removeAttribute('data-selected') : item.setAttribute('data-selected', true);
     }
     this.onSelectOneResource  = evt => {
       this.isPointerDown = true;
       shadowRoot.getElementById('resources-editor-select').focus();
       if(evt.target.className !== 'select-option') return;
-      console.log(this.isControlDown)
+      console.log('is control down --> ',this.isControlDown)
       if(!this.isControlDown) shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => item.removeAttribute('data-selected'));
-      evt.target.setAttribute('data-selected', true)
+      // evt.target.setAttribute('data-selected', true)
+      toggleItemSelected(evt.target);
       this.updateSelected();
     }
     this.selectAndScrollIntoView = el => {
@@ -548,7 +553,6 @@ class ResourcesComponent extends HTMLElement {
         shadowRoot.getElementById('resources-editor-select').focus();
       }, 300) 
     }
-    this.isControlDown = false;
     this.onKeyDown = evt => {
       evt.preventDefault();
       evt.stopPropagation()
@@ -585,10 +589,6 @@ class ResourcesComponent extends HTMLElement {
         this.onSelectAll();
       }
     }
-    this.onSelectResource = evt => {
-      evt.target.toggleAttribute('data-selected');
-      this.updateSelected();
-    };
     this.onSelectAll = () => {
       const hasSelected = !!shadowRoot.getElementById('resources-editor-select').querySelector('[data-selected]');
       shadowRoot.getElementById('resources-editor-select').childNodes.forEach(item => hasSelected ? item.removeAttribute('data-selected') : item.setAttribute('data-selected', true))
@@ -601,7 +601,7 @@ class ResourcesComponent extends HTMLElement {
       console.log({fakeSelect, allSelected, specificFileId})
       this.isBusy('Removing files...');
       const fileData = JSON.parse(this.resourcesFileContent);
-      if(specificFileId && !(specificFileId instanceof PointerEvent)) {
+      if(specificFileId && typeof specificFileId === 'string') {
         console.log({allSelected, specificFileId})
         this.selectAfterUpdate = Object.values(allSelected).filter(item => item.id !== specificFileId);
         delete fileData[specificFileId];
@@ -726,10 +726,9 @@ class ResourcesComponent extends HTMLElement {
     shadowRoot
       .getElementById('resources-editor-select')
       .addEventListener('pointerup',this.onPointerUp);
-    shadowRoot
-      .getElementById('resources-editor-select').addEventListener('keydown', this.onKeyDown);
-    shadowRoot
-      .getElementById('resources-editor-select').addEventListener('keyup', this.onKeyUp);
+    this.isControlDown = false;
+    shadowRoot.addEventListener('keydown', this.onKeyDown);
+    shadowRoot.addEventListener('keyup', this.onKeyUp);
     shadowRoot
       .getElementById('onRemoveButton')
       .removeEventListener('click', this.onRemoveResource);

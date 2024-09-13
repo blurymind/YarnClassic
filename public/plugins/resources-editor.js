@@ -8,7 +8,8 @@ export var ResourcesEditor = function({
   getGistFileUrl,
   getSelectedResourceUrl,
   updateUrlParams,
-  
+  getVolatileResourcesList,
+  getVloatileResource
 }) {
   const self = this;
   this.name = 'ResourcesEditor';
@@ -16,12 +17,10 @@ export var ResourcesEditor = function({
   this.resourcesFileUrl = '';// todo this should be written in the file itself instead. It doesnt persist between reloads atm
   this.resourcesFileContent = '';
   const dbStorage = app.data.db;
-  this.getVloatileResource = (name = '') => dbStorage.getDbValue(`volatileResources-${name || this.selectedResourcesJson}`);
   this.setVolatileResource = (value, name = '') => dbStorage.save(`volatileResources-${name || this.selectedResourcesJson}`, value);
   this.deleteVolatileResource = (name = '') => dbStorage.save(`volatileResources-${name || this.selectedResourcesJson}`, undefined);
-  this.getVolatileResourcesList = () => dbStorage.getDbValue(`volatileResources`);
   this.setVolatileResourcesList = (key, add = true) => {
-    return this.getVolatileResourcesList().then(data => {
+    return getVolatileResourcesList().then(data => {
         if(!data) data = new Set([]);
         if(add) {
           data.add(key)
@@ -74,12 +73,12 @@ export var ResourcesEditor = function({
   }
   // resource in local or at gist
   this.initResourcesFile = (createVolatile = false) => {
+    console.log({INITWITH: this.selectedResourcesJson})
+    this.selectedResourcesJson = 'resources.res.json';//todo use url param, also needs to update list here - it doesnt
     return new Promise((resolve, reject) => {
       const getOrCreateVolatile = () => {
-        return this.getVloatileResource().then(volatile => {
-          if(volatile && volatile.content) {
-            console.log({volatile})
-            this.onUpdateResourcesList();
+        return getVloatileResource().then(volatile => {
+          if(volatile && volatile.content) {    
             resolve(volatile);
             return
           }
@@ -92,16 +91,17 @@ export var ResourcesEditor = function({
             resolve(newFile);
             return
           }
+          this.onUpdateResourcesList();
           return this.createOrEditGistFile(resolve, reject);
         })
       }
-      this.getVolatileResourcesList().then(volatileResourcesList => {
-        console.log({volatileResourcesList})
+      getVolatileResourcesList().then(volatileResourcesList => {
         if(!volatileResourcesList) {
           this.setVolatileResourcesList(this.selectedResourcesJson).then(()=> {
             return getOrCreateVolatile()
           })
         }
+        // this.onUpdateResourcesList();
         return getOrCreateVolatile();
       })
     });
@@ -125,7 +125,7 @@ export var ResourcesEditor = function({
         });
         this.resourcesFileUrl = file.raw_url;
         document.querySelector('resources-component').setIsNew(false);
-        document.querySelector('resources-component').updateRawUrl(file.raw_url);
+        document.querySelector('resources-component').setFileContent(file);
       } else {
         ToastWc.show({
           type: 'error',
@@ -140,19 +140,44 @@ export var ResourcesEditor = function({
 
   this.onGetFromGist = () => {
     // todo make this less hideous
-    this.getVolatileResourcesList().then(volatileResourcesList => {
-      app.data.storage.getGistFiles().then(({ filesInGist }) => {
+    getVolatileResourcesList().then(volatileResourcesList => {
+      this.isBusy('☁️ Requesting new resource files in gist');
+      app.data.storage.getGistFiles(error => {
+        ToastWc.show({
+          type: 'error',
+          content: error,
+          time: 3000,
+        });
+        this.isBusy('');
+      }).then(({ filesInGist }) => {
+        this.isBusy('☁️ Looking for new resource files in gist');
+        
         // try to detect json resource map files in the gist
         const filesFromGist = [];
         const promises = [];
         Object.values(filesInGist).forEach(
           item => {
-            if(item.filename.endsWith('.res.json') && !volatileResourcesList.has(item.filename)) {
+            if(item.filename === this.selectedResourcesJson){
+              console.log('Skip --', item.filename)
+               return;
+            }
+            if(item.filename.endsWith('.res.json') && (!volatileResourcesList.has(item.filename) || !volatileResourcesList[item.filename])) {
               filesFromGist.push(item);
+              this.isBusy(`☁️ Found ${item.filename}.. Trying to load it..`);
               promises.push(app.data.storage.getContentOrRaw(item.content, item.raw_url, console.error));
             }
           }
         );
+        console.log({filesInGist, promises, filesFromGist})
+        if(promises.length === 0) {
+          ToastWc.show({
+            type: 'info',
+            content: 'No new resources found.',
+            time: 3000,
+          });
+          this.isBusy('')
+          return;
+        }
         Promise.all(promises).then((files) => {
           files.forEach((content, index) => {
             const file = {...filesFromGist[index], content}
@@ -162,13 +187,14 @@ export var ResourcesEditor = function({
             this.setVolatileResource(file, newFileName).then(() => {
               if(index === files.length -1) {
                 this.setVolatileResourcesList(newFileName).then(()=> {
-                  this.onUpdateResourcesList(newFileName);
+                  this.onUpdateResourcesList();
                   this.onSetEditingFile(newFileName);
                   ToastWc.show({
                     type: 'success',
                     content: `Added ${files.length} files..\n${filesFromGist.map(item=>item.filename).join('\n')}`,
                     time: 3000,
                   });
+                  this.isBusy('')
                 })
               }
             })
@@ -178,18 +204,19 @@ export var ResourcesEditor = function({
     })
   }
   this.onUpdateResourcesList = () => {
-    this.getVolatileResourcesList().then(resourcesList => {
+    getVolatileResourcesList().then(resourcesList => {
+      console.log({resourcesList})
       document.getElementById("edited-resources").innerHTML = Array.from(resourcesList).map(key => `<option value="${key}">${key}</option>`).join('')
     })
   }
   this.onSetEditingFile = (newFileName = '') => {
     const fileName = newFileName || document.getElementById('edited-resources').value;
     this.selectedResourcesJson = fileName;
-    this.getVloatileResource(fileName).then(file => {
+    getVloatileResource(fileName).then(file => {
       console.log('Set', {fileName, file})
       document.querySelector('resources-component').updateResourcesList(file.content);
       document.getElementById("edited-resources").value = this.selectedResourcesJson;
-      document.querySelector('resources-component').updateRawUrl(file.raw_url);
+      document.querySelector('resources-component').setFileContent(file);
     });
   }
   this.onAddNewFile = () => {
@@ -198,7 +225,7 @@ export var ResourcesEditor = function({
     if (newFileName) {
       newFileName = newFileName.replace(/\s+/g, '').replace(/\//g, '').trim();
       newFileName = newFileName.endsWith('.res.json') ? newFileName : `${newFileName}.res.json`;
-      this.getVolatileResourcesList().then(volatileResources => {
+      getVolatileResourcesList().then(volatileResources => {
         if (volatileResources.has(newFileName)) {
           alert(`${newFileName} already exists.\nPlease choose another name..`)
           return;
@@ -206,7 +233,7 @@ export var ResourcesEditor = function({
         const newFileData = { content: this.getNewresourceFileContent(), filename: newFileName }
         this.setVolatileResource(newFileData, newFileName).then(() => {
           this.setVolatileResourcesList(newFileName).then(()=> {
-            this.onUpdateResourcesList(newFileName);
+            this.onUpdateResourcesList();
             this.onSetEditingFile(newFileName);
           })
         })
@@ -221,7 +248,7 @@ export var ResourcesEditor = function({
     }
     const willDelete = confirm(`Are you sure you want to delete this resources file:\n${fileName}?`)
     if (willDelete) {
-      this.getVolatileResourcesList().then(oldList =>{
+      getVolatileResourcesList().then(oldList =>{
         const resourcesList = Array.from(oldList);
         let nextFileIndex = resourcesList.indexOf(fileName) - 1;
         if(nextFileIndex < 0) nextFileIndex = 0;
@@ -260,7 +287,7 @@ export var ResourcesEditor = function({
                 <div class="button-group-rounded" id="add-remove-resource-file" style="flex-wrap:nowrap">
                   <button id="add-resource-file" onclick="${domPath}.onAddNewFile()" title="Add">+</button>
                   <button id="remove-resource-file" onclick="${domPath}.onRemoveSelectedFile()" title="remove">─</button>
-                  <button id="remove-resource-file" onclick="${domPath}.onGetFromGist()" title="search for new in gist"> ⟳ </button>
+                  <button id="remove-resource-file" onclick="${domPath}.onGetFromGist()" title="find new *.res.json files in gist"> ⟳ </button>
                 </div>
               </span>
             </div>
@@ -313,10 +340,11 @@ export var ResourcesEditor = function({
             })
            }
            if(action === 'push'){
-            this.getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
+            getVloatileResource().then(result=> this.onCommitResourceFiles(result.content))
            }
         });
         this.initResourcesComponent = (file) => {
+          console.log('INIT RES', {file})
           updateUrlParams('selectedResource', 'none');
           document.querySelector('resources-component').init({
             file,
