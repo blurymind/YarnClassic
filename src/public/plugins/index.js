@@ -1,7 +1,78 @@
 import { Runner } from './runner';
 import { PluginEditor } from './plugin-editor';
 import { ResourcesEditor } from './resources-editor';
+export const EXAMPLE = `
+() => {
+  return {
+      // use the modules option to import modules from addresses or from the plugins gist
+    modules: [
+      // if a module is a web address, it can be included this way
+      "https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js",
+      // this is how you can include the contents of other files from the list
+      //'kaplay-dist.js', // <-- copy of kaplay.js can also be  stored in the gist and imported like so
+      // you can host a module on the same gist
+    ],
+    // if passed, inkjs or bondagejs will be included in the output - can be ink or yarn
+    parser: 'ink',
+    // Use the script option to write your code that uses any imported modules
+    script: () => {
+      // since we imported kaplayjs in the modules option, we can now use it like this to render to the Test tab
+      const k = kaplay();
+      k.loadSprite("bean", "public/icon.png")
+      k.scene("main", () => {
+        k.add([
+          k.pos(200, 100),
+          k.sprite("bean"),
+        ]);
+        k.add([
+          k.text("ohhimark fdfg"),
+        ])
 
+      });
+      k.go("main");
+      // inkjs becomes available because we used parser: 'ink' option
+    }
+  }
+}
+`
+export const INTERNAL_EXAMPLE = `
+() => {
+  return {
+    name: 'ExamplePlugin',
+    Constructor: function( {
+      app,
+      createButton,
+      createToggle,
+      getPluginStore,
+      setPluginStore,
+      addSettingsItem,
+      onYarnLoadedData,
+      onYarnEditorOpen,
+      onYarnInPreviewMode,
+      onYarnSavedNode,
+      onYarnSetLanguage,
+      onYarnLoadedStateFromLocalStorage,
+      onYarnSavedStateToLocalStorage,
+      onYarnSetDocumentType,
+      onKeyUp,
+      onKeyDown,
+      onLoad,
+    }) {
+      const self = this;
+      this.name = 'ExamplePlugin';
+      this.onOpenPluginEditor = ()=> {
+        alert("YAY!")
+      }
+      createButton(self.name, {
+        name: 'ExamplePlugin',
+        attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
+        onClick: 'onOpenPluginEditor()',
+        iconName: 'cog',
+      });
+    }
+  }
+}
+`
 const PLUGINS = [Runner, PluginEditor, ResourcesEditor];
 
 const PublicLibs = {}
@@ -230,7 +301,7 @@ export var Plugins = function (app) {
   };
 
   const dbStorage = app.data.db;
-  const getVloatilePlugins = () => dbStorage.getDbValue('volatilePlugins');
+  const getVloatilePlugins = () => dbStorage.getDbValue('volatilePlugins', { ['example.js']: {content: EXAMPLE}});
   const setVloatilePlugins = value => dbStorage.save('volatilePlugins', value);
   const setVloatilePlugin = (key, value) => {
     return getVloatilePlugins().then(prev => {
@@ -337,7 +408,7 @@ export var Plugins = function (app) {
   const getExtensionScriptData = (fileContents) => {
     try {
       const extension = new Function("parameters", `return ${fileContents}`);//();
-      //console.log({isFunction: typeof extension === 'function', fileContents})
+      //console.log({isFunction: typeof extension === 'function', fileContents})   
       if (typeof extension === 'function') {
         const data = extension();
         if (data) {

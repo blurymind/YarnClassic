@@ -1,5 +1,6 @@
 import AceDiff from './ace-diff/ace-diff.min.js';
 import 'ace-builds/webpack-resolver'; // needed for the webworker to work  (syntax highlighting)
+import { EXAMPLE, INTERNAL_EXAMPLE } from './';
 
 const addEsVersionToEditor = editor => {
   editor.session.$worker.send("setOptions", [{
@@ -21,70 +22,6 @@ const removeStyleSheet = (path, root = document) => {
   if (el) root.getElementById(path).remove()
 }
 
-const EXAMPLE = `
-() => {
-  return {
-    modules: [
-      // if a module is a web address, it can be included this way
-      "https://unpkg.com/kaplay@3001.0.0-alpha.21/dist/kaplay.js",
-      // you can host a module on the same gist
-      // "test-local-module.js",
-    ],
-    script: () => {
-      const k = kaplay();
-      k.loadSprite("bean", "public/icon.png")
-      k.scene("main", () => {
-        k.add([
-          k.pos(200, 100),
-          k.sprite("bean"),
-        ]);
-        k.add([
-          k.text("yarr"),
-        ])
-      });
-      k.go("main");
-    }
-  }
-}
-`
-const INTERNAL_EXAMPLE = `
-() => {
-  return {
-    name: 'ExamplePlugin',
-    Constructor: function( {
-      app,
-      createButton,
-      createToggle,
-      getPluginStore,
-      setPluginStore,
-      addSettingsItem,
-      onYarnLoadedData,
-      onYarnEditorOpen,
-      onYarnInPreviewMode,
-      onYarnSavedNode,
-      onYarnSetLanguage,
-      onYarnLoadedStateFromLocalStorage,
-      onYarnSavedStateToLocalStorage,
-      onYarnSetDocumentType,
-      onKeyUp,
-      onKeyDown,
-      onLoad,
-    }) {
-      const self = this;
-      this.name = 'ExamplePlugin';
-      this.onOpenPluginEditor = ()=> {
-        alert("YAY!")
-      }
-      createButton(self.name, {
-        name: 'ExamplePlugin',
-        attachTo: app.settings.developmentModeEnabled() ? 'appHeader': 'fileMenuDropdown',
-        onClick: 'onOpenPluginEditor()',
-        iconName: 'cog',
-      });
-    }
-  }
-}
-`
 
 const getExampleOutputFunction = (error = "") => `
 <head>

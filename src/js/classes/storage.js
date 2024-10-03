@@ -15,10 +15,12 @@ export const DBStorage = function(
       store.put({ key, value });
       return tx.complete;
     },
-    load: async function(valueKey) {
+    load: async function(valueKey, fallBackValue) {
       const tx = this.db.transaction(this.objectStoreName, 'readonly');
       const store = tx.objectStore(this.objectStoreName);
+      
       const data = await store.get(valueKey);
+      if(!data || data.value == null) return fallBackValue;
       return data && data.value;
     },
     openDatabase: function() {
@@ -28,10 +30,10 @@ export const DBStorage = function(
         },
       });
     },
-    getDbValue: function(key = this.dbName) {
+    getDbValue: function(key = this.dbName, fallBackValue) {
       return this.openDatabase().then(_db => {
         this.db = _db;
-        return this.load(key);
+        return this.load(key, fallBackValue);
       });
     },
   };
