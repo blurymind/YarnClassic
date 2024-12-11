@@ -7,9 +7,18 @@
 }
 /* --- ROOT CSS --- */
 body {
-  overflow: hidden;
   -webkit-user-select: none;
   line-height: 1.6em;
+}
+
+html, body {
+  overflow:hidden;
+  /* fix for ipad touch interactions breaking pannning */
+  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: contain;
+  -webkit-text-size-adjust: none;
+	touch-action: pan-y;
 }
 
 h1,
